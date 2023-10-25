@@ -858,6 +858,222 @@
         }
       }
     },
+    "lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol": {
+      "lastModificationDate": 1698213384680,
+      "contentHash": "b091cae7bc6a906ec5956ad0dcd55ae0",
+      "sourceName": "lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol"
+      ],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "IERC1155": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "IERC1155.sol/IERC1155.json"
+        }
+      }
+    },
+    "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol": {
+      "lastModificationDate": 1698213363276,
+      "contentHash": "5df8fdb527e563085847cad29e3c5f2e",
+      "sourceName": "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol"
+      ],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "IERC721": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "IERC721.sol/IERC721.json"
+        }
+      }
+    },
+    "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol": {
+      "lastModificationDate": 1698213363280,
+      "contentHash": "de0163561b417b800d01749cbbe2147e",
+      "sourceName": "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "IERC165": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "IERC165.sol/IERC165.json"
+        }
+      }
+    },
+    "lib/web3/contracts/stats/IStatBlock.sol": {
+      "lastModificationDate": 1698215185861,
+      "contentHash": "08494331b3c241c787dff573f50876cb",
+      "sourceName": "lib/web3/contracts/stats/IStatBlock.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "IStatBlock": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "IStatBlock.sol/IStatBlock.json"
+        }
+      }
+    },
+    "lib/web3/contracts/stats/StatBlock.sol": {
+      "lastModificationDate": 1698215214700,
+      "contentHash": "fbc01256d7224cc3b1fd29832c3558fd",
+      "sourceName": "lib/web3/contracts/stats/StatBlock.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol",
+        "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
+        "lib/web3/contracts/stats/IStatBlock.sol"
+      ],
+      "versionRequirement": "^0.8.0",
+      "artifacts": {
+        "StatBlock": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "StatBlock.sol/StatBlock.json"
+        },
+        "StatBlockBase": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "StatBlock.sol/StatBlockBase.json"
+        }
+      }
+    },
     "script/Counter.s.sol": {
       "lastModificationDate": 1698210519065,
       "contentHash": "7539680fbd3ad49c6632713cc2bb6bf6",
@@ -956,9 +1172,57 @@
       }
     },
     "src/LightningAndSmoke.sol": {
-      "lastModificationDate": 1698212932280,
-      "contentHash": "5423987c185426c1b9369f85b4f1143e",
+      "lastModificationDate": 1698218883254,
+      "contentHash": "69d3078e248616b0ac96b5a9e40235d5",
       "sourceName": "src/LightningAndSmoke.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol",
+        "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
+        "lib/web3/contracts/stats/IStatBlock.sol",
+        "lib/web3/contracts/stats/StatBlock.sol",
+        "src/data.sol"
+      ],
+      "versionRequirement": "^0.8.19",
+      "artifacts": {
+        "LightningAndSmoke": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "LightningAndSmoke.sol/LightningAndSmoke.json"
+        }
+      }
+    },
+    "src/data.sol": {
+      "lastModificationDate": 1698217938689,
+      "contentHash": "5329a6eb0b183ea5e5a02b58525f8ed4",
+      "sourceName": "src/data.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -991,8 +1255,8 @@
       "imports": [],
       "versionRequirement": "^0.8.19",
       "artifacts": {
-        "LightningAndSmoke": {
-          "0.8.21+commit.d9974bed.Linux.gcc": "LightningAndSmoke.sol/LightningAndSmoke.json"
+        "data": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "data.sol/data.json"
         }
       }
     },

@@ -49,10 +49,10 @@ Functionality:
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract LightningAndSmoke is StatBlockBase {
-    uint256 public FeeTokenAddress;
+    address public FeeTokenAddress;
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
-    uint256 public TreasuryAddress;
+    address public TreasuryAddress;
 
     uint256 public NumSessions;
 

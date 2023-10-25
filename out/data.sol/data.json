@@ -1,0 +1,969 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x",
+    "linkReferences": {}
+  },
+  "ast": {
+    "absolutePath": "src/data.sol",
+    "id": 1007,
+    "exportedSymbols": {
+      "HorizontalLocation": [
+        951
+      ],
+      "Pitch": [
+        963
+      ],
+      "PitchType": [
+        934
+      ],
+      "PlayerType": [
+        929
+      ],
+      "Session": [
+        1006
+      ],
+      "Swing": [
+        975
+      ],
+      "SwingType": [
+        939
+      ],
+      "VerticalLocation": [
+        945
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "40:1878:6",
+    "nodes": [
+      {
+        "id": 926,
+        "nodeType": "PragmaDirective",
+        "src": "40:24:6",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".19"
+        ]
+      },
+      {
+        "id": 929,
+        "nodeType": "EnumDefinition",
+        "src": "228:43:6",
+        "nodes": [],
+        "canonicalName": "PlayerType",
+        "members": [
+          {
+            "id": 927,
+            "name": "Pitcher",
+            "nameLocation": "250:7:6",
+            "nodeType": "EnumValue",
+            "src": "250:7:6"
+          },
+          {
+            "id": 928,
+            "name": "Batter",
+            "nameLocation": "263:6:6",
+            "nodeType": "EnumValue",
+            "src": "263:6:6"
+          }
+        ],
+        "name": "PlayerType",
+        "nameLocation": "233:10:6"
+      },
+      {
+        "id": 934,
+        "nodeType": "EnumDefinition",
+        "src": "356:77:6",
+        "nodes": [],
+        "canonicalName": "PitchType",
+        "members": [
+          {
+            "id": 930,
+            "name": "Fastball",
+            "nameLocation": "377:8:6",
+            "nodeType": "EnumValue",
+            "src": "377:8:6"
+          },
+          {
+            "id": 931,
+            "name": "Curveball",
+            "nameLocation": "391:9:6",
+            "nodeType": "EnumValue",
+            "src": "391:9:6"
+          },
+          {
+            "id": 932,
+            "name": "Changeup",
+            "nameLocation": "406:8:6",
+            "nodeType": "EnumValue",
+            "src": "406:8:6"
+          },
+          {
+            "id": 933,
+            "name": "Knuckleball",
+            "nameLocation": "420:11:6",
+            "nodeType": "EnumValue",
+            "src": "420:11:6"
+          }
+        ],
+        "name": "PitchType",
+        "nameLocation": "361:9:6"
+      },
+      {
+        "id": 939,
+        "nodeType": "EnumDefinition",
+        "src": "525:61:6",
+        "nodes": [],
+        "canonicalName": "SwingType",
+        "members": [
+          {
+            "id": 935,
+            "name": "Contact",
+            "nameLocation": "546:7:6",
+            "nodeType": "EnumValue",
+            "src": "546:7:6"
+          },
+          {
+            "id": 936,
+            "name": "Power",
+            "nameLocation": "559:5:6",
+            "nodeType": "EnumValue",
+            "src": "559:5:6"
+          },
+          {
+            "id": 937,
+            "name": "Bunt",
+            "nameLocation": "570:4:6",
+            "nodeType": "EnumValue",
+            "src": "570:4:6"
+          },
+          {
+            "id": 938,
+            "name": "Soft",
+            "nameLocation": "580:4:6",
+            "nodeType": "EnumValue",
+            "src": "580:4:6"
+          }
+        ],
+        "name": "SwingType",
+        "nameLocation": "530:9:6"
+      },
+      {
+        "id": 945,
+        "nodeType": "EnumDefinition",
+        "src": "721:94:6",
+        "nodes": [],
+        "canonicalName": "VerticalLocation",
+        "members": [
+          {
+            "id": 940,
+            "name": "HighBall",
+            "nameLocation": "749:8:6",
+            "nodeType": "EnumValue",
+            "src": "749:8:6"
+          },
+          {
+            "id": 941,
+            "name": "HighStrike",
+            "nameLocation": "763:10:6",
+            "nodeType": "EnumValue",
+            "src": "763:10:6"
+          },
+          {
+            "id": 942,
+            "name": "Middle",
+            "nameLocation": "779:6:6",
+            "nodeType": "EnumValue",
+            "src": "779:6:6"
+          },
+          {
+            "id": 943,
+            "name": "LowStrike",
+            "nameLocation": "791:9:6",
+            "nodeType": "EnumValue",
+            "src": "791:9:6"
+          },
+          {
+            "id": 944,
+            "name": "LowBall",
+            "nameLocation": "806:7:6",
+            "nodeType": "EnumValue",
+            "src": "806:7:6"
+          }
+        ],
+        "name": "VerticalLocation",
+        "nameLocation": "726:16:6"
+      },
+      {
+        "id": 951,
+        "nodeType": "EnumDefinition",
+        "src": "953:108:6",
+        "nodes": [],
+        "canonicalName": "HorizontalLocation",
+        "members": [
+          {
+            "id": 946,
+            "name": "InsideBall",
+            "nameLocation": "983:10:6",
+            "nodeType": "EnumValue",
+            "src": "983:10:6"
+          },
+          {
+            "id": 947,
+            "name": "InsideStrike",
+            "nameLocation": "999:12:6",
+            "nodeType": "EnumValue",
+            "src": "999:12:6"
+          },
+          {
+            "id": 948,
+            "name": "Middle",
+            "nameLocation": "1017:6:6",
+            "nodeType": "EnumValue",
+            "src": "1017:6:6"
+          },
+          {
+            "id": 949,
+            "name": "OutsideStrike",
+            "nameLocation": "1029:13:6",
+            "nodeType": "EnumValue",
+            "src": "1029:13:6"
+          },
+          {
+            "id": 950,
+            "name": "OutsideBall",
+            "nameLocation": "1048:11:6",
+            "nodeType": "EnumValue",
+            "src": "1048:11:6"
+          }
+        ],
+        "name": "HorizontalLocation",
+        "nameLocation": "958:18:6"
+      },
+      {
+        "id": 963,
+        "nodeType": "StructDefinition",
+        "src": "1139:121:6",
+        "nodes": [],
+        "canonicalName": "Pitch",
+        "members": [
+          {
+            "constant": false,
+            "id": 953,
+            "mutability": "mutable",
+            "name": "nonce",
+            "nameLocation": "1166:5:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 963,
+            "src": "1158:13:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 952,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1158:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 956,
+            "mutability": "mutable",
+            "name": "kind",
+            "nameLocation": "1187:4:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 963,
+            "src": "1177:14:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_PitchType_$934",
+              "typeString": "enum PitchType"
+            },
+            "typeName": {
+              "id": 955,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 954,
+                "name": "PitchType",
+                "nameLocations": [
+                  "1177:9:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 934,
+                "src": "1177:9:6"
+              },
+              "referencedDeclaration": 934,
+              "src": "1177:9:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_PitchType_$934",
+                "typeString": "enum PitchType"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 959,
+            "mutability": "mutable",
+            "name": "vertical",
+            "nameLocation": "1214:8:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 963,
+            "src": "1197:25:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_VerticalLocation_$945",
+              "typeString": "enum VerticalLocation"
+            },
+            "typeName": {
+              "id": 958,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 957,
+                "name": "VerticalLocation",
+                "nameLocations": [
+                  "1197:16:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 945,
+                "src": "1197:16:6"
+              },
+              "referencedDeclaration": 945,
+              "src": "1197:16:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_VerticalLocation_$945",
+                "typeString": "enum VerticalLocation"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 962,
+            "mutability": "mutable",
+            "name": "horizontal",
+            "nameLocation": "1247:10:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 963,
+            "src": "1228:29:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_HorizontalLocation_$951",
+              "typeString": "enum HorizontalLocation"
+            },
+            "typeName": {
+              "id": 961,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 960,
+                "name": "HorizontalLocation",
+                "nameLocations": [
+                  "1228:18:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 951,
+                "src": "1228:18:6"
+              },
+              "referencedDeclaration": 951,
+              "src": "1228:18:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_HorizontalLocation_$951",
+                "typeString": "enum HorizontalLocation"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "Pitch",
+        "nameLocation": "1146:5:6",
+        "scope": 1007,
+        "visibility": "public"
+      },
+      {
+        "id": 975,
+        "nodeType": "StructDefinition",
+        "src": "1337:121:6",
+        "nodes": [],
+        "canonicalName": "Swing",
+        "members": [
+          {
+            "constant": false,
+            "id": 965,
+            "mutability": "mutable",
+            "name": "nonce",
+            "nameLocation": "1364:5:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 975,
+            "src": "1356:13:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 964,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1356:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 968,
+            "mutability": "mutable",
+            "name": "kind",
+            "nameLocation": "1385:4:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 975,
+            "src": "1375:14:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_SwingType_$939",
+              "typeString": "enum SwingType"
+            },
+            "typeName": {
+              "id": 967,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 966,
+                "name": "SwingType",
+                "nameLocations": [
+                  "1375:9:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 939,
+                "src": "1375:9:6"
+              },
+              "referencedDeclaration": 939,
+              "src": "1375:9:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_SwingType_$939",
+                "typeString": "enum SwingType"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 971,
+            "mutability": "mutable",
+            "name": "vertical",
+            "nameLocation": "1412:8:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 975,
+            "src": "1395:25:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_VerticalLocation_$945",
+              "typeString": "enum VerticalLocation"
+            },
+            "typeName": {
+              "id": 970,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 969,
+                "name": "VerticalLocation",
+                "nameLocations": [
+                  "1395:16:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 945,
+                "src": "1395:16:6"
+              },
+              "referencedDeclaration": 945,
+              "src": "1395:16:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_VerticalLocation_$945",
+                "typeString": "enum VerticalLocation"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 974,
+            "mutability": "mutable",
+            "name": "horizontal",
+            "nameLocation": "1445:10:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 975,
+            "src": "1426:29:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_enum$_HorizontalLocation_$951",
+              "typeString": "enum HorizontalLocation"
+            },
+            "typeName": {
+              "id": 973,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 972,
+                "name": "HorizontalLocation",
+                "nameLocations": [
+                  "1426:18:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 951,
+                "src": "1426:18:6"
+              },
+              "referencedDeclaration": 951,
+              "src": "1426:18:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_enum$_HorizontalLocation_$951",
+                "typeString": "enum HorizontalLocation"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "Swing",
+        "nameLocation": "1344:5:6",
+        "scope": 1007,
+        "visibility": "public"
+      },
+      {
+        "id": 1006,
+        "nodeType": "StructDefinition",
+        "src": "1529:388:6",
+        "nodes": [],
+        "canonicalName": "Session",
+        "members": [
+          {
+            "constant": false,
+            "id": 977,
+            "mutability": "mutable",
+            "name": "startBlock",
+            "nameLocation": "1558:10:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1550:18:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 976,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1550:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 979,
+            "mutability": "mutable",
+            "name": "commitmentsBlock",
+            "nameLocation": "1582:16:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1574:24:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 978,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1574:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 981,
+            "mutability": "mutable",
+            "name": "pitcherAddress",
+            "nameLocation": "1613:14:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1605:22:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 980,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1605:7:6",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 983,
+            "mutability": "mutable",
+            "name": "pitcherTokenID",
+            "nameLocation": "1641:14:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1633:22:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 982,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1633:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 985,
+            "mutability": "mutable",
+            "name": "didPitcherCommit",
+            "nameLocation": "1666:16:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1661:21:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 984,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1661:4:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 987,
+            "mutability": "mutable",
+            "name": "didPitcherReveal",
+            "nameLocation": "1693:16:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1688:21:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 986,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1688:4:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 989,
+            "mutability": "mutable",
+            "name": "pitcherCommit",
+            "nameLocation": "1721:13:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1715:19:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 988,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "1715:5:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 992,
+            "mutability": "mutable",
+            "name": "pitcherReveal",
+            "nameLocation": "1746:13:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1740:19:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Pitch_$963_storage_ptr",
+              "typeString": "struct Pitch"
+            },
+            "typeName": {
+              "id": 991,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 990,
+                "name": "Pitch",
+                "nameLocations": [
+                  "1740:5:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 963,
+                "src": "1740:5:6"
+              },
+              "referencedDeclaration": 963,
+              "src": "1740:5:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Pitch_$963_storage_ptr",
+                "typeString": "struct Pitch"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 994,
+            "mutability": "mutable",
+            "name": "batterAddress",
+            "nameLocation": "1774:13:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1766:21:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_address",
+              "typeString": "address"
+            },
+            "typeName": {
+              "id": 993,
+              "name": "address",
+              "nodeType": "ElementaryTypeName",
+              "src": "1766:7:6",
+              "stateMutability": "nonpayable",
+              "typeDescriptions": {
+                "typeIdentifier": "t_address",
+                "typeString": "address"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 996,
+            "mutability": "mutable",
+            "name": "batterTokenID",
+            "nameLocation": "1801:13:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1793:21:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 995,
+              "name": "uint256",
+              "nodeType": "ElementaryTypeName",
+              "src": "1793:7:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 998,
+            "mutability": "mutable",
+            "name": "didBatterCommit",
+            "nameLocation": "1825:15:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1820:20:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 997,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1820:4:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 1000,
+            "mutability": "mutable",
+            "name": "didBatterReveal",
+            "nameLocation": "1851:15:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1846:20:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bool",
+              "typeString": "bool"
+            },
+            "typeName": {
+              "id": 999,
+              "name": "bool",
+              "nodeType": "ElementaryTypeName",
+              "src": "1846:4:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bool",
+                "typeString": "bool"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 1002,
+            "mutability": "mutable",
+            "name": "batterCommit",
+            "nameLocation": "1878:12:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1872:18:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_bytes_storage_ptr",
+              "typeString": "bytes"
+            },
+            "typeName": {
+              "id": 1001,
+              "name": "bytes",
+              "nodeType": "ElementaryTypeName",
+              "src": "1872:5:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_bytes_storage_ptr",
+                "typeString": "bytes"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": false,
+            "id": 1005,
+            "mutability": "mutable",
+            "name": "batterReveal",
+            "nameLocation": "1902:12:6",
+            "nodeType": "VariableDeclaration",
+            "scope": 1006,
+            "src": "1896:18:6",
+            "stateVariable": false,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_struct$_Swing_$975_storage_ptr",
+              "typeString": "struct Swing"
+            },
+            "typeName": {
+              "id": 1004,
+              "nodeType": "UserDefinedTypeName",
+              "pathNode": {
+                "id": 1003,
+                "name": "Swing",
+                "nameLocations": [
+                  "1896:5:6"
+                ],
+                "nodeType": "IdentifierPath",
+                "referencedDeclaration": 975,
+                "src": "1896:5:6"
+              },
+              "referencedDeclaration": 975,
+              "src": "1896:5:6",
+              "typeDescriptions": {
+                "typeIdentifier": "t_struct$_Swing_$975_storage_ptr",
+                "typeString": "struct Swing"
+              }
+            },
+            "visibility": "internal"
+          }
+        ],
+        "name": "Session",
+        "nameLocation": "1536:7:6",
+        "scope": 1007,
+        "visibility": "public"
+      }
+    ],
+    "license": "Apache-2.0"
+  },
+  "id": 6
+}
