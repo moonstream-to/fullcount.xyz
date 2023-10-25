@@ -955,6 +955,47 @@
         }
       }
     },
+    "src/LightningAndSmoke.sol": {
+      "lastModificationDate": 1698212932280,
+      "contentHash": "5423987c185426c1b9369f85b4f1143e",
+      "sourceName": "src/LightningAndSmoke.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "useLiteralContent": false,
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.19",
+      "artifacts": {
+        "LightningAndSmoke": {
+          "0.8.21+commit.d9974bed.Linux.gcc": "LightningAndSmoke.sol/LightningAndSmoke.json"
+        }
+      }
+    },
     "test/Counter.t.sol": {
       "lastModificationDate": 1698210519065,
       "contentHash": "cb58204d005faa2a5dfcf152c560595f",

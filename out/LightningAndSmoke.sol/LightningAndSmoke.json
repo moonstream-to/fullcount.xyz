@@ -1,0 +1,114 @@
+{
+  "abi": [],
+  "bytecode": {
+    "object": "0x6080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea26469706673582212209e18c64df98816682974e7aa0464c9b34e606477bc3cef521fe6998fcc7ce02564736f6c63430008150033",
+    "sourceMap": "3070:31:0:-:0;;;;;;;;;;;;;;;;;;;",
+    "linkReferences": {}
+  },
+  "deployedBytecode": {
+    "object": "0x6080604052600080fdfea26469706673582212209e18c64df98816682974e7aa0464c9b34e606477bc3cef521fe6998fcc7ce02564736f6c63430008150033",
+    "sourceMap": "3070:31:0:-:0;;;;;",
+    "linkReferences": {}
+  },
+  "methodIdentifiers": {},
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.21+commit.d9974bed\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/LightningAndSmoke.sol\":\"LightningAndSmoke\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":moonstream-to/web3/=lib/web3/contracts/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\",\":web3/=lib/web3/contracts/\"]},\"sources\":{\"src/LightningAndSmoke.sol\":{\"keccak256\":\"0x2d16246ef25a7609de163f2f03048b86227cfd87d5db00450e9f16ebc6b1f5d4\",\"license\":\"Apache-2.0\",\"urls\":[\"bzz-raw://0e9169bd5a3161acafa2c9e5aa7fb5311f8f60c0baa62e73d92a054ce4338de3\",\"dweb:/ipfs/QmchgGe93HDjdGLBMHFuxeEdqmmbD2aaijCZW345iCQ1Sj\"]}},\"version\":1}",
+  "metadata": {
+    "compiler": {
+      "version": "0.8.21+commit.d9974bed"
+    },
+    "language": "Solidity",
+    "output": {
+      "abi": [],
+      "devdoc": {
+        "kind": "dev",
+        "methods": {},
+        "version": 1
+      },
+      "userdoc": {
+        "kind": "user",
+        "methods": {},
+        "version": 1
+      }
+    },
+    "settings": {
+      "remappings": [
+        "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+        "ds-test/=lib/forge-std/lib/ds-test/src/",
+        "erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
+        "forge-std/=lib/forge-std/src/",
+        "moonstream-to/web3/=lib/web3/contracts/",
+        "openzeppelin-contracts/=lib/openzeppelin-contracts/",
+        "web3/=lib/web3/contracts/"
+      ],
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "metadata": {
+        "bytecodeHash": "ipfs"
+      },
+      "compilationTarget": {
+        "src/LightningAndSmoke.sol": "LightningAndSmoke"
+      },
+      "libraries": {}
+    },
+    "sources": {
+      "src/LightningAndSmoke.sol": {
+        "keccak256": "0x2d16246ef25a7609de163f2f03048b86227cfd87d5db00450e9f16ebc6b1f5d4",
+        "urls": [
+          "bzz-raw://0e9169bd5a3161acafa2c9e5aa7fb5311f8f60c0baa62e73d92a054ce4338de3",
+          "dweb:/ipfs/QmchgGe93HDjdGLBMHFuxeEdqmmbD2aaijCZW345iCQ1Sj"
+        ],
+        "license": "Apache-2.0"
+      }
+    },
+    "version": 1
+  },
+  "ast": {
+    "absolutePath": "src/LightningAndSmoke.sol",
+    "id": 3,
+    "exportedSymbols": {
+      "LightningAndSmoke": [
+        2
+      ]
+    },
+    "nodeType": "SourceUnit",
+    "src": "40:3062:0",
+    "nodes": [
+      {
+        "id": 1,
+        "nodeType": "PragmaDirective",
+        "src": "40:24:0",
+        "nodes": [],
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".19"
+        ]
+      },
+      {
+        "id": 2,
+        "nodeType": "ContractDefinition",
+        "src": "3070:31:0",
+        "nodes": [],
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "LightningAndSmoke",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "linearizedBaseContracts": [
+          2
+        ],
+        "name": "LightningAndSmoke",
+        "nameLocation": "3079:17:0",
+        "scope": 3,
+        "usedErrors": [],
+        "usedEvents": []
+      }
+    ],
+    "license": "Apache-2.0"
+  },
+  "id": 0
+}
