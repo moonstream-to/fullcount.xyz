@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.19;
 
-import {IERC721} from "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {StatBlockBase} from "lib/web3/contracts/stats/StatBlock.sol";
+import {IERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {StatBlockBase} from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Pitch, Swing, Session} from "./data.sol";
 
@@ -53,6 +53,7 @@ contract LightningAndSmoke is StatBlockBase {
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
     address public TreasuryAddress;
+    uint256 public BlocksPerPhase;
 
     uint256 public NumSessions;
 
@@ -67,13 +68,16 @@ contract LightningAndSmoke is StatBlockBase {
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
 
-    event SessionStarted(uint256 sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType indexed role);
 
-    constructor(address feeTokenAddress, uint256 sessionStartPrice, uint256 sessionJoinPrice, address treasuryAddress) {
+    event SessionStarted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role);
+
+
+    constructor(address feeTokenAddress, uint256 sessionStartPrice, uint256 sessionJoinPrice, address treasuryAddress, uint256 blocksPerPhase) {
         FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
         TreasuryAddress = treasuryAddress;
+        BlocksPerPhase = blocksPerPhase;
     }
 
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
@@ -87,5 +91,29 @@ contract LightningAndSmoke is StatBlockBase {
     // Emits:
     // - SessionStarted
     function startSession(address nftAddress, uint256 tokenID, PlayerType role) public virtual returns (uint256) {
+      // Increment NumSessions. The new value is the ID of the session that was just started.
+      // This is what makes sessions 1-indexed.
+      NumSessions++;
+
+      IERC721 nftContract = IERC721(nftAddress);
+      address currentOwner = nftContract.ownerOf(tokenID);
+      Staker[nftAddress][tokenID] = currentOwner;
+      StakedSession[nftAddress][tokenID] = NumSessions;
+
+      SessionState[NumSessions].startBlock = block.number;
+
+      if (role == PlayerType.Pitcher) {
+            SessionState[NumSessions].pitcherAddress = nftAddress;
+            SessionState[NumSessions].pitcherTokenID = tokenID;
+      } else {
+            SessionState[NumSessions].batterAddress = nftAddress;
+            SessionState[NumSessions].batterTokenID = tokenID;
+      }
+
+      nftContract.transferFrom(currentOwner, address(this), tokenID);
+
+      emit SessionStarted(NumSessions, nftAddress, tokenID, role);
+
+      return NumSessions;
     }
 }
