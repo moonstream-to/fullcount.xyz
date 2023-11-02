@@ -51,16 +51,10 @@ contract LSTestBase is Test {
     address randomACcount = address(0x77);
 
     event SessionStarted(
-        uint256 indexed sessionID,
-        address indexed nftAddress,
-        uint256 indexed tokenID,
-        PlayerType role
+        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
     event SessionJoined(
-        uint256 indexed sessionID,
-        address indexed nftAddress,
-        uint256 indexed tokenID,
-        PlayerType role
+        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
 
     function setUp() public {
@@ -90,13 +84,13 @@ contract LSTestDeployment is LSTestBase {
 
 contract LSTest_startSession is LSTestBase {
     /**
-    startSession tests:
-    - [x] fails when game is not approved to transfer character: testRevert_if_game_not_approved_to_transfer_character
-    - [x] fails when game is not approved to transfer fee token: testRevert_if_game_not_approved_to_transfer_fee
-    - [x] fails when player has insufficient fee token: testRevert_if_player_has_insufficient_fee
-    - [x] fails attempts to start session on behalf of player by random account: testRevert_if_transaction_sent_by_random_person
-    - [x] succeeds when starting session as pitcher: test_as_pitcher
-    - [x] succeeds when starting session as batter: test_as_batter
+     * startSession tests:
+     * - [x] fails when game is not approved to transfer character: testRevert_if_game_not_approved_to_transfer_character
+     * - [x] fails when game is not approved to transfer fee token: testRevert_if_game_not_approved_to_transfer_fee
+     * - [x] fails when player has insufficient fee token: testRevert_if_player_has_insufficient_fee
+     * - [x] fails attempts to start session on behalf of player by random account: testRevert_if_transaction_sent_by_random_person
+     * - [x] succeeds when starting session as pitcher: test_as_pitcher
+     * - [x] succeeds when starting session as batter: test_as_batter
      */
 
     function testRevert_if_game_not_approved_to_transfer_character() public {
@@ -115,11 +109,7 @@ contract LSTest_startSession is LSTestBase {
         feeToken.approve(address(game), sessionStartPrice);
 
         vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC721Errors.ERC721InsufficientApproval.selector,
-                address(game),
-                tokenID
-            )
+            abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, address(game), tokenID)
         );
 
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
@@ -151,10 +141,7 @@ contract LSTest_startSession is LSTestBase {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC20Errors.ERC20InsufficientAllowance.selector,
-                address(game),
-                0,
-                sessionStartPrice
+                IERC20Errors.ERC20InsufficientAllowance.selector, address(game), 0, sessionStartPrice
             )
         );
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
@@ -185,10 +172,7 @@ contract LSTest_startSession is LSTestBase {
 
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC20Errors.ERC20InsufficientBalance.selector,
-                player1,
-                sessionStartPrice - 1,
-                sessionStartPrice
+                IERC20Errors.ERC20InsufficientBalance.selector, player1, sessionStartPrice - 1, sessionStartPrice
             )
         );
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
@@ -217,17 +201,8 @@ contract LSTest_startSession is LSTestBase {
         characterNFTs.approve(address(game), tokenID);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(
-            initialNumSessions + 1,
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Pitcher
-        );
-        uint256 sessionID = game.startSession(
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Pitcher
-        );
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
 
@@ -243,19 +218,10 @@ contract LSTest_startSession is LSTestBase {
         assertEq(session.batterTokenID, 0);
 
         assertEq(game.Staker(address(characterNFTs), tokenID), player1);
-        assertEq(
-            game.StakedSession(address(characterNFTs), tokenID),
-            sessionID
-        );
+        assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
 
-        assertEq(
-            feeToken.balanceOf(player1),
-            initialPlayer1FeeBalance - sessionStartPrice
-        );
-        assertEq(
-            feeToken.balanceOf(treasury),
-            initialTreasuryFeeBalance + sessionStartPrice
-        );
+        assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
+        assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
@@ -277,17 +243,8 @@ contract LSTest_startSession is LSTestBase {
         characterNFTs.approve(address(game), tokenID);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(
-            initialNumSessions + 1,
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Batter
-        );
-        uint256 sessionID = game.startSession(
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Batter
-        );
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
 
@@ -303,19 +260,10 @@ contract LSTest_startSession is LSTestBase {
         assertEq(session.pitcherTokenID, 0);
 
         assertEq(game.Staker(address(characterNFTs), tokenID), player1);
-        assertEq(
-            game.StakedSession(address(characterNFTs), tokenID),
-            sessionID
-        );
+        assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
 
-        assertEq(
-            feeToken.balanceOf(player1),
-            initialPlayer1FeeBalance - sessionStartPrice
-        );
-        assertEq(
-            feeToken.balanceOf(treasury),
-            initialTreasuryFeeBalance + sessionStartPrice
-        );
+        assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
+        assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
@@ -328,9 +276,7 @@ contract LSTest_startSession is LSTestBase {
         uint256 initialPlayer1FeeBalance = feeToken.balanceOf(player1);
         uint256 initialTreasuryFeeBalance = feeToken.balanceOf(treasury);
         uint256 initialGameFeeBalance = feeToken.balanceOf(address(game));
-        uint256 initialRandomACcountFeeBalance = feeToken.balanceOf(
-            randomACcount
-        );
+        uint256 initialRandomACcountFeeBalance = feeToken.balanceOf(randomACcount);
 
         uint256 initialNumSessions = game.NumSessions();
 
@@ -342,14 +288,8 @@ contract LSTest_startSession is LSTestBase {
         vm.stopPrank();
 
         vm.prank(randomACcount);
-        vm.expectRevert(
-            "LightningAndSmoke.startSession: msg.sender is not NFT owner"
-        );
-        uint256 sessionID = game.startSession(
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Pitcher
-        );
+        vm.expectRevert("LightningAndSmoke.startSession: msg.sender is not NFT owner");
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), player1);
 
@@ -358,27 +298,24 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
-        assertEq(
-            feeToken.balanceOf(randomACcount),
-            initialRandomACcountFeeBalance
-        );
+        assertEq(feeToken.balanceOf(randomACcount), initialRandomACcountFeeBalance);
     }
 }
 
 contract LSTest_joinSession is LSTestBase {
     /**
-    joinSession tests:
-    - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
-    - [ ] fails when joining session that is already full
-    - [ ] fails when joining session in which opponent left prior to joining
-    - [ ] fails when joining session in same role as opponent (batter)
-    - [ ] fails when joining session in same role as opponent (pitcher)
-    - [ ] fails when joining on behalf of NFT owner using random account
-    - [ ] fails when joiner does not have sufficient fee token
-    - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
-    - [ ] fails when joiner has not approved game to transfer character
-    - [x] succeeds when joining session as pitcher: test_as_pitcher
-    - [x] succeeds when joining session as batter: test_as_batter
+     * joinSession tests:
+     * - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
+     * - [ ] fails when joining session that is already full
+     * - [ ] fails when joining session in which opponent left prior to joining
+     * - [ ] fails when joining session in same role as opponent (batter)
+     * - [ ] fails when joining session in same role as opponent (pitcher)
+     * - [ ] fails when joining on behalf of NFT owner using random account
+     * - [ ] fails when joiner does not have sufficient fee token
+     * - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
+     * - [ ] fails when joiner has not approved game to transfer character
+     * - [x] succeeds when joining session as pitcher: test_as_pitcher
+     * - [x] succeeds when joining session as batter: test_as_batter
      */
 
     function testRevert_when_joining_nonexistent_session() public {
@@ -409,14 +346,8 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        vm.expectRevert(
-            "LightningAndSmoke.joinSession: session does not exist"
-        );
-        game.joinSession(
-            initialNumSessions + 1,
-            address(otherCharacterNFTs),
-            otherTokenID
-        );
+        vm.expectRevert("LightningAndSmoke.joinSession: session does not exist");
+        game.joinSession(initialNumSessions + 1, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions);
 
@@ -452,23 +383,14 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionStartPrice);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession(
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Pitcher
-        );
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         vm.startPrank(player2);
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
         vm.expectEmit(address(game));
-        emit SessionJoined(
-            sessionID,
-            address(otherCharacterNFTs),
-            otherTokenID,
-            PlayerType.Batter
-        );
+        emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions + 1);
@@ -481,27 +403,12 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(session.batterTokenID, otherTokenID);
 
         assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
-        assertEq(
-            game.StakedSession(address(otherCharacterNFTs), otherTokenID),
-            sessionID
-        );
-        assertEq(
-            game.Staker(address(otherCharacterNFTs), otherTokenID),
-            player2
-        );
+        assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
+        assertEq(game.Staker(address(otherCharacterNFTs), otherTokenID), player2);
 
-        assertEq(
-            feeToken.balanceOf(player1),
-            initialPlayer1FeeBalance - sessionStartPrice
-        );
-        assertEq(
-            feeToken.balanceOf(player2),
-            initialPlayer2FeeBalance - sessionJoinPrice
-        );
-        assertEq(
-            feeToken.balanceOf(treasury),
-            initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice
-        );
+        assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
+        assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance - sessionJoinPrice);
+        assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
@@ -529,23 +436,14 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionStartPrice);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession(
-            address(characterNFTs),
-            tokenID,
-            PlayerType.Batter
-        );
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.startPrank(player2);
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
         vm.expectEmit(address(game));
-        emit SessionJoined(
-            sessionID,
-            address(otherCharacterNFTs),
-            otherTokenID,
-            PlayerType.Pitcher
-        );
+        emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Pitcher);
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions + 1);
@@ -558,27 +456,12 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(session.pitcherTokenID, otherTokenID);
 
         assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
-        assertEq(
-            game.StakedSession(address(otherCharacterNFTs), otherTokenID),
-            sessionID
-        );
-        assertEq(
-            game.Staker(address(otherCharacterNFTs), otherTokenID),
-            player2
-        );
+        assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
+        assertEq(game.Staker(address(otherCharacterNFTs), otherTokenID), player2);
 
-        assertEq(
-            feeToken.balanceOf(player1),
-            initialPlayer1FeeBalance - sessionStartPrice
-        );
-        assertEq(
-            feeToken.balanceOf(player2),
-            initialPlayer2FeeBalance - sessionJoinPrice
-        );
-        assertEq(
-            feeToken.balanceOf(treasury),
-            initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice
-        );
+        assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
+        assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance - sessionJoinPrice);
+        assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 }
