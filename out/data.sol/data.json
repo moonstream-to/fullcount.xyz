@@ -10,40 +10,40 @@
   },
   "ast": {
     "absolutePath": "src/data.sol",
-    "id": 47804,
+    "id": 48615,
     "exportedSymbols": {
       "HorizontalLocation": [
-        47748
+        48559
       ],
       "Pitch": [
-        47760
+        48571
       ],
       "PitchType": [
-        47731
+        48542
       ],
       "PlayerType": [
-        47726
+        48537
       ],
       "Session": [
-        47803
+        48614
       ],
       "Swing": [
-        47772
+        48583
       ],
       "SwingType": [
-        47736
+        48547
       ],
       "VerticalLocation": [
-        47742
+        48553
       ]
     },
     "nodeType": "SourceUnit",
-    "src": "40:1878:38",
+    "src": "40:1876:41",
     "nodes": [
       {
-        "id": 47723,
+        "id": 48534,
         "nodeType": "PragmaDirective",
-        "src": "40:24:38",
+        "src": "40:24:41",
         "nodes": [],
         "literals": [
           "solidity",
@@ -53,216 +53,216 @@
         ]
       },
       {
-        "id": 47726,
+        "id": 48537,
         "nodeType": "EnumDefinition",
-        "src": "228:43:38",
+        "src": "228:43:41",
         "nodes": [],
         "canonicalName": "PlayerType",
         "members": [
           {
-            "id": 47724,
+            "id": 48535,
             "name": "Pitcher",
-            "nameLocation": "250:7:38",
+            "nameLocation": "250:7:41",
             "nodeType": "EnumValue",
-            "src": "250:7:38"
+            "src": "250:7:41"
           },
           {
-            "id": 47725,
+            "id": 48536,
             "name": "Batter",
-            "nameLocation": "263:6:38",
+            "nameLocation": "263:6:41",
             "nodeType": "EnumValue",
-            "src": "263:6:38"
+            "src": "263:6:41"
           }
         ],
         "name": "PlayerType",
-        "nameLocation": "233:10:38"
+        "nameLocation": "233:10:41"
       },
       {
-        "id": 47731,
+        "id": 48542,
         "nodeType": "EnumDefinition",
-        "src": "356:77:38",
+        "src": "356:77:41",
         "nodes": [],
         "canonicalName": "PitchType",
         "members": [
           {
-            "id": 47727,
+            "id": 48538,
             "name": "Fastball",
-            "nameLocation": "377:8:38",
+            "nameLocation": "377:8:41",
             "nodeType": "EnumValue",
-            "src": "377:8:38"
+            "src": "377:8:41"
           },
           {
-            "id": 47728,
+            "id": 48539,
             "name": "Curveball",
-            "nameLocation": "391:9:38",
+            "nameLocation": "391:9:41",
             "nodeType": "EnumValue",
-            "src": "391:9:38"
+            "src": "391:9:41"
           },
           {
-            "id": 47729,
+            "id": 48540,
             "name": "Changeup",
-            "nameLocation": "406:8:38",
+            "nameLocation": "406:8:41",
             "nodeType": "EnumValue",
-            "src": "406:8:38"
+            "src": "406:8:41"
           },
           {
-            "id": 47730,
+            "id": 48541,
             "name": "Knuckleball",
-            "nameLocation": "420:11:38",
+            "nameLocation": "420:11:41",
             "nodeType": "EnumValue",
-            "src": "420:11:38"
+            "src": "420:11:41"
           }
         ],
         "name": "PitchType",
-        "nameLocation": "361:9:38"
+        "nameLocation": "361:9:41"
       },
       {
-        "id": 47736,
+        "id": 48547,
         "nodeType": "EnumDefinition",
-        "src": "525:61:38",
+        "src": "525:61:41",
         "nodes": [],
         "canonicalName": "SwingType",
         "members": [
           {
-            "id": 47732,
+            "id": 48543,
             "name": "Contact",
-            "nameLocation": "546:7:38",
+            "nameLocation": "546:7:41",
             "nodeType": "EnumValue",
-            "src": "546:7:38"
+            "src": "546:7:41"
           },
           {
-            "id": 47733,
+            "id": 48544,
             "name": "Power",
-            "nameLocation": "559:5:38",
+            "nameLocation": "559:5:41",
             "nodeType": "EnumValue",
-            "src": "559:5:38"
+            "src": "559:5:41"
           },
           {
-            "id": 47734,
+            "id": 48545,
             "name": "Bunt",
-            "nameLocation": "570:4:38",
+            "nameLocation": "570:4:41",
             "nodeType": "EnumValue",
-            "src": "570:4:38"
+            "src": "570:4:41"
           },
           {
-            "id": 47735,
+            "id": 48546,
             "name": "Soft",
-            "nameLocation": "580:4:38",
+            "nameLocation": "580:4:41",
             "nodeType": "EnumValue",
-            "src": "580:4:38"
+            "src": "580:4:41"
           }
         ],
         "name": "SwingType",
-        "nameLocation": "530:9:38"
+        "nameLocation": "530:9:41"
       },
       {
-        "id": 47742,
+        "id": 48553,
         "nodeType": "EnumDefinition",
-        "src": "721:94:38",
+        "src": "721:94:41",
         "nodes": [],
         "canonicalName": "VerticalLocation",
         "members": [
           {
-            "id": 47737,
+            "id": 48548,
             "name": "HighBall",
-            "nameLocation": "749:8:38",
+            "nameLocation": "749:8:41",
             "nodeType": "EnumValue",
-            "src": "749:8:38"
+            "src": "749:8:41"
           },
           {
-            "id": 47738,
+            "id": 48549,
             "name": "HighStrike",
-            "nameLocation": "763:10:38",
+            "nameLocation": "763:10:41",
             "nodeType": "EnumValue",
-            "src": "763:10:38"
+            "src": "763:10:41"
           },
           {
-            "id": 47739,
+            "id": 48550,
             "name": "Middle",
-            "nameLocation": "779:6:38",
+            "nameLocation": "779:6:41",
             "nodeType": "EnumValue",
-            "src": "779:6:38"
+            "src": "779:6:41"
           },
           {
-            "id": 47740,
+            "id": 48551,
             "name": "LowStrike",
-            "nameLocation": "791:9:38",
+            "nameLocation": "791:9:41",
             "nodeType": "EnumValue",
-            "src": "791:9:38"
+            "src": "791:9:41"
           },
           {
-            "id": 47741,
+            "id": 48552,
             "name": "LowBall",
-            "nameLocation": "806:7:38",
+            "nameLocation": "806:7:41",
             "nodeType": "EnumValue",
-            "src": "806:7:38"
+            "src": "806:7:41"
           }
         ],
         "name": "VerticalLocation",
-        "nameLocation": "726:16:38"
+        "nameLocation": "726:16:41"
       },
       {
-        "id": 47748,
+        "id": 48559,
         "nodeType": "EnumDefinition",
-        "src": "953:108:38",
+        "src": "953:108:41",
         "nodes": [],
         "canonicalName": "HorizontalLocation",
         "members": [
           {
-            "id": 47743,
+            "id": 48554,
             "name": "InsideBall",
-            "nameLocation": "983:10:38",
+            "nameLocation": "983:10:41",
             "nodeType": "EnumValue",
-            "src": "983:10:38"
+            "src": "983:10:41"
           },
           {
-            "id": 47744,
+            "id": 48555,
             "name": "InsideStrike",
-            "nameLocation": "999:12:38",
+            "nameLocation": "999:12:41",
             "nodeType": "EnumValue",
-            "src": "999:12:38"
+            "src": "999:12:41"
           },
           {
-            "id": 47745,
+            "id": 48556,
             "name": "Middle",
-            "nameLocation": "1017:6:38",
+            "nameLocation": "1017:6:41",
             "nodeType": "EnumValue",
-            "src": "1017:6:38"
+            "src": "1017:6:41"
           },
           {
-            "id": 47746,
+            "id": 48557,
             "name": "OutsideStrike",
-            "nameLocation": "1029:13:38",
+            "nameLocation": "1029:13:41",
             "nodeType": "EnumValue",
-            "src": "1029:13:38"
+            "src": "1029:13:41"
           },
           {
-            "id": 47747,
+            "id": 48558,
             "name": "OutsideBall",
-            "nameLocation": "1048:11:38",
+            "nameLocation": "1048:11:41",
             "nodeType": "EnumValue",
-            "src": "1048:11:38"
+            "src": "1048:11:41"
           }
         ],
         "name": "HorizontalLocation",
-        "nameLocation": "958:18:38"
+        "nameLocation": "958:18:41"
       },
       {
-        "id": 47760,
+        "id": 48571,
         "nodeType": "StructDefinition",
-        "src": "1139:121:38",
+        "src": "1139:121:41",
         "nodes": [],
         "canonicalName": "Pitch",
         "members": [
           {
             "constant": false,
-            "id": 47750,
+            "id": 48561,
             "mutability": "mutable",
             "name": "nonce",
-            "nameLocation": "1166:5:38",
+            "nameLocation": "1166:5:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47760,
-            "src": "1158:13:38",
+            "scope": 48571,
+            "src": "1158:13:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -270,10 +270,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47749,
+              "id": 48560,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1158:7:38",
+              "src": "1158:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -283,36 +283,36 @@
           },
           {
             "constant": false,
-            "id": 47753,
+            "id": 48564,
             "mutability": "mutable",
             "name": "kind",
-            "nameLocation": "1187:4:38",
+            "nameLocation": "1187:4:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47760,
-            "src": "1177:14:38",
+            "scope": 48571,
+            "src": "1177:14:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_PitchType_$47731",
+              "typeIdentifier": "t_enum$_PitchType_$48542",
               "typeString": "enum PitchType"
             },
             "typeName": {
-              "id": 47752,
+              "id": 48563,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47751,
+                "id": 48562,
                 "name": "PitchType",
                 "nameLocations": [
-                  "1177:9:38"
+                  "1177:9:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47731,
-                "src": "1177:9:38"
+                "referencedDeclaration": 48542,
+                "src": "1177:9:41"
               },
-              "referencedDeclaration": 47731,
-              "src": "1177:9:38",
+              "referencedDeclaration": 48542,
+              "src": "1177:9:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_PitchType_$47731",
+                "typeIdentifier": "t_enum$_PitchType_$48542",
                 "typeString": "enum PitchType"
               }
             },
@@ -320,36 +320,36 @@
           },
           {
             "constant": false,
-            "id": 47756,
+            "id": 48567,
             "mutability": "mutable",
             "name": "vertical",
-            "nameLocation": "1214:8:38",
+            "nameLocation": "1214:8:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47760,
-            "src": "1197:25:38",
+            "scope": 48571,
+            "src": "1197:25:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_VerticalLocation_$47742",
+              "typeIdentifier": "t_enum$_VerticalLocation_$48553",
               "typeString": "enum VerticalLocation"
             },
             "typeName": {
-              "id": 47755,
+              "id": 48566,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47754,
+                "id": 48565,
                 "name": "VerticalLocation",
                 "nameLocations": [
-                  "1197:16:38"
+                  "1197:16:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47742,
-                "src": "1197:16:38"
+                "referencedDeclaration": 48553,
+                "src": "1197:16:41"
               },
-              "referencedDeclaration": 47742,
-              "src": "1197:16:38",
+              "referencedDeclaration": 48553,
+              "src": "1197:16:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_VerticalLocation_$47742",
+                "typeIdentifier": "t_enum$_VerticalLocation_$48553",
                 "typeString": "enum VerticalLocation"
               }
             },
@@ -357,36 +357,36 @@
           },
           {
             "constant": false,
-            "id": 47759,
+            "id": 48570,
             "mutability": "mutable",
             "name": "horizontal",
-            "nameLocation": "1247:10:38",
+            "nameLocation": "1247:10:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47760,
-            "src": "1228:29:38",
+            "scope": 48571,
+            "src": "1228:29:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_HorizontalLocation_$47748",
+              "typeIdentifier": "t_enum$_HorizontalLocation_$48559",
               "typeString": "enum HorizontalLocation"
             },
             "typeName": {
-              "id": 47758,
+              "id": 48569,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47757,
+                "id": 48568,
                 "name": "HorizontalLocation",
                 "nameLocations": [
-                  "1228:18:38"
+                  "1228:18:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47748,
-                "src": "1228:18:38"
+                "referencedDeclaration": 48559,
+                "src": "1228:18:41"
               },
-              "referencedDeclaration": 47748,
-              "src": "1228:18:38",
+              "referencedDeclaration": 48559,
+              "src": "1228:18:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_HorizontalLocation_$47748",
+                "typeIdentifier": "t_enum$_HorizontalLocation_$48559",
                 "typeString": "enum HorizontalLocation"
               }
             },
@@ -394,26 +394,26 @@
           }
         ],
         "name": "Pitch",
-        "nameLocation": "1146:5:38",
-        "scope": 47804,
+        "nameLocation": "1146:5:41",
+        "scope": 48615,
         "visibility": "public"
       },
       {
-        "id": 47772,
+        "id": 48583,
         "nodeType": "StructDefinition",
-        "src": "1337:121:38",
+        "src": "1337:121:41",
         "nodes": [],
         "canonicalName": "Swing",
         "members": [
           {
             "constant": false,
-            "id": 47762,
+            "id": 48573,
             "mutability": "mutable",
             "name": "nonce",
-            "nameLocation": "1364:5:38",
+            "nameLocation": "1364:5:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47772,
-            "src": "1356:13:38",
+            "scope": 48583,
+            "src": "1356:13:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -421,10 +421,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47761,
+              "id": 48572,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1356:7:38",
+              "src": "1356:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -434,36 +434,36 @@
           },
           {
             "constant": false,
-            "id": 47765,
+            "id": 48576,
             "mutability": "mutable",
             "name": "kind",
-            "nameLocation": "1385:4:38",
+            "nameLocation": "1385:4:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47772,
-            "src": "1375:14:38",
+            "scope": 48583,
+            "src": "1375:14:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_SwingType_$47736",
+              "typeIdentifier": "t_enum$_SwingType_$48547",
               "typeString": "enum SwingType"
             },
             "typeName": {
-              "id": 47764,
+              "id": 48575,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47763,
+                "id": 48574,
                 "name": "SwingType",
                 "nameLocations": [
-                  "1375:9:38"
+                  "1375:9:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47736,
-                "src": "1375:9:38"
+                "referencedDeclaration": 48547,
+                "src": "1375:9:41"
               },
-              "referencedDeclaration": 47736,
-              "src": "1375:9:38",
+              "referencedDeclaration": 48547,
+              "src": "1375:9:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_SwingType_$47736",
+                "typeIdentifier": "t_enum$_SwingType_$48547",
                 "typeString": "enum SwingType"
               }
             },
@@ -471,36 +471,36 @@
           },
           {
             "constant": false,
-            "id": 47768,
+            "id": 48579,
             "mutability": "mutable",
             "name": "vertical",
-            "nameLocation": "1412:8:38",
+            "nameLocation": "1412:8:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47772,
-            "src": "1395:25:38",
+            "scope": 48583,
+            "src": "1395:25:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_VerticalLocation_$47742",
+              "typeIdentifier": "t_enum$_VerticalLocation_$48553",
               "typeString": "enum VerticalLocation"
             },
             "typeName": {
-              "id": 47767,
+              "id": 48578,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47766,
+                "id": 48577,
                 "name": "VerticalLocation",
                 "nameLocations": [
-                  "1395:16:38"
+                  "1395:16:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47742,
-                "src": "1395:16:38"
+                "referencedDeclaration": 48553,
+                "src": "1395:16:41"
               },
-              "referencedDeclaration": 47742,
-              "src": "1395:16:38",
+              "referencedDeclaration": 48553,
+              "src": "1395:16:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_VerticalLocation_$47742",
+                "typeIdentifier": "t_enum$_VerticalLocation_$48553",
                 "typeString": "enum VerticalLocation"
               }
             },
@@ -508,36 +508,36 @@
           },
           {
             "constant": false,
-            "id": 47771,
+            "id": 48582,
             "mutability": "mutable",
             "name": "horizontal",
-            "nameLocation": "1445:10:38",
+            "nameLocation": "1445:10:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47772,
-            "src": "1426:29:38",
+            "scope": 48583,
+            "src": "1426:29:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_enum$_HorizontalLocation_$47748",
+              "typeIdentifier": "t_enum$_HorizontalLocation_$48559",
               "typeString": "enum HorizontalLocation"
             },
             "typeName": {
-              "id": 47770,
+              "id": 48581,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47769,
+                "id": 48580,
                 "name": "HorizontalLocation",
                 "nameLocations": [
-                  "1426:18:38"
+                  "1426:18:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47748,
-                "src": "1426:18:38"
+                "referencedDeclaration": 48559,
+                "src": "1426:18:41"
               },
-              "referencedDeclaration": 47748,
-              "src": "1426:18:38",
+              "referencedDeclaration": 48559,
+              "src": "1426:18:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_enum$_HorizontalLocation_$47748",
+                "typeIdentifier": "t_enum$_HorizontalLocation_$48559",
                 "typeString": "enum HorizontalLocation"
               }
             },
@@ -545,26 +545,26 @@
           }
         ],
         "name": "Swing",
-        "nameLocation": "1344:5:38",
-        "scope": 47804,
+        "nameLocation": "1344:5:41",
+        "scope": 48615,
         "visibility": "public"
       },
       {
-        "id": 47803,
+        "id": 48614,
         "nodeType": "StructDefinition",
-        "src": "1529:388:38",
+        "src": "1529:386:41",
         "nodes": [],
         "canonicalName": "Session",
         "members": [
           {
             "constant": false,
-            "id": 47774,
+            "id": 48585,
             "mutability": "mutable",
             "name": "startBlock",
-            "nameLocation": "1558:10:38",
+            "nameLocation": "1558:10:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1550:18:38",
+            "scope": 48614,
+            "src": "1550:18:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -572,10 +572,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47773,
+              "id": 48584,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1550:7:38",
+              "src": "1550:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -585,13 +585,13 @@
           },
           {
             "constant": false,
-            "id": 47776,
+            "id": 48587,
             "mutability": "mutable",
             "name": "commitmentsBlock",
-            "nameLocation": "1582:16:38",
+            "nameLocation": "1582:16:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1574:24:38",
+            "scope": 48614,
+            "src": "1574:24:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -599,10 +599,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47775,
+              "id": 48586,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1574:7:38",
+              "src": "1574:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -612,13 +612,13 @@
           },
           {
             "constant": false,
-            "id": 47778,
+            "id": 48589,
             "mutability": "mutable",
             "name": "pitcherAddress",
-            "nameLocation": "1613:14:38",
+            "nameLocation": "1612:14:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1605:22:38",
+            "scope": 48614,
+            "src": "1604:22:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -626,10 +626,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 47777,
+              "id": 48588,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "1605:7:38",
+              "src": "1604:7:41",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -640,13 +640,13 @@
           },
           {
             "constant": false,
-            "id": 47780,
+            "id": 48591,
             "mutability": "mutable",
             "name": "pitcherTokenID",
-            "nameLocation": "1641:14:38",
+            "nameLocation": "1640:14:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1633:22:38",
+            "scope": 48614,
+            "src": "1632:22:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -654,10 +654,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47779,
+              "id": 48590,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1633:7:38",
+              "src": "1632:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -667,13 +667,13 @@
           },
           {
             "constant": false,
-            "id": 47782,
+            "id": 48593,
             "mutability": "mutable",
             "name": "didPitcherCommit",
-            "nameLocation": "1666:16:38",
+            "nameLocation": "1665:16:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1661:21:38",
+            "scope": 48614,
+            "src": "1660:21:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -681,10 +681,10 @@
               "typeString": "bool"
             },
             "typeName": {
-              "id": 47781,
+              "id": 48592,
               "name": "bool",
               "nodeType": "ElementaryTypeName",
-              "src": "1661:4:38",
+              "src": "1660:4:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bool",
                 "typeString": "bool"
@@ -694,13 +694,13 @@
           },
           {
             "constant": false,
-            "id": 47784,
+            "id": 48595,
             "mutability": "mutable",
             "name": "didPitcherReveal",
-            "nameLocation": "1693:16:38",
+            "nameLocation": "1692:16:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1688:21:38",
+            "scope": 48614,
+            "src": "1687:21:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -708,10 +708,10 @@
               "typeString": "bool"
             },
             "typeName": {
-              "id": 47783,
+              "id": 48594,
               "name": "bool",
               "nodeType": "ElementaryTypeName",
-              "src": "1688:4:38",
+              "src": "1687:4:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bool",
                 "typeString": "bool"
@@ -721,13 +721,13 @@
           },
           {
             "constant": false,
-            "id": 47786,
+            "id": 48597,
             "mutability": "mutable",
             "name": "pitcherCommit",
-            "nameLocation": "1721:13:38",
+            "nameLocation": "1720:13:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1715:19:38",
+            "scope": 48614,
+            "src": "1714:19:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -735,10 +735,10 @@
               "typeString": "bytes"
             },
             "typeName": {
-              "id": 47785,
+              "id": 48596,
               "name": "bytes",
               "nodeType": "ElementaryTypeName",
-              "src": "1715:5:38",
+              "src": "1714:5:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes_storage_ptr",
                 "typeString": "bytes"
@@ -748,36 +748,36 @@
           },
           {
             "constant": false,
-            "id": 47789,
+            "id": 48600,
             "mutability": "mutable",
             "name": "pitcherReveal",
-            "nameLocation": "1746:13:38",
+            "nameLocation": "1745:13:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1740:19:38",
+            "scope": 48614,
+            "src": "1739:19:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_struct$_Pitch_$47760_storage_ptr",
+              "typeIdentifier": "t_struct$_Pitch_$48571_storage_ptr",
               "typeString": "struct Pitch"
             },
             "typeName": {
-              "id": 47788,
+              "id": 48599,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47787,
+                "id": 48598,
                 "name": "Pitch",
                 "nameLocations": [
-                  "1740:5:38"
+                  "1739:5:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47760,
-                "src": "1740:5:38"
+                "referencedDeclaration": 48571,
+                "src": "1739:5:41"
               },
-              "referencedDeclaration": 47760,
-              "src": "1740:5:38",
+              "referencedDeclaration": 48571,
+              "src": "1739:5:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_struct$_Pitch_$47760_storage_ptr",
+                "typeIdentifier": "t_struct$_Pitch_$48571_storage_ptr",
                 "typeString": "struct Pitch"
               }
             },
@@ -785,13 +785,13 @@
           },
           {
             "constant": false,
-            "id": 47791,
+            "id": 48602,
             "mutability": "mutable",
             "name": "batterAddress",
-            "nameLocation": "1774:13:38",
+            "nameLocation": "1772:13:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1766:21:38",
+            "scope": 48614,
+            "src": "1764:21:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -799,10 +799,10 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 47790,
+              "id": 48601,
               "name": "address",
               "nodeType": "ElementaryTypeName",
-              "src": "1766:7:38",
+              "src": "1764:7:41",
               "stateMutability": "nonpayable",
               "typeDescriptions": {
                 "typeIdentifier": "t_address",
@@ -813,13 +813,13 @@
           },
           {
             "constant": false,
-            "id": 47793,
+            "id": 48604,
             "mutability": "mutable",
             "name": "batterTokenID",
-            "nameLocation": "1801:13:38",
+            "nameLocation": "1799:13:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1793:21:38",
+            "scope": 48614,
+            "src": "1791:21:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -827,10 +827,10 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 47792,
+              "id": 48603,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
-              "src": "1793:7:38",
+              "src": "1791:7:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_uint256",
                 "typeString": "uint256"
@@ -840,13 +840,13 @@
           },
           {
             "constant": false,
-            "id": 47795,
+            "id": 48606,
             "mutability": "mutable",
             "name": "didBatterCommit",
-            "nameLocation": "1825:15:38",
+            "nameLocation": "1823:15:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1820:20:38",
+            "scope": 48614,
+            "src": "1818:20:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -854,10 +854,10 @@
               "typeString": "bool"
             },
             "typeName": {
-              "id": 47794,
+              "id": 48605,
               "name": "bool",
               "nodeType": "ElementaryTypeName",
-              "src": "1820:4:38",
+              "src": "1818:4:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bool",
                 "typeString": "bool"
@@ -867,13 +867,13 @@
           },
           {
             "constant": false,
-            "id": 47797,
+            "id": 48608,
             "mutability": "mutable",
             "name": "didBatterReveal",
-            "nameLocation": "1851:15:38",
+            "nameLocation": "1849:15:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1846:20:38",
+            "scope": 48614,
+            "src": "1844:20:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -881,10 +881,10 @@
               "typeString": "bool"
             },
             "typeName": {
-              "id": 47796,
+              "id": 48607,
               "name": "bool",
               "nodeType": "ElementaryTypeName",
-              "src": "1846:4:38",
+              "src": "1844:4:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bool",
                 "typeString": "bool"
@@ -894,13 +894,13 @@
           },
           {
             "constant": false,
-            "id": 47799,
+            "id": 48610,
             "mutability": "mutable",
             "name": "batterCommit",
-            "nameLocation": "1878:12:38",
+            "nameLocation": "1876:12:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1872:18:38",
+            "scope": 48614,
+            "src": "1870:18:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -908,10 +908,10 @@
               "typeString": "bytes"
             },
             "typeName": {
-              "id": 47798,
+              "id": 48609,
               "name": "bytes",
               "nodeType": "ElementaryTypeName",
-              "src": "1872:5:38",
+              "src": "1870:5:41",
               "typeDescriptions": {
                 "typeIdentifier": "t_bytes_storage_ptr",
                 "typeString": "bytes"
@@ -921,36 +921,36 @@
           },
           {
             "constant": false,
-            "id": 47802,
+            "id": 48613,
             "mutability": "mutable",
             "name": "batterReveal",
-            "nameLocation": "1902:12:38",
+            "nameLocation": "1900:12:41",
             "nodeType": "VariableDeclaration",
-            "scope": 47803,
-            "src": "1896:18:38",
+            "scope": 48614,
+            "src": "1894:18:41",
             "stateVariable": false,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_struct$_Swing_$47772_storage_ptr",
+              "typeIdentifier": "t_struct$_Swing_$48583_storage_ptr",
               "typeString": "struct Swing"
             },
             "typeName": {
-              "id": 47801,
+              "id": 48612,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 47800,
+                "id": 48611,
                 "name": "Swing",
                 "nameLocations": [
-                  "1896:5:38"
+                  "1894:5:41"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 47772,
-                "src": "1896:5:38"
+                "referencedDeclaration": 48583,
+                "src": "1894:5:41"
               },
-              "referencedDeclaration": 47772,
-              "src": "1896:5:38",
+              "referencedDeclaration": 48583,
+              "src": "1894:5:41",
               "typeDescriptions": {
-                "typeIdentifier": "t_struct$_Swing_$47772_storage_ptr",
+                "typeIdentifier": "t_struct$_Swing_$48583_storage_ptr",
                 "typeString": "struct Swing"
               }
             },
@@ -958,12 +958,12 @@
           }
         ],
         "name": "Session",
-        "nameLocation": "1536:7:38",
-        "scope": 47804,
+        "nameLocation": "1536:7:41",
+        "scope": 48615,
         "visibility": "public"
       }
     ],
     "license": "Apache-2.0"
   },
-  "id": 38
+  "id": 41
 }

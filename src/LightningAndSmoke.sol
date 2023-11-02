@@ -7,7 +7,7 @@ import {IERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC
 import {SafeERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {StatBlockBase} from "../lib/web3/contracts/stats/StatBlock.sol";
 
-import {PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Pitch, Swing, Session} from "./data.sol";
+import {PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Session, Pitch, Swing} from "./data.sol";
 
 /*
 LightningAndSmoke implements a simple game in which two NFTs (from any ERC721 contracts) complete against
@@ -102,6 +102,13 @@ contract LightningAndSmoke is StatBlockBase {
         SessionJoinPrice = sessionJoinPrice;
         TreasuryAddress = treasuryAddress;
         BlocksPerPhase = blocksPerPhase;
+    }
+
+    // This is useful because of how return values from the public mapping get serialized.
+    function getSession(
+        uint256 sessionID
+    ) external view returns (Session memory) {
+        return SessionState[sessionID];
     }
 
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the

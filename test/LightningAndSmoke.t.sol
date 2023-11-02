@@ -32,35 +32,11 @@ contract MockERC721 is ERC721 {
     }
 }
 
-contract LightningAndSmokeWithTestUtils is LightningAndSmoke {
-    constructor(
-        address feeTokenAddress,
-        uint256 sessionStartPrice,
-        uint256 sessionJoinPrice,
-        address treasuryAddress,
-        uint256 blocksPerPhase
-    )
-        LightningAndSmoke(
-            feeTokenAddress,
-            sessionStartPrice,
-            sessionJoinPrice,
-            treasuryAddress,
-            blocksPerPhase
-        )
-    {}
-
-    function utilGetSession(
-        uint256 sessionID
-    ) external view returns (Session memory) {
-        return SessionState[sessionID];
-    }
-}
-
 contract LSTestBase is Test {
     MockERC20 public feeToken;
     MockERC721 public characterNFTs;
     MockERC721 public otherCharacterNFTs;
-    LightningAndSmokeWithTestUtils public game;
+    LightningAndSmoke public game;
 
     uint256 sessionStartPrice = 5;
     uint256 sessionJoinPrice = 9;
@@ -80,12 +56,18 @@ contract LSTestBase is Test {
         uint256 indexed tokenID,
         PlayerType role
     );
+    event SessionJoined(
+        uint256 indexed sessionID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        PlayerType role
+    );
 
     function setUp() public {
         feeToken = new MockERC20();
         characterNFTs = new MockERC721();
         otherCharacterNFTs = new MockERC721();
-        game = new LightningAndSmokeWithTestUtils(
+        game = new LightningAndSmoke(
             address(feeToken),
             sessionStartPrice,
             sessionJoinPrice,
@@ -253,7 +235,7 @@ contract LSTest_startSession is LSTestBase {
         assertEq(sessionID, terminalNumSessions);
         assertEq(terminalNumSessions, initialNumSessions + 1);
 
-        Session memory session = game.utilGetSession(sessionID);
+        Session memory session = game.getSession(sessionID);
         assertEq(session.startBlock, block.number);
         assertEq(session.pitcherAddress, address(characterNFTs));
         assertEq(session.pitcherTokenID, tokenID);
@@ -313,7 +295,7 @@ contract LSTest_startSession is LSTestBase {
         assertEq(sessionID, terminalNumSessions);
         assertEq(terminalNumSessions, initialNumSessions + 1);
 
-        Session memory session = game.utilGetSession(sessionID);
+        Session memory session = game.getSession(sessionID);
         assertEq(session.startBlock, block.number);
         assertEq(session.batterAddress, address(characterNFTs));
         assertEq(session.batterTokenID, tokenID);
@@ -389,12 +371,14 @@ contract LSTest_joinSession is LSTestBase {
     - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
     - [ ] fails when joining session that is already full
     - [ ] fails when joining session in which opponent left prior to joining
+    - [ ] fails when joining session in same role as opponent (batter)
+    - [ ] fails when joining session in same role as opponent (pitcher)
     - [ ] fails when joining on behalf of NFT owner using random account
     - [ ] fails when joiner does not have sufficient fee token
     - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
     - [ ] fails when joiner has not approved game to transfer character
-    - [ ] succeeds when joining session as pitcher
-    - [ ] succeeds when joining session as batter
+    - [x] succeeds when joining session as pitcher: test_as_pitcher
+    - [x] succeeds when joining session as batter: test_as_batter
      */
 
     function testRevert_when_joining_nonexistent_session() public {
@@ -441,6 +425,160 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
+        assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+    }
+
+    function test_as_batter() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        uint256 initialPlayer1FeeBalance = feeToken.balanceOf(player1);
+        uint256 initialPlayer2FeeBalance = feeToken.balanceOf(player2);
+        uint256 initialTreasuryFeeBalance = feeToken.balanceOf(treasury);
+        uint256 initialGameFeeBalance = feeToken.balanceOf(address(game));
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(
+            address(characterNFTs),
+            tokenID,
+            PlayerType.Pitcher
+        );
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectEmit(address(game));
+        emit SessionJoined(
+            sessionID,
+            address(otherCharacterNFTs),
+            otherTokenID,
+            PlayerType.Batter
+        );
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        assertEq(game.NumSessions(), initialNumSessions + 1);
+
+        Session memory session = game.getSession(sessionID);
+        assertEq(session.startBlock, block.number);
+        assertEq(session.pitcherAddress, address(characterNFTs));
+        assertEq(session.pitcherTokenID, tokenID);
+        assertEq(session.batterAddress, address(otherCharacterNFTs));
+        assertEq(session.batterTokenID, otherTokenID);
+
+        assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
+        assertEq(
+            game.StakedSession(address(otherCharacterNFTs), otherTokenID),
+            sessionID
+        );
+        assertEq(
+            game.Staker(address(otherCharacterNFTs), otherTokenID),
+            player2
+        );
+
+        assertEq(
+            feeToken.balanceOf(player1),
+            initialPlayer1FeeBalance - sessionStartPrice
+        );
+        assertEq(
+            feeToken.balanceOf(player2),
+            initialPlayer2FeeBalance - sessionJoinPrice
+        );
+        assertEq(
+            feeToken.balanceOf(treasury),
+            initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice
+        );
+        assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+    }
+
+    function test_as_pitcher() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        uint256 initialPlayer1FeeBalance = feeToken.balanceOf(player1);
+        uint256 initialPlayer2FeeBalance = feeToken.balanceOf(player2);
+        uint256 initialTreasuryFeeBalance = feeToken.balanceOf(treasury);
+        uint256 initialGameFeeBalance = feeToken.balanceOf(address(game));
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(
+            address(characterNFTs),
+            tokenID,
+            PlayerType.Batter
+        );
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectEmit(address(game));
+        emit SessionJoined(
+            sessionID,
+            address(otherCharacterNFTs),
+            otherTokenID,
+            PlayerType.Pitcher
+        );
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        assertEq(game.NumSessions(), initialNumSessions + 1);
+
+        Session memory session = game.getSession(sessionID);
+        assertEq(session.startBlock, block.number);
+        assertEq(session.batterAddress, address(characterNFTs));
+        assertEq(session.batterTokenID, tokenID);
+        assertEq(session.pitcherAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherTokenID, otherTokenID);
+
+        assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
+        assertEq(
+            game.StakedSession(address(otherCharacterNFTs), otherTokenID),
+            sessionID
+        );
+        assertEq(
+            game.Staker(address(otherCharacterNFTs), otherTokenID),
+            player2
+        );
+
+        assertEq(
+            feeToken.balanceOf(player1),
+            initialPlayer1FeeBalance - sessionStartPrice
+        );
+        assertEq(
+            feeToken.balanceOf(player2),
+            initialPlayer2FeeBalance - sessionJoinPrice
+        );
+        assertEq(
+            feeToken.balanceOf(treasury),
+            initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice
+        );
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 }

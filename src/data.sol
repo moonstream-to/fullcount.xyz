@@ -103,14 +103,12 @@ Session represents the state of a Lightning and Smoke session.
 struct Session {
     uint256 startBlock;
     uint256 commitmentsBlock;
-
     address pitcherAddress;
     uint256 pitcherTokenID;
     bool didPitcherCommit;
     bool didPitcherReveal;
     bytes pitcherCommit;
     Pitch pitcherReveal;
-
     address batterAddress;
     uint256 batterTokenID;
     bool didBatterCommit;

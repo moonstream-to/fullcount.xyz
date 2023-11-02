@@ -1742,8 +1742,8 @@
       }
     },
     "src/LightningAndSmoke.sol": {
-      "lastModificationDate": 1698930164626,
-      "contentHash": "5b01b20a9215b13c06c1d4f8a63f3b97",
+      "lastModificationDate": 1698932874796,
+      "contentHash": "2b4d02acc228449ac13909f3d9dcd189",
       "sourceName": "src/LightningAndSmoke.sol",
       "solcConfig": {
         "settings": {
@@ -1793,8 +1793,8 @@
       }
     },
     "src/data.sol": {
-      "lastModificationDate": 1698875183646,
-      "contentHash": "5329a6eb0b183ea5e5a02b58525f8ed4",
+      "lastModificationDate": 1698932833926,
+      "contentHash": "b848c5b9c7678067a43bfde5446e4bae",
       "sourceName": "src/data.sol",
       "solcConfig": {
         "settings": {
@@ -1833,8 +1833,8 @@
       }
     },
     "test/LightningAndSmoke.t.sol": {
-      "lastModificationDate": 1698930778466,
-      "contentHash": "c7443e2903f4c38991ab923ec07e0311",
+      "lastModificationDate": 1698933034556,
+      "contentHash": "aa14bfc0988e25df377c99d225464d0c",
       "sourceName": "test/LightningAndSmoke.t.sol",
       "solcConfig": {
         "settings": {
@@ -1919,9 +1919,6 @@
         },
         "LSTest_startSession": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LSTest_startSession.json"
-        },
-        "LightningAndSmokeWithTestUtils": {
-          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LightningAndSmokeWithTestUtils.json"
         },
         "MockERC20": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/MockERC20.json"
