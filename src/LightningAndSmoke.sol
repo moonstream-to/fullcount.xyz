@@ -78,12 +78,16 @@ contract LightningAndSmoke is StatBlockBase {
         uint256 indexed tokenID,
         PlayerType role
     );
-
     event SessionJoined(
         uint256 indexed sessionID,
         address indexed nftAddress,
         uint256 indexed tokenID,
         PlayerType role
+    );
+    event SessionExited(
+        uint256 indexed sessionID,
+        address indexed nftAddress,
+        uint256 indexed tokenID
     );
 
     constructor(
@@ -102,9 +106,10 @@ contract LightningAndSmoke is StatBlockBase {
 
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
     // LightningAndSmoke contract itself.
+    // This is an override of the StatBlockBase.isAdministrator function.
     function isAdministrator(
         address account
-    ) public view virtual override returns (bool) {
+    ) public view override returns (bool) {
         return account == address(this);
     }
 
@@ -134,11 +139,6 @@ contract LightningAndSmoke is StatBlockBase {
         // This is what makes sessions 1-indexed.
         NumSessions++;
 
-        Staker[nftAddress][tokenID] = currentOwner;
-        StakedSession[nftAddress][tokenID] = NumSessions;
-
-        SessionState[NumSessions].startBlock = block.number;
-
         if (role == PlayerType.Pitcher) {
             SessionState[NumSessions].pitcherAddress = nftAddress;
             SessionState[NumSessions].pitcherTokenID = tokenID;
@@ -146,6 +146,11 @@ contract LightningAndSmoke is StatBlockBase {
             SessionState[NumSessions].batterAddress = nftAddress;
             SessionState[NumSessions].batterTokenID = tokenID;
         }
+
+        Staker[nftAddress][tokenID] = currentOwner;
+        StakedSession[nftAddress][tokenID] = NumSessions;
+
+        SessionState[NumSessions].startBlock = block.number;
 
         nftContract.transferFrom(currentOwner, address(this), tokenID);
 
@@ -156,7 +161,16 @@ contract LightningAndSmoke is StatBlockBase {
 
     // Emits:
     // - SessionJoined
-    function joinSession(address nftAddress, uint256 tokenID) public virtual {
+    function joinSession(
+        uint256 sessionID,
+        address nftAddress,
+        uint256 tokenID
+    ) public virtual {
+        require(
+            sessionID <= NumSessions,
+            "LightningAndSmoke.joinSession: session does not exist"
+        );
+
         IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
@@ -171,5 +185,35 @@ contract LightningAndSmoke is StatBlockBase {
             TreasuryAddress,
             SessionJoinPrice
         );
+
+        Session storage session = SessionState[sessionID];
+        if (
+            session.pitcherAddress != address(0) &&
+            session.batterAddress != address(0)
+        ) {
+            revert("LightningAndSmoke.joinSession: session is already full");
+        } else if (
+            session.pitcherAddress == address(0) &&
+            session.batterAddress == address(0)
+        ) {
+            revert("LightningAndSmoke.joinSession: opponent left session");
+        }
+
+        PlayerType role = PlayerType.Pitcher;
+        if (session.batterAddress == address(0)) {
+            role = PlayerType.Batter;
+            session.batterAddress = nftAddress;
+            session.batterTokenID = tokenID;
+        } else {
+            session.pitcherAddress = nftAddress;
+            session.pitcherTokenID = tokenID;
+        }
+
+        Staker[nftAddress][tokenID] = currentOwner;
+        StakedSession[nftAddress][tokenID] = sessionID;
+
+        nftContract.transferFrom(currentOwner, address(this), tokenID);
+
+        emit SessionJoined(sessionID, nftAddress, tokenID, role);
     }
 }

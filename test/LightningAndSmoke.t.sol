@@ -56,7 +56,7 @@ contract LightningAndSmokeWithTestUtils is LightningAndSmoke {
     }
 }
 
-contract LightningAndSmokeTest is Test {
+contract LSTestBase is Test {
     MockERC20 public feeToken;
     MockERC721 public characterNFTs;
     MockERC721 public otherCharacterNFTs;
@@ -93,7 +93,9 @@ contract LightningAndSmokeTest is Test {
             blocksPerPhase
         );
     }
+}
 
+contract LSTestDeployment is LSTestBase {
     function test_Deployment() public {
         assertEq(game.FeeTokenAddress(), address(feeToken));
         assertEq(game.SessionStartPrice(), sessionStartPrice);
@@ -102,10 +104,20 @@ contract LightningAndSmokeTest is Test {
         assertEq(game.BlocksPerPhase(), blocksPerPhase);
         assertEq(game.NumSessions(), 0);
     }
+}
 
-    function testRevert_startSession_fails_if_game_not_approved_to_transfer_character()
-        public
-    {
+contract LSTest_startSession is LSTestBase {
+    /**
+    startSession tests:
+    - [x] fails when game is not approved to transfer character: testRevert_if_game_not_approved_to_transfer_character
+    - [x] fails when game is not approved to transfer fee token: testRevert_if_game_not_approved_to_transfer_fee
+    - [x] fails when player has insufficient fee token: testRevert_if_player_has_insufficient_fee
+    - [x] fails attempts to start session on behalf of player by random account: testRevert_if_transaction_sent_by_random_person
+    - [x] succeeds when starting session as pitcher: test_as_pitcher
+    - [x] succeeds when starting session as batter: test_as_batter
+     */
+
+    function testRevert_if_game_not_approved_to_transfer_character() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -138,9 +150,7 @@ contract LightningAndSmokeTest is Test {
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
-    function testRevert_startSession_fails_if_game_not_approved_to_transfer_fee()
-        public
-    {
+    function testRevert_if_game_not_approved_to_transfer_fee() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -173,9 +183,7 @@ contract LightningAndSmokeTest is Test {
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
-    function testRevert_startSession_fails_if_player_has_insufficient_fee()
-        public
-    {
+    function testRevert_if_player_has_insufficient_fee() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -209,7 +217,7 @@ contract LightningAndSmokeTest is Test {
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
-    function test_startSession_as_pitcher() public {
+    function test_as_pitcher() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -252,6 +260,12 @@ contract LightningAndSmokeTest is Test {
         assertEq(session.batterAddress, address(0));
         assertEq(session.batterTokenID, 0);
 
+        assertEq(game.Staker(address(characterNFTs), tokenID), player1);
+        assertEq(
+            game.StakedSession(address(characterNFTs), tokenID),
+            sessionID
+        );
+
         assertEq(
             feeToken.balanceOf(player1),
             initialPlayer1FeeBalance - sessionStartPrice
@@ -263,7 +277,7 @@ contract LightningAndSmokeTest is Test {
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
-    function test_startSession_as_batter() public {
+    function test_as_batter() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -306,6 +320,12 @@ contract LightningAndSmokeTest is Test {
         assertEq(session.pitcherAddress, address(0));
         assertEq(session.pitcherTokenID, 0);
 
+        assertEq(game.Staker(address(characterNFTs), tokenID), player1);
+        assertEq(
+            game.StakedSession(address(characterNFTs), tokenID),
+            sessionID
+        );
+
         assertEq(
             feeToken.balanceOf(player1),
             initialPlayer1FeeBalance - sessionStartPrice
@@ -317,9 +337,7 @@ contract LightningAndSmokeTest is Test {
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 
-    function test_startSession_fails_if_transaction_sent_by_random_person()
-        public
-    {
+    function testRevert_if_transaction_sent_by_random_person() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
         characterNFTs.mint(player1, tokenID);
@@ -362,5 +380,67 @@ contract LightningAndSmokeTest is Test {
             feeToken.balanceOf(randomACcount),
             initialRandomACcountFeeBalance
         );
+    }
+}
+
+contract LSTest_joinSession is LSTestBase {
+    /**
+    joinSession tests:
+    - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
+    - [ ] fails when joining session that is already full
+    - [ ] fails when joining session in which opponent left prior to joining
+    - [ ] fails when joining on behalf of NFT owner using random account
+    - [ ] fails when joiner does not have sufficient fee token
+    - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
+    - [ ] fails when joiner has not approved game to transfer character
+    - [ ] succeeds when joining session as pitcher
+    - [ ] succeeds when joining session as batter
+     */
+
+    function testRevert_when_joining_nonexistent_session() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        uint256 initialPlayer1FeeBalance = feeToken.balanceOf(player1);
+        uint256 initialPlayer2FeeBalance = feeToken.balanceOf(player2);
+        uint256 initialTreasuryFeeBalance = feeToken.balanceOf(treasury);
+        uint256 initialGameFeeBalance = feeToken.balanceOf(address(game));
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectRevert(
+            "LightningAndSmoke.joinSession: session does not exist"
+        );
+        game.joinSession(
+            initialNumSessions + 1,
+            address(otherCharacterNFTs),
+            otherTokenID
+        );
+
+        assertEq(game.NumSessions(), initialNumSessions);
+
+        assertEq(otherCharacterNFTs.ownerOf(otherTokenID), player2);
+
+        assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
+        assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance);
+        assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
+        assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
     }
 }

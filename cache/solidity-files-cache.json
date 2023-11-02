@@ -1742,8 +1742,8 @@
       }
     },
     "src/LightningAndSmoke.sol": {
-      "lastModificationDate": 1698928249786,
-      "contentHash": "6f3ab15c2acf5d171342fc83b6349830",
+      "lastModificationDate": 1698930164626,
+      "contentHash": "5b01b20a9215b13c06c1d4f8a63f3b97",
       "sourceName": "src/LightningAndSmoke.sol",
       "solcConfig": {
         "settings": {
@@ -1833,8 +1833,8 @@
       }
     },
     "test/LightningAndSmoke.t.sol": {
-      "lastModificationDate": 1698928548666,
-      "contentHash": "f532c63124c28060004daa83d61067ff",
+      "lastModificationDate": 1698930778466,
+      "contentHash": "c7443e2903f4c38991ab923ec07e0311",
       "sourceName": "test/LightningAndSmoke.t.sol",
       "solcConfig": {
         "settings": {
@@ -1908,8 +1908,17 @@
       ],
       "versionRequirement": "^0.8.13",
       "artifacts": {
-        "LightningAndSmokeTest": {
-          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LightningAndSmokeTest.json"
+        "LSTestBase": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LSTestBase.json"
+        },
+        "LSTestDeployment": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LSTestDeployment.json"
+        },
+        "LSTest_joinSession": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LSTest_joinSession.json"
+        },
+        "LSTest_startSession": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LSTest_startSession.json"
         },
         "LightningAndSmokeWithTestUtils": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LightningAndSmokeWithTestUtils.json"
