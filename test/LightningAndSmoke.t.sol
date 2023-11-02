@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import {Test, console2} from "../lib/forge-std/src/Test.sol";
-import {LightningAndSmoke} from "../src/LightningAndSmoke.sol";
-import {PlayerType, Session, Pitch, Swing, PitchType, SwingType} from "../src/data.sol";
-import {ERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
-import {ERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import {IERC20Errors, IERC721Errors} from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
+import { Test, console2 } from "../lib/forge-std/src/Test.sol";
+import { LightningAndSmoke } from "../src/LightningAndSmoke.sol";
+import { PlayerType, Session, Pitch, Swing, PitchType, SwingType } from "../src/data.sol";
+import { ERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
+import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
+import { IERC20Errors, IERC721Errors } from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
 
 contract MockERC20 is ERC20 {
-    constructor() ERC20("test", "test") {}
+    constructor() ERC20("test", "test") { }
 
     function mint(address to, uint256 amount) public {
         _mint(to, amount);
@@ -21,7 +21,7 @@ contract MockERC20 is ERC20 {
 }
 
 contract MockERC721 is ERC721 {
-    constructor() ERC721("test", "test") {}
+    constructor() ERC721("test", "test") { }
 
     function mint(address to, uint256 tokenId) public {
         _mint(to, tokenId);
@@ -85,10 +85,12 @@ contract LSTestDeployment is LSTestBase {
 contract LSTest_startSession is LSTestBase {
     /**
      * startSession tests:
-     * - [x] fails when game is not approved to transfer character: testRevert_if_game_not_approved_to_transfer_character
+     * - [x] fails when game is not approved to transfer character:
+     * testRevert_if_game_not_approved_to_transfer_character
      * - [x] fails when game is not approved to transfer fee token: testRevert_if_game_not_approved_to_transfer_fee
      * - [x] fails when player has insufficient fee token: testRevert_if_player_has_insufficient_fee
-     * - [x] fails attempts to start session on behalf of player by random account: testRevert_if_transaction_sent_by_random_person
+     * - [x] fails attempts to start session on behalf of player by random account:
+     * testRevert_if_transaction_sent_by_random_person
      * - [x] succeeds when starting session as pitcher: test_as_pitcher
      * - [x] succeeds when starting session as batter: test_as_batter
      */

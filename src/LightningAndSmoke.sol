@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.19;
 
-import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
-import {IERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import {SafeERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
-import {StatBlockBase} from "../lib/web3/contracts/stats/StatBlock.sol";
+import { IERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import { SafeERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
     PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Session, Pitch, Swing
@@ -67,7 +67,8 @@ contract LightningAndSmoke is StatBlockBase {
     // NOTE: Sessions are 1-indexed
     mapping(uint256 => Session) public SessionState;
 
-    // ERC721 address => ERC721 token ID => address of player who staked that character into the Lightning and Smoke contract
+    // ERC721 address => ERC721 token ID => address of player who staked that character into the Lightning and Smoke
+    // contract
     mapping(address => mapping(uint256 => address)) public Staker;
 
     // ERC721 address => ERC721 token ID => session that that character is staked into
