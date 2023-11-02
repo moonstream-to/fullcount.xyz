@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.19;
 
+import {IERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import {IERC721} from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
+import {SafeERC20} from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import {StatBlockBase} from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Pitch, Swing, Session} from "./data.sol";
@@ -49,6 +51,8 @@ Functionality:
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract LightningAndSmoke is StatBlockBase {
+    using SafeERC20 for IERC20;
+
     address public FeeTokenAddress;
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
@@ -68,11 +72,27 @@ contract LightningAndSmoke is StatBlockBase {
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
 
+    event SessionStarted(
+        uint256 indexed sessionID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        PlayerType role
+    );
 
-    event SessionStarted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role);
+    event SessionJoined(
+        uint256 indexed sessionID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        PlayerType role
+    );
 
-
-    constructor(address feeTokenAddress, uint256 sessionStartPrice, uint256 sessionJoinPrice, address treasuryAddress, uint256 blocksPerPhase) {
+    constructor(
+        address feeTokenAddress,
+        uint256 sessionStartPrice,
+        uint256 sessionJoinPrice,
+        address treasuryAddress,
+        uint256 blocksPerPhase
+    ) {
         FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
@@ -90,30 +110,66 @@ contract LightningAndSmoke is StatBlockBase {
 
     // Emits:
     // - SessionStarted
-    function startSession(address nftAddress, uint256 tokenID, PlayerType role) public virtual returns (uint256) {
-      // Increment NumSessions. The new value is the ID of the session that was just started.
-      // This is what makes sessions 1-indexed.
-      NumSessions++;
+    function startSession(
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role
+    ) public virtual returns (uint256) {
+        IERC20 feeToken = IERC20(FeeTokenAddress);
+        IERC721 nftContract = IERC721(nftAddress);
+        address currentOwner = nftContract.ownerOf(tokenID);
 
-      IERC721 nftContract = IERC721(nftAddress);
-      address currentOwner = nftContract.ownerOf(tokenID);
-      Staker[nftAddress][tokenID] = currentOwner;
-      StakedSession[nftAddress][tokenID] = NumSessions;
+        require(
+            msg.sender == currentOwner,
+            "LightningAndSmoke.startSession: msg.sender is not NFT owner"
+        );
 
-      SessionState[NumSessions].startBlock = block.number;
+        feeToken.safeTransferFrom(
+            msg.sender,
+            TreasuryAddress,
+            SessionStartPrice
+        );
 
-      if (role == PlayerType.Pitcher) {
+        // Increment NumSessions. The new value is the ID of the session that was just started.
+        // This is what makes sessions 1-indexed.
+        NumSessions++;
+
+        Staker[nftAddress][tokenID] = currentOwner;
+        StakedSession[nftAddress][tokenID] = NumSessions;
+
+        SessionState[NumSessions].startBlock = block.number;
+
+        if (role == PlayerType.Pitcher) {
             SessionState[NumSessions].pitcherAddress = nftAddress;
             SessionState[NumSessions].pitcherTokenID = tokenID;
-      } else {
+        } else {
             SessionState[NumSessions].batterAddress = nftAddress;
             SessionState[NumSessions].batterTokenID = tokenID;
-      }
+        }
 
-      nftContract.transferFrom(currentOwner, address(this), tokenID);
+        nftContract.transferFrom(currentOwner, address(this), tokenID);
 
-      emit SessionStarted(NumSessions, nftAddress, tokenID, role);
+        emit SessionStarted(NumSessions, nftAddress, tokenID, role);
 
-      return NumSessions;
+        return NumSessions;
+    }
+
+    // Emits:
+    // - SessionJoined
+    function joinSession(address nftAddress, uint256 tokenID) public virtual {
+        IERC20 feeToken = IERC20(FeeTokenAddress);
+        IERC721 nftContract = IERC721(nftAddress);
+        address currentOwner = nftContract.ownerOf(tokenID);
+
+        require(
+            msg.sender == currentOwner,
+            "LightningAndSmoke.joinSession: msg.sender is not NFT owner"
+        );
+
+        feeToken.safeTransferFrom(
+            msg.sender,
+            TreasuryAddress,
+            SessionJoinPrice
+        );
     }
 }

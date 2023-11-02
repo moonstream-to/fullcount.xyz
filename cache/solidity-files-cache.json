@@ -637,7 +637,7 @@
       }
     },
     "lib/forge-std/src/Vm.sol": {
-      "lastModificationDate": 1698874019956,
+      "lastModificationDate": 1698877819076,
       "contentHash": "eff2556a384c025f56150fb3f78de858",
       "sourceName": "lib/forge-std/src/Vm.sol",
       "solcConfig": {
@@ -1054,6 +1054,90 @@
         }
       }
     },
+    "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol": {
+      "lastModificationDate": 1698874354876,
+      "contentHash": "da291753fa4641f2c5837bfc4aa4c01b",
+      "sourceName": "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "IERC20Permit": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "IERC20Permit.sol/IERC20Permit.json"
+        }
+      }
+    },
+    "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol": {
+      "lastModificationDate": 1698874354876,
+      "contentHash": "697fd27924863e77c17dace2179018b2",
+      "sourceName": "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [
+        "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Address.sol"
+      ],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "SafeERC20": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "SafeERC20.sol/SafeERC20.json"
+        }
+      }
+    },
     "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol": {
       "lastModificationDate": 1698874354876,
       "contentHash": "1e64e2ad597dc5b2dae11346502baad4",
@@ -1227,6 +1311,46 @@
       "artifacts": {
         "IERC721Metadata": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "IERC721Metadata.sol/IERC721Metadata.json"
+        }
+      }
+    },
+    "lib/openzeppelin-contracts/contracts/utils/Address.sol": {
+      "lastModificationDate": 1698874354876,
+      "contentHash": "79c699f80eb8a9b168cb34e37816f894",
+      "sourceName": "lib/openzeppelin-contracts/contracts/utils/Address.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "paris",
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.20",
+      "artifacts": {
+        "Address": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "Address.sol/Address.json"
         }
       }
     },
@@ -1618,8 +1742,8 @@
       }
     },
     "src/LightningAndSmoke.sol": {
-      "lastModificationDate": 1698875867356,
-      "contentHash": "f10ab1a2e5b8bed56a3a29dae842e069",
+      "lastModificationDate": 1698928249786,
+      "contentHash": "6f3ab15c2acf5d171342fc83b6349830",
       "sourceName": "src/LightningAndSmoke.sol",
       "solcConfig": {
         "settings": {
@@ -1651,7 +1775,11 @@
       },
       "imports": [
         "lib/openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Address.sol",
         "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
         "lib/web3/contracts/stats/IStatBlock.sol",
         "lib/web3/contracts/stats/StatBlock.sol",
@@ -1665,7 +1793,7 @@
       }
     },
     "src/data.sol": {
-      "lastModificationDate": 1698874020396,
+      "lastModificationDate": 1698875183646,
       "contentHash": "5329a6eb0b183ea5e5a02b58525f8ed4",
       "sourceName": "src/data.sol",
       "solcConfig": {
@@ -1705,8 +1833,8 @@
       }
     },
     "test/LightningAndSmoke.t.sol": {
-      "lastModificationDate": 1698883291756,
-      "contentHash": "971bd18447e65553d9efed421c9d2fbc",
+      "lastModificationDate": 1698928548666,
+      "contentHash": "f532c63124c28060004daa83d61067ff",
       "sourceName": "test/LightningAndSmoke.t.sol",
       "solcConfig": {
         "settings": {
@@ -1760,10 +1888,13 @@
         "lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/extensions/IERC20Permit.sol",
+        "lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC721/IERC721Receiver.sol",
         "lib/openzeppelin-contracts/contracts/token/ERC721/extensions/IERC721Metadata.sol",
+        "lib/openzeppelin-contracts/contracts/utils/Address.sol",
         "lib/openzeppelin-contracts/contracts/utils/Context.sol",
         "lib/openzeppelin-contracts/contracts/utils/Strings.sol",
         "lib/openzeppelin-contracts/contracts/utils/introspection/ERC165.sol",
@@ -1780,14 +1911,14 @@
         "LightningAndSmokeTest": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LightningAndSmokeTest.json"
         },
+        "LightningAndSmokeWithTestUtils": {
+          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/LightningAndSmokeWithTestUtils.json"
+        },
         "MockERC20": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/MockERC20.json"
         },
         "MockERC721": {
           "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/MockERC721.json"
-        },
-        "TestLightningAndSmoke": {
-          "0.8.20+commit.a1b79de6.Linux.gcc": "LightningAndSmoke.t.sol/TestLightningAndSmoke.json"
         }
       }
     }

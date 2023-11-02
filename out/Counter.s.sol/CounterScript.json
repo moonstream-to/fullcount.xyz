@@ -30,12 +30,12 @@
   ],
   "bytecode": {
     "object": "0x6080604052600b805462ff00ff19166201000117905534801561002157600080fd5b5061011b806100316000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c80630a9254e4146041578063c0406226146043578063f8ccbf47146049575b600080fd5b005b6041606f565b600b54605b9062010000900460ff1681565b604051901515815260200160405180910390f35b7f885cb69240a935d632d79c317109709ecfa91a80626ff3989d68f67f5b1dd12d60001c6001600160a01b031663afc980406040518163ffffffff1660e01b8152600401600060405180830381600087803b15801560cc57600080fd5b505af115801560df573d6000803e3d6000fd5b5050505056fea2646970667358221220c309849dbb152022f0f8f3f24051c6a6611a0429f6a9f3b69314114a89609de664736f6c63430008140033",
-    "sourceMap": "121:126:24:-:0;;;3126:44:4;;;-1:-1:-1;;800:28:2;;;;;121:126:24;;;;;;;;;;;;;;;;",
+    "sourceMap": "121:126:36:-:0;;;3126:44:4;;;-1:-1:-1;;800:28:2;;;;;121:126:36;;;;;;;;;;;;;;;;",
     "linkReferences": {}
   },
   "deployedBytecode": {
     "object": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c80630a9254e4146041578063c0406226146043578063f8ccbf47146049575b600080fd5b005b6041606f565b600b54605b9062010000900460ff1681565b604051901515815260200160405180910390f35b7f885cb69240a935d632d79c317109709ecfa91a80626ff3989d68f67f5b1dd12d60001c6001600160a01b031663afc980406040518163ffffffff1660e01b8152600401600060405180830381600087803b15801560cc57600080fd5b505af115801560df573d6000803e3d6000fd5b5050505056fea2646970667358221220c309849dbb152022f0f8f3f24051c6a6611a0429f6a9f3b69314114a89609de664736f6c63430008140033",
-    "sourceMap": "121:126:24:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;160:26;;192:53;;;:::i;800:28:2:-;;;;;;;;;;;;;;;179:14:29;;172:22;154:41;;142:2;127:18;800:28:2;;;;;;;192:53:24;317:28:1;309:37;;-1:-1:-1;;;;;224:12:24;;:14;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;192:53::o",
+    "sourceMap": "121:126:36:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;160:26;;192:53;;;:::i;800:28:2:-;;;;;;;;;;;;;;;179:14:40;;172:22;154:41;;142:2;127:18;800:28:2;;;;;;;192:53:36;317:28:1;309:37;;-1:-1:-1;;;;;224:12:36;;:14;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;192:53::o",
     "linkReferences": {}
   },
   "methodIdentifiers": {
@@ -236,10 +236,10 @@
   },
   "ast": {
     "absolutePath": "script/Counter.s.sol",
-    "id": 44221,
+    "id": 47492,
     "exportedSymbols": {
       "CounterScript": [
-        44220
+        47491
       ],
       "Script": [
         2405
@@ -249,12 +249,12 @@
       ]
     },
     "nodeType": "SourceUnit",
-    "src": "39:209:24",
+    "src": "39:209:36",
     "nodes": [
       {
-        "id": 44201,
+        "id": 47472,
         "nodeType": "PragmaDirective",
-        "src": "39:24:24",
+        "src": "39:24:36",
         "nodes": [],
         "literals": [
           "solidity",
@@ -264,36 +264,36 @@
         ]
       },
       {
-        "id": 44204,
+        "id": 47475,
         "nodeType": "ImportDirective",
-        "src": "65:54:24",
+        "src": "65:54:36",
         "nodes": [],
         "absolutePath": "lib/forge-std/src/Script.sol",
         "file": "forge-std/Script.sol",
         "nameLocation": "-1:-1:-1",
-        "scope": 44221,
+        "scope": 47492,
         "sourceUnit": 2406,
         "symbolAliases": [
           {
             "foreign": {
-              "id": 44202,
+              "id": 47473,
               "name": "Script",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
               "referencedDeclaration": 2405,
-              "src": "73:6:24",
+              "src": "73:6:36",
               "typeDescriptions": {}
             },
             "nameLocation": "-1:-1:-1"
           },
           {
             "foreign": {
-              "id": 44203,
+              "id": 47474,
               "name": "console2",
               "nodeType": "Identifier",
               "overloadedDeclarations": [],
               "referencedDeclaration": 30149,
-              "src": "81:8:24",
+              "src": "81:8:36",
               "typeDescriptions": {}
             },
             "nameLocation": "-1:-1:-1"
@@ -302,19 +302,19 @@
         "unitAlias": ""
       },
       {
-        "id": 44220,
+        "id": 47491,
         "nodeType": "ContractDefinition",
-        "src": "121:126:24",
+        "src": "121:126:36",
         "nodes": [
           {
-            "id": 44210,
+            "id": 47481,
             "nodeType": "FunctionDefinition",
-            "src": "160:26:24",
+            "src": "160:26:36",
             "nodes": [],
             "body": {
-              "id": 44209,
+              "id": 47480,
               "nodeType": "Block",
-              "src": "184:2:24",
+              "src": "184:2:36",
               "nodes": [],
               "statements": []
             },
@@ -323,33 +323,33 @@
             "kind": "function",
             "modifiers": [],
             "name": "setUp",
-            "nameLocation": "169:5:24",
+            "nameLocation": "169:5:36",
             "parameters": {
-              "id": 44207,
+              "id": 47478,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "174:2:24"
+              "src": "174:2:36"
             },
             "returnParameters": {
-              "id": 44208,
+              "id": 47479,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "184:0:24"
+              "src": "184:0:36"
             },
-            "scope": 44220,
+            "scope": 47491,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           },
           {
-            "id": 44219,
+            "id": 47490,
             "nodeType": "FunctionDefinition",
-            "src": "192:53:24",
+            "src": "192:53:36",
             "nodes": [],
             "body": {
-              "id": 44218,
+              "id": 47489,
               "nodeType": "Block",
-              "src": "214:31:24",
+              "src": "214:31:36",
               "nodes": [],
               "statements": [
                 {
@@ -358,33 +358,33 @@
                     "expression": {
                       "argumentTypes": [],
                       "expression": {
-                        "id": 44213,
+                        "id": 47484,
                         "name": "vm",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 2350,
-                        "src": "224:2:24",
+                        "src": "224:2:36",
                         "typeDescriptions": {
                           "typeIdentifier": "t_contract$_Vm_$13960",
                           "typeString": "contract Vm"
                         }
                       },
-                      "id": 44215,
+                      "id": 47486,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "227:9:24",
+                      "memberLocation": "227:9:36",
                       "memberName": "broadcast",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 12983,
-                      "src": "224:12:24",
+                      "src": "224:12:36",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$__$returns$__$",
                         "typeString": "function () external"
                       }
                     },
-                    "id": 44216,
+                    "id": 47487,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -393,16 +393,16 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "224:14:24",
+                    "src": "224:14:36",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 44217,
+                  "id": 47488,
                   "nodeType": "ExpressionStatement",
-                  "src": "224:14:24"
+                  "src": "224:14:36"
                 }
               ]
             },
@@ -411,20 +411,20 @@
             "kind": "function",
             "modifiers": [],
             "name": "run",
-            "nameLocation": "201:3:24",
+            "nameLocation": "201:3:36",
             "parameters": {
-              "id": 44211,
+              "id": 47482,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "204:2:24"
+              "src": "204:2:36"
             },
             "returnParameters": {
-              "id": 44212,
+              "id": 47483,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "214:0:24"
+              "src": "214:0:36"
             },
-            "scope": 44220,
+            "scope": 47491,
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
@@ -434,18 +434,18 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 44205,
+              "id": 47476,
               "name": "Script",
               "nameLocations": [
-                "147:6:24"
+                "147:6:36"
               ],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 2405,
-              "src": "147:6:24"
+              "src": "147:6:36"
             },
-            "id": 44206,
+            "id": 47477,
             "nodeType": "InheritanceSpecifier",
-            "src": "147:6:24"
+            "src": "147:6:36"
           }
         ],
         "canonicalName": "CounterScript",
@@ -453,7 +453,7 @@
         "contractKind": "contract",
         "fullyImplemented": true,
         "linearizedBaseContracts": [
-          44220,
+          47491,
           2405,
           12203,
           6621,
@@ -462,13 +462,13 @@
           2354
         ],
         "name": "CounterScript",
-        "nameLocation": "130:13:24",
-        "scope": 44221,
+        "nameLocation": "130:13:36",
+        "scope": 47492,
         "usedErrors": [],
         "usedEvents": []
       }
     ],
     "license": "UNLICENSED"
   },
-  "id": 24
+  "id": 36
 }
