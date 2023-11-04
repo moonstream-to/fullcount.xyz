@@ -48,7 +48,7 @@ contract LSTestBase is Test {
     address treasury = address(0x42);
     address player1 = address(0x1);
     address player2 = address(0x2);
-    address randomACcount = address(0x77);
+    address randomPerson = address(0x77);
 
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
@@ -288,7 +288,7 @@ contract LSTest_startSession is LSTestBase {
         uint256 initialPlayer1FeeBalance = feeToken.balanceOf(player1);
         uint256 initialTreasuryFeeBalance = feeToken.balanceOf(treasury);
         uint256 initialGameFeeBalance = feeToken.balanceOf(address(game));
-        uint256 initialRandomACcountFeeBalance = feeToken.balanceOf(randomACcount);
+        uint256 initialRandomACcountFeeBalance = feeToken.balanceOf(randomPerson);
 
         uint256 initialNumSessions = game.NumSessions();
 
@@ -299,7 +299,7 @@ contract LSTest_startSession is LSTestBase {
 
         vm.stopPrank();
 
-        vm.prank(randomACcount);
+        vm.prank(randomPerson);
         vm.expectRevert("LightningAndSmoke.startSession: msg.sender is not NFT owner");
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
@@ -310,7 +310,7 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
-        assertEq(feeToken.balanceOf(randomACcount), initialRandomACcountFeeBalance);
+        assertEq(feeToken.balanceOf(randomPerson), initialRandomACcountFeeBalance);
     }
 }
 
@@ -318,15 +318,15 @@ contract LSTest_joinSession is LSTestBase {
     /**
      * joinSession tests:
      * - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
-     * - [ ] fails when joining session that is already full
+     * - [x] fails when joining session that is already full: testRevert_when_session_is_full
      * - [ ] fails when joining session in which opponent left prior to joining
      * - [ ] fails when joining on behalf of NFT owner using random account
      * - [x] fails when joiner does not have sufficient fee token:
-     * testRevert_joinSession_when_joiner_has_insufficient_feeToken_balance
+     * testRevert_when_joiner_has_insufficient_feeToken_balance
      * - [x] fails when joiner has not approved game to transfer sufficient amount of fee token:
-     * testRevert_joinSession_when_joiner_has_not_approved_feeToken_transfer
+     * testRevert_when_joiner_has_not_approved_feeToken_transfer
      * - [x] fails when joiner has not approved game to transfer character:
-     * testRevert_joinSession_when_joiner_has_not_approved_nft_transfer
+     * testRevert_when_joiner_has_not_approved_nft_transfer
      * - [x] succeeds when joining session as pitcher: test_as_pitcher
      * - [x] succeeds when joining session as batter: test_as_batter
      */
@@ -484,7 +484,7 @@ contract LSTest_joinSession is LSTestBase {
         vm.stopPrank();
     }
 
-    function testRevert_joinSession_when_joiner_has_insufficient_feeToken_balance() public {
+    function testRevert_when_joiner_has_insufficient_feeToken_balance() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
@@ -515,7 +515,7 @@ contract LSTest_joinSession is LSTestBase {
         vm.stopPrank();
     }
 
-    function testRevert_joinSession_when_joiner_has_not_approved_feeToken_transfer() public {
+    function testRevert_when_joiner_has_not_approved_feeToken_transfer() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
@@ -546,7 +546,7 @@ contract LSTest_joinSession is LSTestBase {
         vm.stopPrank();
     }
 
-    function testRevert_joinSession_when_joiner_has_not_approved_nft_transfer() public {
+    function testRevert_when_joiner_has_not_approved_nft_transfer() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
@@ -572,6 +572,52 @@ contract LSTest_joinSession is LSTestBase {
             abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, address(game), otherTokenID)
         );
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_when_session_is_full() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectEmit(address(game));
+        emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+
+        otherCharactersMinted++;
+        uint256 nextOtherTokenID = otherCharactersMinted;
+        otherCharacterNFTs.mint(randomPerson, nextOtherTokenID);
+
+        feeToken.mint(randomPerson, sessionJoinPrice);
+
+        vm.startPrank(randomPerson);
+
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), nextOtherTokenID);
+
+        vm.expectRevert("LightningAndSmoke.joinSession: session is already full");
+        game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
 
         vm.stopPrank();
     }
