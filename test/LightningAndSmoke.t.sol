@@ -321,7 +321,8 @@ contract LSTest_joinSession is LSTestBase {
      * - [ ] fails when joining session that is already full
      * - [ ] fails when joining session in which opponent left prior to joining
      * - [ ] fails when joining on behalf of NFT owner using random account
-     * - [ ] fails when joiner does not have sufficient fee token
+     * - [x] fails when joiner does not have sufficient fee token:
+     * testRevert_joinSession_when_joiner_has_insufficient_feeToken_balance
      * - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
      * - [ ] fails when joiner has not approved game to transfer character
      * - [x] succeeds when joining session as pitcher: test_as_pitcher
@@ -506,6 +507,37 @@ contract LSTest_joinSession is LSTestBase {
 
         vm.expectRevert(
             abi.encodeWithSelector(IERC20Errors.ERC20InsufficientBalance.selector, player2, 0, sessionJoinPrice)
+        );
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_joinSession_when_joiner_has_not_approved_feeToken_transfer() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), 0);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectRevert(
+            abi.encodeWithSelector(IERC20Errors.ERC20InsufficientAllowance.selector, address(game), 0, sessionJoinPrice)
         );
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
 
