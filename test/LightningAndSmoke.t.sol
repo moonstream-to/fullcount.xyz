@@ -300,7 +300,7 @@ contract LSTest_startSession is LSTestBase {
         vm.stopPrank();
 
         vm.prank(randomPerson);
-        vm.expectRevert("LightningAndSmoke.startSession: msg.sender is not NFT owner");
+        vm.expectRevert("LS.startSession: msg.sender is not NFT owner");
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), player1);
@@ -359,7 +359,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        vm.expectRevert("LightningAndSmoke.joinSession: session does not exist");
+        vm.expectRevert("LS.joinSession: session does not exist");
         game.joinSession(initialNumSessions + 1, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions);
@@ -626,7 +626,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), nextOtherTokenID);
 
-        vm.expectRevert("LightningAndSmoke.joinSession: session is already full");
+        vm.expectRevert("LS.joinSession: session is already full");
         game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
 
         vm.stopPrank();
@@ -658,7 +658,7 @@ contract LSTest_joinSession is LSTestBase {
         vm.stopPrank();
 
         vm.prank(randomPerson);
-        vm.expectRevert("LightningAndSmoke.joinSession: msg.sender is not NFT owner");
+        vm.expectRevert("LS.joinSession: msg.sender is not NFT owner");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
     }
 }
