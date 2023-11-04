@@ -55,7 +55,7 @@ Functionality:
 - [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
 
-TODO: We get rid of fees to start and sessions. Instead, we define a native token budget for each
+TODO: MAYBE we get rid of fees to start and sessions. Instead, we define a native token budget for each
 operations - start, join, commit, reveal. We do this to make things symmetric between player_1 and
 player_2. Whatever portion of this budget that doesn't get spent on gas goes to the treasury. We should
 still give a discount to player 1 (which is why start is handled differently from join). We need to
