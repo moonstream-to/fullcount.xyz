@@ -320,7 +320,7 @@ contract LSTest_joinSession is LSTestBase {
      * - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
      * - [x] fails when joining session that is already full: testRevert_when_session_is_full
      * - [ ] fails when joining session in which opponent left prior to joining
-     * - [ ] fails when joining on behalf of NFT owner using random account
+     * - [x] fails when joining on behalf of NFT owner using random account: testRevert_if_msg_sender_not_nft_owner
      * - [x] fails when joiner does not have sufficient fee token:
      * testRevert_when_joiner_has_insufficient_feeToken_balance
      * - [x] fails when joiner has not approved game to transfer sufficient amount of fee token:
@@ -620,5 +620,35 @@ contract LSTest_joinSession is LSTestBase {
         game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
 
         vm.stopPrank();
+    }
+
+    function testRevert_if_msg_sender_not_nft_owner() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.startPrank(player2);
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.stopPrank();
+
+        vm.prank(randomPerson);
+        vm.expectRevert("LightningAndSmoke.joinSession: msg.sender is not NFT owner");
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
     }
 }
