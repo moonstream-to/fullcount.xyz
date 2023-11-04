@@ -318,7 +318,7 @@ contract LSTest_startSession is LSTestBase {
  * joinSession tests:
  * - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
  * - [x] fails when joining session that is already full: testRevert_when_session_is_full
- * - [ ] fails when joining session in which opponent left prior to joining
+ * - [x] fails when joining session in which opponent left prior to joining: testRevert_when_joining_aborted_session
  * - [x] fails when joining on behalf of NFT owner using random account: testRevert_if_msg_sender_not_nft_owner
  * - [x] fails when joiner does not have sufficient fee token:
  * testRevert_when_joiner_has_insufficient_feeToken_balance
@@ -659,6 +659,42 @@ contract LSTest_joinSession is LSTestBase {
         vm.prank(randomPerson);
         vm.expectRevert("LS.joinSession: msg.sender is not NFT owner");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+    }
+
+    function testRevert_when_joining_aborted_session() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        game.abortSession(sessionID);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(sessionID), 1);
+
+        vm.startPrank(player2);
+
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.expectRevert("LS.joinSession: opponent left session");
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
     }
 }
 
