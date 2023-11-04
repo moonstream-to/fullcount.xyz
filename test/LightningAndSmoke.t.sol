@@ -320,8 +320,6 @@ contract LSTest_joinSession is LSTestBase {
      * - [x] fails when joining non-existent session: testRevert_when_joining_nonexistent_session
      * - [ ] fails when joining session that is already full
      * - [ ] fails when joining session in which opponent left prior to joining
-     * - [ ] fails when joining session in same role as opponent (batter)
-     * - [ ] fails when joining session in same role as opponent (pitcher)
      * - [ ] fails when joining on behalf of NFT owner using random account
      * - [ ] fails when joiner does not have sufficient fee token
      * - [ ] fails when joiner has not approved game to transfer sufficient amount of fee token
