@@ -122,6 +122,8 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function testRevert_if_game_not_approved_to_transfer_fee() public {
@@ -152,6 +154,8 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function testRevert_if_player_has_insufficient_fee() public {
@@ -183,6 +187,8 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function test_as_pitcher() public {
@@ -225,6 +231,8 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function test_as_batter() public {
@@ -267,6 +275,8 @@ contract LSTest_startSession is LSTestBase {
         assertEq(feeToken.balanceOf(player1), initialPlayer1FeeBalance - sessionStartPrice);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function testRevert_if_transaction_sent_by_random_person() public {
@@ -359,6 +369,8 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function test_as_batter() public {
@@ -412,6 +424,8 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance - sessionJoinPrice);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 
     function test_as_pitcher() public {
@@ -465,5 +479,7 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(feeToken.balanceOf(player2), initialPlayer2FeeBalance - sessionJoinPrice);
         assertEq(feeToken.balanceOf(treasury), initialTreasuryFeeBalance + sessionStartPrice + sessionJoinPrice);
         assertEq(feeToken.balanceOf(address(game)), initialGameFeeBalance);
+
+        vm.stopPrank();
     }
 }
