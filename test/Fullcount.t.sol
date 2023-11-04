@@ -74,6 +74,7 @@ contract FullcountTestBase is Test {
 
 contract FullcountTestDeployment is FullcountTestBase {
     function test_Deployment() public {
+        assertEq(game.FullcountVersion(), "0.0.1");
         assertEq(game.FeeTokenAddress(), address(feeToken));
         assertEq(game.SessionStartPrice(), sessionStartPrice);
         assertEq(game.SessionJoinPrice(), sessionJoinPrice);

@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.19;
 
+import { EIP712 } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 import { IERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import { SafeERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -28,12 +29,13 @@ Functionality:
 - [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
       to start the session. (joinSession automatically chooses the role of the joining player)
 - [x] When a pitcher and batter are staked into a session, the session automatically starts.
-- [ ] Staking a character into a session costs either native tokens or ERC20 tokens. Starting a session
+- [x] Staking a character into a session costs either native tokens or ERC20 tokens. Starting a session
       can have a different price than joining an existing session. In general, we will keep it cheaper
       to start a session than to join a sesion that someone else started -- this will incentivize many
       matches. The cost will disincentivize bots grinding against themselves. The contract is deployed
       with `feeTokenAddress`, `sessionStartPrice`, `sessionJoinPrice`, and `treasuryAddress` parameters.
       Prices are transferred to the `treasuryAddress` when a session is either started or joined.
+      NOTE: Currently, only ERC20 fees are implemented.
 - [ ] Once a session starts, both the pitcher and the batter can commit their moves.
 - [ ] Commitments are signed EIP712 messages representing the moves.
 - [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
@@ -52,8 +54,10 @@ Functionality:
 - [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
-contract Fullcount is StatBlockBase {
+contract Fullcount is StatBlockBase, EIP712 {
     using SafeERC20 for IERC20;
+
+    string public constant FullcountVersion = "0.0.1";
 
     address public FeeTokenAddress;
     uint256 public SessionStartPrice;
@@ -90,7 +94,9 @@ contract Fullcount is StatBlockBase {
         uint256 sessionJoinPrice,
         address treasuryAddress,
         uint256 secondsPerPhase
-    ) {
+    )
+        EIP712("Fullcount", FullcountVersion)
+    {
         FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
