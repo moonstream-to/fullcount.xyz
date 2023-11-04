@@ -664,8 +664,9 @@ contract LSTest_joinSession is LSTestBase {
 
 /**
  * abortSession tests:
- * - [ ] fails when aborting non-existent session
- * - [ ] fails when aborting session that is not in the "join" phase
+ * - [x] fails when aborting non-existent session: testRevert_when_aborting_nonexistent_session
+ * - [x] fails when aborting session that is not in the "join" phase:
+ * testRevert_when_aborting_session_in_commitment_phase
  * - [x] fails when aborting session with pitcher that was not staked by the aborter:
  * testRevert_when_pitcher_aborted_by_nonstaker
  * - [x] fails when aborting session with batter that was not staked by the aborter:
@@ -820,5 +821,58 @@ contract LSTest_abortSession is LSTestBase {
         assertEq(terminalSession.batterTokenID, tokenID);
         assertEq(terminalSession.pitcherAddress, address(0));
         assertEq(terminalSession.pitcherTokenID, 0);
+    }
+
+    function testRevert_when_aborting_nonexistent_session() public {
+        uint256 nonexistentSessionID = game.NumSessions() + 1;
+        assertEq(game.sessionProgress(nonexistentSessionID), 0);
+
+        vm.prank(player1);
+        vm.expectRevert("LS.abortSession: cannot abort from session in this state");
+        game.abortSession(nonexistentSessionID);
+    }
+
+    function testRevert_when_aborting_session_in_commitment_phase() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.stopPrank();
+
+        vm.startPrank(player2);
+
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(sessionID), 3);
+
+        vm.startPrank(player1);
+
+        vm.expectRevert("LS.abortSession: cannot abort from session in this state");
+        game.abortSession(sessionID);
+
+        vm.stopPrank();
+
+        assertEq(characterNFTs.ownerOf(tokenID), address(game));
+        assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
     }
 }
