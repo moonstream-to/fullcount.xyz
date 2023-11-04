@@ -330,13 +330,23 @@ contract Fullcount is StatBlockBase, EIP712 {
     }
 
     /**
-     * TODO(zomglings): Should we allow commitments by the first character even if a second character
-     * has not yet joined the session?
+     * TODO: Should we allow commitments by the first character even if a second character has not
+     * yet joined the session?
      * This doesn't really make a difference on the technical implementation (besides slight increase
      * in complexity), but it could cheapen the game play experience.
      * The current implementation forces both players to be *present* in some way while the game is
      * in session. The current setup encourages both players to think about each other when they
      * decide their moves.
+     */
+
+    /**
+     * TODO: Should we allow players to change their commitments before the first reveal has taken
+     * place?
+     * Just as with the decision about making commitments before the session has been joined by the
+     * second player, the technical implementation is easy but doing this could cheapen the gameplay
+     * experience.
+     * I like the way we have it implemented now, where a player can only commit once per character.
+     * It gives the commitment a sense of urgency, immediacy, and gravity.
      */
 
     function commitPitch(uint256 sessionID, bytes memory signature) external {

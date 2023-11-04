@@ -937,11 +937,13 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
 /**
  * commitPitch and commitSwing tests:
- * - [ ] succeed when committing pitch/swing in the "commitment" phase:
- * - [ ] successfully progresses section when both commitments are registered:
+ * - [x] succeed when committing pitch/swing in the "commitment" phase: test_full_commitment
+ * - [x] successfully progresses section when both commitments are registered: test_full_commitment
  * - [ ] fails if commitment already exists (pitch):
  * - [ ] fails if commitment already exists (swing):
  * - [ ] fails if session is still in the "join" phase (i.e. it hasn't been joined by second player):
+ * - [ ] fails if someone other than staker attempts commitment (pitch):
+ * - [ ] fails if someone other than staker attempts commitment (swing):
  */
 contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
     uint256 SessionID;
