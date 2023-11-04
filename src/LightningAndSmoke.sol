@@ -22,12 +22,12 @@ The ball will not go foul. Either the pitcher gets the batter out or the batter 
 Authors: Moonstream (https://moonstream.to)
 
 Functionality:
-- [ ] Game is played by NFTs from *any* collection.
+- [x] Game is played by NFTs from *any* collection.
 - [ ] All NFTs start with stats of 0 and improve their stats by playing sessions of Lightning and Smoke.
-- [ ] Player can start a session as pitcher or batter.
-- [ ] Player can stake into existing session as pitcher or batter - complement of the role that was staked
-      to start the session.
-- [ ] When a pitcher and batter are staked into a session, the session automatically starts.
+- [x] Player can start a session as pitcher or batter.
+- [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
+      to start the session. (joinSession automatically chooses the role of the joining player)
+- [x] When a pitcher and batter are staked into a session, the session automatically starts.
 - [ ] Staking a character into a session costs either native tokens or ERC20 tokens. Starting a session
       can have a different price than joining an existing session. In general, we will keep it cheaper
       to start a session than to join a sesion that someone else started -- this will incentivize many
