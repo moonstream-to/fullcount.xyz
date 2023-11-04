@@ -82,6 +82,7 @@ contract LightningAndSmoke is StatBlockBase {
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
     event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+    event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
 
     constructor(
         address feeTokenAddress,
@@ -136,7 +137,7 @@ contract LightningAndSmoke is StatBlockBase {
             return 6;
         }
 
-        revert("LightningAndSmoke.sessionProgress: Programmer is idiot");
+        revert("LS.sessionProgress: Programmer is idiot");
     }
 
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
@@ -148,12 +149,12 @@ contract LightningAndSmoke is StatBlockBase {
 
     // Emits:
     // - SessionStarted
-    function startSession(address nftAddress, uint256 tokenID, PlayerType role) public virtual returns (uint256) {
+    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
         IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "LightningAndSmoke.startSession: msg.sender is not NFT owner");
+        require(msg.sender == currentOwner, "LS.startSession: msg.sender is not NFT owner");
 
         feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionStartPrice);
 
@@ -183,22 +184,22 @@ contract LightningAndSmoke is StatBlockBase {
 
     // Emits:
     // - SessionJoined
-    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) public virtual {
-        require(sessionID <= NumSessions, "LightningAndSmoke.joinSession: session does not exist");
+    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
+        require(sessionID <= NumSessions, "LS.joinSession: session does not exist");
 
         IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "LightningAndSmoke.joinSession: msg.sender is not NFT owner");
+        require(msg.sender == currentOwner, "LS.joinSession: msg.sender is not NFT owner");
 
         feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
-            revert("LightningAndSmoke.joinSession: session is already full");
+            revert("LS.joinSession: session is already full");
         } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
-            revert("LightningAndSmoke.joinSession: opponent left session");
+            revert("LS.joinSession: opponent left session");
         }
 
         PlayerType role = PlayerType.Pitcher;
@@ -219,5 +220,26 @@ contract LightningAndSmoke is StatBlockBase {
         nftContract.transferFrom(currentOwner, address(this), tokenID);
 
         emit SessionJoined(sessionID, nftAddress, tokenID, role);
+    }
+
+    function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
+        uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
+        require(stakedSessionID > 0, "LS._unstakeNFT: NFT is not staked");
+
+        address tokenOwner = Staker[nftAddress][tokenID];
+
+        IERC721 nftContract = IERC721(nftAddress);
+        nftContract.transferFrom(address(this), tokenOwner, tokenID);
+
+        StakedSession[nftAddress][tokenID] = 0;
+        Staker[nftAddress][tokenID] = address(0);
+    }
+
+    /**
+     * Players who have started a session but who have not yet had an opponent join their session can choose
+     * to abort the session and unstake their characters.
+     */
+    function abortSession(uint256 sessionID) external {
+        require(sessionProgress(sessionID) == 1, "LS.abortSession: cannot abort from session in this state");
     }
 }
