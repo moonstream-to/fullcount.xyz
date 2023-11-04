@@ -666,7 +666,10 @@ contract LSTest_joinSession is LSTestBase {
  * abortSession tests:
  * - [ ] fails when aborting non-existent session
  * - [ ] fails when aborting session that is not in the "join" phase
- * - [ ] fails when aborting session that is not staked by the aborter
+ * - [x] fails when aborting session with pitcher that was not staked by the aborter:
+ * testRevert_when_pitcher_aborted_by_nonstaker
+ * - [x] fails when aborting session with batter that was not staked by the aborter:
+ * testRevert_when_batter_aborted_by_nonstaker
  * - [x] succeeds when aborting session as pitcher: test_as_pitcher
  * - [x] succeeds when aborting session as batter: test_as_batter
  */
@@ -745,5 +748,77 @@ contract LSTest_abortSession is LSTestBase {
         assertEq(terminalSession.pitcherTokenID, 0);
 
         vm.stopPrank();
+    }
+
+    function testRevert_when_pitcher_aborted_by_nonstaker() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+        feeToken.mint(player1, sessionStartPrice);
+
+        vm.startPrank(player1);
+
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        assertEq(game.sessionProgress(sessionID), 2);
+
+        vm.stopPrank();
+
+        Session memory initialSession = game.getSession(sessionID);
+        assertEq(initialSession.pitcherAddress, address(characterNFTs));
+        assertEq(initialSession.pitcherTokenID, tokenID);
+        assertEq(initialSession.batterAddress, address(0));
+        assertEq(initialSession.batterTokenID, 0);
+
+        vm.prank(player2);
+        vm.expectRevert("LS._unstakeNFT: msg.sender is not NFT owner");
+        game.abortSession(sessionID);
+
+        assertEq(game.sessionProgress(sessionID), 2);
+
+        Session memory terminalSession = game.getSession(sessionID);
+        assertEq(terminalSession.pitcherAddress, address(characterNFTs));
+        assertEq(terminalSession.pitcherTokenID, tokenID);
+        assertEq(terminalSession.batterAddress, address(0));
+        assertEq(terminalSession.batterTokenID, 0);
+    }
+
+    function testRevert_when_batter_aborted_by_nonstaker() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+        feeToken.mint(player1, sessionStartPrice);
+
+        vm.startPrank(player1);
+
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        assertEq(game.sessionProgress(sessionID), 2);
+
+        vm.stopPrank();
+
+        Session memory initialSession = game.getSession(sessionID);
+        assertEq(initialSession.batterAddress, address(characterNFTs));
+        assertEq(initialSession.batterTokenID, tokenID);
+        assertEq(initialSession.pitcherAddress, address(0));
+        assertEq(initialSession.pitcherTokenID, 0);
+
+        vm.prank(player2);
+        vm.expectRevert("LS._unstakeNFT: msg.sender is not NFT owner");
+        game.abortSession(sessionID);
+
+        assertEq(game.sessionProgress(sessionID), 2);
+
+        Session memory terminalSession = game.getSession(sessionID);
+        assertEq(terminalSession.batterAddress, address(characterNFTs));
+        assertEq(terminalSession.batterTokenID, tokenID);
+        assertEq(terminalSession.pitcherAddress, address(0));
+        assertEq(terminalSession.pitcherTokenID, 0);
     }
 }
