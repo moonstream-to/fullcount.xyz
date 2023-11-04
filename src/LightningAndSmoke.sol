@@ -102,6 +102,43 @@ contract LightningAndSmoke is StatBlockBase {
         return SessionState[sessionID];
     }
 
+    /**
+     * Return values:
+     * 0 - session does not exist
+     * 1 - session aborted
+     * 2 - session started, but second player has not yet joined
+     * 3 - session started, both players joined, ready for commitments
+     * 4 - both players committed, ready for reveals
+     * 5 - session complete
+     * 6 - session expired
+     */
+    function sessionProgress(uint256 sessionID) public view returns (uint256) {
+        if (sessionID > NumSessions) {
+            return 0;
+        }
+
+        Session storage session = SessionState[sessionID];
+        if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
+            return 1;
+        } else if (session.pitcherAddress == address(0) || session.batterAddress == address(0)) {
+            return 2;
+        } else if (!session.didPitcherCommit || !session.didBatterCommit) {
+            if (session.phaseStartBlock + BlocksPerPhase < block.number) {
+                return 6;
+            }
+            return 3;
+        } else if (!session.didPitcherReveal || !session.didBatterReveal) {
+            if (session.phaseStartBlock + BlocksPerPhase < block.number) {
+                return 6;
+            }
+            return 4;
+        } else if (session.didPitcherReveal && session.didBatterReveal) {
+            return 6;
+        }
+
+        revert("LightningAndSmoke.sessionProgress: Programmer is idiot");
+    }
+
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
     // LightningAndSmoke contract itself.
     // This is an override of the StatBlockBase.isAdministrator function.
@@ -135,7 +172,7 @@ contract LightningAndSmoke is StatBlockBase {
         Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = NumSessions;
 
-        SessionState[NumSessions].startBlock = block.number;
+        SessionState[NumSessions].phaseStartBlock = block.number;
 
         nftContract.transferFrom(currentOwner, address(this), tokenID);
 
