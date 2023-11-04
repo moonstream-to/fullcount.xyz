@@ -60,7 +60,7 @@ operations - start, join, commit, reveal. We do this to make things symmetric be
 player_2. Whatever portion of this budget that doesn't get spent on gas goes to the treasury. We should
 still give a discount to player 1 (which is why start is handled differently from join). We need to
 incentivize starting sessions as it is inherently riskier -- you never know if someone will join and
-you never know how powerful the character is that joined. Fees are bullshit, especially ERC20 fees.
+you never know how powerful the character is that joined.
  */
 contract Fullcount is StatBlockBase, EIP712 {
     using SafeERC20 for IERC20;
