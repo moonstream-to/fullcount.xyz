@@ -6,6 +6,7 @@ import { EIP712 } from "../lib/openzeppelin-contracts/contracts/utils/cryptograp
 import { IERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import { SafeERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
+import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
 import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
@@ -87,6 +88,8 @@ contract Fullcount is StatBlockBase, EIP712 {
     );
     event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+    event PitchCommitted(uint256 indexed sessionID);
+    event SwingCommitted(uint256 indexed sessionID);
 
     constructor(
         address feeTokenAddress,
@@ -280,5 +283,95 @@ contract Fullcount is StatBlockBase, EIP712 {
         }
 
         require(sessionProgress(sessionID) == 1, "Fullcount.abortSession: incorrect sessionProgress");
+    }
+
+    function pitchHash(
+        uint256 nonce,
+        PitchType kind,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        public
+        view
+        returns (bytes32)
+    {
+        bytes32 structHash = keccak256(
+            abi.encode(
+                keccak256("PitchMessage(uint256 nonce,uint256 kind,uint256 vertical,uint256 horizontal)"),
+                nonce,
+                uint256(kind),
+                uint256(vertical),
+                uint256(horizontal)
+            )
+        );
+        return _hashTypedDataV4(structHash);
+    }
+
+    function swingHash(
+        uint256 nonce,
+        SwingType kind,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        public
+        view
+        returns (bytes32)
+    {
+        bytes32 structHash = keccak256(
+            abi.encode(
+                keccak256("SwingMessage(uint256 nonce,uint256 kind,uint256 vertical,uint256 horizontal)"),
+                nonce,
+                uint256(kind),
+                uint256(vertical),
+                uint256(horizontal)
+            )
+        );
+        return _hashTypedDataV4(structHash);
+    }
+
+    /**
+     * TODO(zomglings): Should we allow commitments by the first character even if a second character
+     * has not yet joined the session?
+     * This doesn't really make a difference on the technical implementation (besides slight increase
+     * in complexity), but it could cheapen the game play experience.
+     * The current implementation forces both players to be *present* in some way while the game is
+     * in session. The current setup encourages both players to think about each other when they
+     * decide their moves.
+     */
+
+    function commitPitch(uint256 sessionID, bytes memory signature) external {
+        require(sessionProgress(sessionID) == 3, "Fullcount.commitPitch: cannot commit in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
+            "Fullcount.commitPitch: msg.sender did not stake pitcher"
+        );
+
+        require(!session.didPitcherCommit, "Fullcount.commitPitch: pitcher already committed");
+
+        session.didPitcherCommit = true;
+        session.pitcherCommit = signature;
+
+        emit PitchCommitted(sessionID);
+    }
+
+    function commitSwing(uint256 sessionID, bytes memory signature) external {
+        require(sessionProgress(sessionID) == 3, "Fullcount.commitSwing: cannot commit in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.batterAddress][session.batterTokenID],
+            "Fullcount.commitSwing: msg.sender did not stake batter"
+        );
+
+        require(!session.didBatterCommit, "Fullcount.commitSwing: batter already committed");
+
+        session.didBatterCommit = true;
+        session.batterCommit = signature;
+
+        emit SwingCommitted(sessionID);
     }
 }

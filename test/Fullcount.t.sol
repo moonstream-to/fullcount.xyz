@@ -3,7 +3,16 @@ pragma solidity ^0.8.13;
 
 import { Test, console2 } from "../lib/forge-std/src/Test.sol";
 import { Fullcount } from "../src/Fullcount.sol";
-import { PlayerType, Session, Pitch, Swing, PitchType, SwingType } from "../src/data.sol";
+import {
+    PlayerType,
+    Session,
+    Pitch,
+    Swing,
+    PitchType,
+    SwingType,
+    VerticalLocation,
+    HorizontalLocation
+} from "../src/data.sol";
 import { ERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import { IERC20Errors, IERC721Errors } from "../lib/openzeppelin-contracts/contracts/interfaces/draft-IERC6093.sol";
@@ -46,9 +55,19 @@ contract FullcountTestBase is Test {
     uint256 otherCharactersMinted = 0;
 
     address treasury = address(0x42);
-    address player1 = address(0x1);
-    address player2 = address(0x2);
-    address randomPerson = address(0x77);
+
+    uint256 player1PrivateKey = 0x1;
+    uint256 player2PrivateKey = 0x2;
+    uint256 randomPersonPrivateKey = 0x77;
+
+    address player1 = vm.addr(player1PrivateKey);
+    address player2 = vm.addr(player2PrivateKey);
+    address randomPerson = vm.addr(randomPersonPrivateKey);
+
+    function signMessageHash(uint256 privateKey, bytes32 messageHash) internal pure returns (bytes memory) {
+        (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, messageHash);
+        return abi.encodePacked(r, s, v);
+    }
 
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
@@ -57,8 +76,10 @@ contract FullcountTestBase is Test {
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+    event PitchCommitted(uint256 indexed sessionID);
+    event SwingCommitted(uint256 indexed sessionID);
 
-    function setUp() public {
+    function setUp() public virtual {
         feeToken = new MockERC20();
         characterNFTs = new MockERC721();
         otherCharacterNFTs = new MockERC721();
@@ -911,5 +932,121 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
         assertEq(otherCharacterNFTs.ownerOf(otherTokenID), address(game));
+    }
+}
+
+/**
+ * commitPitch and commitSwing tests:
+ * - [ ] succeed when committing pitch/swing in the "commitment" phase:
+ * - [ ] successfully progresses section when both commitments are registered:
+ * - [ ] fails if commitment already exists (pitch):
+ * - [ ] fails if commitment already exists (swing):
+ * - [ ] fails if session is still in the "join" phase (i.e. it hasn't been joined by second player):
+ */
+contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
+    uint256 SessionID;
+    uint256 PitcherTokenID;
+    uint256 BatterTokenID;
+
+    function setUp() public virtual override {
+        super.setUp();
+
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        feeToken.mint(player1, sessionStartPrice);
+        feeToken.mint(player2, sessionJoinPrice);
+
+        vm.startPrank(player1);
+
+        feeToken.approve(address(game), sessionStartPrice);
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        vm.stopPrank();
+
+        vm.startPrank(player2);
+
+        feeToken.approve(address(game), sessionJoinPrice);
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+
+        SessionID = sessionID;
+        PitcherTokenID = tokenID;
+        BatterTokenID = otherTokenID;
+    }
+
+    function test_full_commitment() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Session memory session = game.getSession(SessionID);
+
+        assertFalse(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        vm.startPrank(player1);
+
+        // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
+        uint256 pitcherNonce = 0x1902a;
+        PitchType pitcherPitch = PitchType.Fastball;
+        VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
+        HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
+
+        bytes32 pitchMessageHash =
+            game.pitchHash(pitcherNonce, pitcherPitch, pitcherVerticalLocation, pitcherHorizontalLocation);
+        bytes memory pitcherCommitment = signMessageHash(player1PrivateKey, pitchMessageHash);
+
+        vm.expectEmit(address(game));
+        emit PitchCommitted(SessionID);
+        game.commitPitch(SessionID, pitcherCommitment);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+
+        vm.startPrank(player2);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        uint256 batterNonce = 0x725ae98;
+        SwingType batterSwing = SwingType.Power;
+        VerticalLocation batterVerticalLocation = VerticalLocation.Middle;
+        HorizontalLocation batterHorizontalLocation = HorizontalLocation.Middle;
+
+        bytes32 swingMessageHash =
+            game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
+        bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
+
+        vm.expectEmit(address(game));
+        emit SwingCommitted(SessionID);
+        game.commitSwing(SessionID, batterCommitment);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertTrue(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+        assertEq(session.batterCommit, batterCommitment);
     }
 }

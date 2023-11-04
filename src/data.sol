@@ -3,7 +3,7 @@
 pragma solidity ^0.8.19;
 
 /*
-This file defines the basic data types and structures that are used in Lightning and Smoke game mechanics.
+This file defines the basic data types and structures that are used in Fullcount game mechanics.
 */
 
 /*
@@ -78,7 +78,7 @@ enum HorizontalLocation {
 }
 
 /*
-Pitch represents the pitcher's move in a Lightning and Smoke session.
+Pitch represents the pitcher's move in a Fullcount session.
 */
 struct Pitch {
     uint256 nonce;
@@ -88,7 +88,7 @@ struct Pitch {
 }
 
 /*
-Swing represents the batter's move in a Lightning and Smoke session.
+Swing represents the batter's move in a Fullcount session.
 */
 struct Swing {
     uint256 nonce;
@@ -98,7 +98,7 @@ struct Swing {
 }
 
 /*
-Session represents the state of a Lightning and Smoke session.
+Session represents the state of a Fullcount session.
 */
 struct Session {
     uint256 phaseStartTimestamp;
