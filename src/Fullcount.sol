@@ -12,7 +12,7 @@ import {
 } from "./data.sol";
 
 /*
-LightningAndSmoke implements a simple game in which two NFTs (from any ERC721 contracts) complete against
+Fullcount implements a simple game in which two NFTs (from any ERC721 contracts) complete against
 each other in a single pitch of baseball. One NFT acts as the pitcher, the other one acts as the batter,
 and they face off with the game tied, the bases loaded, a full count, and two outs in the bottom of the 9th
 inning.
@@ -23,7 +23,7 @@ Authors: Moonstream (https://moonstream.to)
 
 Functionality:
 - [x] Game is played by NFTs from *any* collection.
-- [ ] All NFTs start with stats of 0 and improve their stats by playing sessions of Lightning and Smoke.
+- [ ] All NFTs start with stats of 0 and improve their stats by playing sessions of Fullcount.
 - [x] Player can start a session as pitcher or batter.
 - [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
       to start the session. (joinSession automatically chooses the role of the joining player)
@@ -36,7 +36,7 @@ Functionality:
       Prices are transferred to the `treasuryAddress` when a session is either started or joined.
 - [ ] Once a session starts, both the pitcher and the batter can commit their moves.
 - [ ] Commitments are signed EIP712 messages representing the moves.
-- [ ] LightningAndSmoke contract is deployed with a `secondsPerPhase` parameter. If one player commits
+- [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
       their move but the other one does not commit their move before `secondsPerPhase` blocks have
       elapsed since the session started, then the first player wins by forfeit. They can submit a
       transaction to end the session, unstake their NFT, and earn their reward.
@@ -52,7 +52,7 @@ Functionality:
 - [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
-contract LightningAndSmoke is StatBlockBase {
+contract Fullcount is StatBlockBase {
     using SafeERC20 for IERC20;
 
     address public FeeTokenAddress;
@@ -67,7 +67,7 @@ contract LightningAndSmoke is StatBlockBase {
     // NOTE: Sessions are 1-indexed
     mapping(uint256 => Session) public SessionState;
 
-    // ERC721 address => ERC721 token ID => address of player who staked that character into the Lightning and Smoke
+    // ERC721 address => ERC721 token ID => address of player who staked that character into the Fullcount
     // contract
     mapping(address => mapping(uint256 => address)) public Staker;
 
@@ -137,11 +137,11 @@ contract LightningAndSmoke is StatBlockBase {
             return 6;
         }
 
-        revert("LS.sessionProgress: idiot programmer");
+        revert("Fullcount.sessionProgress: idiot programmer");
     }
 
-    // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
-    // LightningAndSmoke contract itself.
+    // Fullcount is an autnonomous game, and so the only administrator for NFT stats is the
+    // Fullcount contract itself.
     // This is an override of the StatBlockBase.isAdministrator function.
     function isAdministrator(address account) public view override returns (bool) {
         return account == address(this);
@@ -154,7 +154,7 @@ contract LightningAndSmoke is StatBlockBase {
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "LS.startSession: msg.sender is not NFT owner");
+        require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
 
         feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionStartPrice);
 
@@ -185,21 +185,21 @@ contract LightningAndSmoke is StatBlockBase {
     // Emits:
     // - SessionJoined
     function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
-        require(sessionID <= NumSessions, "LS.joinSession: session does not exist");
+        require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
         IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "LS.joinSession: msg.sender is not NFT owner");
+        require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
 
         feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
-            revert("LS.joinSession: session is already full");
+            revert("Fullcount.joinSession: session is already full");
         } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
-            revert("LS.joinSession: opponent left session");
+            revert("Fullcount.joinSession: opponent left session");
         }
 
         PlayerType role = PlayerType.Pitcher;
@@ -224,11 +224,11 @@ contract LightningAndSmoke is StatBlockBase {
 
     function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
         uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
-        require(stakedSessionID > 0, "LS._unstakeNFT: NFT is not staked");
+        require(stakedSessionID > 0, "Fullcount._unstakeNFT: NFT is not staked");
 
         address tokenOwner = Staker[nftAddress][tokenID];
 
-        require(msg.sender == tokenOwner, "LS._unstakeNFT: msg.sender is not NFT owner");
+        require(msg.sender == tokenOwner, "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
         IERC721 nftContract = IERC721(nftAddress);
         nftContract.transferFrom(address(this), tokenOwner, tokenID);
@@ -246,7 +246,7 @@ contract LightningAndSmoke is StatBlockBase {
             SessionState[stakedSessionID].batterAddress = address(0);
             SessionState[stakedSessionID].batterTokenID = 0;
         } else {
-            revert("LS._unstakeNFT: idiot programmer");
+            revert("Fullcount._unstakeNFT: idiot programmer");
         }
 
         StakedSession[nftAddress][tokenID] = 0;
@@ -258,7 +258,7 @@ contract LightningAndSmoke is StatBlockBase {
      * to abort the session and unstake their characters.
      */
     function abortSession(uint256 sessionID) external {
-        require(sessionProgress(sessionID) == 2, "LS.abortSession: cannot abort from session in this state");
+        require(sessionProgress(sessionID) == 2, "Fullcount.abortSession: cannot abort from session in this state");
 
         // In each branch, we emit SessionAborted before unstaking because unstaking changes SessionState.
         if (SessionState[sessionID].pitcherAddress != address(0)) {
@@ -270,9 +270,9 @@ contract LightningAndSmoke is StatBlockBase {
             emit SessionAborted(sessionID, SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
             _unstakeNFT(SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
         } else {
-            revert("LS.abortSession: idiot programmer");
+            revert("Fullcount.abortSession: idiot programmer");
         }
 
-        require(sessionProgress(sessionID) == 1, "LS.abortSession: incorrect sessionProgress");
+        require(sessionProgress(sessionID) == 1, "Fullcount.abortSession: incorrect sessionProgress");
     }
 }

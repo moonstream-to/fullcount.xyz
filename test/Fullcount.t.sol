@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import { Test, console2 } from "../lib/forge-std/src/Test.sol";
-import { LightningAndSmoke } from "../src/LightningAndSmoke.sol";
+import { Fullcount } from "../src/Fullcount.sol";
 import { PlayerType, Session, Pitch, Swing, PitchType, SwingType } from "../src/data.sol";
 import { ERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
@@ -32,11 +32,11 @@ contract MockERC721 is ERC721 {
     }
 }
 
-contract LSTestBase is Test {
+contract FullcountTestBase is Test {
     MockERC20 public feeToken;
     MockERC721 public characterNFTs;
     MockERC721 public otherCharacterNFTs;
-    LightningAndSmoke public game;
+    Fullcount public game;
 
     uint256 sessionStartPrice = 5;
     uint256 sessionJoinPrice = 9;
@@ -62,7 +62,7 @@ contract LSTestBase is Test {
         feeToken = new MockERC20();
         characterNFTs = new MockERC721();
         otherCharacterNFTs = new MockERC721();
-        game = new LightningAndSmoke(
+        game = new Fullcount(
             address(feeToken),
             sessionStartPrice,
             sessionJoinPrice,
@@ -72,7 +72,7 @@ contract LSTestBase is Test {
     }
 }
 
-contract LSTestDeployment is LSTestBase {
+contract FullcountTestDeployment is FullcountTestBase {
     function test_Deployment() public {
         assertEq(game.FeeTokenAddress(), address(feeToken));
         assertEq(game.SessionStartPrice(), sessionStartPrice);
@@ -94,7 +94,7 @@ contract LSTestDeployment is LSTestBase {
  * - [x] succeeds when starting session as pitcher: test_as_pitcher
  * - [x] succeeds when starting session as batter: test_as_batter
  */
-contract LSTest_startSession is LSTestBase {
+contract FullcountTest_startSession is FullcountTestBase {
     function testRevert_if_game_not_approved_to_transfer_character() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
@@ -300,7 +300,7 @@ contract LSTest_startSession is LSTestBase {
         vm.stopPrank();
 
         vm.prank(randomPerson);
-        vm.expectRevert("LS.startSession: msg.sender is not NFT owner");
+        vm.expectRevert("Fullcount.startSession: msg.sender is not NFT owner");
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), player1);
@@ -329,7 +329,7 @@ contract LSTest_startSession is LSTestBase {
  * - [x] succeeds when joining session as pitcher: test_as_pitcher
  * - [x] succeeds when joining session as batter: test_as_batter
  */
-contract LSTest_joinSession is LSTestBase {
+contract FullcountTest_joinSession is FullcountTestBase {
     function testRevert_when_joining_nonexistent_session() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
@@ -358,7 +358,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        vm.expectRevert("LS.joinSession: session does not exist");
+        vm.expectRevert("Fullcount.joinSession: session does not exist");
         game.joinSession(initialNumSessions + 1, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions);
@@ -625,7 +625,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), nextOtherTokenID);
 
-        vm.expectRevert("LS.joinSession: session is already full");
+        vm.expectRevert("Fullcount.joinSession: session is already full");
         game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
 
         vm.stopPrank();
@@ -657,7 +657,7 @@ contract LSTest_joinSession is LSTestBase {
         vm.stopPrank();
 
         vm.prank(randomPerson);
-        vm.expectRevert("LS.joinSession: msg.sender is not NFT owner");
+        vm.expectRevert("Fullcount.joinSession: msg.sender is not NFT owner");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
     }
 
@@ -691,7 +691,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        vm.expectRevert("LS.joinSession: opponent left session");
+        vm.expectRevert("Fullcount.joinSession: opponent left session");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
@@ -710,7 +710,7 @@ contract LSTest_joinSession is LSTestBase {
  * - [x] succeeds when aborting session as pitcher: test_as_pitcher
  * - [x] succeeds when aborting session as batter: test_as_batter
  */
-contract LSTest_abortSession is LSTestBase {
+contract FullcountTest_abortSession is FullcountTestBase {
     function test_as_pitcher() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
@@ -811,7 +811,7 @@ contract LSTest_abortSession is LSTestBase {
         assertEq(initialSession.batterTokenID, 0);
 
         vm.prank(player2);
-        vm.expectRevert("LS._unstakeNFT: msg.sender is not NFT owner");
+        vm.expectRevert("Fullcount._unstakeNFT: msg.sender is not NFT owner");
         game.abortSession(sessionID);
 
         assertEq(game.sessionProgress(sessionID), 2);
@@ -847,7 +847,7 @@ contract LSTest_abortSession is LSTestBase {
         assertEq(initialSession.pitcherTokenID, 0);
 
         vm.prank(player2);
-        vm.expectRevert("LS._unstakeNFT: msg.sender is not NFT owner");
+        vm.expectRevert("Fullcount._unstakeNFT: msg.sender is not NFT owner");
         game.abortSession(sessionID);
 
         assertEq(game.sessionProgress(sessionID), 2);
@@ -864,7 +864,7 @@ contract LSTest_abortSession is LSTestBase {
         assertEq(game.sessionProgress(nonexistentSessionID), 0);
 
         vm.prank(player1);
-        vm.expectRevert("LS.abortSession: cannot abort from session in this state");
+        vm.expectRevert("Fullcount.abortSession: cannot abort from session in this state");
         game.abortSession(nonexistentSessionID);
     }
 
@@ -903,7 +903,7 @@ contract LSTest_abortSession is LSTestBase {
 
         vm.startPrank(player1);
 
-        vm.expectRevert("LS.abortSession: cannot abort from session in this state");
+        vm.expectRevert("Fullcount.abortSession: cannot abort from session in this state");
         game.abortSession(sessionID);
 
         vm.stopPrank();
