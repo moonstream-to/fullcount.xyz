@@ -939,8 +939,12 @@ contract FullcountTest_abortSession is FullcountTestBase {
  * commitPitch and commitSwing tests:
  * - [x] succeed when committing pitch/swing in the "commitment" phase: test_full_commitment
  * - [x] successfully progresses section when both commitments are registered: test_full_commitment
- * - [ ] fails if commitment already exists (pitch):
- * - [ ] fails if commitment already exists (swing):
+ * - [x] fails if commitment already exists (pitch): testRevert_on_second_commitment_by_pitcher
+ * - [x] fails if commitment already exists (swing): testRevert_on_second_commitment_by_batter
+ * - [x] fails if session is in the "reveal" phase (pitcher):
+ * testRevert_on_commitment_after_end_of_commitment_phase_by_pitcher
+ * - [x] fails if session is in the "reveal" phase (batter):
+ * testRevert_on_commitment_after_end_of_commitment_phase_by_batter
  * - [ ] fails if session is still in the "join" phase (i.e. it hasn't been joined by second player):
  * - [ ] fails if someone other than staker attempts commitment (pitch):
  * - [ ] fails if someone other than staker attempts commitment (swing):
@@ -1044,6 +1048,251 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 4);
 
         session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertTrue(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+        assertEq(session.batterCommit, batterCommitment);
+    }
+
+    function testRevert_on_second_commitment_by_pitcher() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Session memory session = game.getSession(SessionID);
+
+        assertFalse(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        vm.startPrank(player1);
+
+        // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
+        uint256 pitcherNonce = 0x1902a;
+        PitchType pitcherPitch = PitchType.Fastball;
+        VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
+        HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
+
+        bytes32 pitchMessageHash =
+            game.pitchHash(pitcherNonce, pitcherPitch, pitcherVerticalLocation, pitcherHorizontalLocation);
+        bytes memory pitcherCommitment = signMessageHash(player1PrivateKey, pitchMessageHash);
+
+        vm.expectEmit(address(game));
+        emit PitchCommitted(SessionID);
+        game.commitPitch(SessionID, pitcherCommitment);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+
+        // Player 1 then decides to change their mind and pitch a curveball in the lower-outside corner of the strike
+        // zone
+        uint256 pitcherNonce2 = 0x84535ad85a;
+        PitchType pitcherPitch2 = PitchType.Curveball;
+        VerticalLocation pitcherVerticalLocation2 = VerticalLocation.LowStrike;
+        HorizontalLocation pitcherHorizontalLocation2 = HorizontalLocation.OutsideStrike;
+
+        bytes32 pitchMessageHash2 =
+            game.pitchHash(pitcherNonce2, pitcherPitch2, pitcherVerticalLocation2, pitcherHorizontalLocation2);
+
+        bytes memory pitcherCommitment2 = signMessageHash(player1PrivateKey, pitchMessageHash2);
+
+        vm.expectRevert("Fullcount.commitPitch: pitcher already committed");
+        game.commitPitch(SessionID, pitcherCommitment2);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_on_second_commitment_by_batter() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Session memory session = game.getSession(SessionID);
+
+        assertFalse(session.didPitcherCommit);
+        assertFalse(session.didBatterCommit);
+
+        vm.startPrank(player2);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        uint256 batterNonce = 0x725ae98;
+        SwingType batterSwing = SwingType.Power;
+        VerticalLocation batterVerticalLocation = VerticalLocation.Middle;
+        HorizontalLocation batterHorizontalLocation = HorizontalLocation.Middle;
+
+        bytes32 swingMessageHash =
+            game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
+        bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
+
+        vm.expectEmit(address(game));
+        emit SwingCommitted(SessionID);
+        game.commitSwing(SessionID, batterCommitment);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        session = game.getSession(SessionID);
+
+        assertFalse(session.didPitcherCommit);
+        assertTrue(session.didBatterCommit);
+
+        assertEq(session.batterCommit, batterCommitment);
+
+        // Player 2 changes their mind and decides to make a contact swing at the upper inside corner
+        // of the strike zone instead.
+        uint256 batterNonce2 = 0x84753aa;
+        SwingType batterSwing2 = SwingType.Contact;
+        VerticalLocation batterVerticalLocation2 = VerticalLocation.HighStrike;
+        HorizontalLocation batterHorizontalLocation2 = HorizontalLocation.InsideStrike;
+
+        bytes32 swingMessageHash2 =
+            game.swingHash(batterNonce2, batterSwing2, batterVerticalLocation2, batterHorizontalLocation2);
+        bytes memory batterCommitment2 = signMessageHash(player2PrivateKey, swingMessageHash2);
+
+        vm.expectRevert("Fullcount.commitSwing: batter already committed");
+        game.commitSwing(SessionID, batterCommitment2);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        session = game.getSession(SessionID);
+
+        assertFalse(session.didPitcherCommit);
+        assertTrue(session.didBatterCommit);
+
+        assertEq(session.batterCommit, batterCommitment);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_on_commitment_after_end_of_commitment_phase_by_pitcher() public {
+        vm.startPrank(player1);
+
+        // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
+        uint256 pitcherNonce = 0x1902a;
+        PitchType pitcherPitch = PitchType.Fastball;
+        VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
+        HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
+
+        bytes32 pitchMessageHash =
+            game.pitchHash(pitcherNonce, pitcherPitch, pitcherVerticalLocation, pitcherHorizontalLocation);
+        bytes memory pitcherCommitment = signMessageHash(player1PrivateKey, pitchMessageHash);
+
+        game.commitPitch(SessionID, pitcherCommitment);
+
+        vm.stopPrank();
+
+        vm.startPrank(player2);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        uint256 batterNonce = 0x725ae98;
+        SwingType batterSwing = SwingType.Power;
+        VerticalLocation batterVerticalLocation = VerticalLocation.Middle;
+        HorizontalLocation batterHorizontalLocation = HorizontalLocation.Middle;
+
+        bytes32 swingMessageHash =
+            game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
+        bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
+
+        game.commitSwing(SessionID, batterCommitment);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        vm.startPrank(player1);
+
+        // Player 1 then decides to change their mind and pitch a curveball in the lower-outside corner of the strike
+        // zone
+        uint256 pitcherNonce2 = 0x84535ad85a;
+        PitchType pitcherPitch2 = PitchType.Curveball;
+        VerticalLocation pitcherVerticalLocation2 = VerticalLocation.LowStrike;
+        HorizontalLocation pitcherHorizontalLocation2 = HorizontalLocation.OutsideStrike;
+
+        bytes32 pitchMessageHash2 =
+            game.pitchHash(pitcherNonce2, pitcherPitch2, pitcherVerticalLocation2, pitcherHorizontalLocation2);
+
+        vm.expectRevert("Fullcount.commitPitch: cannot commit in current state");
+        game.commitPitch(SessionID, signMessageHash(player1PrivateKey, pitchMessageHash2));
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        Session memory session = game.getSession(SessionID);
+
+        assertTrue(session.didPitcherCommit);
+        assertTrue(session.didBatterCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);
+        assertEq(session.batterCommit, batterCommitment);
+    }
+
+    function testRevert_on_commitment_after_end_of_commitment_phase_by_batter() public {
+        vm.startPrank(player1);
+
+        // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
+        uint256 pitcherNonce = 0x1902a;
+        PitchType pitcherPitch = PitchType.Fastball;
+        VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
+        HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
+
+        bytes32 pitchMessageHash =
+            game.pitchHash(pitcherNonce, pitcherPitch, pitcherVerticalLocation, pitcherHorizontalLocation);
+        bytes memory pitcherCommitment = signMessageHash(player1PrivateKey, pitchMessageHash);
+
+        game.commitPitch(SessionID, pitcherCommitment);
+
+        vm.stopPrank();
+
+        vm.startPrank(player2);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        uint256 batterNonce = 0x725ae98;
+        SwingType batterSwing = SwingType.Power;
+        VerticalLocation batterVerticalLocation = VerticalLocation.Middle;
+        HorizontalLocation batterHorizontalLocation = HorizontalLocation.Middle;
+
+        bytes32 swingMessageHash =
+            game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
+        bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
+
+        game.commitSwing(SessionID, batterCommitment);
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        vm.startPrank(player2);
+
+        // Player 2 changes their mind and decides to make a contact swing at the upper inside corner
+        // of the strike zone instead.
+        uint256 batterNonce2 = 0x84753aa;
+        SwingType batterSwing2 = SwingType.Contact;
+        VerticalLocation batterVerticalLocation2 = VerticalLocation.HighStrike;
+        HorizontalLocation batterHorizontalLocation2 = HorizontalLocation.InsideStrike;
+
+        bytes32 swingMessageHash2 =
+            game.swingHash(batterNonce2, batterSwing2, batterVerticalLocation2, batterHorizontalLocation2);
+
+        vm.expectRevert("Fullcount.commitSwing: cannot commit in current state");
+        game.commitSwing(SessionID, signMessageHash(player2PrivateKey, swingMessageHash2));
+
+        vm.stopPrank();
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        Session memory session = game.getSession(SessionID);
 
         assertTrue(session.didPitcherCommit);
         assertTrue(session.didBatterCommit);
