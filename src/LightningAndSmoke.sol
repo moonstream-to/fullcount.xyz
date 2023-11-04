@@ -137,7 +137,7 @@ contract LightningAndSmoke is StatBlockBase {
             return 6;
         }
 
-        revert("LS.sessionProgress: Programmer is idiot");
+        revert("LS.sessionProgress: idiot programmer");
     }
 
     // LightningAndSmoke is an autnonomous game, and so the only administrator for NFT stats is the
@@ -228,8 +228,26 @@ contract LightningAndSmoke is StatBlockBase {
 
         address tokenOwner = Staker[nftAddress][tokenID];
 
+        require(msg.sender == tokenOwner, "LS._unstakeNFT: msg.sender is not NFT owner");
+
         IERC721 nftContract = IERC721(nftAddress);
         nftContract.transferFrom(address(this), tokenOwner, tokenID);
+
+        if (
+            SessionState[stakedSessionID].pitcherAddress == nftAddress
+                && SessionState[stakedSessionID].pitcherTokenID == tokenID
+        ) {
+            SessionState[stakedSessionID].pitcherAddress = address(0);
+            SessionState[stakedSessionID].pitcherTokenID = 0;
+        } else if (
+            SessionState[stakedSessionID].batterAddress == nftAddress
+                && SessionState[stakedSessionID].batterTokenID == tokenID
+        ) {
+            SessionState[stakedSessionID].batterAddress = address(0);
+            SessionState[stakedSessionID].batterTokenID = 0;
+        } else {
+            revert("LS._unstakeNFT: idiot programmer");
+        }
 
         StakedSession[nftAddress][tokenID] = 0;
         Staker[nftAddress][tokenID] = address(0);
@@ -240,6 +258,21 @@ contract LightningAndSmoke is StatBlockBase {
      * to abort the session and unstake their characters.
      */
     function abortSession(uint256 sessionID) external {
-        require(sessionProgress(sessionID) == 1, "LS.abortSession: cannot abort from session in this state");
+        require(sessionProgress(sessionID) == 2, "LS.abortSession: cannot abort from session in this state");
+
+        // In each branch, we emit SessionAborted before unstaking because unstaking changes SessionState.
+        if (SessionState[sessionID].pitcherAddress != address(0)) {
+            emit SessionAborted(
+                sessionID, SessionState[sessionID].pitcherAddress, SessionState[sessionID].pitcherTokenID
+            );
+            _unstakeNFT(SessionState[sessionID].pitcherAddress, SessionState[sessionID].pitcherTokenID);
+        } else if (SessionState[sessionID].batterAddress != address(0)) {
+            emit SessionAborted(sessionID, SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
+            _unstakeNFT(SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
+        } else {
+            revert("LS.abortSession: idiot programmer");
+        }
+
+        require(sessionProgress(sessionID) == 1, "LS.abortSession: incorrect sessionProgress");
     }
 }
