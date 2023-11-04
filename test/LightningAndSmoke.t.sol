@@ -40,7 +40,7 @@ contract LSTestBase is Test {
 
     uint256 sessionStartPrice = 5;
     uint256 sessionJoinPrice = 9;
-    uint256 blocksPerPhase = 10;
+    uint256 secondsPerPhase = 300;
 
     uint256 charactersMinted = 0;
     uint256 otherCharactersMinted = 0;
@@ -66,7 +66,7 @@ contract LSTestBase is Test {
             sessionStartPrice,
             sessionJoinPrice,
             treasury,
-            blocksPerPhase
+            secondsPerPhase
         );
     }
 }
@@ -77,7 +77,7 @@ contract LSTestDeployment is LSTestBase {
         assertEq(game.SessionStartPrice(), sessionStartPrice);
         assertEq(game.SessionJoinPrice(), sessionJoinPrice);
         assertEq(game.TreasuryAddress(), treasury);
-        assertEq(game.BlocksPerPhase(), blocksPerPhase);
+        assertEq(game.SecondsPerPhase(), secondsPerPhase);
         assertEq(game.NumSessions(), 0);
     }
 }
@@ -219,7 +219,7 @@ contract LSTest_startSession is LSTestBase {
         assertEq(terminalNumSessions, initialNumSessions + 1);
 
         Session memory session = game.getSession(sessionID);
-        assertEq(session.phaseStartBlock, block.number);
+        assertEq(session.phaseStartTimestamp, block.timestamp);
         assertEq(session.pitcherAddress, address(characterNFTs));
         assertEq(session.pitcherTokenID, tokenID);
         assertEq(session.batterAddress, address(0));
@@ -263,7 +263,7 @@ contract LSTest_startSession is LSTestBase {
         assertEq(terminalNumSessions, initialNumSessions + 1);
 
         Session memory session = game.getSession(sessionID);
-        assertEq(session.phaseStartBlock, block.number);
+        assertEq(session.phaseStartTimestamp, block.timestamp);
         assertEq(session.batterAddress, address(characterNFTs));
         assertEq(session.batterTokenID, tokenID);
         assertEq(session.pitcherAddress, address(0));
@@ -394,6 +394,10 @@ contract LSTest_joinSession is LSTestBase {
 
         uint256 initialNumSessions = game.NumSessions();
 
+        uint256 initialBlockTimestamp = block.timestamp;
+        uint256 startJoinOffsetSeconds = 5;
+        uint256 expectedNextPhaseTimestamp = initialBlockTimestamp + startJoinOffsetSeconds;
+
         vm.startPrank(player1);
         feeToken.approve(address(game), sessionStartPrice);
         characterNFTs.approve(address(game), tokenID);
@@ -404,6 +408,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
+        vm.warp(initialBlockTimestamp + startJoinOffsetSeconds);
         vm.expectEmit(address(game));
         emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
@@ -411,7 +416,7 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(game.NumSessions(), initialNumSessions + 1);
 
         Session memory session = game.getSession(sessionID);
-        assertEq(session.phaseStartBlock, block.number);
+        assertEq(session.phaseStartTimestamp, expectedNextPhaseTimestamp);
         assertEq(session.pitcherAddress, address(characterNFTs));
         assertEq(session.pitcherTokenID, tokenID);
         assertEq(session.batterAddress, address(otherCharacterNFTs));
@@ -449,6 +454,10 @@ contract LSTest_joinSession is LSTestBase {
 
         uint256 initialNumSessions = game.NumSessions();
 
+        uint256 initialBlockTimestamp = block.timestamp;
+        uint256 startJoinOffsetSeconds = 500;
+        uint256 expectedNextPhaseTimestamp = initialBlockTimestamp + startJoinOffsetSeconds;
+
         vm.startPrank(player1);
         feeToken.approve(address(game), sessionStartPrice);
         characterNFTs.approve(address(game), tokenID);
@@ -459,6 +468,7 @@ contract LSTest_joinSession is LSTestBase {
         feeToken.approve(address(game), sessionJoinPrice);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
+        vm.warp(initialBlockTimestamp + startJoinOffsetSeconds);
         vm.expectEmit(address(game));
         emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Pitcher);
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
@@ -466,7 +476,7 @@ contract LSTest_joinSession is LSTestBase {
         assertEq(game.NumSessions(), initialNumSessions + 1);
 
         Session memory session = game.getSession(sessionID);
-        assertEq(session.phaseStartBlock, block.number);
+        assertEq(session.phaseStartTimestamp, expectedNextPhaseTimestamp);
         assertEq(session.batterAddress, address(characterNFTs));
         assertEq(session.batterTokenID, tokenID);
         assertEq(session.pitcherAddress, address(otherCharacterNFTs));

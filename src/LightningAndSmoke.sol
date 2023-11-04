@@ -36,20 +36,20 @@ Functionality:
       Prices are transferred to the `treasuryAddress` when a session is either started or joined.
 - [ ] Once a session starts, both the pitcher and the batter can commit their moves.
 - [ ] Commitments are signed EIP712 messages representing the moves.
-- [ ] LightningAndSmoke contract is deployed with a `blocksPerPhase` parameter. If one player commits
-      their move but the other one does not commit their move before `blocksPerPhase` blocks have
+- [ ] LightningAndSmoke contract is deployed with a `secondsPerPhase` parameter. If one player commits
+      their move but the other one does not commit their move before `secondsPerPhase` blocks have
       elapsed since the session started, then the first player wins by forfeit. They can submit a
       transaction to end the session, unstake their NFT, and earn their reward.
 - [ ] A player can unstake their NFT from a session if the session has either not started or if the session
       has completed.
-- [ ] If both players commit their moves before `blocksPerPhase` blocks have elapsed since the session
-      started, then the session enters the "reveal" phase. In this phase, each player has `blocksPerPhase`
+- [ ] If both players commit their moves before `secondsPerPhase` blocks have elapsed since the session
+      started, then the session enters the "reveal" phase. In this phase, each player has `secondsPerPhase`
       blocks to reveal their moves. They do this by submitting the EIP712 messages that were signed
       to generate their commits. The session is resolved once the second player reveals their move (in the
       same transaction).
-- [ ] If one player reveals their move before `blocksPerPhase` blocks have passed since the second
+- [ ] If one player reveals their move before `secondsPerPhase` blocks have passed since the second
       commit but the other one doesn't, then the player who revealed wins by default.
-- [ ] If neither player reveals their move before `blocksPerPhase` blocks have passed since the
+- [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract LightningAndSmoke is StatBlockBase {
@@ -59,7 +59,7 @@ contract LightningAndSmoke is StatBlockBase {
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
     address public TreasuryAddress;
-    uint256 public BlocksPerPhase;
+    uint256 public SecondsPerPhase;
 
     uint256 public NumSessions;
 
@@ -88,13 +88,13 @@ contract LightningAndSmoke is StatBlockBase {
         uint256 sessionStartPrice,
         uint256 sessionJoinPrice,
         address treasuryAddress,
-        uint256 blocksPerPhase
+        uint256 secondsPerPhase
     ) {
         FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
         TreasuryAddress = treasuryAddress;
-        BlocksPerPhase = blocksPerPhase;
+        SecondsPerPhase = secondsPerPhase;
     }
 
     // This is useful because of how return values from the public mapping get serialized.
@@ -123,12 +123,12 @@ contract LightningAndSmoke is StatBlockBase {
         } else if (session.pitcherAddress == address(0) || session.batterAddress == address(0)) {
             return 2;
         } else if (!session.didPitcherCommit || !session.didBatterCommit) {
-            if (session.phaseStartBlock + BlocksPerPhase < block.number) {
+            if (session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
                 return 6;
             }
             return 3;
         } else if (!session.didPitcherReveal || !session.didBatterReveal) {
-            if (session.phaseStartBlock + BlocksPerPhase < block.number) {
+            if (session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
                 return 6;
             }
             return 4;
@@ -172,7 +172,7 @@ contract LightningAndSmoke is StatBlockBase {
         Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = NumSessions;
 
-        SessionState[NumSessions].phaseStartBlock = block.number;
+        SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
 
         nftContract.transferFrom(currentOwner, address(this), tokenID);
 
@@ -210,6 +210,8 @@ contract LightningAndSmoke is StatBlockBase {
             session.pitcherAddress = nftAddress;
             session.pitcherTokenID = tokenID;
         }
+
+        session.phaseStartTimestamp = block.timestamp;
 
         Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = sessionID;

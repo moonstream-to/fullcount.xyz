@@ -101,7 +101,7 @@ struct Swing {
 Session represents the state of a Lightning and Smoke session.
 */
 struct Session {
-    uint256 phaseStartBlock;
+    uint256 phaseStartTimestamp;
     address pitcherAddress;
     uint256 pitcherTokenID;
     bool didPitcherCommit;
