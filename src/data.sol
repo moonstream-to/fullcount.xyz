@@ -34,14 +34,16 @@ enum PitchType {
 Types of swings a batter can make:
 - Contact - 0
 - Power - 1
-- Bunt - 2
-- Check - 3
+- Check - 2
+
+No bunting in a bottom-of-the-ninth situation with 2 outs and the bases loaded in a full count.
+
+Check guarantees a walk on a ball, and gives a small chance to hit on a pitch in the strike zone.
 */
 enum SwingType {
     Contact,
     Power,
-    Bunt,
-    Soft
+    Check
 }
 
 /*
