@@ -37,8 +37,8 @@ Functionality:
       with `feeTokenAddress`, `sessionStartPrice`, `sessionJoinPrice`, and `treasuryAddress` parameters.
       Prices are transferred to the `treasuryAddress` when a session is either started or joined.
       NOTE: Currently, only ERC20 fees are implemented.
-- [ ] Once a session starts, both the pitcher and the batter can commit their moves.
-- [ ] Commitments are signed EIP712 messages representing the moves.
+- [x] Once a session starts, both the pitcher and the batter can commit their moves.
+- [x] Commitments are signed EIP712 messages representing the moves.
 - [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
       their move but the other one does not commit their move before `secondsPerPhase` blocks have
       elapsed since the session started, then the first player wins by forfeit. They can submit a
@@ -128,6 +128,8 @@ contract Fullcount is StatBlockBase, EIP712 {
      * 4 - both players committed, ready for reveals
      * 5 - session complete
      * 6 - session expired
+     *
+     * All session expiration logic should go through a `sessionProgress(sessionID) == 6` check.
      */
     function sessionProgress(uint256 sessionID) public view returns (uint256) {
         if (sessionID > NumSessions) {
@@ -357,7 +359,11 @@ contract Fullcount is StatBlockBase, EIP712 {
      */
 
     function commitPitch(uint256 sessionID, bytes memory signature) external {
-        require(sessionProgress(sessionID) == 3, "Fullcount.commitPitch: cannot commit in current state");
+        uint256 progress = sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.commitPitch: session has expired");
+        }
+        require(progress == 3, "Fullcount.commitPitch: cannot commit in current state");
 
         Session storage session = SessionState[sessionID];
 
@@ -375,7 +381,11 @@ contract Fullcount is StatBlockBase, EIP712 {
     }
 
     function commitSwing(uint256 sessionID, bytes memory signature) external {
-        require(sessionProgress(sessionID) == 3, "Fullcount.commitSwing: cannot commit in current state");
+        uint256 progress = sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.commitSwing: session has expired");
+        }
+        require(progress == 3, "Fullcount.commitSwing: cannot commit in current state");
 
         Session storage session = SessionState[sessionID];
 
