@@ -26,8 +26,7 @@ Pitch types:
 enum PitchType {
     Fastball,
     Curveball,
-    Changeup,
-    Knuckleball
+    Changeup
 }
 
 /*
