@@ -77,6 +77,28 @@ enum HorizontalLocation {
     OutsideBall
 }
 
+/**
+ * Possible outcomes of a Fullcount session:
+ * - Strikeout - 0
+ * - Walk - 1
+ * - Single - 2
+ * - Double - 3
+ * - Triple - 4
+ * - HomeRun - 5
+ * - Groundout - 6
+ * - Flyout - 7
+ */
+enum Outcome {
+    Strikeout,
+    Walk,
+    Single,
+    Double,
+    Triple,
+    HomeRun,
+    Groundout,
+    Flyout
+}
+
 /*
 Pitch represents the pitcher's move in a Fullcount session.
 */

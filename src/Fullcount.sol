@@ -10,7 +10,15 @@ import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/
 import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
-    PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Session, Pitch, Swing
+    PlayerType,
+    PitchType,
+    SwingType,
+    VerticalLocation,
+    HorizontalLocation,
+    Session,
+    Pitch,
+    Swing,
+    Outcome
 } from "./data.sol";
 
 /*
@@ -416,5 +424,79 @@ contract Fullcount is StatBlockBase, EIP712 {
         }
 
         emit SwingCommitted(sessionID);
+    }
+
+    function resolve(Pitch calldata pitch, Swing calldata swing) public view returns (Outcome) { }
+
+    function revealPitch(
+        uint256 sessionID,
+        uint256 nonce,
+        PitchType kind,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        external
+    {
+        uint256 progress = sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.revealPitch: session has expired");
+        }
+        require(progress == 4, "Fullcount.revealPitch: cannot reveal in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
+            "Fullcount.revealPitch: msg.sender did not stake pitcher"
+        );
+
+        require(!session.didPitcherReveal, "Fullcount.revealPitch: pitcher already revealed");
+
+        bytes32 pitchMessageHash = pitchHash(nonce, kind, vertical, horizontal);
+        require(
+            SignatureChecker.isValidSignatureNow(msg.sender, pitchMessageHash, session.pitcherCommit),
+            "Fullcount.revealPitch: invalid signature"
+        );
+
+        session.didPitcherReveal = true;
+        session.pitcherReveal = Pitch(nonce, kind, vertical, horizontal);
+
+        emit PitchRevealed(sessionID, session.pitcherReveal);
+    }
+
+    function revealSwing(
+        uint256 sessionID,
+        uint256 nonce,
+        SwingType kind,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        external
+    {
+        uint256 progress = sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.revealSwing: session has expired");
+        }
+        require(progress == 4, "Fullcount.revealSwing: cannot reveal in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.batterAddress][session.batterTokenID],
+            "Fullcount.revealSwing: msg.sender did not stake batter"
+        );
+
+        require(!session.didBatterReveal, "Fullcount.revealSwing: batter already revealed");
+
+        bytes32 swingMessageHash = swingHash(nonce, kind, vertical, horizontal);
+        require(
+            SignatureChecker.isValidSignatureNow(msg.sender, swingMessageHash, session.batterCommit),
+            "Fullcount.revealSwing: invalid signature"
+        );
+
+        session.didBatterReveal = true;
+        session.batterReveal = Swing(nonce, kind, vertical, horizontal);
+
+        emit SwingRevealed(sessionID, session.batterReveal);
     }
 }
