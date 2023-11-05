@@ -97,6 +97,14 @@ contract Fullcount is StatBlockBase, EIP712 {
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event PitchCommitted(uint256 indexed sessionID);
     event SwingCommitted(uint256 indexed sessionID);
+    event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
+    event SwingRevealed(uint256 indexed sessionID, Swing swing);
+    event SessionResolved(
+        uint256 indexed sessionID,
+        address indexed winningNFTAddress,
+        uint256 indexed winningTokenID,
+        address winningPlayerAddress
+    );
 
     constructor(
         address feeTokenAddress,
