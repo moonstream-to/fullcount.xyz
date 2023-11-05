@@ -385,6 +385,10 @@ contract Fullcount is StatBlockBase, EIP712 {
         session.didPitcherCommit = true;
         session.pitcherCommit = signature;
 
+        if (session.didPitcherCommit && session.didBatterCommit) {
+            session.phaseStartTimestamp = block.timestamp;
+        }
+
         emit PitchCommitted(sessionID);
     }
 
@@ -406,6 +410,10 @@ contract Fullcount is StatBlockBase, EIP712 {
 
         session.didBatterCommit = true;
         session.batterCommit = signature;
+
+        if (session.didPitcherCommit && session.didBatterCommit) {
+            session.phaseStartTimestamp = block.timestamp;
+        }
 
         emit SwingCommitted(sessionID);
     }

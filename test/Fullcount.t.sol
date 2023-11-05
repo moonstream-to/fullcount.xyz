@@ -1045,6 +1045,10 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
             game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
         bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
 
+        // We move time forward 1 second so we can test that the phaseStartTimestamp was updated on
+        // the session.
+        uint256 commitmentsCompleteTimestamp = block.timestamp + 1;
+        vm.warp(commitmentsCompleteTimestamp);
         vm.expectEmit(address(game));
         emit SwingCommitted(SessionID);
         game.commitSwing(SessionID, batterCommitment);
@@ -1054,6 +1058,8 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 4);
 
         session = game.getSession(SessionID);
+
+        assertEq(session.phaseStartTimestamp, commitmentsCompleteTimestamp);
 
         assertTrue(session.didPitcherCommit);
         assertTrue(session.didBatterCommit);
