@@ -9,6 +9,8 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     parser.set_defaults(func=lambda _: parser.print_help())
 
+    subparsers = parser.add_subparsers()
+
     return parser
 
 
