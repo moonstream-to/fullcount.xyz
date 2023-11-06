@@ -86,8 +86,8 @@ enum HorizontalLocation {
  * - Double - 3
  * - Triple - 4
  * - HomeRun - 5
- * - Groundout - 6
- * - Flyout - 7
+ * - GroundOut - 6
+ * - FlyOut - 7
  */
 enum Outcome {
     Strikeout,
@@ -96,8 +96,8 @@ enum Outcome {
     Double,
     Triple,
     HomeRun,
-    Groundout,
-    Flyout
+    GroundOut,
+    FlyOut
 }
 
 /*
