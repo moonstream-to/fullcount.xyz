@@ -29,7 +29,7 @@ setup(
     ],
     python_requires=">=3.6",
     entry_points={
-        "console_scripts": []
+        "console_scripts": ["fullcount-theory=fullcount_theory.cli:main"]
     },
     include_package_data=True,
 )
