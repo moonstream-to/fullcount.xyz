@@ -21,7 +21,6 @@ Pitch types:
 - Fastball - 0
 - Curveball - 1
 - Changeup - 2
-- Knuckleball - 3
 */
 enum PitchType {
     Fastball,
@@ -52,7 +51,6 @@ Possible vertical locations for a pitch:
 - Middle - 2
 - LowStrike - 3
 - LowBall - 4
-- Dirt - 5
 */
 enum VerticalLocation {
     HighBall,
