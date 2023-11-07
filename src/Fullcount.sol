@@ -10,7 +10,15 @@ import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/
 import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
-    PlayerType, PitchType, SwingType, VerticalLocation, HorizontalLocation, Session, Pitch, Swing
+    PlayerType,
+    PitchSpeed,
+    SwingType,
+    VerticalLocation,
+    HorizontalLocation,
+    Session,
+    Pitch,
+    Swing,
+    Outcome
 } from "./data.sol";
 
 /*
@@ -30,13 +38,12 @@ Functionality:
 - [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
       to start the session. (joinSession automatically chooses the role of the joining player)
 - [x] When a pitcher and batter are staked into a session, the session automatically starts.
-- [x] Staking a character into a session costs either native tokens or ERC20 tokens. Starting a session
-      can have a different price than joining an existing session. In general, we will keep it cheaper
-      to start a session than to join a sesion that someone else started -- this will incentivize many
-      matches. The cost will disincentivize bots grinding against themselves. The contract is deployed
-      with `feeTokenAddress`, `sessionStartPrice`, `sessionJoinPrice`, and `treasuryAddress` parameters.
-      Prices are transferred to the `treasuryAddress` when a session is either started or joined.
-      NOTE: Currently, only ERC20 fees are implemented.
+- [x] Staking a character into a session costs native tokens. Starting a session can have a different
+      price than joining an existing session. In general, we will keep it cheaper to start a session
+      than to join a sesion that someone else started -- this will incentivize many matches. The cost
+      will disincentivize bots grinding against themselves. The contract is deployed with `sessionStartPrice`,
+      `sessionJoinPrice`, `treasuryAddress`, and `secondsPerPhase` parameters.
+      Tokens are transferred to the `treasuryAddress` when a session is either started or joined.
 - [x] Once a session starts, both the pitcher and the batter can commit their moves.
 - [x] Commitments are signed EIP712 messages representing the moves.
 - [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
@@ -67,13 +74,17 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     string public constant FullcountVersion = "0.0.1";
 
-    address public FeeTokenAddress;
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
-    address public TreasuryAddress;
+    address payable public TreasuryAddress;
     uint256 public SecondsPerPhase;
 
     uint256 public NumSessions;
+
+    uint256[7] public Distance0Distribution = [0, 0, 4458, 1408, 126, 1008, 3000];
+    uint256[7] public Distance1Distribution = [500, 0, 3185, 1005, 90, 720, 4500];
+    uint256[7] public Distance2Distribution = [2000, 0, 1910, 603, 55, 432, 5000];
+    uint256[7] public DistanceGT2Distribution = [6000, 0, 636, 201, 19, 144, 3000];
 
     // Session ID => session state
     // NOTE: Sessions are 1-indexed
@@ -97,17 +108,25 @@ contract Fullcount is StatBlockBase, EIP712 {
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event PitchCommitted(uint256 indexed sessionID);
     event SwingCommitted(uint256 indexed sessionID);
+    event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
+    event SwingRevealed(uint256 indexed sessionID, Swing swing);
+    event SessionResolved(
+        uint256 indexed sessionID,
+        Outcome indexed outcome,
+        address pitcherAddress,
+        uint256 pitcherTokenID,
+        address batterAddress,
+        uint256 batterTokenID
+    );
 
     constructor(
-        address feeTokenAddress,
         uint256 sessionStartPrice,
         uint256 sessionJoinPrice,
-        address treasuryAddress,
+        address payable treasuryAddress,
         uint256 secondsPerPhase
     )
         EIP712("Fullcount", FullcountVersion)
     {
-        FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
         TreasuryAddress = treasuryAddress;
@@ -129,9 +148,9 @@ contract Fullcount is StatBlockBase, EIP712 {
      * 5 - session complete
      * 6 - session expired
      *
-     * All session expiration logic should go through a `sessionProgress(sessionID) == 6` check.
+     * All session expiration logic should go through a `_sessionProgress(sessionID) == 6` check.
      */
-    function sessionProgress(uint256 sessionID) public view returns (uint256) {
+    function _sessionProgress(uint256 sessionID) internal view returns (uint256) {
         if (sessionID > NumSessions) {
             return 0;
         }
@@ -155,7 +174,11 @@ contract Fullcount is StatBlockBase, EIP712 {
             return 6;
         }
 
-        revert("Fullcount.sessionProgress: idiot programmer");
+        revert("Fullcount._sessionProgress: idiot programmer");
+    }
+
+    function sessionProgress(uint256 sessionID) public view returns (uint256) {
+        return _sessionProgress(sessionID);
     }
 
     // Fullcount is an autnonomous game, and so the only administrator for NFT stats is the
@@ -167,14 +190,24 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionStarted
-    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
-        IERC20 feeToken = IERC20(FeeTokenAddress);
+    function startSession(
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role
+    )
+        external
+        payable
+        virtual
+        returns (uint256)
+    {
+        require(msg.value >= SessionStartPrice, "Fullcount.startSession: incorrect session start price");
+
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
 
-        feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionStartPrice);
+        TreasuryAddress.transfer(SessionStartPrice);
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -202,16 +235,17 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionJoined
-    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
+    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external payable virtual {
+        require(msg.value == SessionJoinPrice, "Fullcount.joinSession: incorrect join fee");
+
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
-        IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
 
-        feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionJoinPrice);
+        payable(TreasuryAddress).transfer(SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
@@ -276,7 +310,7 @@ contract Fullcount is StatBlockBase, EIP712 {
      * to abort the session and unstake their characters.
      */
     function abortSession(uint256 sessionID) external {
-        require(sessionProgress(sessionID) == 2, "Fullcount.abortSession: cannot abort from session in this state");
+        require(_sessionProgress(sessionID) == 2, "Fullcount.abortSession: cannot abort from session in this state");
 
         // In each branch, we emit SessionAborted before unstaking because unstaking changes SessionState.
         if (SessionState[sessionID].pitcherAddress != address(0)) {
@@ -291,12 +325,12 @@ contract Fullcount is StatBlockBase, EIP712 {
             revert("Fullcount.abortSession: idiot programmer");
         }
 
-        require(sessionProgress(sessionID) == 1, "Fullcount.abortSession: incorrect sessionProgress");
+        require(_sessionProgress(sessionID) == 1, "Fullcount.abortSession: incorrect _sessionProgress");
     }
 
     function pitchHash(
         uint256 nonce,
-        PitchType kind,
+        PitchSpeed speed,
         VerticalLocation vertical,
         HorizontalLocation horizontal
     )
@@ -306,9 +340,9 @@ contract Fullcount is StatBlockBase, EIP712 {
     {
         bytes32 structHash = keccak256(
             abi.encode(
-                keccak256("PitchMessage(uint256 nonce,uint256 kind,uint256 vertical,uint256 horizontal)"),
+                keccak256("PitchMessage(uint256 nonce,uint256 speed,uint256 vertical,uint256 horizontal)"),
                 nonce,
-                uint256(kind),
+                uint256(speed),
                 uint256(vertical),
                 uint256(horizontal)
             )
@@ -359,7 +393,7 @@ contract Fullcount is StatBlockBase, EIP712 {
      */
 
     function commitPitch(uint256 sessionID, bytes memory signature) external {
-        uint256 progress = sessionProgress(sessionID);
+        uint256 progress = _sessionProgress(sessionID);
         if (progress == 6) {
             revert("Fullcount.commitPitch: session has expired");
         }
@@ -377,11 +411,15 @@ contract Fullcount is StatBlockBase, EIP712 {
         session.didPitcherCommit = true;
         session.pitcherCommit = signature;
 
+        if (session.didPitcherCommit && session.didBatterCommit) {
+            session.phaseStartTimestamp = block.timestamp;
+        }
+
         emit PitchCommitted(sessionID);
     }
 
     function commitSwing(uint256 sessionID, bytes memory signature) external {
-        uint256 progress = sessionProgress(sessionID);
+        uint256 progress = _sessionProgress(sessionID);
         if (progress == 6) {
             revert("Fullcount.commitSwing: session has expired");
         }
@@ -399,6 +437,216 @@ contract Fullcount is StatBlockBase, EIP712 {
         session.didBatterCommit = true;
         session.batterCommit = signature;
 
+        if (session.didPitcherCommit && session.didBatterCommit) {
+            session.phaseStartTimestamp = block.timestamp;
+        }
+
         emit SwingCommitted(sessionID);
+    }
+
+    function sampleOutcomeFromDistribution(
+        uint256 nonce0,
+        uint256 nonce1,
+        uint256[7] memory distribution
+    )
+        public
+        pure
+        returns (Outcome)
+    {
+        uint256 totalMass = distribution[0] + distribution[1] + distribution[2] + distribution[3] + distribution[4]
+            + distribution[5] + distribution[6];
+
+        // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
+        uint256 sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
+
+        uint256 cumulativeMass = distribution[0];
+        if (sample < cumulativeMass) {
+            return Outcome.Strikeout;
+        }
+
+        cumulativeMass += distribution[1];
+        if (sample < cumulativeMass) {
+            return Outcome.Walk;
+        }
+
+        cumulativeMass += distribution[2];
+        if (sample < cumulativeMass) {
+            return Outcome.Single;
+        }
+
+        cumulativeMass += distribution[3];
+        if (sample < cumulativeMass) {
+            return Outcome.Double;
+        }
+
+        cumulativeMass += distribution[4];
+        if (sample < cumulativeMass) {
+            return Outcome.Triple;
+        }
+
+        cumulativeMass += distribution[5];
+        if (sample < cumulativeMass) {
+            return Outcome.HomeRun;
+        }
+
+        return Outcome.InPlayOut;
+    }
+
+    function _l1_distance(Pitch memory pitch, Swing memory swing) internal pure returns (uint256) {
+        require(swing.kind != SwingType.Take, "Fullcount._l1_distance: Not defined when batter takes");
+        uint256 dist = 0;
+        uint256 pitchParam = 0;
+        uint256 swingParam = 0;
+
+        pitchParam = uint256(pitch.speed);
+        swingParam = uint256(swing.kind);
+        if (pitchParam <= swingParam) {
+            dist += (swingParam - pitchParam);
+        } else {
+            dist += (pitchParam - swingParam);
+        }
+
+        pitchParam = uint256(pitch.vertical);
+        swingParam = uint256(swing.vertical);
+        if (pitchParam <= swingParam) {
+            dist += (swingParam - pitchParam);
+        } else {
+            dist += (pitchParam - swingParam);
+        }
+
+        pitchParam = uint256(pitch.horizontal);
+        swingParam = uint256(swing.horizontal);
+        if (pitchParam <= swingParam) {
+            dist += (swingParam - pitchParam);
+        } else {
+            dist += (pitchParam - swingParam);
+        }
+
+        return dist;
+    }
+
+    function resolve(Pitch memory pitch, Swing memory swing) public view returns (Outcome) {
+        if (swing.kind == SwingType.Take) {
+            if (
+                pitch.vertical == VerticalLocation.HighBall || pitch.vertical == VerticalLocation.LowBall
+                    || pitch.horizontal == HorizontalLocation.InsideBall
+                    || pitch.horizontal == HorizontalLocation.OutsideBall
+            ) {
+                return Outcome.Walk;
+            } else {
+                return Outcome.Strikeout;
+            }
+        }
+
+        uint256 dist = _l1_distance(pitch, swing);
+        if (dist == 0) {
+            return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance0Distribution);
+        } else if (dist == 1) {
+            return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance1Distribution);
+        } else if (dist == 2) {
+            return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance2Distribution);
+        }
+
+        return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, DistanceGT2Distribution);
+    }
+
+    function revealPitch(
+        uint256 sessionID,
+        uint256 nonce,
+        PitchSpeed speed,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        external
+    {
+        uint256 progress = _sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.revealPitch: session has expired");
+        }
+        require(progress == 4, "Fullcount.revealPitch: cannot reveal in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
+            "Fullcount.revealPitch: msg.sender did not stake pitcher"
+        );
+
+        require(!session.didPitcherReveal, "Fullcount.revealPitch: pitcher already revealed");
+
+        bytes32 pitchMessageHash = pitchHash(nonce, speed, vertical, horizontal);
+        require(
+            SignatureChecker.isValidSignatureNow(msg.sender, pitchMessageHash, session.pitcherCommit),
+            "Fullcount.revealPitch: invalid signature"
+        );
+
+        session.didPitcherReveal = true;
+        session.pitcherReveal = Pitch(nonce, speed, vertical, horizontal);
+
+        emit PitchRevealed(sessionID, session.pitcherReveal);
+
+        if (session.didBatterReveal) {
+            Outcome outcome = resolve(session.pitcherReveal, session.batterReveal);
+            emit SessionResolved(
+                sessionID,
+                outcome,
+                session.pitcherAddress,
+                session.pitcherTokenID,
+                session.batterAddress,
+                session.batterTokenID
+            );
+
+            _unstakeNFT(session.pitcherAddress, session.pitcherTokenID);
+        }
+    }
+
+    function revealSwing(
+        uint256 sessionID,
+        uint256 nonce,
+        SwingType kind,
+        VerticalLocation vertical,
+        HorizontalLocation horizontal
+    )
+        external
+    {
+        uint256 progress = _sessionProgress(sessionID);
+        if (progress == 6) {
+            revert("Fullcount.revealSwing: session has expired");
+        }
+        require(progress == 4, "Fullcount.revealSwing: cannot reveal in current state");
+
+        Session storage session = SessionState[sessionID];
+
+        require(
+            msg.sender == Staker[session.batterAddress][session.batterTokenID],
+            "Fullcount.revealSwing: msg.sender did not stake batter"
+        );
+
+        require(!session.didBatterReveal, "Fullcount.revealSwing: batter already revealed");
+
+        bytes32 swingMessageHash = swingHash(nonce, kind, vertical, horizontal);
+        require(
+            SignatureChecker.isValidSignatureNow(msg.sender, swingMessageHash, session.batterCommit),
+            "Fullcount.revealSwing: invalid signature"
+        );
+
+        session.didBatterReveal = true;
+        session.batterReveal = Swing(nonce, kind, vertical, horizontal);
+
+        emit SwingRevealed(sessionID, session.batterReveal);
+
+        if (session.didPitcherReveal) {
+            Outcome outcome = resolve(session.pitcherReveal, session.batterReveal);
+            emit SessionResolved(
+                sessionID,
+                outcome,
+                session.pitcherAddress,
+                session.pitcherTokenID,
+                session.batterAddress,
+                session.batterTokenID
+            );
+
+            _unstakeNFT(session.batterAddress, session.batterTokenID);
+        }
     }
 }

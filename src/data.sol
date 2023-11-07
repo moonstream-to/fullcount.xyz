@@ -17,31 +17,27 @@ enum PlayerType {
 }
 
 /*
-Pitch types:
-- Fastball - 0
-- Curveball - 1
-- Changeup - 2
-- Knuckleball - 3
+Pitch speeds:
+- Fast - 0
+- Slow - 1
 */
-enum PitchType {
-    Fastball,
-    Curveball,
-    Changeup,
-    Knuckleball
+enum PitchSpeed {
+    Fast,
+    Slow
 }
 
 /*
 Types of swings a batter can make:
 - Contact - 0
 - Power - 1
-- Bunt - 2
-- Check - 3
+- Take - 2
+
+No bunting in a bottom-of-the-ninth situation with 2 outs and the bases loaded in a full count.
 */
 enum SwingType {
     Contact,
     Power,
-    Bunt,
-    Soft
+    Take
 }
 
 /*
@@ -51,7 +47,6 @@ Possible vertical locations for a pitch:
 - Middle - 2
 - LowStrike - 3
 - LowBall - 4
-- Dirt - 5
 */
 enum VerticalLocation {
     HighBall,
@@ -77,12 +72,34 @@ enum HorizontalLocation {
     OutsideBall
 }
 
+/**
+ * Possible outcomes of a Fullcount session:
+ * - Strikeout - 0
+ * - Walk - 1
+ * - Single - 2
+ * - Double - 3
+ * - Triple - 4
+ * - HomeRun - 5
+ * - InPlayOut - 6
+ *
+ * InPlayOut represents a GroundOut or FlyOut. In the future, we may split this into two outcomes.
+ */
+enum Outcome {
+    Strikeout,
+    Walk,
+    Single,
+    Double,
+    Triple,
+    HomeRun,
+    InPlayOut
+}
+
 /*
 Pitch represents the pitcher's move in a Fullcount session.
 */
 struct Pitch {
     uint256 nonce;
-    PitchType kind;
+    PitchSpeed speed;
     VerticalLocation vertical;
     HorizontalLocation horizontal;
 }
