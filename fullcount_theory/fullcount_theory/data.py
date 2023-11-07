@@ -2,7 +2,9 @@
 The docstrings for the enums refer back to data.sol
 """
 
+import argparse
 from enum import Enum
+import random
 from typing import Callable, Tuple
 
 
@@ -35,15 +37,13 @@ class PitchType(Enum):
     """
     /*
     Pitch types:
-    - Fastball - 0
-    - Curveball - 1
-    - Changeup - 2
+    - Fast - 0
+    - Slow - 1
     */
     """
 
-    Fastball = 0
-    Curveball = 1
-    Changeup = 2
+    Fast = 0
+    Slow = 1
 
 
 class SwingType(Enum):
@@ -52,12 +52,12 @@ class SwingType(Enum):
     Types of swings a batter can make:
     - Contact - 0
     - Power - 1
-    - Check - 2
+    - Take - 2
     """
 
     Contact = 0
     Power = 1
-    Check = 2
+    Take = 2
 
 
 class VerticalLocation(Enum):
@@ -113,3 +113,36 @@ Rule = Callable[
     ],
     OutcomeDistribution,
 ]
+
+
+def l1_distance(
+    pitch_type: PitchType,
+    pitch_vertical_location: VerticalLocation,
+    pitch_horizontal_location: HorizontalLocation,
+    swing_type: SwingType,
+    swing_vertical_location: VerticalLocation,
+    swing_horizontal_location: HorizontalLocation,
+) -> int:
+    assert swing_type != SwingType.Take, "Distance not used when batter chooses Take"
+    return (
+        abs(pitch_horizontal_location.value - swing_horizontal_location.value)
+        + abs(pitch_vertical_location.value - swing_vertical_location.value)
+        + abs(pitch_type.value - swing_type.value)
+    )
+
+
+def sample(distribution: OutcomeDistribution) -> Outcome:
+    roll = random.randint(0, 9999)
+    outcome_index = min(i for i in range(8) if sum(distribution[: i + 1]) > roll)
+    return Outcome(outcome_index)
+
+
+def configure_move_type_handler(
+    parser: argparse.ArgumentParser, required: bool = True
+) -> None:
+    parser.add_argument("--pitch-type", "-t", type=int, required=required)
+    parser.add_argument("--pitch-vertical", "-v", type=int, required=required)
+    parser.add_argument("--pitch-horizontal", "-z", type=int, required=required)
+    parser.add_argument("--swing-type", "-T", type=int, required=required)
+    parser.add_argument("--swing-vertical", "-V", type=int, required=required)
+    parser.add_argument("--swing-horizontal", "-Z", type=int, required=required)

@@ -6,11 +6,10 @@ from . import generation_1
 class Generation1Tests(unittest.TestCase):
     def test_outcome_weights(self):
         outcome_types = {
-            "SolidGround": generation_1.SolidGround,
-            "WeakGround": generation_1.WeakGround,
-            "SolidPower": generation_1.SolidPower,
-            "WeakPower": generation_1.WeakPower,
-            "SwingAndLikelyMiss": generation_1.SwingAndLikelyMiss,
+            "Distance0": generation_1.Distance0,
+            "Distance1": generation_1.Distance1,
+            "Distance2": generation_1.Distance2,
+            "DistanceGT2": generation_1.DistanceGT2,
         }
 
         for name, outcome_type in outcome_types.items():
