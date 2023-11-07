@@ -1,6 +1,6 @@
 import argparse
 
-from . import generation_1
+from . import Fullcount, generation_1
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -12,6 +12,9 @@ def generate_cli() -> argparse.ArgumentParser:
     parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
+
+    contract_parser = Fullcount.generate_cli()
+    subparsers.add_parser("contract", parents=[contract_parser], add_help=False)
 
     generation_1_parser = generation_1.generate_cli()
     subparsers.add_parser("gen-1", parents=[generation_1_parser], add_help=False)
