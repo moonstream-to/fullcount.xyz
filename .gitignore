@@ -16,3 +16,6 @@ Cargo.lock
 # Foundry stuff
 out/
 cache/
+
+# Brownie stuff
+build/
