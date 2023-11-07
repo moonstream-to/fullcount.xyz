@@ -42,7 +42,7 @@ Functionality:
       can have a different price than joining an existing session. In general, we will keep it cheaper
       to start a session than to join a sesion that someone else started -- this will incentivize many
       matches. The cost will disincentivize bots grinding against themselves. The contract is deployed
-      with `feeTokenAddress`, `sessionStartPrice`, `sessionJoinPrice`, and `treasuryAddress` parameters.
+      with `sessionStartPrice`, `sessionJoinPrice`, `treasuryAddress`, and `secondsPerPhase` parameters.
       Prices are transferred to the `treasuryAddress` when a session is either started or joined.
       NOTE: Currently, only ERC20 fees are implemented.
 - [x] Once a session starts, both the pitcher and the batter can commit their moves.
@@ -75,10 +75,9 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     string public constant FullcountVersion = "0.0.1";
 
-    address public FeeTokenAddress;
     uint256 public SessionStartPrice;
     uint256 public SessionJoinPrice;
-    address public TreasuryAddress;
+    address payable public TreasuryAddress;
     uint256 public SecondsPerPhase;
 
     uint256 public NumSessions;
@@ -115,15 +114,13 @@ contract Fullcount is StatBlockBase, EIP712 {
     );
 
     constructor(
-        address feeTokenAddress,
         uint256 sessionStartPrice,
         uint256 sessionJoinPrice,
-        address treasuryAddress,
+        address payable treasuryAddress,
         uint256 secondsPerPhase
     )
         EIP712("Fullcount", FullcountVersion)
     {
-        FeeTokenAddress = feeTokenAddress;
         SessionStartPrice = sessionStartPrice;
         SessionJoinPrice = sessionJoinPrice;
         TreasuryAddress = treasuryAddress;
@@ -183,14 +180,15 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionStarted
-    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
-        IERC20 feeToken = IERC20(FeeTokenAddress);
+    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external payable virtual returns (uint256) {
+        require(msg.value >= SessionStartPrice, "Fullcount.startSession: incorrect session start price");
+
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
 
-        feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionStartPrice);
+        TreasuryAddress.transfer(SessionStartPrice);
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -218,16 +216,17 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionJoined
-    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
+    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external payable virtual {
+        require(msg.value == SessionJoinPrice, "Fullcount.joinSession: incorrect join fee");
+
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
-        IERC20 feeToken = IERC20(FeeTokenAddress);
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
 
-        feeToken.safeTransferFrom(msg.sender, TreasuryAddress, SessionJoinPrice);
+        payable(TreasuryAddress).transfer(SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
