@@ -5,8 +5,8 @@ from . import Fullcount, generation_1
 
 def generate_cli() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="fullcount-theory",
-        description="Fullcount Theory: A tool to experiment with the game design and balance of Fullcount.xyz",
+        prog="fullcount",
+        description="Fullcount: A Python client to Fullcount.xyz",
         epilog="For more information, see https://github.com/moonstream-to/fullcount.xyz",
     )
     parser.set_defaults(func=lambda _: parser.print_help())
