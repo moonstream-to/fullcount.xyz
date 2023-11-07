@@ -11,7 +11,7 @@ import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
     PlayerType,
-    PitchType,
+    PitchSpeed,
     SwingType,
     VerticalLocation,
     HorizontalLocation,
@@ -180,7 +180,16 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionStarted
-    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external payable virtual returns (uint256) {
+    function startSession(
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role
+    )
+        external
+        payable
+        virtual
+        returns (uint256)
+    {
         require(msg.value >= SessionStartPrice, "Fullcount.startSession: incorrect session start price");
 
         IERC721 nftContract = IERC721(nftAddress);
@@ -311,7 +320,7 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     function pitchHash(
         uint256 nonce,
-        PitchType kind,
+        PitchSpeed speed,
         VerticalLocation vertical,
         HorizontalLocation horizontal
     )
@@ -321,9 +330,9 @@ contract Fullcount is StatBlockBase, EIP712 {
     {
         bytes32 structHash = keccak256(
             abi.encode(
-                keccak256("PitchMessage(uint256 nonce,uint256 kind,uint256 vertical,uint256 horizontal)"),
+                keccak256("PitchMessage(uint256 nonce,uint256 speed,uint256 vertical,uint256 horizontal)"),
                 nonce,
-                uint256(kind),
+                uint256(speed),
                 uint256(vertical),
                 uint256(horizontal)
             )
@@ -430,7 +439,7 @@ contract Fullcount is StatBlockBase, EIP712 {
     function revealPitch(
         uint256 sessionID,
         uint256 nonce,
-        PitchType kind,
+        PitchSpeed speed,
         VerticalLocation vertical,
         HorizontalLocation horizontal
     )
@@ -451,14 +460,14 @@ contract Fullcount is StatBlockBase, EIP712 {
 
         require(!session.didPitcherReveal, "Fullcount.revealPitch: pitcher already revealed");
 
-        bytes32 pitchMessageHash = pitchHash(nonce, kind, vertical, horizontal);
+        bytes32 pitchMessageHash = pitchHash(nonce, speed, vertical, horizontal);
         require(
             SignatureChecker.isValidSignatureNow(msg.sender, pitchMessageHash, session.pitcherCommit),
             "Fullcount.revealPitch: invalid signature"
         );
 
         session.didPitcherReveal = true;
-        session.pitcherReveal = Pitch(nonce, kind, vertical, horizontal);
+        session.pitcherReveal = Pitch(nonce, speed, vertical, horizontal);
 
         emit PitchRevealed(sessionID, session.pitcherReveal);
     }

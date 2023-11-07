@@ -8,7 +8,7 @@ import {
     Session,
     Pitch,
     Swing,
-    PitchType,
+    PitchSpeed,
     SwingType,
     VerticalLocation,
     HorizontalLocation
@@ -135,7 +135,7 @@ contract FullcountTest_startSession is FullcountTestBase {
             abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, address(game), tokenID)
         );
 
-        game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
         assertEq(game.NumSessions(), initialNumSessions);
 
         assertEq(characterNFTs.ownerOf(tokenID), player1);
@@ -165,7 +165,7 @@ contract FullcountTest_startSession is FullcountTestBase {
         vm.expectRevert(
             // TODO: get correct error
         );
-        game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
         assertEq(game.NumSessions(), initialNumSessions);
 
         assertEq(poorPlayer.balance, initialPoorPlayerBalance);
@@ -192,7 +192,8 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         vm.expectEmit(address(game));
         emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
 
@@ -234,7 +235,8 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         vm.expectEmit(address(game));
         emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
 
@@ -279,7 +281,7 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         vm.prank(randomPerson);
         vm.expectRevert("Fullcount.startSession: msg.sender is not NFT owner");
-        game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(characterNFTs.ownerOf(tokenID), player1);
 
@@ -332,7 +334,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
         vm.expectRevert("Fullcount.joinSession: session does not exist");
-        game.joinSession{value: sessionJoinPrice}(initialNumSessions + 1, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(initialNumSessions + 1, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions);
 
@@ -370,7 +372,8 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         vm.startPrank(player2);
         otherCharacterNFTs.approve(address(game), otherTokenID);
@@ -378,7 +381,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.warp(initialBlockTimestamp + startJoinOffsetSeconds);
         vm.expectEmit(address(game));
         emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions + 1);
 
@@ -425,7 +428,8 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.startPrank(player2);
         otherCharacterNFTs.approve(address(game), otherTokenID);
@@ -433,7 +437,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.warp(initialBlockTimestamp + startJoinOffsetSeconds);
         vm.expectEmit(address(game));
         emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Pitcher);
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         assertEq(game.NumSessions(), initialNumSessions + 1);
 
@@ -469,7 +473,8 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.startPrank(poorPlayer);
         otherCharacterNFTs.approve(address(game), otherTokenID);
@@ -477,7 +482,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.expectRevert(
             // TODO: get correct error
         );
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
     }
@@ -495,14 +500,15 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.startPrank(player2);
 
         vm.expectRevert(
             abi.encodeWithSelector(IERC721Errors.ERC721InsufficientApproval.selector, address(game), otherTokenID)
         );
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
     }
@@ -520,14 +526,15 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         vm.startPrank(player2);
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
         vm.expectEmit(address(game));
         emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
 
@@ -540,7 +547,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         otherCharacterNFTs.approve(address(game), nextOtherTokenID);
 
         vm.expectRevert("Fullcount.joinSession: session is already full");
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), nextOtherTokenID);
 
         vm.stopPrank();
     }
@@ -558,7 +565,8 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.startPrank(player2);
         otherCharacterNFTs.approve(address(game), otherTokenID);
@@ -567,7 +575,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.prank(randomPerson);
         vm.expectRevert("Fullcount.joinSession: msg.sender is not NFT owner");
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
     }
 
     function testRevert_when_joining_aborted_session() public {
@@ -583,7 +591,8 @@ contract FullcountTest_joinSession is FullcountTestBase {
         vm.startPrank(player1);
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         game.abortSession(sessionID);
 
@@ -596,7 +605,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
         vm.expectRevert("Fullcount.joinSession: opponent left session");
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
     }
@@ -624,7 +633,8 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(game.sessionProgress(sessionID), 2);
 
@@ -658,7 +668,8 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         assertEq(characterNFTs.ownerOf(tokenID), address(game));
 
@@ -696,7 +707,8 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(game.sessionProgress(sessionID), 2);
 
@@ -730,7 +742,8 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         assertEq(game.sessionProgress(sessionID), 2);
 
@@ -778,7 +791,8 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         vm.stopPrank();
 
@@ -786,7 +800,7 @@ contract FullcountTest_abortSession is FullcountTestBase {
 
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
 
@@ -845,7 +859,8 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         vm.stopPrank();
 
@@ -853,7 +868,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        game.joinSession{value: sessionJoinPrice}(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
 
@@ -874,7 +889,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -944,7 +959,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -965,10 +980,10 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         assertEq(session.pitcherCommit, pitcherCommitment);
 
-        // Player 1 then decides to change their mind and pitch a curveball in the lower-outside corner of the strike
-        // zone
+        // Player 1 then decides to change their mind and pitch an offspeed pitch in the lower-outside corner of the
+        // strike zone
         uint256 pitcherNonce2 = 0x84535ad85a;
-        PitchType pitcherPitch2 = PitchType.Curveball;
+        PitchSpeed pitcherPitch2 = PitchSpeed.Slow;
         VerticalLocation pitcherVerticalLocation2 = VerticalLocation.LowStrike;
         HorizontalLocation pitcherHorizontalLocation2 = HorizontalLocation.OutsideStrike;
 
@@ -1056,7 +1071,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -1088,10 +1103,10 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         vm.startPrank(player1);
 
-        // Player 1 then decides to change their mind and pitch a curveball in the lower-outside corner of the strike
-        // zone
+        // Player 1 then decides to change their mind and pitch an offspeed pitch in the lower-outside corner of the
+        // strike zone
         uint256 pitcherNonce2 = 0x84535ad85a;
-        PitchType pitcherPitch2 = PitchType.Curveball;
+        PitchSpeed pitcherPitch2 = PitchSpeed.Slow;
         VerticalLocation pitcherVerticalLocation2 = VerticalLocation.LowStrike;
         HorizontalLocation pitcherHorizontalLocation2 = HorizontalLocation.OutsideStrike;
 
@@ -1119,7 +1134,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -1189,7 +1204,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -1257,11 +1272,12 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
@@ -1285,7 +1301,8 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession{value: sessionStartPrice}(address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Batter);
 
         // Player 1 chooses to make a power swing in the middle of their strike zone.
         uint256 batterNonce = 0x725ae98;
@@ -1310,7 +1327,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
 
         // Player 1 chooses to pitch a fastball in the upper-inside corner of the strike zone
         uint256 pitcherNonce = 0x1902a;
-        PitchType pitcherPitch = PitchType.Fastball;
+        PitchSpeed pitcherPitch = PitchSpeed.Fast;
         VerticalLocation pitcherVerticalLocation = VerticalLocation.HighStrike;
         HorizontalLocation pitcherHorizontalLocation = HorizontalLocation.InsideStrike;
 
