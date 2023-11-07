@@ -19,3 +19,8 @@ cache/
 
 # Brownie stuff
 build/
+
+# Python stuff
+venv/
+.venv/
+.fullcount/
