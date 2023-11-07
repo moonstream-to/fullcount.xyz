@@ -457,7 +457,7 @@ contract Fullcount is StatBlockBase, EIP712 {
             + distribution[5] + distribution[6];
 
         // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
-        uint256 sample = uint256(keccak256(abi.encodePacked(nonce0, nonce1))) % totalMass;
+        uint256 sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
 
         uint256 cumulativeMass = distribution[0];
         if (sample < cumulativeMass) {
