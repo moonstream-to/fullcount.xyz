@@ -79,3 +79,23 @@ To regenerate the Python interface to the `BeerLeagueBallers` NFT contract:
 ```bash
 moonworm generate-brownie -o fullcount -p ../ --foundry -n BeerLeagueBallers --sol-filename Players.sol
 ```
+
+### Randomness
+
+The `fulltest randomness` command allows you to see the random `uint256` that would be sampled from any
+two nonces.
+
+For example, to check the `uint256` sampled from the pitcher nonce `2384902384` and the batter nonce `98290483902842390482`,
+you would run:
+
+```bash
+fullcount randomness -n 2384902384 -N 98290483902842390482
+```
+
+This produces:
+
+```
+$ fullcount randomness -n 2384902384 -N 98290483902842390482
+Nonce 1: 2384902384, Nonce 2: 98290483902842390482, Denominator: 10000
+Random sample: 6727
+```

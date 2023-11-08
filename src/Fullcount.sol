@@ -444,6 +444,17 @@ contract Fullcount is StatBlockBase, EIP712 {
         emit SwingCommitted(sessionID);
     }
 
+    // Internal method gets inlined into contract methods
+    function _randomSample(uint256 nonce0, uint256 nonce1, uint256 totalMass) internal pure returns (uint256 sample) {
+        // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
+        sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
+    }
+
+    // External method makes it easy to test randomness for the purposes of game clients
+    function randomSample(uint256 nonce0, uint256 nonce1, uint256 totalMass) external pure returns (uint256) {
+        return _randomSample(nonce0, nonce1, totalMass);
+    }
+
     function sampleOutcomeFromDistribution(
         uint256 nonce0,
         uint256 nonce1,
@@ -456,8 +467,7 @@ contract Fullcount is StatBlockBase, EIP712 {
         uint256 totalMass = distribution[0] + distribution[1] + distribution[2] + distribution[3] + distribution[4]
             + distribution[5] + distribution[6];
 
-        // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
-        uint256 sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
+        uint256 sample = _randomSample(nonce0, nonce1, totalMass);
 
         uint256 cumulativeMass = distribution[0];
         if (sample < cumulativeMass) {
