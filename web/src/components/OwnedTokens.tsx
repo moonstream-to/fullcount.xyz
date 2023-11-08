@@ -9,6 +9,7 @@ import useMoonToast from "../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
+import { decodeBase64Json } from "../utils/decoders";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
@@ -23,7 +24,7 @@ export interface Token {
 
 const OwnedTokens = () => {
   const web3ctx = useContext(Web3Context);
-  const { tokenAddress } = useGameContext();
+  const { tokenAddress, contractAddress } = useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -53,22 +54,6 @@ const OwnedTokens = () => {
     },
   );
 
-  function decodeBase64Json(encodedData: string): any {
-    try {
-      // Split the encoded data to remove the data URI scheme if present
-      const base64String = encodedData.split(",")[1] || encodedData;
-
-      // Decode the base64 string to a UTF-8 string
-      const decodedStr = Buffer.from(base64String, "base64").toString("utf-8");
-
-      // Parse the JSON string to an object
-      return JSON.parse(decodedStr);
-    } catch (error) {
-      console.error("Failed to decode base64 JSON data:", error);
-      return null;
-    }
-  }
-
   const ownedTokens = useQuery<Token[]>(
     ["owned_tokens", web3ctx.account, web3ctx.chainId],
     async () => {
@@ -96,6 +81,31 @@ const OwnedTokens = () => {
     },
   );
 
+  const setApproval = useMutation(
+    async ({ approval }: { approval: boolean }) => {
+      if (!web3ctx.account) {
+        return new Promise((_, reject) => {
+          reject(new Error(`Account address isn't set`));
+        });
+      }
+
+      return tokenContract.methods.setApprovalForAll(contractAddress, approval).send({
+        from: web3ctx.account,
+        maxPriorityFeePerGas: null,
+        maxFeePerGas: null,
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("contract_approval");
+        toast("SetApproval successful.", "success");
+      },
+      onError: (e: Error) => {
+        toast("SetApproval failed." + e?.message, "error");
+      },
+    },
+  );
+
   return (
     <Flex className={styles.container}>
       <Text className={styles.title}>Your NFTs</Text>
@@ -109,6 +119,10 @@ const OwnedTokens = () => {
       <button className={styles.button} onClick={onOpen}>
         {mintToken.isLoading ? <Spinner /> : "Mint"}
       </button>
+      <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
+        {mintToken.isLoading ? <Spinner /> : "Approve"}
+      </button>
+
       <CreateNewCharacter
         isOpen={isOpen}
         onClose={onClose}
