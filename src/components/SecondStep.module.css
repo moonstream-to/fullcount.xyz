@@ -1,0 +1,45 @@
+.container {
+    display: flex;
+    width: 648px;
+    padding: 40px 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    /*flex: 1 0 0;*/
+    border: 1px solid #4D4D4D;
+    background: rgba(41, 41, 41, 0.70);
+}
+
+.title {
+    background: linear-gradient(92deg, #00A341 -10.37%, #FFF 133.66%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%;
+    letter-spacing: -0.4px;
+}
+
+.prompt {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.text {
+    width: 402px;
+    color: #BFBFBF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
