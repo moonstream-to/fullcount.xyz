@@ -1,20 +1,29 @@
 import argparse
 
-from . import generation_1
+from . import BeerLeagueBallers, Fullcount, generation_1, randomness
 
 
 def generate_cli() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="fullcount-theory",
-        description="Fullcount Theory: A tool to experiment with the game design and balance of Fullcount.xyz",
+        prog="fullcount",
+        description="Fullcount: A Python client to Fullcount.xyz",
         epilog="For more information, see https://github.com/moonstream-to/fullcount.xyz",
     )
     parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
 
+    contract_parser = Fullcount.generate_cli()
+    subparsers.add_parser("contract", parents=[contract_parser], add_help=False)
+
     generation_1_parser = generation_1.generate_cli()
     subparsers.add_parser("gen-1", parents=[generation_1_parser], add_help=False)
+
+    blb_parser = BeerLeagueBallers.generate_cli()
+    subparsers.add_parser("blb", parents=[blb_parser], add_help=False)
+
+    randomness_parser = randomness.generate_cli()
+    subparsers.add_parser("randomness", parents=[randomness_parser], add_help=False)
 
     return parser
 

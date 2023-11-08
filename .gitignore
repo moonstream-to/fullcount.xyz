@@ -16,3 +16,11 @@ Cargo.lock
 # Foundry stuff
 out/
 cache/
+
+# Brownie stuff
+build/
+
+# Python stuff
+venv/
+.venv/
+.fullcount/
