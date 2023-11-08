@@ -5,18 +5,18 @@ import { Test, console2 } from "../lib/forge-std/src/Test.sol";
 import { FullcountTestBase } from "./Fullcount.t.sol";
 
 /**
- * These tests check that the "fullcount randomness" tool generates the same random numbers from
+ * These tests check that the "fullcount randomness inspect" tool generates the same random numbers from
  * nonces as the Fullcount smart contract.
  *
  * Test names are as follows:
  * test_<nonce1>_<nonce2>_<denominator>_<expected_output>
  *
  * The expected output for this test would be generated using:
- * $ fullcount randomness -n <nonce1> -N <nonce2> -d <denominator>
+ * $ fullcount randomness inspect -n <nonce1> -N <nonce2> -d <denominator>
  */
 contract RandomnessConsistencyTest is FullcountTestBase {
     /**
-     * $ fullcount randomness -n 1 -N 2 -d 10000
+     * $ fullcount randomness inspect -n 1 -N 2 -d 10000
      * Nonce 1: 1, Nonce 2: 2, Denominator: 10000
      * Random sample: 9136
      */
@@ -25,7 +25,7 @@ contract RandomnessConsistencyTest is FullcountTestBase {
     }
 
     /**
-     * $ fullcount randomness -n 1 -N 2 -d 1
+     * $ fullcount randomness inspect -n 1 -N 2 -d 1
      * Nonce 1: 1, Nonce 2: 2, Denominator: 1
      * Random sample: 0
      */
@@ -34,7 +34,7 @@ contract RandomnessConsistencyTest is FullcountTestBase {
     }
 
     /**
-     * $ fullcount randomness -n 29384923 -N 984543 -d 10000
+     * $ fullcount randomness inspect -n 29384923 -N 984543 -d 10000
      * Nonce 1: 29384923, Nonce 2: 29384923, Denominator: 10000
      * Random sample: 365
      */
@@ -43,7 +43,7 @@ contract RandomnessConsistencyTest is FullcountTestBase {
     }
 
     /**
-     * $ fullcount randomness -n 29384923 -N 984543 -d 123984239
+     * $ fullcount randomness inspect -n 29384923 -N 984543 -d 123984239
      * Nonce 1: 29384923, Nonce 2: 29384923, Denominator: 123984239
      * Random sample: 72037728
      */
@@ -52,7 +52,7 @@ contract RandomnessConsistencyTest is FullcountTestBase {
     }
 
     /**
-     * $ fullcount randomness -n 287349237429034239084 -N 239480239842390842390482390 -d 10000
+     * $ fullcount randomness inspect -n 287349237429034239084 -N 239480239842390842390482390 -d 10000
      * Nonce 1: 287349237429034239084, Nonce 2: 287349237429034239084, Denominator: 10000
      * Random sample: 7575
      */

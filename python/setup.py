@@ -14,7 +14,7 @@ setup(
     name="fullcount",
     version=VERSION,
     packages=find_packages(),
-    install_requires=["eth-brownie"],
+    install_requires=["eth-brownie", "tqdm"],
     extras_require={
         "dev": ["black", "moonworm[moonstream]"],
         "distribute": ["setuptools", "twine", "wheel"],
