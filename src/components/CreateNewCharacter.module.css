@@ -1,0 +1,83 @@
+.container {
+    display: flex;
+    width: 500px;
+    padding: 30px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+    border-radius: 20px;
+    border: 1px solid #FFF;
+}
+.message {
+    color: #FFF;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%; /* 24px */
+}
+
+.input {
+    display: flex;
+    padding: 10px 15px;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    align-self: stretch;
+    border-radius: 10px;
+    border: 1px solid #FFF;
+    background-color: #1A1D22;
+    color: #FFF;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%; /* 22.4px */
+}
+
+.input:focus-visible {
+    outline: none;
+}
+
+.buttons {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.cancelButton {
+    display: flex;
+    width: 210px;
+    padding: 6px 40px;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    background: #4D4D4D;
+    color: #FFF;
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.saveButton {
+    display: flex;
+    width: 210px;
+    padding: 6px 40px;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    color: #FFF;
+    text-align: center;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    background: #F56646;
+}
+
+
+
+.saveButton:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
