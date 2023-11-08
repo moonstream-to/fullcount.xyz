@@ -9,7 +9,7 @@ import { useQuery, useQueryClient } from "react-query";
 import { chainByChainId } from "../contexts/Web3Context";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import queryCacheProps from "../hooks/hookCommon";
-import {useGameContext} from "../contexts/GameContext";
+import { useGameContext } from "../contexts/GameContext";
 import OwnedTokens from "./OwnedTokens";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
@@ -19,26 +19,18 @@ const TitleScreen = () => {
 
   const router = useRouter();
 
-  const {
-    sessionId,
-    contractAddress,
-    selectedToken,
-      updateContext,
-  } = useGameContext();
+  const { sessionId, contractAddress, selectedToken, updateContext } = useGameContext();
 
   const chain = {
     id: Number(process.env.NEXT_PUBLIC_CHAIN_ID) ?? 322,
     name: chainByChainId(Number(process.env.NEXT_PUBLIC_CHAIN_ID) ?? 322),
   };
 
-
-
   useEffect(() => {
     if (typeof router.query.session_id === "string") {
-      updateContext({sessionId: Number(router.query.session_id)});
+      updateContext({ sessionId: Number(router.query.session_id) });
     }
   }, [router.query.session_id]);
-
 
   const queryClient = useQueryClient();
 
@@ -48,28 +40,27 @@ const TitleScreen = () => {
   }, [web3ctx.chainId, web3ctx.account]);
 
   return (
+    <>
+      {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chain.id ? (
+        <TitleScreenLayout>
+          <SecondStep chain={chain} nextStep={() => setStep(3)} />
+        </TitleScreenLayout>
+      ) : (
         <>
-          {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chain.id ? (
-            <TitleScreenLayout>
-              <SecondStep chain={chain} nextStep={() => setStep(3)} />
-            </TitleScreenLayout>
+          {selectedToken !== -1 ? (
+            <PlayingLayout>
+              <Playing />
+            </PlayingLayout>
           ) : (
             <>
-              {selectedToken !== -1 ? (
-                <PlayingLayout>
-                  <Playing />
-                </PlayingLayout>
-              ) : (
-                <>
-                    <TitleScreenLayout>
-                      <OwnedTokens />
-                    </TitleScreenLayout>
-
-                </>
-              )}
+              <TitleScreenLayout>
+                <OwnedTokens />
+              </TitleScreenLayout>
             </>
           )}
         </>
+      )}
+    </>
   );
 };
 

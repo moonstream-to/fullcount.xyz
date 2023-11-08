@@ -43,4 +43,3 @@ export interface MoonstreamWeb3ProviderInterface {
   changeChain: typeof ChangeChain;
   targetChain: ChainInterface | undefined;
 }
-

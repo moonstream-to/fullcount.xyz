@@ -9,12 +9,11 @@ const TitleScreenLayout = ({ children }: { children: React.ReactNode }) => {
       minH="100vh"
       flexDirection="column"
       justifyContent="center"
-      alignItems={'center'}
+      alignItems={"center"}
       placeSelf="stretch"
-
-      bg={'#1B1B1B'}
+      bg={"#1B1B1B"}
     >
-        {children}
+      {children}
     </Flex>
   );
 };
