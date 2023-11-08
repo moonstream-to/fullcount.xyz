@@ -73,3 +73,5 @@ test.env
 prod.env
 .todo
 /.secrets/
+/web/.next/
+/web/.secrets/
