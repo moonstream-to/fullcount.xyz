@@ -28,17 +28,6 @@ const Navbar = () => {
         w={{ base: "100%", sm: "fit-content" }}
         gap={{ base: "auto", sm: "30px" }}
       >
-        <Flex gap={{ base: "15px", sm: "30px" }} alignItems={"center"}>
-          <Button variant={"transparent"} p={"10px"} gap={"10px"}>
-            <Image alt={"help"} src={`${assetsPath}/icons/help-circle.png`} h={"20px"} w={"20px"} />
-            {!isSmallScreen && <Text>Help</Text>}
-          </Button>
-          <Button variant={"transparent"} p={"10px"} gap={"10px"}>
-            <Image alt={"discord"} src={`${assetsPath}/icons/discord.png`} w={"20px"} h={"15px"} />
-            {!isSmallScreen && <Text>Discuss</Text>}
-          </Button>
-        </Flex>
-
         <Text lineHeight={"100%"} letterSpacing={"0.7px"}>
           {address}
         </Text>

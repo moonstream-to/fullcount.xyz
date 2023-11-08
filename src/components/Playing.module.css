@@ -1,14 +1,21 @@
 .container {
-  display: flex;
-  width: 648px;
-  padding: 40px 20px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 40px;
-  /*flex: 1 0 0;*/
-  border: 1px solid #4d4d4d;
-  background: rgba(41, 41, 41, 0.7);
+  /*display: flex;*/
+  /*width: 648px;*/
+  /*padding: 40px 20px;*/
+  /*flex-direction: column;*/
+  /*justify-content: center;*/
+  /*align-items: center;*/
+  /*width: 100%;*/
+  /*gap: 40px;*/
+  /*!*flex: 1 0 0;*!*/
+  /*border: 1px solid #4d4d4d;*/
+  /*background: rgba(41, 41, 41, 0.7);*/
+    display: flex;
+    /*width: 1440px;*/
+    /*height: 800px;*/
+    flex-direction: column;
+    align-items: flex-start;
+    /*background-color: #221111;*/
 }
 
 .title {

@@ -43,32 +43,3 @@ export interface MoonstreamWeb3ProviderInterface {
   changeChain: typeof ChangeChain;
   targetChain: ChainInterface | undefined;
 }
-
-export interface UpdateClaim {
-  claim_block_deadline?: string;
-  claim_id?: string;
-  description?: string;
-  dropper_claim_id?: string;
-  dropper_contract_id?: string;
-  terminus_address?: string;
-  terminus_pool_id?: string;
-  title?: string;
-}
-
-export interface ClaimInterface {
-  active: boolean;
-  claim_block_deadline: number;
-  drop_number: number;
-  description: string;
-  dropper_contract_address: string;
-  id: string;
-  terminus_address: string;
-  terminus_pool_id: number;
-  title: string;
-}
-
-import { NFTInfo } from "../components/nft/types";
-
-export type StakedTokenInfo = NFTInfo & {
-  sessionId: number;
-};

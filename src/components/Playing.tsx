@@ -1,11 +1,23 @@
 import styles from "./Playing.module.css";
 import { Flex, Text } from "@chakra-ui/react";
+import { useGameContext } from "../contexts/GameContext";
+import SessionsView from "./SessionsView";
 
 const Playing = () => {
+  const { sessionId, updateContext } = useGameContext();
   return (
     <Flex className={styles.container}>
-      <Text className={styles.title}>Playing</Text>
-      <Text className={styles.prompt}>Soon...</Text>
+      <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: -1 })}>
+        Back
+      </Text>
+      {!sessionId ? (
+        <SessionsView />
+      ) : (
+        <>
+          <Text className={styles.title}>Playing</Text>
+          <Text className={styles.prompt}>Soon...</Text>
+        </>
+      )}
     </Flex>
   );
 };

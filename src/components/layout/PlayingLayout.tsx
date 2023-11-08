@@ -12,6 +12,7 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       maxW={"1900px"}
       placeSelf={"center"}
       w={"100%"}
+      // bg={"#111133"}
     >
       <Navbar />
       {children}
