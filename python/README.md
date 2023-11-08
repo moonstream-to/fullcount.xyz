@@ -70,6 +70,12 @@ pip install -e .[dev]
 
 To regenerate the Python interface to the `Fullcount` contract:
 
-```
+```bash
 moonworm generate-brownie -o fullcount -p ../ -n Fullcount --foundry
+```
+
+To regenerate the Python interface to the `BeerLeagueBallers` NFT contract:
+
+```bash
+moonworm generate-brownie -o fullcount -p ../ --foundry -n BeerLeagueBallers --sol-filename Players.sol
 ```
