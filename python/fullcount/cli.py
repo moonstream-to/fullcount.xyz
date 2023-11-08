@@ -1,6 +1,6 @@
 import argparse
 
-from . import Fullcount, generation_1
+from . import BeerLeagueBallers, Fullcount, generation_1
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -18,6 +18,9 @@ def generate_cli() -> argparse.ArgumentParser:
 
     generation_1_parser = generation_1.generate_cli()
     subparsers.add_parser("gen-1", parents=[generation_1_parser], add_help=False)
+
+    blb_parser = BeerLeagueBallers.generate_cli()
+    subparsers.add_parser("blb", parents=[blb_parser], add_help=False)
 
     return parser
 
