@@ -12,6 +12,8 @@
   background: rgba(41, 41, 41, 0.7);
 }
 
+
+
 .title {
   color: #fff;
   font-family: Inter, serif;
@@ -19,6 +21,13 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+}
+
+.cards {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  align-self: stretch;
 }
 
 .button {
