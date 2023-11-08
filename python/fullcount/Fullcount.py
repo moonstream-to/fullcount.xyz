@@ -342,6 +342,18 @@ class Fullcount:
             nonce, speed, vertical, horizontal, block_identifier=block_number
         )
 
+    def random_sample(
+        self,
+        nonce0: int,
+        nonce1: int,
+        total_mass: int,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.randomSample.call(
+            nonce0, nonce1, total_mass, block_identifier=block_number
+        )
+
     def resolve(
         self,
         pitch: tuple,
@@ -803,6 +815,18 @@ def handle_pitch_hash(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_random_sample(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.random_sample(
+        nonce0=args.nonce0,
+        nonce1=args.nonce1,
+        total_mass=args.total_mass,
+        block_number=args.block_number,
+    )
+    print(result)
+
+
 def handle_resolve(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -1165,6 +1189,19 @@ def generate_cli() -> argparse.ArgumentParser:
         "--horizontal", required=True, help="Type: uint8", type=int
     )
     pitch_hash_parser.set_defaults(func=handle_pitch_hash)
+
+    random_sample_parser = subcommands.add_parser("random-sample")
+    add_default_arguments(random_sample_parser, False)
+    random_sample_parser.add_argument(
+        "--nonce0", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.add_argument(
+        "--nonce1", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.add_argument(
+        "--total-mass", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.set_defaults(func=handle_random_sample)
 
     resolve_parser = subcommands.add_parser("resolve")
     add_default_arguments(resolve_parser, False)
