@@ -6,7 +6,6 @@ import PlayingLayout from "./layout/PlayingLayout";
 import Playing from "./Playing";
 import { useRouter } from "next/router";
 import { useQuery, useQueryClient } from "react-query";
-import { chainByChainId } from "../contexts/Web3Context";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import queryCacheProps from "../hooks/hookCommon";
 import { useGameContext } from "../contexts/GameContext";
@@ -19,12 +18,7 @@ const TitleScreen = () => {
 
   const router = useRouter();
 
-  const { sessionId, contractAddress, selectedToken, updateContext } = useGameContext();
-
-  const chain = {
-    id: Number(process.env.NEXT_PUBLIC_CHAIN_ID) ?? 322,
-    name: chainByChainId(Number(process.env.NEXT_PUBLIC_CHAIN_ID) ?? 322),
-  };
+  const { sessionId, contractAddress, selectedToken, updateContext, chainId } = useGameContext();
 
   useEffect(() => {
     if (typeof router.query.session_id === "string") {
@@ -41,9 +35,9 @@ const TitleScreen = () => {
 
   return (
     <>
-      {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chain.id ? (
+      {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chainId ? (
         <TitleScreenLayout>
-          <SecondStep chain={chain} nextStep={() => setStep(3)} />
+          <SecondStep nextStep={() => setStep(3)} />
         </TitleScreenLayout>
       ) : (
         <>
