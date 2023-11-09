@@ -41,7 +41,7 @@ const TitleScreen = () => {
         </TitleScreenLayout>
       ) : (
         <>
-          {selectedToken !== -1 ? (
+          {selectedToken ? (
             <PlayingLayout>
               <Playing />
             </PlayingLayout>

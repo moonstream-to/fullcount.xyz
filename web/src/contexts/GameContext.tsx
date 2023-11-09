@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, FC } from "react";
+import { Token } from "../types";
 
 interface GameContextProps {
   nonce: number;
@@ -9,7 +10,7 @@ interface GameContextProps {
   contractAddress: string;
   tokenAddress: string;
   chainId: number;
-  selectedToken: number;
+  selectedToken: Token | undefined;
   sessionId: number;
 }
 
@@ -35,7 +36,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 322),
     tokenAddress:
       process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0xF674839663C9353379b48fEb2AFb019a07CA00F4",
-    selectedToken: -1,
+    selectedToken: undefined,
     sessionId: 0,
   });
 

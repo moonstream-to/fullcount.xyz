@@ -7,7 +7,7 @@ const Playing = () => {
   const { sessionId, updateContext } = useGameContext();
   return (
     <Flex className={styles.container}>
-      <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: -1 })}>
+      <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: undefined })}>
         Back
       </Text>
       {!sessionId ? (

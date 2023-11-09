@@ -15,7 +15,7 @@ const CharacterCard = ({
 }) => {
   const { updateContext } = useGameContext();
   const handleClick = () => {
-    updateContext({ selectedToken: token.id });
+    updateContext({ selectedToken: token });
     if (sessionID) {
       updateContext({ sessionId: sessionID });
     }

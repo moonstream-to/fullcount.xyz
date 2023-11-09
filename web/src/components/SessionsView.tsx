@@ -37,7 +37,7 @@ const SessionsView = () => {
         });
       }
       console.log(tokenAddress, selectedToken, role);
-      return gameContract.methods.startSession(tokenAddress, selectedToken, role).send({
+      return gameContract.methods.startSession(tokenAddress, selectedToken?.id, role).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
@@ -62,7 +62,7 @@ const SessionsView = () => {
         });
       }
       console.log(sessionID, tokenAddress, selectedToken);
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken).send({
+      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
