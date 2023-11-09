@@ -10,7 +10,7 @@ from eth_abi import encode
 from tqdm import tqdm
 
 
-def sample(nonce_1: int, nonce_2: int, denominator: int = 10000) -> int:
+def random_sample(nonce_1: int, nonce_2: int, denominator: int = 10000) -> int:
     assert denominator != 0, "denominator cannot be zero"
     combination_raw = web3.keccak(encode(["uint256", "uint256"], [nonce_1, nonce_2]))
     combination = web3.toInt(combination_raw)
@@ -24,9 +24,9 @@ def grind(
         nonce_1 is not None or nonce_2 is not None
     ), "at least one nonce should be specified"
 
-    is_valid = lambda x: sample(x, nonce_2, denominator) == target
+    is_valid = lambda x: random_sample(x, nonce_2, denominator) == target
     if nonce_2 is None:
-        is_valid = lambda x: sample(nonce_1, x, denominator) == target
+        is_valid = lambda x: random_sample(nonce_1, x, denominator) == target
 
     candidate = 0
     with tqdm() as pbar:
@@ -41,7 +41,7 @@ def grind(
 
 
 def handle_inspect(args: argparse.Namespace) -> None:
-    sample = sample(args.nonce_1, args.nonce_2, args.denominator)
+    sample = random_sample(args.nonce_1, args.nonce_2, args.denominator)
     if not args.test:
         print(
             f"Nonce 1: {args.nonce_1}, Nonce 2: {args.nonce_2}, Denominator: {args.denominator}"
