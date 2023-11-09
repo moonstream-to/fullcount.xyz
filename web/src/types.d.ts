@@ -43,3 +43,29 @@ export interface MoonstreamWeb3ProviderInterface {
   changeChain: typeof ChangeChain;
   targetChain: ChainInterface | undefined;
 }
+
+interface TokenMetadata {
+  name: string;
+  image: string;
+}
+
+interface Token {
+  id: number;
+  name: string;
+  image: string;
+  staker?: string;
+}
+
+interface Pair {
+  pitcher: Token | undefined;
+  batter: Token | undefined;
+}
+
+interface Session {
+  pair: Pair;
+  sessionID: number;
+}
+
+interface SessionsQueryData {
+  sessions: Session[];
+}

@@ -7,9 +7,11 @@ import { useContext } from "react";
 import Web3Context from "../contexts/Web3Context/context";
 import useMoonToast from "../hooks/useMoonToast";
 import queryCacheProps from "../hooks/hookCommon";
-import { Token } from "./OwnedTokens";
 import { decodeBase64Json } from "../utils/decoders";
 import CharacterCard from "./CharacterCard";
+import { Session, Token } from "../types";
+import SessionView from "./SessionView";
+import MySessions from "./MySessions";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -77,7 +79,7 @@ const SessionsView = () => {
     },
   );
 
-  const sessions = useQuery<any[]>(
+  const sessions = useQuery<Session[]>(
     ["sessions", web3ctx.account, web3ctx.chainId],
     async () => {
       console.log("sessions");
@@ -95,20 +97,28 @@ const SessionsView = () => {
           const pitcherMetadata = decodeBase64Json(
             await tokenContract.methods.tokenURI(session.pitcherTokenID).call(),
           );
+          const staker = await gameContract.methods
+            .Staker(session.pitcherAddress, session.pitcherTokenID)
+            .call();
           pair.pitcher = {
             id: session.pitcherTokenID,
             name: pitcherMetadata.name.split(` - `)[0],
             image: pitcherMetadata.image,
+            staker,
           };
         }
         if (session.batterAddress !== ZERO_ADDRESS) {
           const batterMetadata = decodeBase64Json(
             await tokenContract.methods.tokenURI(session.batterTokenID).call(),
           );
+          const staker = await gameContract.methods
+            .Staker(session.batterAddress, session.batterTokenID)
+            .call();
           pair.batter = {
-            id: session.pitcherTokenID,
+            id: session.batterTokenID,
             name: batterMetadata.name.split(` - `)[0],
             image: batterMetadata.image,
+            staker,
           };
         }
 
@@ -116,12 +126,28 @@ const SessionsView = () => {
         console.log({ pair, sessionID: i });
       }
       console.log(sessions);
-      return sessions;
+      return sessions.reverse();
     },
     {
       ...queryCacheProps,
     },
   );
+
+  const mySessions = (sessions: any[]) => {
+    return sessions.filter(
+      (session) =>
+        session.pair.batter?.staker === web3ctx.account ||
+        session.pair.pitcher?.staker === web3ctx.account,
+    );
+  };
+
+  const notMySessions = (sessions: any[]) => {
+    return sessions.filter(
+      (session) =>
+        session.pair.batter?.staker !== web3ctx.account &&
+        session.pair.pitcher?.staker !== web3ctx.account,
+    );
+  };
 
   return (
     <Flex className={styles.container}>
@@ -142,31 +168,19 @@ const SessionsView = () => {
           </button>
         </Flex>
       </Flex>
+      <Text className={styles.subtitle}>My sessions</Text>
+      {sessions.data && mySessions(sessions.data).length > 0 && (
+        <MySessions sessions={mySessions(sessions.data)} />
+      )}
+      <Text className={styles.subtitle}>Other sessions</Text>
+
       {sessions.data &&
-        sessions.data.map((session, index: number) => (
-          <Flex justifyContent={"space-between"} key={index} w={"100%"} alignItems={"center"}>
-            {session.pair.pitcher ? (
-              <CharacterCard token={session.pair.pitcher} active={false} />
-            ) : (
-              <button
-                className={globalStyles.button}
-                onClick={() => joinSession.mutate(session.sessionID)}
-              >
-                join as pitcher
-              </button>
-            )}
-            <Text>vs</Text>
-            {session.pair.batter ? (
-              <CharacterCard token={session.pair.batter} active={false} />
-            ) : (
-              <button
-                className={globalStyles.button}
-                onClick={() => joinSession.mutate(session.sessionId)}
-              >
-                join as batter
-              </button>
-            )}
-          </Flex>
+        notMySessions(sessions.data).map((session, index: number) => (
+          <SessionView
+            session={session}
+            onClick={(session: Session) => joinSession.mutate(session.sessionID)}
+            key={index}
+          />
         ))}
     </Flex>
   );

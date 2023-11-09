@@ -10,17 +10,12 @@ import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
 import { decodeBase64Json } from "../utils/decoders";
+import { Token } from "../types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../web3/abi/BLBABI.json");
-
-export interface Token {
-  id: number;
-  name: string;
-  image: string;
-}
 
 const OwnedTokens = () => {
   const web3ctx = useContext(Web3Context);
