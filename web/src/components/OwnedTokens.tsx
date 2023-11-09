@@ -76,6 +76,22 @@ const OwnedTokens = () => {
     },
   );
 
+  const isApproved = useQuery<boolean>(
+    ["isApproved", web3ctx.account, web3ctx.chainId, contractAddress],
+    async () => {
+      console.log("isApproved");
+
+      const isApproved = await tokenContract.methods
+        .isApprovedForAll(web3ctx.account, contractAddress)
+        .call();
+      console.log(isApproved);
+      return isApproved;
+    },
+    {
+      ...queryCacheProps,
+    },
+  );
+
   const setApproval = useMutation(
     async ({ approval }: { approval: boolean }) => {
       if (!web3ctx.account) {
@@ -92,7 +108,7 @@ const OwnedTokens = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("contract_approval");
+        queryClient.invalidateQueries("isApproved");
         toast("SetApproval successful.", "success");
       },
       onError: (e: Error) => {
@@ -114,9 +130,11 @@ const OwnedTokens = () => {
       <button className={styles.button} onClick={onOpen}>
         {mintToken.isLoading ? <Spinner /> : "Mint"}
       </button>
-      <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
-        {mintToken.isLoading ? <Spinner /> : "Approve"}
-      </button>
+      {isApproved.isSuccess && isApproved.data === false && (
+        <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
+          {mintToken.isLoading ? <Spinner /> : "Approve"}
+        </button>
+      )}
 
       <CreateNewCharacter
         isOpen={isOpen}

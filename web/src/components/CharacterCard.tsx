@@ -8,10 +8,12 @@ const CharacterCard = ({
   token,
   active = true,
   sessionID,
+  ...props
 }: {
   token: Token;
   active?: boolean;
   sessionID?: number;
+  [x: string]: any;
 }) => {
   const { updateContext } = useGameContext();
   const handleClick = () => {
@@ -21,7 +23,7 @@ const CharacterCard = ({
     }
   };
   return (
-    <Flex className={styles.container}>
+    <Flex className={styles.container} {...props} h={active ? "216px" : "fit-content"}>
       <Image h={"137px"} w={"137px"} alt={token.name} src={token.image} />
       <Flex className={styles.bottom}>
         <Text>{token.name}</Text>

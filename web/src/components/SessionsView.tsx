@@ -151,22 +151,16 @@ const SessionsView = () => {
 
   return (
     <Flex className={styles.container}>
-      <Flex
-        justifyContent={"space-between"}
-        className={styles.session}
-        w={"100%"}
-        placeSelf={"stretch"}
-        minW={"100%"}
-      >
-        <Text className={styles.title}>Sessions</Text>
-        <Flex gap={"20px"}>
-          <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
-            Start new session as pitcher
-          </button>
-          <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
-            Start new session as batter
-          </button>
-        </Flex>
+      {selectedToken && <CharacterCard token={selectedToken} active={false} placeSelf={"center"} />}
+
+      <Text className={styles.title}>Sessions</Text>
+      <Flex gap={"20px"} justifyContent={"space-between"} w={"100%"}>
+        <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
+          Start new session as pitcher
+        </button>
+        <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
+          Start new session as batter
+        </button>
       </Flex>
       <Text className={styles.subtitle}>My sessions</Text>
       {sessions.data && mySessions(sessions.data).length > 0 && (
