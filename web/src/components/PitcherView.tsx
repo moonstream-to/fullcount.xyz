@@ -1,0 +1,144 @@
+import { Flex, Text } from "@chakra-ui/react";
+import globalStyles from "./GlobalStyles.module.css";
+import styles from "./PlayView.module.css";
+import GridComponent from "./GridComponent";
+import { useContext, useState } from "react";
+import { getRowCol, horizontalLocations, pitchSpeed, verticalLocations } from "./PlayView";
+import { signPitch } from "./Signing";
+import web3Context from "../contexts/Web3Context";
+import Web3Context from "../contexts/Web3Context/context";
+import { useGameContext } from "../contexts/GameContext";
+import { useMutation, useQueryClient } from "react-query";
+import useMoonToast from "../hooks/useMoonToast";
+const FullcountABI = require("../web3/abi/FullcountABI.json");
+
+const PitcherView = () => {
+  const [speed, setSpeed] = useState(0);
+  const [gridIndex, setGridIndex] = useState(12);
+  const [nonce, setNonce] = useState(322);
+  const web3ctx = useContext(Web3Context);
+  const { selectedSession, contractAddress } = useGameContext();
+  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
+  gameContract.options.address = contractAddress;
+
+  const handleCommit = async () => {
+    const sign = await signPitch(
+      web3ctx.account,
+      window.ethereum,
+      nonce,
+      speed,
+      getRowCol(gridIndex)[0],
+      getRowCol(gridIndex)[1],
+    );
+    localStorage.setItem(`fullcount.xyz-${selectedSession?.sessionID}`, sign);
+    commitPitch.mutate({ sign });
+    console.log(sign, typeof sign);
+  };
+
+  const handleReveal = async () => {
+    revealPitch.mutate({
+      nonce,
+      speed,
+      vertical: getRowCol(gridIndex)[0],
+      horizontal: getRowCol(gridIndex)[1],
+    });
+  };
+
+  const toast = useMoonToast();
+  const queryClient = useQueryClient();
+
+  const commitPitch = useMutation(
+    async ({ sign }: { sign: string }) => {
+      if (!web3ctx.account) {
+        return new Promise((_, reject) => {
+          reject(new Error(`Account address isn't set`));
+        });
+      }
+
+      return gameContract.methods.commitPitch(selectedSession?.sessionID, sign).send({
+        from: web3ctx.account,
+        maxPriorityFeePerGas: null,
+        maxFeePerGas: null,
+      });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("isApproved");
+        toast("SetApproval successful.", "success");
+      },
+      onError: (e: Error) => {
+        toast("SetApproval failed." + e?.message, "error");
+      },
+    },
+  );
+
+  const revealPitch = useMutation(
+    async ({
+      nonce,
+      speed,
+      vertical,
+      horizontal,
+    }: {
+      nonce: number;
+      speed: number;
+      vertical: number;
+      horizontal: number;
+    }) => {
+      if (!web3ctx.account) {
+        return new Promise((_, reject) => {
+          reject(new Error(`Account address isn't set`));
+        });
+      }
+
+      return gameContract.methods
+        .revealPitch(selectedSession?.sessionID, nonce, speed, vertical, horizontal)
+        .send({
+          from: web3ctx.account,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries("isApproved");
+        toast("SetApproval successful.", "success");
+      },
+      onError: (e: Error) => {
+        toast("SetApproval failed." + e?.message, "error");
+      },
+    },
+  );
+
+  return (
+    <Flex direction={"column"} gap={"15px"}>
+      <Flex justifyContent={"center"} gap={"20px"}>
+        <Flex
+          className={speed === 0 ? styles.activeChoice : styles.inactiveChoice}
+          onClick={() => setSpeed(0)}
+        >
+          Fast
+        </Flex>
+        <Flex
+          className={speed === 1 ? styles.activeChoice : styles.inactiveChoice}
+          onClick={() => setSpeed(1)}
+        >
+          Slow
+        </Flex>
+      </Flex>
+      <GridComponent selectedIndex={gridIndex} setSelectedIndex={setGridIndex} />
+      <Text>{verticalLocations[getRowCol(gridIndex)[0] as keyof typeof horizontalLocations]}</Text>
+      <Text>
+        {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}
+      </Text>
+      <Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>
+      <button className={globalStyles.button} onClick={handleCommit}>
+        Commit
+      </button>
+      <button className={globalStyles.button} onClick={handleReveal}>
+        Reveal
+      </button>
+    </Flex>
+  );
+};
+
+export default PitcherView;

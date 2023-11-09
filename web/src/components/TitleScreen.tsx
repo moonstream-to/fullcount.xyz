@@ -18,13 +18,14 @@ const TitleScreen = () => {
 
   const router = useRouter();
 
-  const { sessionId, contractAddress, selectedToken, updateContext, chainId } = useGameContext();
+  const { selectedSession, contractAddress, selectedToken, updateContext, chainId } =
+    useGameContext();
 
-  useEffect(() => {
-    if (typeof router.query.session_id === "string") {
-      updateContext({ sessionId: Number(router.query.session_id) });
-    }
-  }, [router.query.session_id]);
+  // useEffect(() => {
+  //   if (typeof router.query.session_id === "string") {
+  //     updateContext({ sessionId: Number(router.query.session_id) });
+  //   }
+  // }, [router.query.session_id]);
 
   const queryClient = useQueryClient();
 

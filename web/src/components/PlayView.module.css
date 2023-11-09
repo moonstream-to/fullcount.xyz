@@ -1,0 +1,39 @@
+.activeChoice {
+    display: flex;
+    padding: 10px 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 30px;
+    border: 1px solid #00A341;
+    background: #00A341;
+    color: #FFF;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+
+}
+
+.inactiveChoice {
+    display: flex;
+    padding: 10px 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    color: #FFF;
+    border-radius: 30px;
+    border: 1px solid #FFF;
+    leading-trim: both;
+    text-edge: cap;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}

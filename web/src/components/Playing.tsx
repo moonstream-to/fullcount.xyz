@@ -2,20 +2,28 @@ import styles from "./Playing.module.css";
 import { Flex, Text } from "@chakra-ui/react";
 import { useGameContext } from "../contexts/GameContext";
 import SessionsView from "./SessionsView";
+import { useEffect } from "react";
+import PlayView from "./PlayView";
 
 const Playing = () => {
-  const { sessionId, updateContext } = useGameContext();
+  const { selectedSession, updateContext, selectedToken } = useGameContext();
+
+  useEffect(() => {
+    console.log(selectedSession, selectedToken);
+  }, [selectedSession, selectedToken]);
+
   return (
     <Flex className={styles.container}>
-      <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: undefined })}>
-        Back
-      </Text>
-      {!sessionId ? (
-        <SessionsView />
+      {!selectedSession ? (
+        <>
+          <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: undefined })}>
+            Back
+          </Text>
+          <SessionsView />
+        </>
       ) : (
         <>
-          <Text className={styles.title}>Playing</Text>
-          <Text className={styles.prompt}>Soon...</Text>
+          <PlayView />
         </>
       )}
     </Flex>

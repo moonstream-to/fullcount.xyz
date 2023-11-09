@@ -17,6 +17,7 @@ const MySessionView = ({ session }: { session: Session }) => {
         <CharacterCard
           token={session.pair.pitcher}
           active={session.pair.pitcher.staker === web3ctx.account}
+          session={session}
         />
       ) : (
         <button className={globalStyles.button} onClick={handleInvite}>
@@ -28,6 +29,7 @@ const MySessionView = ({ session }: { session: Session }) => {
         <CharacterCard
           token={session.pair.batter}
           active={session.pair.batter.staker === web3ctx.account}
+          session={session}
         />
       ) : (
         <button className={globalStyles.button} onClick={handleInvite}>
