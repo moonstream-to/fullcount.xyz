@@ -156,7 +156,9 @@ contract Fullcount is StatBlockBase, EIP712 {
         }
 
         Session storage session = SessionState[sessionID];
-        if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
+        if (session.didPitcherReveal && session.didBatterReveal) {
+            return 5;
+        } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
             return 1;
         } else if (session.pitcherAddress == address(0) || session.batterAddress == address(0)) {
             return 2;
@@ -170,8 +172,6 @@ contract Fullcount is StatBlockBase, EIP712 {
                 return 6;
             }
             return 4;
-        } else if (session.didPitcherReveal && session.didBatterReveal) {
-            return 6;
         }
 
         revert("Fullcount._sessionProgress: idiot programmer");
@@ -303,6 +303,16 @@ contract Fullcount is StatBlockBase, EIP712 {
 
         StakedSession[nftAddress][tokenID] = 0;
         Staker[nftAddress][tokenID] = address(0);
+    }
+
+    function unstakeNFT(address nftAddress, uint256 tokenID) external {
+        uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
+        require(stakedSessionID > 0, "Fullcount._unstakeNFT: NFT is not staked");
+
+        uint256 progress = _sessionProgress(stakedSessionID);
+        require(progress == 5 || progress == 6, "Fullcount.unstakeNFT: cannot unstake from session in this state");
+
+        _unstakeNFT(nftAddress, tokenID);
     }
 
     /**

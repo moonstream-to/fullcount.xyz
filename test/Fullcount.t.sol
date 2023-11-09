@@ -79,6 +79,8 @@ contract FullcountTestBase is Test {
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event PitchCommitted(uint256 indexed sessionID);
     event SwingCommitted(uint256 indexed sessionID);
+    event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
+    event SwingRevealed(uint256 indexed sessionID, Swing swing);
 
     function setUp() public virtual {
         characterNFTs = new MockERC721();
@@ -92,6 +94,101 @@ contract FullcountTestBase is Test {
         vm.deal(player1, 1 ether);
         vm.deal(player2, 1 ether);
         vm.deal(randomPerson, 1 ether);
+    }
+
+    function _startSession (address player, address nftAddress, uint256 tokenID, PlayerType playerType) internal returns (uint256) {
+        vm.startPrank(player);
+
+        uint256 sessionID =
+            game.startSession{ value: sessionStartPrice }(nftAddress, tokenID, playerType);
+
+        vm.stopPrank();
+
+        return sessionID;
+    }
+
+    function _joinSession(uint256 sessionID, address player, address nftAddress, uint256 tokenID) internal {
+        vm.startPrank(player);
+
+        game.joinSession{ value: sessionJoinPrice }(sessionID, nftAddress, tokenID);
+
+        vm.stopPrank();
+    }
+
+    function _commitPitch(uint256 sessionID, address player, uint256 playerPrivateKey, Pitch memory pitch) internal {
+        vm.startPrank(player);
+
+        bytes32 pitchMessageHash =
+            game.pitchHash(pitch.nonce, pitch.speed, pitch.vertical, pitch.horizontal);
+        bytes memory pitcherCommitment = signMessageHash(playerPrivateKey, pitchMessageHash);
+
+        vm.expectEmit(address(game));
+        emit PitchCommitted(sessionID);
+        game.commitPitch(sessionID, pitcherCommitment);
+
+        vm.stopPrank();  
+
+        Session memory session = game.getSession(sessionID);
+
+        assertTrue(session.didPitcherCommit);
+
+        assertEq(session.pitcherCommit, pitcherCommitment);  
+    }
+
+    function _commitSwing(uint256 sessionID, address player, uint256 playerPrivateKey, Swing memory swing) internal {
+        vm.startPrank(player);
+
+        bytes32 swingMessageHash =
+            game.swingHash(swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+        bytes memory batterCommitment = signMessageHash(playerPrivateKey, swingMessageHash);
+
+        vm.expectEmit(address(game));
+        emit SwingCommitted(sessionID);
+        game.commitSwing(sessionID, batterCommitment);
+
+        vm.stopPrank();  
+
+        Session memory session = game.getSession(sessionID);
+        assertTrue(session.didBatterCommit);
+        assertEq(session.batterCommit, batterCommitment);
+    }
+
+    function _revealPitch(uint256 sessionID, address player, Pitch memory pitch) internal {
+        vm.startPrank(player);
+
+        vm.expectEmit(address(game));
+        emit PitchRevealed(sessionID, pitch);
+        game.revealPitch(sessionID, pitch.nonce, pitch.speed, pitch.vertical, pitch.horizontal);
+        
+        vm.stopPrank();
+
+        Session memory session = game.getSession(sessionID);
+        assertTrue(session.didPitcherReveal);
+
+        Pitch memory sessionPitch = session.pitcherReveal;
+        assertEq(sessionPitch.nonce, pitch.nonce);
+        assertEq(uint(sessionPitch.speed), uint(pitch.speed));
+        assertEq(uint(sessionPitch.vertical), uint(pitch.vertical));
+        assertEq(uint(sessionPitch.horizontal), uint(pitch.horizontal));
+    }
+
+    function _revealSwing(uint256 sessionID, address player, Swing memory swing) internal {
+         vm.startPrank(player);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(sessionID, swing);
+        game.revealSwing(sessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+        
+        vm.stopPrank();
+
+        Session memory session = game.getSession(sessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint(sessionSwing.kind), uint(swing.kind));
+        assertEq(uint(sessionSwing.vertical), uint(swing.vertical));
+        assertEq(uint(sessionSwing.horizontal), uint(swing.horizontal));       
     }
 }
 
@@ -1364,3 +1461,319 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
         assertEq(session.batterCommit, bytes(""));
     }
 }
+
+contract FullcountTest_reveal is FullcountTestBase {
+    uint256 SessionID;
+    uint256 PitcherTokenID;
+    uint256 BatterTokenID;
+
+    function setUp() public virtual override {
+        super.setUp();
+
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        vm.startPrank(player1);
+
+        characterNFTs.approve(address(game), tokenID);
+
+        vm.stopPrank();
+
+        uint256 sessionID = _startSession(player1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        vm.startPrank(player2);
+
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        vm.stopPrank();
+
+        _joinSession(sessionID, player2, address(otherCharacterNFTs), otherTokenID);
+
+        SessionID = sessionID;
+        PitcherTokenID = tokenID;
+        BatterTokenID = otherTokenID;
+
+        Session memory session = game.getSession(SessionID);
+        assertEq(session.pitcherAddress, address(characterNFTs));
+        assertEq(session.batterAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherTokenID, PitcherTokenID);
+        assertEq(session.batterTokenID, BatterTokenID);
+    }
+
+    function test_pitcher_reveal_then_batter_reveal() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch = Pitch(
+                                287349237429034239084,
+                                PitchSpeed.Fast,
+                                VerticalLocation.Middle,
+                                HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+                                239480239842390842390482390,
+                                SwingType.Contact,
+                                VerticalLocation.Middle,
+                                HorizontalLocation.Middle);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        _revealPitch(SessionID, player1, pitch);
+
+        _revealSwing(SessionID, player2, swing);
+
+        assertEq(game.sessionProgress(SessionID), 5);
+
+        Session memory session = game.getSession(SessionID);
+        assertEq(session.pitcherAddress, address(characterNFTs));
+        assertEq(session.batterAddress, address(0));
+        assertEq(session.pitcherTokenID, PitcherTokenID);
+        assertEq(session.batterTokenID, 0);
+    }
+
+    function test_batter_reveal_then_pitcher_reveal() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+                                239480239842390842390482390,
+                                SwingType.Contact,
+                                VerticalLocation.Middle,
+                                HorizontalLocation.Middle);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch = Pitch(
+                                287349237429034239084,
+                                PitchSpeed.Fast,
+                                VerticalLocation.Middle,
+                                HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        _revealSwing(SessionID, player2, swing);
+
+        _revealPitch(SessionID, player1, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 5);
+
+        Session memory session = game.getSession(SessionID);
+        assertEq(session.pitcherAddress, address(0));
+        assertEq(session.batterAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherTokenID, 0);
+        assertEq(session.batterTokenID, BatterTokenID);
+    }
+}
+
+// contract FullcountTest_unstake is FullcountTestBase {
+//     uint256 SessionID;
+//     uint256 PitcherTokenID;
+//     uint256 BatterTokenID;
+
+//     function setUp() public virtual override {
+//         super.setUp();
+
+//         charactersMinted++;
+//         uint256 tokenID = charactersMinted;
+
+//         otherCharactersMinted++;
+//         uint256 otherTokenID = otherCharactersMinted;
+
+//         characterNFTs.mint(player1, tokenID);
+//         otherCharacterNFTs.mint(player2, otherTokenID);
+
+//         vm.startPrank(player1);
+
+//         characterNFTs.approve(address(game), tokenID);
+
+//         uint256 sessionID =
+//             game.startSession{ value: sessionStartPrice }(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+//         vm.stopPrank();
+
+//         vm.startPrank(player2);
+
+//         otherCharacterNFTs.approve(address(game), otherTokenID);
+
+//         game.joinSession{ value: sessionJoinPrice }(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+//         vm.stopPrank();
+
+//         SessionID = sessionID;
+//         PitcherTokenID = tokenID;
+//         BatterTokenID = otherTokenID;
+
+//         Session memory session = game.getSession(SessionID);
+//         assertEq(session.pitcherAddress, address(characterNFTs));
+//         assertEq(session.batterAddress, address(otherCharacterNFTs));
+//         assertEq(session.pitcherTokenID, PitcherTokenID);
+//         assertEq(session.batterTokenID, BatterTokenID);
+//     }
+
+//     function _commitPitch(address player, uint256 playerPrivateKey, Pitch memory pitch) internal {
+//         vm.startPrank(player);
+
+//         bytes32 pitchMessageHash =
+//             game.pitchHash(pitch.nonce, pitch.speed, pitch.vertical, pitch.horizontal);
+//         bytes memory pitcherCommitment = signMessageHash(playerPrivateKey, pitchMessageHash);
+
+//         vm.expectEmit(address(game));
+//         emit PitchCommitted(SessionID);
+//         game.commitPitch(SessionID, pitcherCommitment);
+
+//         vm.stopPrank();  
+
+//         Session memory session = game.getSession(SessionID);
+
+//         assertTrue(session.didPitcherCommit);
+
+//         assertEq(session.pitcherCommit, pitcherCommitment);  
+//     }
+
+//     function _commitSwing(address player, uint256 playerPrivateKey, Swing memory swing) internal {
+//         vm.startPrank(player);
+
+//         bytes32 swingMessageHash =
+//             game.swingHash(swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+//         bytes memory batterCommitment = signMessageHash(playerPrivateKey, swingMessageHash);
+
+//         vm.expectEmit(address(game));
+//         emit SwingCommitted(SessionID);
+//         game.commitSwing(SessionID, batterCommitment);
+
+//         vm.stopPrank();  
+
+//         Session memory session = game.getSession(SessionID);
+//         assertTrue(session.didBatterCommit);
+//         assertEq(session.batterCommit, batterCommitment);
+//     }
+
+//     function _revealPitch(address player, Pitch memory pitch) internal {
+//         vm.startPrank(player);
+
+//         vm.expectEmit(address(game));
+//         emit PitchRevealed(SessionID, pitch);
+//         game.revealPitch(SessionID, pitch.nonce, pitch.speed, pitch.vertical, pitch.horizontal);
+        
+//         vm.stopPrank();
+
+//         Session memory session = game.getSession(SessionID);
+//         assertTrue(session.didPitcherReveal);
+
+//         Pitch memory sessionPitch = session.pitcherReveal;
+//         assertEq(sessionPitch.nonce, pitch.nonce);
+//         assertEq(uint(sessionPitch.speed), uint(pitch.speed));
+//         assertEq(uint(sessionPitch.vertical), uint(pitch.vertical));
+//         assertEq(uint(sessionPitch.horizontal), uint(pitch.horizontal));
+//     }
+
+//     function _revealSwing(address player, Swing memory swing) internal {
+//          vm.startPrank(player);
+
+//         vm.expectEmit(address(game));
+//         emit SwingRevealed(SessionID, swing);
+//         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+        
+//         vm.stopPrank();
+
+//         Session memory session = game.getSession(SessionID);
+//         assertTrue(session.didBatterReveal);
+
+//         Swing memory sessionSwing = session.batterReveal;
+//         assertEq(sessionSwing.nonce, swing.nonce);
+//         assertEq(uint(sessionSwing.kind), uint(swing.kind));
+//         assertEq(uint(sessionSwing.vertical), uint(swing.vertical));
+//         assertEq(uint(sessionSwing.horizontal), uint(swing.horizontal));       
+//     }
+
+//     function test_pitcher_reveal_then_batter_reveal() public {
+//         assertEq(game.sessionProgress(SessionID), 3);
+
+//         // Player 1 chooses to pitch a fastball over the middle of the plate
+//         Pitch memory pitch = Pitch(
+//                                 287349237429034239084,
+//                                 PitchSpeed.Fast,
+//                                 VerticalLocation.Middle,
+//                                 HorizontalLocation.Middle);
+//         _commitPitch(player1, player1PrivateKey, pitch);
+
+//         assertEq(game.sessionProgress(SessionID), 3);
+
+//         // Player 2 chooses to make a power swing in the middle of their strike zone.
+//         Swing memory swing = Swing(
+//                                 239480239842390842390482390,
+//                                 SwingType.Contact,
+//                                 VerticalLocation.Middle,
+//                                 HorizontalLocation.Middle);
+
+//         _commitSwing(player2, player2PrivateKey, swing);
+
+//         assertEq(game.sessionProgress(SessionID), 4);
+
+//         _revealPitch(player1, pitch);
+
+//         _revealSwing(player2, swing);
+
+//         assertEq(game.sessionProgress(SessionID), 5);
+
+//         Session memory session = game.getSession(SessionID);
+//         assertEq(session.pitcherAddress, address(characterNFTs));
+//         assertEq(session.batterAddress, address(0));
+//         assertEq(session.pitcherTokenID, PitcherTokenID);
+//         assertEq(session.batterTokenID, 0);
+//     }
+
+//     function test_batter_reveal_then_pitcher_reveal() public {
+//         assertEq(game.sessionProgress(SessionID), 3);
+
+
+//         // Player 2 chooses to make a power swing in the middle of their strike zone.
+//         Swing memory swing = Swing(
+//                                 239480239842390842390482390,
+//                                 SwingType.Contact,
+//                                 VerticalLocation.Middle,
+//                                 HorizontalLocation.Middle);
+
+//         _commitSwing(player2, player2PrivateKey, swing);
+
+//         assertEq(game.sessionProgress(SessionID), 3);
+
+//         // Player 1 chooses to pitch a fastball over the middle of the plate
+//         Pitch memory pitch = Pitch(
+//                                 287349237429034239084,
+//                                 PitchSpeed.Fast,
+//                                 VerticalLocation.Middle,
+//                                 HorizontalLocation.Middle);
+//         _commitPitch(player1, player1PrivateKey, pitch);
+
+//         assertEq(game.sessionProgress(SessionID), 4);
+
+//         _revealSwing(player2, swing);
+
+//         _revealPitch(player1, pitch);
+
+//         assertEq(game.sessionProgress(SessionID), 5);
+
+//         Session memory session = game.getSession(SessionID);
+//         assertEq(session.pitcherAddress, address(0));
+//         assertEq(session.batterAddress, address(otherCharacterNFTs));
+//         assertEq(session.pitcherTokenID, 0);
+//         assertEq(session.batterTokenID, BatterTokenID);
+//     }
+// }

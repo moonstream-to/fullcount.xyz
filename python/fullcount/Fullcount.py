@@ -342,6 +342,18 @@ class Fullcount:
             nonce, speed, vertical, horizontal, block_identifier=block_number
         )
 
+    def random_sample(
+        self,
+        nonce0: int,
+        nonce1: int,
+        total_mass: int,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.randomSample.call(
+            nonce0, nonce1, total_mass, block_identifier=block_number
+        )
+
     def resolve(
         self,
         pitch: tuple,
@@ -431,6 +443,12 @@ class Fullcount:
         return self.contract.swingHash.call(
             nonce, kind, vertical, horizontal, block_identifier=block_number
         )
+
+    def unstake_nft(
+        self, nft_address: ChecksumAddress, token_id: int, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.unstakeNFT(nft_address, token_id, transaction_config)
 
 
 def get_transaction_config(args: argparse.Namespace) -> Dict[str, Any]:
@@ -803,6 +821,18 @@ def handle_pitch_hash(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_random_sample(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.random_sample(
+        nonce0=args.nonce0,
+        nonce1=args.nonce1,
+        total_mass=args.total_mass,
+        block_number=args.block_number,
+    )
+    print(result)
+
+
 def handle_resolve(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -914,6 +944,20 @@ def handle_swing_hash(args: argparse.Namespace) -> None:
         block_number=args.block_number,
     )
     print(result)
+
+
+def handle_unstake_nft(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.unstake_nft(
+        nft_address=args.nft_address,
+        token_id=args.token_id,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -1166,6 +1210,19 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     pitch_hash_parser.set_defaults(func=handle_pitch_hash)
 
+    random_sample_parser = subcommands.add_parser("random-sample")
+    add_default_arguments(random_sample_parser, False)
+    random_sample_parser.add_argument(
+        "--nonce0", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.add_argument(
+        "--nonce1", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.add_argument(
+        "--total-mass", required=True, help="Type: uint256", type=int
+    )
+    random_sample_parser.set_defaults(func=handle_random_sample)
+
     resolve_parser = subcommands.add_parser("resolve")
     add_default_arguments(resolve_parser, False)
     resolve_parser.add_argument("--pitch", required=True, help="Type: tuple", type=eval)
@@ -1276,6 +1333,16 @@ def generate_cli() -> argparse.ArgumentParser:
         "--horizontal", required=True, help="Type: uint8", type=int
     )
     swing_hash_parser.set_defaults(func=handle_swing_hash)
+
+    unstake_nft_parser = subcommands.add_parser("unstake-nft")
+    add_default_arguments(unstake_nft_parser, True)
+    unstake_nft_parser.add_argument(
+        "--nft-address", required=True, help="Type: address"
+    )
+    unstake_nft_parser.add_argument(
+        "--token-id", required=True, help="Type: uint256", type=int
+    )
+    unstake_nft_parser.set_defaults(func=handle_unstake_nft)
 
     return parser
 
