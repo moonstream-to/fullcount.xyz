@@ -96,22 +96,9 @@ class Fullcount:
                 self.contract_name, self.address, self.abi
             )
 
-    def deploy(
-        self,
-        session_start_price: int,
-        session_join_price: int,
-        treasury_address: ChecksumAddress,
-        seconds_per_phase: int,
-        transaction_config,
-    ):
+    def deploy(self, seconds_per_phase: int, transaction_config):
         contract_class = contract_from_build(self.contract_name)
-        deployed_contract = contract_class.deploy(
-            session_start_price,
-            session_join_price,
-            treasury_address,
-            seconds_per_phase,
-            transaction_config,
-        )
+        deployed_contract = contract_class.deploy(seconds_per_phase, transaction_config)
         self.address = deployed_contract.address
         self.contract = deployed_contract
         return deployed_contract.tx
@@ -177,18 +164,6 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.SecondsPerPhase.call(block_identifier=block_number)
 
-    def session_join_price(
-        self, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.SessionJoinPrice.call(block_identifier=block_number)
-
-    def session_start_price(
-        self, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.SessionStartPrice.call(block_identifier=block_number)
-
     def session_state(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -214,12 +189,6 @@ class Fullcount:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.Staker.call(arg1, arg2, block_identifier=block_number)
-
-    def treasury_address(
-        self, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.TreasuryAddress.call(block_identifier=block_number)
 
     def abort_session(self, session_id: int, transaction_config) -> Any:
         self.assert_contract_is_instantiated()
@@ -523,11 +492,7 @@ def handle_deploy(args: argparse.Namespace) -> None:
     transaction_config = get_transaction_config(args)
     contract = Fullcount(None)
     result = contract.deploy(
-        session_start_price=args.session_start_price,
-        session_join_price=args.session_join_price,
-        treasury_address=args.treasury_address,
-        seconds_per_phase=args.seconds_per_phase,
-        transaction_config=transaction_config,
+        seconds_per_phase=args.seconds_per_phase, transaction_config=transaction_config
     )
     print(result)
     if args.verbose:
@@ -605,20 +570,6 @@ def handle_seconds_per_phase(args: argparse.Namespace) -> None:
     print(result)
 
 
-def handle_session_join_price(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.session_join_price(block_number=args.block_number)
-    print(result)
-
-
-def handle_session_start_price(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.session_start_price(block_number=args.block_number)
-    print(result)
-
-
 def handle_session_state(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -641,13 +592,6 @@ def handle_staker(args: argparse.Namespace) -> None:
     result = contract.staker(
         arg1=args.arg1, arg2=args.arg2, block_number=args.block_number
     )
-    print(result)
-
-
-def handle_treasury_address(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.treasury_address(block_number=args.block_number)
     print(result)
 
 
@@ -968,15 +912,6 @@ def generate_cli() -> argparse.ArgumentParser:
     deploy_parser = subcommands.add_parser("deploy")
     add_default_arguments(deploy_parser, True)
     deploy_parser.add_argument(
-        "--session-start-price", required=True, help="Type: uint256", type=int
-    )
-    deploy_parser.add_argument(
-        "--session-join-price", required=True, help="Type: uint256", type=int
-    )
-    deploy_parser.add_argument(
-        "--treasury-address", required=True, help="Type: address"
-    )
-    deploy_parser.add_argument(
         "--seconds-per-phase", required=True, help="Type: uint256", type=int
     )
     deploy_parser.set_defaults(func=handle_deploy)
@@ -1031,14 +966,6 @@ def generate_cli() -> argparse.ArgumentParser:
     add_default_arguments(seconds_per_phase_parser, False)
     seconds_per_phase_parser.set_defaults(func=handle_seconds_per_phase)
 
-    session_join_price_parser = subcommands.add_parser("session-join-price")
-    add_default_arguments(session_join_price_parser, False)
-    session_join_price_parser.set_defaults(func=handle_session_join_price)
-
-    session_start_price_parser = subcommands.add_parser("session-start-price")
-    add_default_arguments(session_start_price_parser, False)
-    session_start_price_parser.set_defaults(func=handle_session_start_price)
-
     session_state_parser = subcommands.add_parser("session-state")
     add_default_arguments(session_state_parser, False)
     session_state_parser.add_argument(
@@ -1059,10 +986,6 @@ def generate_cli() -> argparse.ArgumentParser:
     staker_parser.add_argument("--arg1", required=True, help="Type: address")
     staker_parser.add_argument("--arg2", required=True, help="Type: uint256", type=int)
     staker_parser.set_defaults(func=handle_staker)
-
-    treasury_address_parser = subcommands.add_parser("treasury-address")
-    add_default_arguments(treasury_address_parser, False)
-    treasury_address_parser.set_defaults(func=handle_treasury_address)
 
     abort_session_parser = subcommands.add_parser("abort-session")
     add_default_arguments(abort_session_parser, True)
