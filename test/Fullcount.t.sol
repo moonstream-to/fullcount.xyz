@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { Test, console2 } from "../lib/forge-std/src/Test.sol";
+import { Test, console, console2 } from "../lib/forge-std/src/Test.sol";
 import { Fullcount } from "../src/Fullcount.sol";
 import {
     PlayerType,
@@ -11,7 +11,8 @@ import {
     PitchSpeed,
     SwingType,
     VerticalLocation,
-    HorizontalLocation
+    HorizontalLocation,
+    Outcome
 } from "../src/data.sol";
 import { ERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
@@ -78,6 +79,14 @@ contract FullcountTestBase is Test {
     event SwingCommitted(uint256 indexed sessionID);
     event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
     event SwingRevealed(uint256 indexed sessionID, Swing swing);
+    event SessionResolved(
+        uint256 indexed sessionID,
+        Outcome indexed outcome,
+        address pitcherAddress,
+        uint256 pitcherTokenID,
+        address batterAddress,
+        uint256 batterTokenID
+    );
 
     function setUp() public virtual {
         characterNFTs = new MockERC721();
@@ -1503,7 +1512,7 @@ contract FullcountTest_unstake is FullcountTestBase {
             Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
-        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
         Swing memory swing = Swing(
             239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
         );
@@ -1520,7 +1529,7 @@ contract FullcountTest_unstake is FullcountTestBase {
     function test_batter_can_unstake_after_completed_session() public {
         assertEq(game.sessionProgress(SessionID), 3);
 
-        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
         Swing memory swing = Swing(
             239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
         );
@@ -1571,7 +1580,7 @@ contract FullcountTest_unstake is FullcountTestBase {
     function test_pitcher_can_unstake_after_completed_session() public {
         assertEq(game.sessionProgress(SessionID), 3);
 
-        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
         Swing memory swing = Swing(
             239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
         );
@@ -1622,7 +1631,7 @@ contract FullcountTest_unstake is FullcountTestBase {
     function testRevert_if_non_owner_attempts_to_unstake() public {
         assertEq(game.sessionProgress(SessionID), 3);
 
-        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
         Swing memory swing = Swing(
             239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
         );
@@ -1657,4 +1666,375 @@ contract FullcountTest_unstake is FullcountTestBase {
 
         vm.stopPrank();
     }
+}
+
+contract FullcountTest_outcomes is FullcountTestBase {
+    uint256 SessionID;
+    address PitcherNFTAddress;
+    uint256 PitcherTokenID;
+    address BatterNFTAddress;
+    uint256 BatterTokenID;
+
+    function setUp() public virtual override {
+        super.setUp();
+
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        vm.startPrank(player1);
+
+        characterNFTs.approve(address(game), tokenID);
+
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+
+        vm.stopPrank();
+
+        vm.startPrank(player2);
+
+        otherCharacterNFTs.approve(address(game), otherTokenID);
+
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+
+        SessionID = sessionID;
+        PitcherNFTAddress = address(characterNFTs);
+        PitcherTokenID = tokenID;
+        BatterNFTAddress = address(otherCharacterNFTs);
+        BatterTokenID = otherTokenID;
+
+        Session memory session = game.getSession(SessionID);
+        assertEq(session.pitcherAddress, address(characterNFTs));
+        assertEq(session.batterAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherTokenID, PitcherTokenID);
+        assertEq(session.batterTokenID, BatterTokenID);
+    }
+
+    function test_distance_0_outcome_2() public {
+        //  Nonces 2 and 277 generate random number 4457 which is a single.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(2, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            277, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.Single,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }    
+    
+    function test_distance_0_outcome_3() public {
+        //  Nonces 3 and 2245 generate random number 4458 which is a double.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(3, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            2245, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.Double,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    function test_distance_0_outcome_4() public {
+        //  Nonces 4 and 1260 generate random number 5866 which is a double.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(4, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            1260, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.Triple,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    function test_distance_0_outcome_5() public {
+        //  Nonces 5 and 1904 generate random number 6999 which is a home run.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(5, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            1904, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.HomeRun,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    function test_distance_0_outcome_6() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(6, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a contact swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            18702, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.InPlayOut,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    function test_distance_1_outcome_0() public {
+        //  Nonces 10 and 13750 generate random number 499 which is a strikeout.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(10, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 2 chooses to make a power swing in the middle of their strike zone.
+        Swing memory swing = Swing(
+            13750, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle
+        );
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SwingRevealed(SessionID, swing);
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID,
+            Outcome.Strikeout,
+            PitcherNFTAddress,
+            PitcherTokenID,
+            BatterNFTAddress,
+            BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }   
 }

@@ -59,4 +59,35 @@ contract RandomnessConsistencyTest is FullcountTestBase {
     function test_287349237429034239084_239480239842390842390482390_10000_7575() public {
         assertEq(game.randomSample(287_349_237_429_034_239_084, 239_480_239_842_390_842_390_482_390, 10_000), 7575);
     }
+
+    // Correspsonds to distance 0 outcome tests
+    function test_2_277_10000_4457() public {
+        assertEq(game.randomSample(2, 277, 10_000), 4457);  
+    }
+
+    function test_3_2245_10000_4458() public {
+        assertEq(game.randomSample(3, 2245, 10_000), 4458);  
+    }
+
+    function test_4_1260_10000_5866() public {
+        assertEq(game.randomSample(4, 1260, 10_000), 5866);  
+    }
+
+    function test_5_1904_10000_6999() public {
+        assertEq(game.randomSample(5, 1904, 10_000), 6999);  
+    }
+
+    function test_6_18702_10000_7000() public {
+        assertEq(game.randomSample(6, 18702, 10_000), 7000);  
+    }
+
+    /**
+    * $ fullcount randomness inspect -n 10 -N 13750 -d 10000
+    * Nonce 1: 10, Nonce 2: 10, Denominator: 10000
+    * Random sample: 499
+    */
+    function test_10_13750_10000_499() public {
+        assertEq(game.randomSample(10, 13750, 10000), 499);
+    }
+
 }
