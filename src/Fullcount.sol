@@ -3,9 +3,7 @@
 pragma solidity ^0.8.19;
 
 import { EIP712 } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
-import { IERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import { SafeERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
 import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
@@ -55,17 +53,8 @@ Functionality:
       commit but the other one doesn't, then the player who revealed wins by default.
 - [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
-
-TODO: MAYBE we get rid of fees to start and sessions. Instead, we define a native token budget for each
-operations - start, join, commit, reveal. We do this to make things symmetric between player_1 and
-player_2. Whatever portion of this budget that doesn't get spent on gas goes to the treasury. We should
-still give a discount to player 1 (which is why start is handled differently from join). We need to
-incentivize starting sessions as it is inherently riskier -- you never know if someone will join and
-you never know how powerful the character is that joined.
  */
 contract Fullcount is StatBlockBase, EIP712 {
-    using SafeERC20 for IERC20;
-
     string public constant FullcountVersion = "0.0.1";
 
     uint256 public SecondsPerPhase;
@@ -89,6 +78,7 @@ contract Fullcount is StatBlockBase, EIP712 {
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
 
+    event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
@@ -110,12 +100,9 @@ contract Fullcount is StatBlockBase, EIP712 {
         uint256 batterTokenID
     );
 
-    constructor(
-        uint256 secondsPerPhase
-    )
-        EIP712("Fullcount", FullcountVersion)
-    {
+    constructor(uint256 secondsPerPhase) EIP712("Fullcount", FullcountVersion) {
         SecondsPerPhase = secondsPerPhase;
+        emit FullcountDeployed(FullcountVersion, secondsPerPhase);
     }
 
     // This is useful because of how return values from the public mapping get serialized.
@@ -175,15 +162,7 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionStarted
-    function startSession(
-        address nftAddress,
-        uint256 tokenID,
-        PlayerType role
-    )
-        external
-        virtual
-        returns (uint256)
-    {
+    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
