@@ -38,12 +38,6 @@ Functionality:
 - [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
       to start the session. (joinSession automatically chooses the role of the joining player)
 - [x] When a pitcher and batter are staked into a session, the session automatically starts.
-- [x] Staking a character into a session costs native tokens. Starting a session can have a different
-      price than joining an existing session. In general, we will keep it cheaper to start a session
-      than to join a sesion that someone else started -- this will incentivize many matches. The cost
-      will disincentivize bots grinding against themselves. The contract is deployed with `sessionStartPrice`,
-      `sessionJoinPrice`, `treasuryAddress`, and `secondsPerPhase` parameters.
-      Tokens are transferred to the `treasuryAddress` when a session is either started or joined.
 - [x] Once a session starts, both the pitcher and the batter can commit their moves.
 - [x] Commitments are signed EIP712 messages representing the moves.
 - [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
@@ -74,9 +68,6 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     string public constant FullcountVersion = "0.0.1";
 
-    uint256 public SessionStartPrice;
-    uint256 public SessionJoinPrice;
-    address payable public TreasuryAddress;
     uint256 public SecondsPerPhase;
 
     uint256 public NumSessions;
@@ -120,16 +111,10 @@ contract Fullcount is StatBlockBase, EIP712 {
     );
 
     constructor(
-        uint256 sessionStartPrice,
-        uint256 sessionJoinPrice,
-        address payable treasuryAddress,
         uint256 secondsPerPhase
     )
         EIP712("Fullcount", FullcountVersion)
     {
-        SessionStartPrice = sessionStartPrice;
-        SessionJoinPrice = sessionJoinPrice;
-        TreasuryAddress = treasuryAddress;
         SecondsPerPhase = secondsPerPhase;
     }
 
@@ -196,18 +181,13 @@ contract Fullcount is StatBlockBase, EIP712 {
         PlayerType role
     )
         external
-        payable
         virtual
         returns (uint256)
     {
-        require(msg.value >= SessionStartPrice, "Fullcount.startSession: incorrect session start price");
-
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
-
-        TreasuryAddress.transfer(SessionStartPrice);
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -235,17 +215,13 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionJoined
-    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external payable virtual {
-        require(msg.value == SessionJoinPrice, "Fullcount.joinSession: incorrect join fee");
-
+    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
-
-        payable(TreasuryAddress).transfer(SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
