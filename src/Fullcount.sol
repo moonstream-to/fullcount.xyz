@@ -123,7 +123,7 @@ contract Fullcount is StatBlockBase, EIP712 {
      * All session expiration logic should go through a `_sessionProgress(sessionID) == 6` check.
      */
     function _sessionProgress(uint256 sessionID) internal view returns (uint256) {
-        if (sessionID > NumSessions) {
+        if (sessionID > NumSessions || sessionID == 0) {
             return 0;
         }
 
@@ -261,10 +261,7 @@ contract Fullcount is StatBlockBase, EIP712 {
     }
 
     function unstakeNFT(address nftAddress, uint256 tokenID) external {
-        uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
-        require(stakedSessionID > 0, "Fullcount._unstakeNFT: NFT is not staked");
-
-        uint256 progress = _sessionProgress(stakedSessionID);
+        uint256 progress = _sessionProgress(StakedSession[nftAddress][tokenID]);
         require(progress == 5 || progress == 6, "Fullcount.unstakeNFT: cannot unstake from session in this state");
 
         _unstakeNFT(nftAddress, tokenID);
