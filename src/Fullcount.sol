@@ -571,6 +571,8 @@ contract Fullcount is StatBlockBase, EIP712 {
                 session.batterTokenID
             );
 
+            session.outcome = outcome;
+
             _unstakeNFT(session.pitcherAddress, session.pitcherTokenID);
         }
     }
@@ -620,6 +622,8 @@ contract Fullcount is StatBlockBase, EIP712 {
                 session.batterAddress,
                 session.batterTokenID
             );
+
+            session.outcome = outcome;
 
             _unstakeNFT(session.batterAddress, session.batterTokenID);
         }

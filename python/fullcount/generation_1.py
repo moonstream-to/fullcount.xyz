@@ -11,8 +11,7 @@ Distance0: data.OutcomeDistribution = (
     1408,
     126,
     1008,
-    1500,
-    1500,
+    3000,
 )
 
 Distance1: data.OutcomeDistribution = (
@@ -22,8 +21,7 @@ Distance1: data.OutcomeDistribution = (
     1005,
     90,
     720,
-    2250,
-    2250,
+    4500,
 )
 
 Distance2: data.OutcomeDistribution = (
@@ -33,8 +31,7 @@ Distance2: data.OutcomeDistribution = (
     603,
     55,
     432,
-    2500,
-    2500,
+    5000,
 )
 
 DistanceGT2: data.OutcomeDistribution = (
@@ -44,8 +41,7 @@ DistanceGT2: data.OutcomeDistribution = (
     201,
     19,
     144,
-    1500,
-    1500,
+    3000,
 )
 
 
@@ -121,22 +117,34 @@ def rollout(
 
     for _ in range(num_samples):
         sample_pitch_type = (
-            pitch_type if pitch_type is not None else data.PitchType(random.randint(0, 1))
+            pitch_type
+            if pitch_type is not None
+            else data.PitchType(random.randint(0, 1))
         )
         sample_pitch_vertical = (
-            pitch_vertical if pitch_vertical is not None else data.VerticalLocation(random.randint(0, 4))
+            pitch_vertical
+            if pitch_vertical is not None
+            else data.VerticalLocation(random.randint(0, 4))
         )
         sample_pitch_horizontal = (
-            pitch_horizontal if pitch_horizontal is not None else data.HorizontalLocation(random.randint(0, 4))
+            pitch_horizontal
+            if pitch_horizontal is not None
+            else data.HorizontalLocation(random.randint(0, 4))
         )
         sample_swing_type = (
-            swing_type if swing_type is not None else data.SwingType(random.randint(0, 1))
+            swing_type
+            if swing_type is not None
+            else data.SwingType(random.randint(0, 1))
         )
         sample_swing_vertical = (
-            swing_vertical if swing_vertical is not None else data.VerticalLocation(random.randint(0, 4))
+            swing_vertical
+            if swing_vertical is not None
+            else data.VerticalLocation(random.randint(0, 4))
         )
         sample_swing_horizontal = (
-            swing_horizontal if swing_horizontal is not None else data.HorizontalLocation(random.randint(0, 4))
+            swing_horizontal
+            if swing_horizontal is not None
+            else data.HorizontalLocation(random.randint(0, 4))
         )
 
         results.append(
@@ -193,7 +201,9 @@ def handle_rollout(args: argparse.Namespace) -> None:
         else None,
     )
 
-    print("pitch_type,pitch_vertical,pitch_horizontal,swing_type,swing_vertical,swing_horizontal,outcome")
+    print(
+        "pitch_type,pitch_vertical,pitch_horizontal,swing_type,swing_vertical,swing_horizontal,outcome"
+    )
     for result in results:
         print(",".join([item.name for item in result]))
 

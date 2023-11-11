@@ -1,6 +1,6 @@
 import argparse
 
-from . import BeerLeagueBallers, Fullcount, generation_1, randomness
+from . import BeerLeagueBallers, Fullcount, generation_1, randomness, generators
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -24,6 +24,9 @@ def generate_cli() -> argparse.ArgumentParser:
 
     randomness_parser = randomness.generate_cli()
     subparsers.add_parser("randomness", parents=[randomness_parser], add_help=False)
+
+    codegen_parser = generators.generate_cli()
+    subparsers.add_parser("codegen", parents=[codegen_parser], add_help=False)
 
     return parser
 

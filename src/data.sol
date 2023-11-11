@@ -131,4 +131,5 @@ struct Session {
     bool didBatterReveal;
     bytes batterCommit;
     Swing batterReveal;
+    Outcome outcome;
 }
