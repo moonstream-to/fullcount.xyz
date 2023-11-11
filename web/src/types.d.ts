@@ -64,6 +64,7 @@ interface Pair {
 interface Session {
   pair: Pair;
   sessionID: number;
+  progress: number;
 }
 
 interface SessionsQueryData {

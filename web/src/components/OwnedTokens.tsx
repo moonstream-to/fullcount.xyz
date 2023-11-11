@@ -137,9 +137,9 @@ const OwnedTokens = () => {
               isActive={false}
               maxW={"70px"}
               maxH={"85px"}
+              showName={false}
               isClickable={true}
               border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
-              showName={false}
             />
           ))}
         <Flex w={"70px"} h={"85px"} className={styles.mintCard} onClick={onOpen} cursor={"pointer"}>

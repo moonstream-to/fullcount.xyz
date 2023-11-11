@@ -43,14 +43,16 @@ const CharacterCard = ({
       cursor={isClickable ? "pointer" : "default"}
     >
       <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
-      <Flex className={styles.bottom}>
-        {showName && <Text>{token.name}</Text>}
-        {isActive && (
-          <button className={globalStyles.button} onClick={handleClick}>
-            Play
-          </button>
-        )}
-      </Flex>
+      {showName && (
+        <Flex className={styles.bottom}>
+          {showName && <Text>{token.name}</Text>}
+          {isActive && (
+            <button className={globalStyles.button} onClick={handleClick}>
+              Play
+            </button>
+          )}
+        </Flex>
+      )}
     </Flex>
   );
 };

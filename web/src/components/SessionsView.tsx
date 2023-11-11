@@ -14,6 +14,7 @@ import SessionView from "./SessionView";
 import MySessions from "./MySessions";
 import OwnedTokens from "./OwnedTokens";
 import StakedTokens from "./StakedTokens";
+import SessionViewSmall from "./SessionViewSmall";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -182,7 +183,7 @@ const SessionsView = () => {
 
       {sessions.data &&
         notMySessions(sessions.data).map((session, index: number) => (
-          <SessionView
+          <SessionViewSmall
             session={session}
             onClick={(session: Session) => joinSession.mutate(session.sessionID)}
             key={index}
