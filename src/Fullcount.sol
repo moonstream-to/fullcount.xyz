@@ -38,20 +38,20 @@ Functionality:
 - [x] When a pitcher and batter are staked into a session, the session automatically starts.
 - [x] Once a session starts, both the pitcher and the batter can commit their moves.
 - [x] Commitments are signed EIP712 messages representing the moves.
-- [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
+- [x] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
       their move but the other one does not commit their move before `secondsPerPhase` blocks have
       elapsed since the session started, then the first player wins by forfeit. They can submit a
       transaction to end the session, unstake their NFT, and earn their reward.
-- [ ] A player can unstake their NFT from a session if the session has either not started or if the session
+- [x] A player can unstake their NFT from a session if the session has either not started or if the session
       has completed.
-- [ ] If both players commit their moves before `secondsPerPhase` blocks have elapsed since the session
+- [x] If both players commit their moves before `secondsPerPhase` blocks have elapsed since the session
       started, then the session enters the "reveal" phase. In this phase, each player has `secondsPerPhase`
       blocks to reveal their moves. They do this by submitting the EIP712 messages that were signed
       to generate their commits. The session is resolved once the second player reveals their move (in the
       same transaction).
 - [ ] If one player reveals their move before `secondsPerPhase` blocks have passed since the second
       commit but the other one doesn't, then the player who revealed wins by default.
-- [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
+- [x] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract Fullcount is StatBlockBase, EIP712 {
