@@ -1722,16 +1722,13 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(2, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(2, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            277, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(277, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1746,12 +1743,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.Single,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.Single, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -1768,24 +1760,21 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
 
         assertEq(game.sessionProgress(SessionID), 5);
-    }    
-    
+    }
+
     function test_distance_0_outcome_3() public {
         //  Nonces 3 and 2245 generate random number 4458 which is a double.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(3, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(3, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            2245, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(2245, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1800,12 +1789,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.Double,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.Double, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -1830,16 +1814,13 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(4, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(4, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            1260, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(1260, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1854,12 +1835,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.Triple,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -1884,16 +1860,13 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(5, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(5, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            1904, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(1904, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1908,12 +1881,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.HomeRun,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -1936,16 +1904,13 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(6, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(6, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            18702, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(18_702, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1960,12 +1925,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.InPlayOut,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.InPlayOut, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -1990,16 +1950,13 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(10, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Pitch memory pitch = Pitch(10, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         // Player 2 chooses to make a power swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            13750, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        Swing memory swing = Swing(13_750, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -2014,12 +1971,7 @@ contract FullcountTest_outcomes is FullcountTestBase {
         emit SwingRevealed(SessionID, swing);
         vm.expectEmit(address(game));
         emit SessionResolved(
-            SessionID,
-            Outcome.Strikeout,
-            PitcherNFTAddress,
-            PitcherTokenID,
-            BatterNFTAddress,
-            BatterTokenID
+            SessionID, Outcome.Strikeout, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
         );
 
         game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
@@ -2036,5 +1988,5 @@ contract FullcountTest_outcomes is FullcountTestBase {
         assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
 
         assertEq(game.sessionProgress(SessionID), 5);
-    }   
+    }
 }
