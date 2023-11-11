@@ -1,8 +1,8 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import globalStyles from "./GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
-import { useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { getRowCol, horizontalLocations, pitchSpeed, verticalLocations } from "./PlayView";
 import { signPitch } from "./Signing";
 import web3Context from "../contexts/Web3Context";
@@ -42,6 +42,34 @@ const PitcherView = () => {
       vertical: getRowCol(gridIndex)[0],
       horizontal: getRowCol(gridIndex)[1],
     });
+  };
+
+  const [movements, setMovements] = useState<number[]>([]);
+  const [seed, setSeed] = useState("");
+
+  useEffect(() => {
+    setMovements([]);
+  }, [selectedSession]);
+
+  useEffect(() => {
+    if (movements.length > 1000) {
+      window.removeEventListener("mousemove", handleMouseMove);
+      setSeed(generateSeed(movements));
+      setMovements([]);
+    }
+  }, [movements.length]);
+  const generateSeed = (movements: number[]): string => {
+    const dataString = movements.join("");
+    const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
+    const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
+    console.log(uint256Seed, hash);
+    return uint256Seed;
+  };
+  const handleMouseMove = useCallback((event: MouseEvent) => {
+    setMovements((prevMovements) => [...prevMovements, event.clientX, event.clientY]);
+  }, []);
+  const handleGenerate = () => {
+    window.addEventListener("mousemove", handleMouseMove);
   };
 
   const toast = useMoonToast();
@@ -131,6 +159,21 @@ const PitcherView = () => {
         {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}
       </Text>
       <Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>
+      <button className={globalStyles.button} onClick={handleGenerate}>
+        Generate
+      </button>
+      {movements.length > -1 && (
+        <Flex
+          onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
+          w={"100%"}
+          h={"20px"}
+          border={"1px solid white"}
+        >
+          <Box w={`${(movements.length / 1000) * 100}%`} bg={"green"} />
+          <Box bg={"gray"} />
+        </Flex>
+      )}
+      {seed && <Box>Generated</Box>}
       <button className={globalStyles.button} onClick={handleCommit}>
         Commit
       </button>
