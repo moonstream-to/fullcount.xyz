@@ -5,7 +5,6 @@ pragma solidity ^0.8.19;
 import { EIP712 } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
 import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
 import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
-import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
     PlayerType,
@@ -54,7 +53,7 @@ Functionality:
 - [x] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
-contract Fullcount is StatBlockBase, EIP712 {
+contract Fullcount is EIP712 {
     string public constant FullcountVersion = "0.0.1";
 
     uint256 public SecondsPerPhase;
@@ -151,13 +150,6 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     function sessionProgress(uint256 sessionID) public view returns (uint256) {
         return _sessionProgress(sessionID);
-    }
-
-    // Fullcount is an autnonomous game, and so the only administrator for NFT stats is the
-    // Fullcount contract itself.
-    // This is an override of the StatBlockBase.isAdministrator function.
-    function isAdministrator(address account) public view override returns (bool) {
-        return account == address(this);
     }
 
     // Emits:
