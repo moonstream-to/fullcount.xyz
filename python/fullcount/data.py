@@ -7,6 +7,8 @@ from enum import Enum
 import random
 from typing import Callable, Tuple
 
+MAX_UINT256 = 2**256 - 1
+
 
 class Outcome(Enum):
     """
@@ -18,8 +20,7 @@ class Outcome(Enum):
     * - Double - 3
     * - Triple - 4
     * - HomeRun - 5
-    * - GroundOut - 6
-    * - FlyOut - 7
+    * - InPlayOut - 6
     */
     """
 
@@ -29,8 +30,7 @@ class Outcome(Enum):
     Double = 3
     Triple = 4
     HomeRun = 5
-    GroundOut = 6
-    FlyOut = 7
+    InPlayOut = 6
 
 
 class PitchType(Enum):
