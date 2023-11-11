@@ -154,10 +154,6 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.NumSessions.call(block_identifier=block_number)
 
-    def num_stats(self, block_number: Optional[Union[str, int]] = "latest") -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.NumStats.call(block_identifier=block_number)
-
     def seconds_per_phase(
         self, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -194,44 +190,6 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.abortSession(session_id, transaction_config)
 
-    def assign_stats(
-        self,
-        token_address: ChecksumAddress,
-        token_id: int,
-        stat_i_ds: List,
-        values: List,
-        transaction_config,
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.assignStats(
-            token_address, token_id, stat_i_ds, values, transaction_config
-        )
-
-    def batch_assign_stats(
-        self,
-        token_addresses: List,
-        token_i_ds: List,
-        stat_i_ds: Any,
-        values: Any,
-        transaction_config,
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.batchAssignStats(
-            token_addresses, token_i_ds, stat_i_ds, values, transaction_config
-        )
-
-    def batch_get_stats(
-        self,
-        token_addresses: List,
-        token_i_ds: List,
-        stat_i_ds: List,
-        block_number: Optional[Union[str, int]] = "latest",
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.batchGetStats.call(
-            token_addresses, token_i_ds, stat_i_ds, block_identifier=block_number
-        )
-
     def commit_pitch(
         self, session_id: int, signature: bytes, transaction_config
     ) -> Any:
@@ -244,16 +202,6 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.commitSwing(session_id, signature, transaction_config)
 
-    def create_stat(self, descriptor: str, transaction_config) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.createStat(descriptor, transaction_config)
-
-    def describe_stat(
-        self, stat_id: int, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.describeStat.call(stat_id, block_identifier=block_number)
-
     def eip712_domain(self, block_number: Optional[Union[str, int]] = "latest") -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.eip712Domain.call(block_identifier=block_number)
@@ -263,28 +211,6 @@ class Fullcount:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.getSession.call(session_id, block_identifier=block_number)
-
-    def get_stats(
-        self,
-        token_address: ChecksumAddress,
-        token_id: int,
-        stat_i_ds: List,
-        block_number: Optional[Union[str, int]] = "latest",
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.getStats.call(
-            token_address, token_id, stat_i_ds, block_identifier=block_number
-        )
-
-    def is_administrator(
-        self,
-        account: ChecksumAddress,
-        block_number: Optional[Union[str, int]] = "latest",
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.isAdministrator.call(
-            account, block_identifier=block_number
-        )
 
     def join_session(
         self,
@@ -380,12 +306,6 @@ class Fullcount:
             session_id, block_identifier=block_number
         )
 
-    def set_stat_descriptor(
-        self, stat_id: int, descriptor: str, transaction_config
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.setStatDescriptor(stat_id, descriptor, transaction_config)
-
     def start_session(
         self, nft_address: ChecksumAddress, token_id: int, role: int, transaction_config
     ) -> Any:
@@ -393,12 +313,6 @@ class Fullcount:
         return self.contract.startSession(
             nft_address, token_id, role, transaction_config
         )
-
-    def stat_block_version(
-        self, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.statBlockVersion.call(block_identifier=block_number)
 
     def swing_hash(
         self,
@@ -556,13 +470,6 @@ def handle_num_sessions(args: argparse.Namespace) -> None:
     print(result)
 
 
-def handle_num_stats(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.num_stats(block_number=args.block_number)
-    print(result)
-
-
 def handle_seconds_per_phase(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -607,50 +514,6 @@ def handle_abort_session(args: argparse.Namespace) -> None:
         print(result.info())
 
 
-def handle_assign_stats(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    transaction_config = get_transaction_config(args)
-    result = contract.assign_stats(
-        token_address=args.token_address,
-        token_id=args.token_id,
-        stat_i_ds=args.stat_i_ds,
-        values=args.values,
-        transaction_config=transaction_config,
-    )
-    print(result)
-    if args.verbose:
-        print(result.info())
-
-
-def handle_batch_assign_stats(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    transaction_config = get_transaction_config(args)
-    result = contract.batch_assign_stats(
-        token_addresses=args.token_addresses,
-        token_i_ds=args.token_i_ds,
-        stat_i_ds=args.stat_i_ds,
-        values=args.values,
-        transaction_config=transaction_config,
-    )
-    print(result)
-    if args.verbose:
-        print(result.info())
-
-
-def handle_batch_get_stats(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.batch_get_stats(
-        token_addresses=args.token_addresses,
-        token_i_ds=args.token_i_ds,
-        stat_i_ds=args.stat_i_ds,
-        block_number=args.block_number,
-    )
-    print(result)
-
-
 def handle_commit_pitch(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -679,27 +542,6 @@ def handle_commit_swing(args: argparse.Namespace) -> None:
         print(result.info())
 
 
-def handle_create_stat(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    transaction_config = get_transaction_config(args)
-    result = contract.create_stat(
-        descriptor=args.descriptor, transaction_config=transaction_config
-    )
-    print(result)
-    if args.verbose:
-        print(result.info())
-
-
-def handle_describe_stat(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.describe_stat(
-        stat_id=args.stat_id, block_number=args.block_number
-    )
-    print(result)
-
-
 def handle_eip712_domain(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -712,27 +554,6 @@ def handle_get_session(args: argparse.Namespace) -> None:
     contract = Fullcount(args.address)
     result = contract.get_session(
         session_id=args.session_id, block_number=args.block_number
-    )
-    print(result)
-
-
-def handle_get_stats(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.get_stats(
-        token_address=args.token_address,
-        token_id=args.token_id,
-        stat_i_ds=args.stat_i_ds,
-        block_number=args.block_number,
-    )
-    print(result)
-
-
-def handle_is_administrator(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.is_administrator(
-        account=args.account, block_number=args.block_number
     )
     print(result)
 
@@ -841,20 +662,6 @@ def handle_session_progress(args: argparse.Namespace) -> None:
     print(result)
 
 
-def handle_set_stat_descriptor(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    transaction_config = get_transaction_config(args)
-    result = contract.set_stat_descriptor(
-        stat_id=args.stat_id,
-        descriptor=args.descriptor,
-        transaction_config=transaction_config,
-    )
-    print(result)
-    if args.verbose:
-        print(result.info())
-
-
 def handle_start_session(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -868,13 +675,6 @@ def handle_start_session(args: argparse.Namespace) -> None:
     print(result)
     if args.verbose:
         print(result.info())
-
-
-def handle_stat_block_version(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.stat_block_version(block_number=args.block_number)
-    print(result)
 
 
 def handle_swing_hash(args: argparse.Namespace) -> None:
@@ -958,10 +758,6 @@ def generate_cli() -> argparse.ArgumentParser:
     add_default_arguments(num_sessions_parser, False)
     num_sessions_parser.set_defaults(func=handle_num_sessions)
 
-    num_stats_parser = subcommands.add_parser("num-stats")
-    add_default_arguments(num_stats_parser, False)
-    num_stats_parser.set_defaults(func=handle_num_stats)
-
     seconds_per_phase_parser = subcommands.add_parser("seconds-per-phase")
     add_default_arguments(seconds_per_phase_parser, False)
     seconds_per_phase_parser.set_defaults(func=handle_seconds_per_phase)
@@ -994,51 +790,6 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     abort_session_parser.set_defaults(func=handle_abort_session)
 
-    assign_stats_parser = subcommands.add_parser("assign-stats")
-    add_default_arguments(assign_stats_parser, True)
-    assign_stats_parser.add_argument(
-        "--token-address", required=True, help="Type: address"
-    )
-    assign_stats_parser.add_argument(
-        "--token-id", required=True, help="Type: uint256", type=int
-    )
-    assign_stats_parser.add_argument(
-        "--stat-i-ds", required=True, help="Type: uint256[]", nargs="+"
-    )
-    assign_stats_parser.add_argument(
-        "--values", required=True, help="Type: uint256[]", nargs="+"
-    )
-    assign_stats_parser.set_defaults(func=handle_assign_stats)
-
-    batch_assign_stats_parser = subcommands.add_parser("batch-assign-stats")
-    add_default_arguments(batch_assign_stats_parser, True)
-    batch_assign_stats_parser.add_argument(
-        "--token-addresses", required=True, help="Type: address[]", nargs="+"
-    )
-    batch_assign_stats_parser.add_argument(
-        "--token-i-ds", required=True, help="Type: uint256[]", nargs="+"
-    )
-    batch_assign_stats_parser.add_argument(
-        "--stat-i-ds", required=True, help="Type: uint256[][]", type=eval
-    )
-    batch_assign_stats_parser.add_argument(
-        "--values", required=True, help="Type: uint256[][]", type=eval
-    )
-    batch_assign_stats_parser.set_defaults(func=handle_batch_assign_stats)
-
-    batch_get_stats_parser = subcommands.add_parser("batch-get-stats")
-    add_default_arguments(batch_get_stats_parser, False)
-    batch_get_stats_parser.add_argument(
-        "--token-addresses", required=True, help="Type: address[]", nargs="+"
-    )
-    batch_get_stats_parser.add_argument(
-        "--token-i-ds", required=True, help="Type: uint256[]", nargs="+"
-    )
-    batch_get_stats_parser.add_argument(
-        "--stat-i-ds", required=True, help="Type: uint256[]", nargs="+"
-    )
-    batch_get_stats_parser.set_defaults(func=handle_batch_get_stats)
-
     commit_pitch_parser = subcommands.add_parser("commit-pitch")
     add_default_arguments(commit_pitch_parser, True)
     commit_pitch_parser.add_argument(
@@ -1059,20 +810,6 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     commit_swing_parser.set_defaults(func=handle_commit_swing)
 
-    create_stat_parser = subcommands.add_parser("create-stat")
-    add_default_arguments(create_stat_parser, True)
-    create_stat_parser.add_argument(
-        "--descriptor", required=True, help="Type: string", type=str
-    )
-    create_stat_parser.set_defaults(func=handle_create_stat)
-
-    describe_stat_parser = subcommands.add_parser("describe-stat")
-    add_default_arguments(describe_stat_parser, False)
-    describe_stat_parser.add_argument(
-        "--stat-id", required=True, help="Type: uint256", type=int
-    )
-    describe_stat_parser.set_defaults(func=handle_describe_stat)
-
     eip712_domain_parser = subcommands.add_parser("eip712-domain")
     add_default_arguments(eip712_domain_parser, False)
     eip712_domain_parser.set_defaults(func=handle_eip712_domain)
@@ -1083,26 +820,6 @@ def generate_cli() -> argparse.ArgumentParser:
         "--session-id", required=True, help="Type: uint256", type=int
     )
     get_session_parser.set_defaults(func=handle_get_session)
-
-    get_stats_parser = subcommands.add_parser("get-stats")
-    add_default_arguments(get_stats_parser, False)
-    get_stats_parser.add_argument(
-        "--token-address", required=True, help="Type: address"
-    )
-    get_stats_parser.add_argument(
-        "--token-id", required=True, help="Type: uint256", type=int
-    )
-    get_stats_parser.add_argument(
-        "--stat-i-ds", required=True, help="Type: uint256[]", nargs="+"
-    )
-    get_stats_parser.set_defaults(func=handle_get_stats)
-
-    is_administrator_parser = subcommands.add_parser("is-administrator")
-    add_default_arguments(is_administrator_parser, False)
-    is_administrator_parser.add_argument(
-        "--account", required=True, help="Type: address"
-    )
-    is_administrator_parser.set_defaults(func=handle_is_administrator)
 
     join_session_parser = subcommands.add_parser("join-session")
     add_default_arguments(join_session_parser, True)
@@ -1214,16 +931,6 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     session_progress_parser.set_defaults(func=handle_session_progress)
 
-    set_stat_descriptor_parser = subcommands.add_parser("set-stat-descriptor")
-    add_default_arguments(set_stat_descriptor_parser, True)
-    set_stat_descriptor_parser.add_argument(
-        "--stat-id", required=True, help="Type: uint256", type=int
-    )
-    set_stat_descriptor_parser.add_argument(
-        "--descriptor", required=True, help="Type: string", type=str
-    )
-    set_stat_descriptor_parser.set_defaults(func=handle_set_stat_descriptor)
-
     start_session_parser = subcommands.add_parser("start-session")
     add_default_arguments(start_session_parser, True)
     start_session_parser.add_argument(
@@ -1236,10 +943,6 @@ def generate_cli() -> argparse.ArgumentParser:
         "--role", required=True, help="Type: uint8", type=int
     )
     start_session_parser.set_defaults(func=handle_start_session)
-
-    stat_block_version_parser = subcommands.add_parser("stat-block-version")
-    add_default_arguments(stat_block_version_parser, False)
-    stat_block_version_parser.set_defaults(func=handle_stat_block_version)
 
     swing_hash_parser = subcommands.add_parser("swing-hash")
     add_default_arguments(swing_hash_parser, False)
