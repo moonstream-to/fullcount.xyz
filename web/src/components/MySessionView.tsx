@@ -16,7 +16,7 @@ const MySessionView = ({ session }: { session: Session }) => {
       {session.pair.pitcher ? (
         <CharacterCard
           token={session.pair.pitcher}
-          active={session.pair.pitcher.staker === web3ctx.account}
+          isActive={session.pair.pitcher.staker === web3ctx.account}
           session={session}
         />
       ) : (
@@ -28,7 +28,7 @@ const MySessionView = ({ session }: { session: Session }) => {
       {session.pair.batter ? (
         <CharacterCard
           token={session.pair.batter}
-          active={session.pair.batter.staker === web3ctx.account}
+          isActive={session.pair.batter.staker === web3ctx.account}
           session={session}
         />
       ) : (

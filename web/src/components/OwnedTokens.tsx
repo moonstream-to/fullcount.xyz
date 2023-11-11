@@ -19,7 +19,7 @@ const tokenABI = require("../web3/abi/BLBABI.json");
 
 const OwnedTokens = () => {
   const web3ctx = useContext(Web3Context);
-  const { tokenAddress, contractAddress } = useGameContext();
+  const { tokenAddress, contractAddress, selectedToken, updateContext } = useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -69,6 +69,10 @@ const OwnedTokens = () => {
         });
       }
       console.log(tokens);
+      if (!selectedToken && tokens.length > 0) {
+        const randomIndex = Math.floor(Math.random() * tokens.length);
+        updateContext({ selectedToken: tokens[randomIndex] });
+      }
       return tokens;
     },
     {
@@ -118,23 +122,30 @@ const OwnedTokens = () => {
   );
 
   return (
-    <Flex className={styles.container}>
-      <Text className={styles.title}>Your NFTs</Text>
-      <Flex className={styles.cards}>
+    <>
+      <Flex className={styles.cards} alignItems={"end"}>
+        {isApproved.isSuccess && isApproved.data === false && (
+          <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
+            {mintToken.isLoading ? <Spinner /> : "Approve"}
+          </button>
+        )}
         {ownedTokens.data &&
           ownedTokens.data.map((token: Token, idx: number) => (
-            <CharacterCard token={token} key={idx} />
+            <CharacterCard
+              token={token}
+              key={idx}
+              isActive={false}
+              maxW={"70px"}
+              maxH={"85px"}
+              isClickable={true}
+              border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
+              showName={false}
+            />
           ))}
+        <Flex w={"70px"} h={"85px"} className={styles.mintCard} onClick={onOpen} cursor={"pointer"}>
+          {mintToken.isLoading ? <Spinner /> : " + Mint"}
+        </Flex>
       </Flex>
-
-      <button className={styles.button} onClick={onOpen}>
-        {mintToken.isLoading ? <Spinner /> : "Mint"}
-      </button>
-      {isApproved.isSuccess && isApproved.data === false && (
-        <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
-          {mintToken.isLoading ? <Spinner /> : "Approve"}
-        </button>
-      )}
 
       <CreateNewCharacter
         isOpen={isOpen}
@@ -144,7 +155,7 @@ const OwnedTokens = () => {
           mintToken.mutate({ name, imageIndex });
         }}
       />
-    </Flex>
+    </>
   );
 };
 

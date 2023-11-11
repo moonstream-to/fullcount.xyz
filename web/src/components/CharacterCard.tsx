@@ -6,13 +6,17 @@ import { Session, Token } from "../types";
 
 const CharacterCard = ({
   token,
-  active = true,
+  isActive = true,
   session,
+  isClickable = false,
+  showName = true,
   ...props
 }: {
-  token: Token;
-  active?: boolean;
+  token: Token | undefined;
+  isActive?: boolean;
   session?: Session;
+  isClickable?: boolean;
+  showName?: boolean;
   [x: string]: any;
 }) => {
   const { updateContext } = useGameContext();
@@ -22,17 +26,26 @@ const CharacterCard = ({
       updateContext({ selectedSession: session });
     }
   };
+  if (!token) {
+    return <></>;
+  }
   return (
     <Flex
       className={styles.container}
       {...props}
-      h={active ? "216px" : "fit-content"}
+      h={isActive ? "216px" : "fit-content"}
       w={"fit-content"}
+      onClick={() => {
+        if (isClickable) {
+          handleClick();
+        }
+      }}
+      cursor={isClickable ? "pointer" : "default"}
     >
-      <Image h={"137px"} w={"137px"} alt={token.name} src={token.image} />
+      <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
       <Flex className={styles.bottom}>
-        <Text>{token.name}</Text>
-        {active && (
+        {showName && <Text>{token.name}</Text>}
+        {isActive && (
           <button className={globalStyles.button} onClick={handleClick}>
             Play
           </button>

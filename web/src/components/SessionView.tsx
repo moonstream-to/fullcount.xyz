@@ -13,7 +13,7 @@ const SessionView = ({
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"}>
       {session.pair.pitcher ? (
-        <CharacterCard token={session.pair.pitcher} active={false} />
+        <CharacterCard token={session.pair.pitcher} isActive={false} />
       ) : (
         <button className={globalStyles.button} onClick={() => onClick(session)}>
           join as pitcher
@@ -21,7 +21,7 @@ const SessionView = ({
       )}
       <Text>vs</Text>
       {session.pair.batter ? (
-        <CharacterCard token={session.pair.batter} active={false} />
+        <CharacterCard token={session.pair.batter} isActive={false} />
       ) : (
         <button className={globalStyles.button} onClick={() => onClick(session)}>
           join as batter

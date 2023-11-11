@@ -12,6 +12,7 @@ interface GameContextProps {
   chainId: number;
   selectedToken: Token | undefined;
   selectedSession: Session | undefined;
+  sessions: Session[] | undefined;
 }
 
 interface GameContextType extends GameContextProps {
@@ -38,6 +39,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
       process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0xF674839663C9353379b48fEb2AFb019a07CA00F4",
     selectedToken: undefined,
     selectedSession: undefined,
+    sessions: undefined,
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {

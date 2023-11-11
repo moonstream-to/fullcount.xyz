@@ -46,7 +46,7 @@ const PlayView = () => {
       <Text onClick={() => updateContext({ selectedSession: undefined })} cursor={"pointer"}>
         Back
       </Text>
-      {selectedToken && <CharacterCard token={selectedToken} active={false} />}
+      {selectedToken && <CharacterCard token={selectedToken} isActive={false} />}
       {isPitcher() && <PitcherView />}
 
       {!isPitcher() && <BatterView />}

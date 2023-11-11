@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from "react-query";
 import queryCacheProps from "../hooks/hookCommon";
 import { useGameContext } from "../contexts/GameContext";
 import OwnedTokens from "./OwnedTokens";
+import SessionsView from "./SessionsView";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 const TitleScreen = () => {
@@ -42,17 +43,9 @@ const TitleScreen = () => {
         </TitleScreenLayout>
       ) : (
         <>
-          {selectedToken ? (
-            <PlayingLayout>
-              <Playing />
-            </PlayingLayout>
-          ) : (
-            <>
-              <TitleScreenLayout>
-                <OwnedTokens />
-              </TitleScreenLayout>
-            </>
-          )}
+          <PlayingLayout>
+            <Playing />
+          </PlayingLayout>
         </>
       )}
     </>

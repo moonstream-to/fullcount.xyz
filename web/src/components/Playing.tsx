@@ -16,9 +16,6 @@ const Playing = () => {
     <Flex className={styles.container}>
       {!selectedSession ? (
         <>
-          <Text cursor={"pointer"} onClick={() => updateContext({ selectedToken: undefined })}>
-            Back
-          </Text>
           <SessionsView />
         </>
       ) : (
