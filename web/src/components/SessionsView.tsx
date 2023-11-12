@@ -167,6 +167,7 @@ const SessionsView = () => {
       )}
 
       <Text className={styles.title}>Sessions</Text>
+      <FiltersView />
       <Flex gap={"20px"} justifyContent={"space-between"} w={"100%"}>
         <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
           Start new session as pitcher

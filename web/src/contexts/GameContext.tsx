@@ -7,6 +7,7 @@ interface GameContextProps {
   kind: number;
   vertical: number;
   horizontal: number;
+  progressFilter: boolean[];
   contractAddress: string;
   tokenAddress: string;
   chainId: number;
@@ -32,8 +33,9 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     kind: 0,
     vertical: 0,
     horizontal: 0,
+    progressFilter: [false, true, true, true, true, true, true],
     contractAddress:
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0x9b81f7b0F4445b022EDD1109fe438d2E4484A1c5",
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0xf861273b98c2A2205f9979df2d6fa3B85e29d61B",
     chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 322),
     tokenAddress:
       process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0xF674839663C9353379b48fEb2AFb019a07CA00F4",

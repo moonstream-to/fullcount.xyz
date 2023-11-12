@@ -2,6 +2,8 @@ import { Flex, Text } from "@chakra-ui/react";
 import CharacterCard from "./CharacterCard";
 import globalStyles from "./OwnedTokens.module.css";
 import { Session } from "../types";
+import { useGameContext } from "../contexts/GameContext";
+import Timer from "./Timer";
 
 export const sessionStates = [
   "session does not exist",
@@ -20,6 +22,10 @@ const SessionViewSmall = ({
   session: Session;
   onClick: (session: Session) => void;
 }) => {
+  const { progressFilter } = useGameContext();
+  if (!progressFilter[session.progress]) {
+    return <></>;
+  }
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"}>
       <Flex direction={"column"}>
