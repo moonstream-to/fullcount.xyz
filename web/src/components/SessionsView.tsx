@@ -15,6 +15,7 @@ import MySessions from "./MySessions";
 import OwnedTokens from "./OwnedTokens";
 import StakedTokens from "./StakedTokens";
 import SessionViewSmall from "./SessionViewSmall";
+import FiltersView from "./FiltersView";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -88,6 +89,7 @@ const SessionsView = () => {
       console.log("sessions");
 
       const numSessions = await gameContract.methods.NumSessions().call();
+      const secondsPerPhase = await gameContract.methods.SecondsPerPhase().call();
       console.log(numSessions);
       const sessions = [];
       for (let i = 1; i <= numSessions; i += 1) {
@@ -126,8 +128,20 @@ const SessionsView = () => {
           };
         }
 
-        sessions.push({ pair, sessionID: i, progress });
-        console.log({ pair, sessionID: i, progress });
+        sessions.push({
+          pair,
+          sessionID: i,
+          progress,
+          secondsPerPhase: Number(secondsPerPhase),
+          phaseStartTimestamp: Number(session.phaseStartTimestamp),
+        });
+        console.log({
+          pair,
+          sessionID: i,
+          progress,
+          secondsPerPhase,
+          phaseStartTimestamp: session.phaseStartTimestamp,
+        });
       }
       console.log(sessions);
       return sessions.reverse();

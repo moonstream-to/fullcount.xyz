@@ -65,6 +65,8 @@ interface Session {
   pair: Pair;
   sessionID: number;
   progress: number;
+  secondsPerPhase: number;
+  phaseStartTimestamp: number;
 }
 
 interface SessionsQueryData {
