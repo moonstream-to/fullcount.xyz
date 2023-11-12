@@ -3,21 +3,6 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "sessionStartPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "sessionJoinPrice",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address payable",
-        "name": "treasuryAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
         "name": "secondsPerPhase",
         "type": "uint256"
       }
@@ -45,6 +30,25 @@
     "anonymous": false,
     "inputs": [],
     "name": "EIP712DomainChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "string",
+        "name": "version",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "SecondsPerPhase",
+        "type": "uint256"
+      }
+    ],
+    "name": "FullcountDeployed",
     "type": "event"
   },
   {
@@ -261,69 +265,6 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "tokenID",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "StatAssigned",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      }
-    ],
-    "name": "StatCreated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "string",
-        "name": "descriptor",
-        "type": "string"
-      }
-    ],
-    "name": "StatDescriptorUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
         "internalType": "uint256",
         "name": "sessionID",
         "type": "uint256"
@@ -477,46 +418,7 @@
   },
   {
     "inputs": [],
-    "name": "NumStats",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "SecondsPerPhase",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SessionJoinPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "SessionStartPrice",
     "outputs": [
       {
         "internalType": "uint256",
@@ -645,6 +547,11 @@
         "internalType": "struct Swing",
         "name": "batterReveal",
         "type": "tuple"
+      },
+      {
+        "internalType": "enum Outcome",
+        "name": "outcome",
+        "type": "uint8"
       }
     ],
     "stateMutability": "view",
@@ -699,19 +606,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "TreasuryAddress",
-    "outputs": [
-      {
-        "internalType": "address payable",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -722,91 +616,6 @@
     "name": "abortSession",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenID",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "statIDs",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "values",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "assignStats",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "tokenIDs",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[][]",
-        "name": "statIDs",
-        "type": "uint256[][]"
-      },
-      {
-        "internalType": "uint256[][]",
-        "name": "values",
-        "type": "uint256[][]"
-      }
-    ],
-    "name": "batchAssignStats",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "tokenAddresses",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "tokenIDs",
-        "type": "uint256[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "statIDs",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "batchGetStats",
-    "outputs": [
-      {
-        "internalType": "uint256[][]",
-        "name": "",
-        "type": "uint256[][]"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -843,44 +652,6 @@
     "name": "commitSwing",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "string",
-        "name": "descriptor",
-        "type": "string"
-      }
-    ],
-    "name": "createStat",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      }
-    ],
-    "name": "describeStat",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -1046,59 +817,16 @@
             "internalType": "struct Swing",
             "name": "batterReveal",
             "type": "tuple"
+          },
+          {
+            "internalType": "enum Outcome",
+            "name": "outcome",
+            "type": "uint8"
           }
         ],
         "internalType": "struct Session",
         "name": "",
         "type": "tuple"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "tokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "tokenID",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "statIDs",
-        "type": "uint256[]"
-      }
-    ],
-    "name": "getStats",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "account",
-        "type": "address"
-      }
-    ],
-    "name": "isAdministrator",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -1124,7 +852,7 @@
     ],
     "name": "joinSession",
     "outputs": [],
-    "stateMutability": "payable",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1159,6 +887,35 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "nonce0",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce1",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "totalMass",
+        "type": "uint256"
+      }
+    ],
+    "name": "randomSample",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -1346,24 +1103,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "statID",
-        "type": "uint256"
-      },
-      {
-        "internalType": "string",
-        "name": "descriptor",
-        "type": "string"
-      }
-    ],
-    "name": "setStatDescriptor",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "nftAddress",
         "type": "address"
@@ -1387,20 +1126,7 @@
         "type": "uint256"
       }
     ],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "statBlockVersion",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -1435,6 +1161,24 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "nftAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "tokenID",
+        "type": "uint256"
+      }
+    ],
+    "name": "unstakeNFT",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]
