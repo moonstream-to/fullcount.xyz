@@ -42,7 +42,7 @@ const BatterView = () => {
       JSON.stringify({ nonce, kind, row: getRowCol(gridIndex)[0], col: getRowCol(gridIndex)[1] }),
     );
     console.log(nonce, kind, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign, typeof sign);
-    // commitSwing.mutate({ sign });
+    commitSwing.mutate({ sign });
   };
 
   const handleReveal = async () => {

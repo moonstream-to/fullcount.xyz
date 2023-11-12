@@ -35,7 +35,7 @@ const PitcherView = () => {
       JSON.stringify({ nonce, speed, row: getRowCol(gridIndex)[0], col: getRowCol(gridIndex)[1] }),
     );
     console.log(nonce, speed, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
-    // commitPitch.mutate({ sign });
+    commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {
@@ -139,6 +139,16 @@ const PitcherView = () => {
       },
     },
   );
+
+  const resolve = async () => {
+    const res = await gameContract.methods
+      .resolve(
+        { nonce: 0, speed: 0, vertical: 2, horizontal: 2 },
+        { nonce: 0, kind: 0, vertical: 2, horizontal: 2 },
+      )
+      .call();
+    console.log(res);
+  };
 
   return (
     <Flex direction={"column"} gap={"15px"}>
