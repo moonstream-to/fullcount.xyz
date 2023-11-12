@@ -15,7 +15,7 @@ const FullcountABI = require("../web3/abi/FullcountABI.json");
 const PitcherView = () => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
-  const [nonce, setNonce] = useState(322);
+  const [nonce, setNonce] = useState(0);
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -30,9 +30,12 @@ const PitcherView = () => {
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
-    localStorage.setItem(`fullcount.xyz-${selectedSession?.sessionID}`, sign);
-    commitPitch.mutate({ sign });
-    console.log(sign, typeof sign);
+    localStorage.setItem(
+      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}`,
+      JSON.stringify({ nonce, speed, row: getRowCol(gridIndex)[0], col: getRowCol(gridIndex)[1] }),
+    );
+    console.log(nonce, speed, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
+    // commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {

@@ -192,7 +192,10 @@ const SessionsView = () => {
       </Flex>
       <Text className={styles.subtitle}>My sessions</Text>
       {sessions.data && mySessions(sessions.data).length > 0 && (
-        <MySessions sessions={mySessions(sessions.data)} />
+        <MySessions
+          sessions={mySessions(sessions.data)}
+          onClick={(session: Session) => joinSession.mutate(session.sessionID)}
+        />
       )}
       <Text className={styles.subtitle}>Other sessions</Text>
 

@@ -22,7 +22,7 @@ const FullcountABI = require("../web3/abi/FullcountABI.json");
 const BatterView = () => {
   const [kind, setKind] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
-  const [nonce, setNonce] = useState(322);
+  const [nonce, setNonce] = useState(0);
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -37,9 +37,12 @@ const BatterView = () => {
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
-    localStorage.setItem(`fullcount.xyz-${selectedSession?.sessionID}`, sign);
-    commitSwing.mutate({ sign });
-    console.log(sign, typeof sign);
+    localStorage.setItem(
+      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}`,
+      JSON.stringify({ nonce, kind, row: getRowCol(gridIndex)[0], col: getRowCol(gridIndex)[1] }),
+    );
+    console.log(nonce, kind, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign, typeof sign);
+    // commitSwing.mutate({ sign });
   };
 
   const handleReveal = async () => {
@@ -70,11 +73,11 @@ const BatterView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("isApproved");
-        toast("SetApproval successful.", "success");
+        queryClient.invalidateQueries("sessions");
+        toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
-        toast("SetApproval failed." + e?.message, "error");
+        toast("Commit failed." + e?.message, "error");
       },
     },
   );
@@ -107,11 +110,11 @@ const BatterView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("isApproved");
-        toast("SetApproval successful.", "success");
+        queryClient.invalidateQueries("sessions");
+        toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
-        toast("SetApproval failed." + e?.message, "error");
+        toast("Reveal failed." + e?.message, "error");
       },
     },
   );

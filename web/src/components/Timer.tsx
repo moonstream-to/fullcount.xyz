@@ -18,7 +18,6 @@ const Timer: React.FC<TimerProps> = ({ start, delay }) => {
         setTimeLeft("00:00");
         return;
       }
-      console.log(typeof start, typeof delay, start, start + delay, currentTime, remainingTime);
 
       const minutes = Math.floor(remainingTime / 60)
         .toString()

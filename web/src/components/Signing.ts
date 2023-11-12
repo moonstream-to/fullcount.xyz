@@ -6,50 +6,45 @@ export async function signPitch(
   vertical: number,
   horizontal: number,
 ): Promise<string> {
-  // if (duration <= 0 || duration == undefined)
-  //   throw new Error("signAccessToken: duration must be defined");
   if (!provider) throw new Error("signAccessToken: provider must be defined");
   if (!account) throw new Error("signAccessToken: account must be defined");
 
   const msgParams = JSON.stringify({
     domain: {
-      // Give a user friendly name to the specific contract you are signing for.
       name: "Fullcount",
-      // Just let's you know the latest version. Definitely make sure the field name is correct.
-      version: "1",
+      version: "0.0.1",
+      chainId: "322",
+      verifyingContract: "0xf861273b98c2A2205f9979df2d6fa3B85e29d61B",
     },
-
-    // Defining the message signing data content.
     message: {
       nonce,
       speed,
       vertical,
       horizontal,
     },
-    // Refers to the keys of the *types* object below.
-    primaryType: "FullcountPitchCommit",
+    primaryType: "PitchMessage",
     types: {
-      // TODO: Clarify if EIP712Domain refers to the domain the contract is hosted on
       EIP712Domain: [
         { name: "name", type: "string" },
         { name: "version", type: "string" },
+        { name: "chainId", type: "uint256" },
+        { name: "verifyingContract", type: "address" },
       ],
-      // Refer to PrimaryType
-      FullcountPitchCommit: [
+      PitchMessage: [
         {
           type: "uint256",
           name: "nonce",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "speed",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "vertical",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "horizontal",
         },
       ],
@@ -61,15 +56,6 @@ export async function signPitch(
     params: [account, msgParams],
     from: account,
   });
-
-  // const retval = Buffer.from(
-  //   JSON.stringify({
-  //     address: account,
-  //     deadline: JSON.parse(msgParams).message.deadline,
-  //     signed_message: result,
-  //   }),
-  //   "utf-8",
-  // ).toString("base64");
 
   return result;
 }
@@ -82,50 +68,45 @@ export async function signSwing(
   vertical: number,
   horizontal: number,
 ): Promise<string> {
-  // if (duration <= 0 || duration == undefined)
-  //   throw new Error("signAccessToken: duration must be defined");
   if (!provider) throw new Error("signAccessToken: provider must be defined");
   if (!account) throw new Error("signAccessToken: account must be defined");
 
   const msgParams = JSON.stringify({
     domain: {
-      // Give a user friendly name to the specific contract you are signing for.
       name: "Fullcount",
-      // Just let's you know the latest version. Definitely make sure the field name is correct.
-      version: "1",
+      version: "0.0.1",
+      chainId: "322",
+      verifyingContract: "0xf861273b98c2A2205f9979df2d6fa3B85e29d61B",
     },
-
-    // Defining the message signing data content.
     message: {
       nonce,
       kind,
       vertical,
       horizontal,
     },
-    // Refers to the keys of the *types* object below.
-    primaryType: "FullcountSwingCommit",
+    primaryType: "SwingMessage",
     types: {
-      // TODO: Clarify if EIP712Domain refers to the domain the contract is hosted on
       EIP712Domain: [
         { name: "name", type: "string" },
         { name: "version", type: "string" },
+        { name: "chainId", type: "uint256" },
+        { name: "verifyingContract", type: "address" },
       ],
-      // Refer to PrimaryType
-      FullcountSwingCommit: [
+      SwingMessage: [
         {
           type: "uint256",
           name: "nonce",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "kind",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "vertical",
         },
         {
-          type: "uint8",
+          type: "uint256",
           name: "horizontal",
         },
       ],
@@ -137,15 +118,6 @@ export async function signSwing(
     params: [account, msgParams],
     from: account,
   });
-
-  // const retval = Buffer.from(
-  //   JSON.stringify({
-  //     address: account,
-  //     deadline: JSON.parse(msgParams).message.deadline,
-  //     signed_message: result,
-  //   }),
-  //   "utf-8",
-  // ).toString("base64");
 
   return result;
 }
