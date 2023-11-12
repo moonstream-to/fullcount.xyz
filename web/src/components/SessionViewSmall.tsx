@@ -4,6 +4,8 @@ import globalStyles from "./OwnedTokens.module.css";
 import { Session } from "../types";
 import { useGameContext } from "../contexts/GameContext";
 import Timer from "./Timer";
+import { useContext } from "react";
+import Web3Context from "../contexts/Web3Context/context";
 
 export const sessionStates = [
   "session does not exist",
@@ -23,6 +25,7 @@ const SessionViewSmall = ({
   onClick: (session: Session) => void;
 }) => {
   const { progressFilter } = useGameContext();
+  const web3ctx = useContext(Web3Context);
   if (!progressFilter[session.progress]) {
     return <></>;
   }
@@ -37,11 +40,12 @@ const SessionViewSmall = ({
         <Flex gap={4}>
           <CharacterCard
             token={session.pair.pitcher}
-            isActive={false}
+            isActive={session.pair.pitcher?.staker === web3ctx.account}
             placeSelf={"start"}
             maxW={"70px"}
             maxH={"85px"}
             showName={false}
+            session={session}
           />
           <Flex direction={"column"}>
             <Text>Pitcher:</Text>
@@ -59,12 +63,13 @@ const SessionViewSmall = ({
       {session.pair.batter ? (
         <Flex gap={4}>
           <CharacterCard
-            token={session.pair.pitcher}
-            isActive={false}
+            token={session.pair.batter}
+            isActive={session.pair.batter?.staker === web3ctx.account}
             placeSelf={"start"}
             maxW={"70px"}
             maxH={"85px"}
             showName={false}
+            session={session}
           />
           <Flex direction={"column"}>
             <Text>Batter:</Text>

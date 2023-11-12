@@ -43,7 +43,7 @@ const CharacterCard = ({
       cursor={isClickable ? "pointer" : "default"}
     >
       <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
-      {showName && (
+      {(showName || isActive) && (
         <Flex className={styles.bottom}>
           {showName && <Text>{token.name}</Text>}
           {isActive && (

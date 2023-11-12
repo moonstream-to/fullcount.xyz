@@ -28,7 +28,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay }) => {
     };
 
     // Update timer every second
-    const intervalId = setInterval(updateTimer, 3000);
+    const intervalId = setInterval(updateTimer, 1000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);

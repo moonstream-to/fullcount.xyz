@@ -89,11 +89,11 @@ const SessionsView = () => {
       console.log("sessions");
 
       const numSessions = await gameContract.methods.NumSessions().call();
-      const secondsPerPhase = await gameContract.methods.SecondsPerPhase().call();
+      const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
       console.log(numSessions);
       const sessions = [];
       for (let i = 1; i <= numSessions; i += 1) {
-        const progress = await gameContract.methods.sessionProgress(i).call();
+        const progress = Number(await gameContract.methods.sessionProgress(i).call());
         const session = await gameContract.methods.getSession(i).call();
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
           pitcher: undefined,
@@ -132,7 +132,7 @@ const SessionsView = () => {
           pair,
           sessionID: i,
           progress,
-          secondsPerPhase: Number(secondsPerPhase),
+          secondsPerPhase: secondsPerPhase,
           phaseStartTimestamp: Number(session.phaseStartTimestamp),
         });
         console.log({

@@ -3,6 +3,8 @@ import PitcherView from "./PitcherView";
 import { Flex, Text } from "@chakra-ui/react";
 import CharacterCard from "./CharacterCard";
 import BatterView from "./BatterView";
+import { sessionStates } from "./SessionViewSmall";
+import Timer from "./Timer";
 
 export function getRowCol(index: number): [number, number] {
   const size = 5; // Size of the grid (5x5)
@@ -46,6 +48,14 @@ const PlayView = () => {
       <Text onClick={() => updateContext({ selectedSession: undefined })} cursor={"pointer"}>
         Back
       </Text>
+      <Text>{sessionStates[selectedSession?.progress ?? 0]}</Text>
+
+      {(selectedSession?.progress === 3 || selectedSession?.progress === 4) && (
+        <Timer
+          start={selectedSession.phaseStartTimestamp}
+          delay={selectedSession.secondsPerPhase}
+        />
+      )}
       {selectedToken && <CharacterCard token={selectedToken} isActive={false} />}
       {isPitcher() && <PitcherView />}
 
