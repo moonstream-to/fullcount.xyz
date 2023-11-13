@@ -69,6 +69,7 @@ contract Fullcount is EIP712 {
     // NOTE: Sessions are 1-indexed
     mapping(uint256 => Session) public SessionState;
 
+    // TODO Do we need staker dictionary?
     // ERC721 address => ERC721 token ID => address of player who staked that character into the Fullcount
     // contract
     mapping(address => mapping(uint256 => address)) public Staker;
@@ -177,8 +178,6 @@ contract Fullcount is EIP712 {
 
         SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
 
-        nftContract.transferFrom(currentOwner, address(this), tokenID);
-
         emit SessionStarted(NumSessions, nftAddress, tokenID, role);
 
         return NumSessions;
@@ -216,11 +215,10 @@ contract Fullcount is EIP712 {
         Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = sessionID;
 
-        nftContract.transferFrom(currentOwner, address(this), tokenID);
-
         emit SessionJoined(sessionID, nftAddress, tokenID, role);
     }
 
+    // TODO Change name of function as tokens are no longer staked?
     function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
         uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
         require(stakedSessionID > 0, "Fullcount._unstakeNFT: NFT is not staked");
@@ -228,9 +226,6 @@ contract Fullcount is EIP712 {
         address tokenOwner = Staker[nftAddress][tokenID];
 
         require(msg.sender == tokenOwner, "Fullcount._unstakeNFT: msg.sender is not NFT owner");
-
-        IERC721 nftContract = IERC721(nftAddress);
-        nftContract.transferFrom(address(this), tokenOwner, tokenID);
 
         if (
             SessionState[stakedSessionID].pitcherAddress == nftAddress
@@ -355,6 +350,7 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
+        // TODO check for token ownership instead of staker dictionary
         require(
             msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
             "Fullcount.commitPitch: msg.sender did not stake pitcher"
