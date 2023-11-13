@@ -10,14 +10,18 @@ import Web3Context from "../contexts/Web3Context/context";
 import { useGameContext } from "../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../hooks/useMoonToast";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
+
+export type PLAY_STATUS = "TO_GENERATE" | "TO_COMMIT" | "TO_REVEAL" | "COMPLETE";
 
 const PitcherView = () => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
-  const [nonce, setNonce] = useState(0);
+  const [nonce, setNonce] = useState("0");
+  const [status, setStatus] = useState<PLAY_STATUS>("TO_GENERATE");
   const web3ctx = useContext(Web3Context);
-  const { selectedSession, contractAddress } = useGameContext();
+  const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
@@ -31,19 +35,30 @@ const PitcherView = () => {
       getRowCol(gridIndex)[1],
     );
     localStorage.setItem(
-      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}`,
-      JSON.stringify({ nonce, speed, row: getRowCol(gridIndex)[0], col: getRowCol(gridIndex)[1] }),
+      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
+      JSON.stringify({
+        nonce,
+        speed,
+        vertical: getRowCol(gridIndex)[0],
+        horizontal: getRowCol(gridIndex)[1],
+      }),
     );
     console.log(nonce, speed, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
     commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {
+    const item =
+      localStorage.getItem(
+        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+      ) ?? "";
+    const reveal = JSON.parse(item);
+    console.log(reveal);
     revealPitch.mutate({
-      nonce,
-      speed,
-      vertical: getRowCol(gridIndex)[0],
-      horizontal: getRowCol(gridIndex)[1],
+      nonce: reveal.nonce,
+      speed: reveal.speed,
+      vertical: reveal.vertical,
+      horizontal: reveal.horizontal,
     });
   };
 
@@ -55,17 +70,19 @@ const PitcherView = () => {
   }, [selectedSession]);
 
   useEffect(() => {
-    if (movements.length > 1000) {
+    if (movements.length > 499) {
       window.removeEventListener("mousemove", handleMouseMove);
       setSeed(generateSeed(movements));
       setMovements([]);
     }
   }, [movements.length]);
+
   const generateSeed = (movements: number[]): string => {
     const dataString = movements.join("");
     const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
     const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
     console.log(uint256Seed, hash);
+    setNonce(uint256Seed);
     return uint256Seed;
   };
   const handleMouseMove = useCallback((event: MouseEvent) => {
@@ -95,6 +112,7 @@ const PitcherView = () => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("sessions");
+        setStatus("TO_REVEAL");
         toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
@@ -110,7 +128,7 @@ const PitcherView = () => {
       vertical,
       horizontal,
     }: {
-      nonce: number;
+      nonce: string;
       speed: number;
       vertical: number;
       horizontal: number;
@@ -172,27 +190,34 @@ const PitcherView = () => {
         {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}
       </Text>
       <Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>
-      <button className={globalStyles.button} onClick={handleGenerate}>
-        Generate
-      </button>
-      {movements.length > -1 && (
+      {!seed && movements.length === 0 && (
+        <button className={globalStyles.button} onClick={handleGenerate}>
+          Generate
+        </button>
+      )}
+      {movements.length > 0 && (
         <Flex
           onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
           w={"100%"}
           h={"20px"}
           border={"1px solid white"}
         >
-          <Box w={`${(movements.length / 1000) * 100}%`} bg={"green"} />
+          <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
           <Box bg={"gray"} />
         </Flex>
       )}
-      {seed && <Box>Generated</Box>}
-      <button className={globalStyles.button} onClick={handleCommit}>
-        Commit
-      </button>
-      <button className={globalStyles.button} onClick={handleReveal}>
-        Reveal
-      </button>
+      {seed && status !== "TO_REVEAL" && (
+        <>
+          <button className={globalStyles.button} onClick={handleCommit}>
+            Commit
+          </button>
+        </>
+      )}
+      {status !== "TO_REVEAL" && (
+        <button className={globalStyles.button} onClick={handleReveal}>
+          Reveal
+        </button>
+      )}
     </Flex>
   );
 };

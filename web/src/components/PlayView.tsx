@@ -48,7 +48,7 @@ const PlayView = () => {
       <Text onClick={() => updateContext({ selectedSession: undefined })} cursor={"pointer"}>
         Back
       </Text>
-      <Text>{sessionStates[selectedSession?.progress ?? 0]}</Text>
+      {/*<Text>{sessionStates[selectedSession?.progress ?? 0]}</Text>*/}
 
       {(selectedSession?.progress === 3 || selectedSession?.progress === 4) && (
         <Timer

@@ -1,7 +1,7 @@
 export async function signPitch(
   account: string,
   provider: any,
-  nonce: number,
+  nonce: string,
   speed: number,
   vertical: number,
   horizontal: number,
@@ -63,7 +63,7 @@ export async function signPitch(
 export async function signSwing(
   account: string,
   provider: any,
-  nonce: number,
+  nonce: string,
   kind: number,
   vertical: number,
   horizontal: number,
