@@ -1,66 +1,46 @@
-## Foundry
+# Fullcount.xyz
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This repository contains all code related to the Fullcount.xyz autonomous, web3, baseball game.
 
-Foundry consists of:
+## Smart contracts
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+### Development
 
-## Documentation
+Fullcount uses [Foundry](https://book.getfoundry.sh/) to build and test smart contracts.
 
-https://book.getfoundry.sh/
+We use the [`fullcount` CLI](python/README.md) to deploy and run operations related to the `Fullcount` contract.
 
-## Usage
-
-### Build
+#### Build
 
 ```shell
 $ forge build
 ```
 
-### Test
+#### Test
 
 ```shell
 $ forge test
 ```
 
-### Format
+#### Format
 
 ```shell
 $ forge fmt
 ```
 
-### Gas Snapshots
+#### Gas Snapshots
 
 ```shell
 $ forge snapshot
 ```
 
-### Anvil
+#### Deployment and operations
 
-```shell
-$ anvil
-```
+Please see [the README for the Fullcount Python client](python/README.md).
 
-### Deploy
+## Frontend
 
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
+## Game balance and tuning
 
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+The [Python client](python/README.md) contains utilities that we use to help tune and balance the
+game across versions.

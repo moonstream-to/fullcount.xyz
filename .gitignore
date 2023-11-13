@@ -75,3 +75,14 @@ prod.env
 /.secrets/
 /web/.next/
 /web/.secrets/
+
+# Brownie stuff
+build/
+
+# Python stuff
+venv/
+.venv/
+.fullcount/
+
+# Notes
+scratch.md

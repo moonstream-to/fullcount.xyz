@@ -3,11 +3,8 @@
 pragma solidity ^0.8.19;
 
 import { EIP712 } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/EIP712.sol";
-import { IERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IERC721.sol";
-import { SafeERC20 } from "../lib/openzeppelin-contracts/contracts/token/ERC20/utils/SafeERC20.sol";
 import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
-import { StatBlockBase } from "../lib/web3/contracts/stats/StatBlock.sol";
 
 import {
     PlayerType,
@@ -38,45 +35,27 @@ Functionality:
 - [x] Player can stake into existing session as pitcher or batter - complement of the role that was staked
       to start the session. (joinSession automatically chooses the role of the joining player)
 - [x] When a pitcher and batter are staked into a session, the session automatically starts.
-- [x] Staking a character into a session costs native tokens. Starting a session can have a different
-      price than joining an existing session. In general, we will keep it cheaper to start a session
-      than to join a sesion that someone else started -- this will incentivize many matches. The cost
-      will disincentivize bots grinding against themselves. The contract is deployed with `sessionStartPrice`,
-      `sessionJoinPrice`, `treasuryAddress`, and `secondsPerPhase` parameters.
-      Tokens are transferred to the `treasuryAddress` when a session is either started or joined.
 - [x] Once a session starts, both the pitcher and the batter can commit their moves.
 - [x] Commitments are signed EIP712 messages representing the moves.
-- [ ] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
+- [x] Fullcount contract is deployed with a `secondsPerPhase` parameter. If one player commits
       their move but the other one does not commit their move before `secondsPerPhase` blocks have
       elapsed since the session started, then the first player wins by forfeit. They can submit a
       transaction to end the session, unstake their NFT, and earn their reward.
-- [ ] A player can unstake their NFT from a session if the session has either not started or if the session
+- [x] A player can unstake their NFT from a session if the session has either not started or if the session
       has completed.
-- [ ] If both players commit their moves before `secondsPerPhase` blocks have elapsed since the session
+- [x] If both players commit their moves before `secondsPerPhase` blocks have elapsed since the session
       started, then the session enters the "reveal" phase. In this phase, each player has `secondsPerPhase`
       blocks to reveal their moves. They do this by submitting the EIP712 messages that were signed
       to generate their commits. The session is resolved once the second player reveals their move (in the
       same transaction).
 - [ ] If one player reveals their move before `secondsPerPhase` blocks have passed since the second
       commit but the other one doesn't, then the player who revealed wins by default.
-- [ ] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
+- [x] If neither player reveals their move before `secondsPerPhase` blocks have passed since the
       second commit, then the session is cancelled and both players may unstake their NFTs.
-
-TODO: MAYBE we get rid of fees to start and sessions. Instead, we define a native token budget for each
-operations - start, join, commit, reveal. We do this to make things symmetric between player_1 and
-player_2. Whatever portion of this budget that doesn't get spent on gas goes to the treasury. We should
-still give a discount to player 1 (which is why start is handled differently from join). We need to
-incentivize starting sessions as it is inherently riskier -- you never know if someone will join and
-you never know how powerful the character is that joined.
  */
-contract Fullcount is StatBlockBase, EIP712 {
-    using SafeERC20 for IERC20;
-
+contract Fullcount is EIP712 {
     string public constant FullcountVersion = "0.0.1";
 
-    uint256 public SessionStartPrice;
-    uint256 public SessionJoinPrice;
-    address payable public TreasuryAddress;
     uint256 public SecondsPerPhase;
 
     uint256 public NumSessions;
@@ -98,6 +77,7 @@ contract Fullcount is StatBlockBase, EIP712 {
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
 
+    event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
@@ -119,18 +99,9 @@ contract Fullcount is StatBlockBase, EIP712 {
         uint256 batterTokenID
     );
 
-    constructor(
-        uint256 sessionStartPrice,
-        uint256 sessionJoinPrice,
-        address payable treasuryAddress,
-        uint256 secondsPerPhase
-    )
-        EIP712("Fullcount", FullcountVersion)
-    {
-        SessionStartPrice = sessionStartPrice;
-        SessionJoinPrice = sessionJoinPrice;
-        TreasuryAddress = treasuryAddress;
+    constructor(uint256 secondsPerPhase) EIP712("Fullcount", FullcountVersion) {
         SecondsPerPhase = secondsPerPhase;
+        emit FullcountDeployed(FullcountVersion, secondsPerPhase);
     }
 
     // This is useful because of how return values from the public mapping get serialized.
@@ -151,12 +122,14 @@ contract Fullcount is StatBlockBase, EIP712 {
      * All session expiration logic should go through a `_sessionProgress(sessionID) == 6` check.
      */
     function _sessionProgress(uint256 sessionID) internal view returns (uint256) {
-        if (sessionID > NumSessions) {
+        if (sessionID > NumSessions || sessionID == 0) {
             return 0;
         }
 
         Session storage session = SessionState[sessionID];
-        if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
+        if (session.didPitcherReveal && session.didBatterReveal) {
+            return 5;
+        } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
             return 1;
         } else if (session.pitcherAddress == address(0) || session.batterAddress == address(0)) {
             return 2;
@@ -170,8 +143,6 @@ contract Fullcount is StatBlockBase, EIP712 {
                 return 6;
             }
             return 4;
-        } else if (session.didPitcherReveal && session.didBatterReveal) {
-            return 6;
         }
 
         revert("Fullcount._sessionProgress: idiot programmer");
@@ -181,33 +152,13 @@ contract Fullcount is StatBlockBase, EIP712 {
         return _sessionProgress(sessionID);
     }
 
-    // Fullcount is an autnonomous game, and so the only administrator for NFT stats is the
-    // Fullcount contract itself.
-    // This is an override of the StatBlockBase.isAdministrator function.
-    function isAdministrator(address account) public view override returns (bool) {
-        return account == address(this);
-    }
-
     // Emits:
     // - SessionStarted
-    function startSession(
-        address nftAddress,
-        uint256 tokenID,
-        PlayerType role
-    )
-        external
-        payable
-        virtual
-        returns (uint256)
-    {
-        require(msg.value >= SessionStartPrice, "Fullcount.startSession: incorrect session start price");
-
+    function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
-
-        TreasuryAddress.transfer(SessionStartPrice);
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -235,17 +186,13 @@ contract Fullcount is StatBlockBase, EIP712 {
 
     // Emits:
     // - SessionJoined
-    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external payable virtual {
-        require(msg.value == SessionJoinPrice, "Fullcount.joinSession: incorrect join fee");
-
+    function joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) external virtual {
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
         IERC721 nftContract = IERC721(nftAddress);
         address currentOwner = nftContract.ownerOf(tokenID);
 
         require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
-
-        payable(TreasuryAddress).transfer(SessionJoinPrice);
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
@@ -303,6 +250,13 @@ contract Fullcount is StatBlockBase, EIP712 {
 
         StakedSession[nftAddress][tokenID] = 0;
         Staker[nftAddress][tokenID] = address(0);
+    }
+
+    function unstakeNFT(address nftAddress, uint256 tokenID) external {
+        uint256 progress = _sessionProgress(StakedSession[nftAddress][tokenID]);
+        require(progress == 5 || progress == 6, "Fullcount.unstakeNFT: cannot unstake from session in this state");
+
+        _unstakeNFT(nftAddress, tokenID);
     }
 
     /**
@@ -444,6 +398,17 @@ contract Fullcount is StatBlockBase, EIP712 {
         emit SwingCommitted(sessionID);
     }
 
+    // Internal method gets inlined into contract methods
+    function _randomSample(uint256 nonce0, uint256 nonce1, uint256 totalMass) internal pure returns (uint256 sample) {
+        // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
+        sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
+    }
+
+    // External method makes it easy to test randomness for the purposes of game clients
+    function randomSample(uint256 nonce0, uint256 nonce1, uint256 totalMass) external pure returns (uint256) {
+        return _randomSample(nonce0, nonce1, totalMass);
+    }
+
     function sampleOutcomeFromDistribution(
         uint256 nonce0,
         uint256 nonce1,
@@ -456,8 +421,7 @@ contract Fullcount is StatBlockBase, EIP712 {
         uint256 totalMass = distribution[0] + distribution[1] + distribution[2] + distribution[3] + distribution[4]
             + distribution[5] + distribution[6];
 
-        // Combining the nonces this way prevents overflow concerns when adding two nonces >= 2^255
-        uint256 sample = uint256(keccak256(abi.encode(nonce0, nonce1))) % totalMass;
+        uint256 sample = _randomSample(nonce0, nonce1, totalMass);
 
         uint256 cumulativeMass = distribution[0];
         if (sample < cumulativeMass) {
@@ -596,6 +560,8 @@ contract Fullcount is StatBlockBase, EIP712 {
                 session.batterTokenID
             );
 
+            session.outcome = outcome;
+
             _unstakeNFT(session.pitcherAddress, session.pitcherTokenID);
         }
     }
@@ -645,6 +611,8 @@ contract Fullcount is StatBlockBase, EIP712 {
                 session.batterAddress,
                 session.batterTokenID
             );
+
+            session.outcome = outcome;
 
             _unstakeNFT(session.batterAddress, session.batterTokenID);
         }

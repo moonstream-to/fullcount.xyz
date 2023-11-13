@@ -1,22 +1,25 @@
+import os
 from setuptools import find_packages, setup
 
-with open("fullcount_theory/version.txt") as ifp:
+with open("fullcount/version.txt") as ifp:
     VERSION = ifp.read().strip()
 
 long_description = ""
 with open("README.md") as ifp:
     long_description = ifp.read()
 
+os.environ["BROWNIE_LIB"] = "1"
+
 setup(
-    name="fullcount_theory",
+    name="fullcount",
     version=VERSION,
     packages=find_packages(),
-    install_requires=[],
+    install_requires=["eth-brownie", "tqdm"],
     extras_require={
-        "dev": ["black"],
+        "dev": ["black", "moonworm[moonstream]"],
         "distribute": ["setuptools", "twine", "wheel"],
     },
-    description="Fullcount.xyz game design tool",
+    description="Fullcount.xyz Python client and game design utilities",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="Moonstream",
@@ -28,8 +31,6 @@ setup(
         "Topic :: Software Development :: Libraries",
     ],
     python_requires=">=3.6",
-    entry_points={
-        "console_scripts": ["fullcount-theory=fullcount_theory.cli:main"]
-    },
+    entry_points={"console_scripts": ["fullcount=fullcount.cli:main"]},
     include_package_data=True,
 )
