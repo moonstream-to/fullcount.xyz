@@ -25,6 +25,50 @@ const StakedTokens = () => {
   const toast = useMoonToast();
   const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
   tokenContract.options.address = tokenAddress;
+  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
+  gameContract.options.address = contractAddress;
+
+  const unstakeNFT = useMutation(
+    async (token: Token) => {
+      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
+        return gameContract.methods.abortSession(tokenSessionID(token)).send({
+          from: web3ctx.account,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+      }
+      if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
+        return gameContract.methods.unstakeNFT(token.address, token.id).send({
+          from: web3ctx.account,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+      }
+    },
+    {
+      onSuccess: () => {
+        // queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("sessions");
+        queryClient.refetchQueries("owned_tokens");
+        toast("Unstake successful.", "success");
+      },
+      onError: (e: Error) => {
+        toast("Unstake failed." + e?.message, "error");
+      },
+    },
+  );
+
+  const tokenProgress = (token: Token) => {
+    return sessions?.find(
+      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
+    )?.progress;
+  };
+
+  const tokenSessionID = (token: Token) => {
+    return sessions?.find(
+      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
+    )?.sessionID;
+  };
 
   return (
     <>
@@ -45,10 +89,20 @@ const StakedTokens = () => {
                 isActive={false}
                 maxW={"70px"}
                 maxH={"85px"}
-                isClickable={true}
                 border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
                 showName={false}
-              />
+                isClickable={false}
+              >
+                <button className={styles.button} onClick={() => unstakeNFT.mutate(token)}>
+                  {`unstake ${
+                    sessions.find(
+                      (session) =>
+                        session.pair.pitcher?.id === token.id ||
+                        session.pair.batter?.id === token.id,
+                    )?.progress
+                  }`}
+                </button>
+              </CharacterCard>
             ))}
       </Flex>
     </>

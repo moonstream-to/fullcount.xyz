@@ -94,11 +94,11 @@ const PitcherView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("isApproved");
-        toast("SetApproval successful.", "success");
+        queryClient.invalidateQueries("sessions");
+        toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
-        toast("SetApproval failed." + e?.message, "error");
+        toast("Commmit failed." + e?.message, "error");
       },
     },
   );
@@ -131,11 +131,11 @@ const PitcherView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("isApproved");
-        toast("SetApproval successful.", "success");
+        queryClient.invalidateQueries("sessions");
+        toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
-        toast("SetApproval failed." + e?.message, "error");
+        toast("Reveal failed." + e?.message, "error");
       },
     },
   );

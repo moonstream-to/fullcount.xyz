@@ -3,6 +3,7 @@ import styles from "./CharacterCard.module.css";
 import globalStyles from "./OwnedTokens.module.css";
 import { useGameContext } from "../contexts/GameContext";
 import { Session, Token } from "../types";
+import { ReactNode, useEffect } from "react";
 
 const CharacterCard = ({
   token,
@@ -10,6 +11,7 @@ const CharacterCard = ({
   session,
   isClickable = false,
   showName = true,
+  children,
   ...props
 }: {
   token: Token | undefined;
@@ -17,6 +19,7 @@ const CharacterCard = ({
   session?: Session;
   isClickable?: boolean;
   showName?: boolean;
+  children?: ReactNode;
   [x: string]: any;
 }) => {
   const { updateContext } = useGameContext();
@@ -26,14 +29,16 @@ const CharacterCard = ({
       updateContext({ selectedSession: session });
     }
   };
+
   if (!token) {
     return <></>;
   }
+
   return (
     <Flex
       className={styles.container}
       {...props}
-      h={isActive ? "216px" : "fit-content"}
+      h={isActive || children ? "216px" : "fit-content"}
       w={"fit-content"}
       onClick={() => {
         if (isClickable) {
@@ -43,7 +48,7 @@ const CharacterCard = ({
       cursor={isClickable ? "pointer" : "default"}
     >
       <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
-      {(showName || isActive) && (
+      {(showName || isActive || children) && (
         <Flex className={styles.bottom}>
           {showName && <Text>{token.name}</Text>}
           {isActive && (
@@ -51,6 +56,7 @@ const CharacterCard = ({
               Play
             </button>
           )}
+          {children}
         </Flex>
       )}
     </Flex>
