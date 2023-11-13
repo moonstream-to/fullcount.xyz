@@ -55,9 +55,13 @@ const SessionViewSmall = ({
           </Flex>
         </Flex>
       ) : (
-        <button className={globalStyles.button} onClick={() => onClick(session)}>
-          join as pitcher
-        </button>
+        <>
+          {session.progress === 2 && (
+            <button className={globalStyles.button} onClick={() => onClick(session)}>
+              join as pitcher
+            </button>
+          )}
+        </>
       )}
       <Text>vs</Text>
       {session.pair.batter ? (
@@ -79,9 +83,13 @@ const SessionViewSmall = ({
           </Flex>
         </Flex>
       ) : (
-        <button className={globalStyles.button} onClick={() => onClick(session)}>
-          join as batter
-        </button>
+        <>
+          {session.progress === 2 && (
+            <button className={globalStyles.button} onClick={() => onClick(session)}>
+              join as batter
+            </button>
+          )}
+        </>
       )}
     </Flex>
   );
