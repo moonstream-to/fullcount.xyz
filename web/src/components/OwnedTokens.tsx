@@ -66,6 +66,7 @@ const OwnedTokens = () => {
           id: tokenId,
           name: tokenMetadata.name.split(` - ${tokenId}`)[0],
           image: tokenMetadata.image,
+          address: tokenContract.options.address,
         });
       }
       console.log(tokens);

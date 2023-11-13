@@ -43,4 +43,23 @@
 }
 
 
+.sessionSection {
+    display: flex;
+    padding: 15px 15px 0px 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    align-self: stretch;
+    border: 1px solid #4D4D4D;
+}
+
+.sessionSectionTitle {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 100%; /* 24px */
+}
+
 

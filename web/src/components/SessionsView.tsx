@@ -10,7 +10,6 @@ import queryCacheProps from "../hooks/hookCommon";
 import { decodeBase64Json } from "../utils/decoders";
 import CharacterCard from "./CharacterCard";
 import { Session, Token } from "../types";
-import SessionView from "./SessionView";
 import MySessions from "./MySessions";
 import OwnedTokens from "./OwnedTokens";
 import StakedTokens from "./StakedTokens";
@@ -18,6 +17,7 @@ import SessionViewSmall from "./SessionViewSmall";
 import FiltersView from "./FiltersView";
 import { MULTICALL2_CONTRACT_ADDRESSES } from "../constants";
 import { outputs } from "../web3/abi/ABIITems";
+import SessionView3 from "./SessionView3";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -167,24 +167,26 @@ const SessionsView = () => {
         };
       });
 
-      const sessionsWithTokens = decodedRes.map((res, idx) => {
+      const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
           pitcher: tokensParsed.find(
             (token) =>
-              token.address === res.session.pitcherAddress &&
-              token.id === res.session.pitcherTokenID,
+              token.address === session.session.pitcherAddress &&
+              token.id === session.session.pitcherTokenID,
           ),
           batter: tokensParsed.find(
             (token) =>
-              token.address === res.session.batterAddress && token.id === res.session.batterTokenID,
+              token.address === session.session.batterAddress &&
+              token.id === session.session.batterTokenID,
           ),
         };
+
         return {
           pair,
-          progress: res.progress,
           sessionID: idx + 1,
-          phaseStartTimestamp: Number(res.session.phaseStartTimestamp),
+          phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
+          progress: session.progress,
         };
       });
       return sessionsWithTokens.reverse();
@@ -213,6 +215,28 @@ const SessionsView = () => {
     );
   };
 
+  const activeSessions = (sessions: any[]) => {
+    return sessions.filter((session) => session.progress === 2);
+  };
+
+  const liveSessions = (sessions: any[]) => {
+    return sessions.filter((session) => session.progress === 3 || session.progress === 4);
+  };
+
+  const otherSessions = (sessions: any[]) => {
+    return sessions.filter(
+      (session) => session.progress !== 3 && session.progress !== 4 && session.progress !== 2,
+    );
+  };
+
+  const filters = [
+    {
+      label: "Active",
+      progress: [2],
+    },
+    { lable: "Live", progress: [3, 4] },
+    { label: "Other", progress: [0, 1, 5, 6] },
+  ];
   return (
     <Flex className={styles.container}>
       <Flex gap={"30px"}>
@@ -223,33 +247,42 @@ const SessionsView = () => {
         <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
       )}
 
-      <Text className={styles.title}>Sessions</Text>
       <FiltersView />
-      <Flex gap={"20px"} justifyContent={"space-between"} w={"100%"}>
-        <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
-          Start new session as pitcher
-        </button>
-        <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
-          Start new session as batter
-        </button>
+      <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
+        <Text className={styles.title}>Sessions</Text>
+        <Flex gap={"20px"}>
+          <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
+            Start new session as pitcher
+          </button>
+          <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
+            Start new session as batter
+          </button>
+        </Flex>
       </Flex>
-      <Text className={styles.subtitle}>My sessions</Text>
-      {sessions.data && mySessions(sessions.data).length > 0 && (
-        <MySessions
-          sessions={mySessions(sessions.data)}
-          onClick={(session: Session) => joinSession.mutate(session.sessionID)}
-        />
+      {sessions.data && activeSessions(sessions.data).length > 0 && (
+        <Flex className={styles.sessionSection}>
+          <Text className={styles.sessionSectionTitle}>Active</Text>
+          {activeSessions(sessions.data).map((session, idx) => (
+            <SessionView3 key={idx} session={session} />
+          ))}
+        </Flex>
       )}
-      <Text className={styles.subtitle}>Other sessions</Text>
-
-      {sessions.data &&
-        notMySessions(sessions.data).map((session, index: number) => (
-          <SessionViewSmall
-            session={session}
-            onClick={(session: Session) => joinSession.mutate(session.sessionID)}
-            key={index}
-          />
-        ))}
+      {sessions.data && liveSessions(sessions.data).length > 0 && (
+        <Flex className={styles.sessionSection}>
+          <Text className={styles.sessionSectionTitle}>Live</Text>
+          {liveSessions(sessions.data).map((session, idx) => (
+            <SessionView3 key={idx} session={session} />
+          ))}
+        </Flex>
+      )}
+      {sessions.data && otherSessions(sessions.data).length > 0 && (
+        <Flex className={styles.sessionSection}>
+          <Text className={styles.sessionSectionTitle}>Other</Text>
+          {otherSessions(sessions.data).map((session, idx) => (
+            <SessionView3 key={idx} session={session} />
+          ))}
+        </Flex>
+      )}
     </Flex>
   );
 };

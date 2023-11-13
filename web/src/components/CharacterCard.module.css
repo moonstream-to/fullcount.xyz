@@ -28,3 +28,10 @@
     flex: 1 0 0;
     align-self: stretch;
 }
+
+.containerSmall {
+    display: flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+}
