@@ -140,7 +140,7 @@ const SessionsView = () => {
       });
 
       const tokenQueries: any[] = [];
-      await tokens.forEach((token) => {
+      tokens.forEach((token) => {
         tokenContract.options.address = token.address;
         tokenQueries.push({
           target: token.address,
@@ -155,7 +155,8 @@ const SessionsView = () => {
       const tokenRes = await multicallContract.methods.tryAggregate(false, tokenQueries).call();
 
       const tokensParsed = tokens.map((token, idx) => {
-        const tokenMetadata = decodeBase64Json(web3ctx.web3.utils.hexToUtf8(tokenRes[idx * 2][1]));
+        const tokenMetadata = decodeBase64Json(web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]));
+
         const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
         const staker = web3ctx.web3.utils.toChecksumAddress(adr);
         return {
