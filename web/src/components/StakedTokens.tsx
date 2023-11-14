@@ -70,6 +70,12 @@ const StakedTokens = () => {
     )?.sessionID;
   };
 
+  const tokenSession = (token: Token) => {
+    return sessions?.find(
+      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
+    );
+  };
+
   return (
     <>
       <Flex className={styles.cards} alignItems={"end"}>
@@ -93,15 +99,24 @@ const StakedTokens = () => {
                 showName={false}
                 isClickable={false}
               >
-                <button className={styles.button} onClick={() => unstakeNFT.mutate(token)}>
-                  {`unstake ${
-                    sessions.find(
-                      (session) =>
-                        session.pair.pitcher?.id === token.id ||
-                        session.pair.batter?.id === token.id,
-                    )?.progress
-                  }`}
-                </button>
+                {[2, 5, 6].includes(tokenProgress(token) ?? 0) && (
+                  <button className={styles.smallButton} onClick={() => unstakeNFT.mutate(token)}>
+                    unstake
+                  </button>
+                )}
+                {![2, 5, 6].includes(tokenProgress(token) ?? 0) && tokenSession(token) && (
+                  <button
+                    className={styles.smallButton}
+                    onClick={() =>
+                      updateContext({
+                        selectedSession: tokenSession(token),
+                        selectedToken: token,
+                      })
+                    }
+                  >
+                    play
+                  </button>
+                )}
               </CharacterCard>
             ))}
       </Flex>

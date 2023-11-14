@@ -100,3 +100,20 @@
   font-weight: 500;
   line-height: normal;
 }
+
+.smallButton {
+  display: flex;
+  padding: 4px 4px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #00A341;
+  background: #1B1B1B;
+  color: #00A341;
+  text-align: center;
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
