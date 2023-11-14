@@ -20,7 +20,8 @@ export const MAX_INT =
   "115792089237316195423570985008687907853269984665640564039457584007913129639935";
 
 export const AWS_STATIC_ASSETS_PATH = "https://static.simiotics.com/moonstream/assets";
-export const MOONBOUND_ASSETS_PATH = "https://static.simiotics.com/moonstream/assets/moonbound";
+
+export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
 export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
 
 export type ChainName = "ethereum" | "localhost" | "mumbai" | "polygon" | "wyrm" | "gnosis";

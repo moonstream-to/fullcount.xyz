@@ -5,7 +5,7 @@ const Outcome = ({ outcome, isExpired }: { outcome: number; isExpired: boolean }
   return (
     <Flex className={styles.container}>
       {isExpired ? (
-        <Text className={styles.result}>Expired!</Text>
+        <Text className={styles.result}>Session expired</Text>
       ) : (
         <Text className={styles.result}>{outcomes[outcome].toUpperCase()}!</Text>
       )}
