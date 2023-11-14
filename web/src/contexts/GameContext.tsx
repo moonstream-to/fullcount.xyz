@@ -33,7 +33,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     kind: 0,
     vertical: 0,
     horizontal: 0,
-    progressFilter: [false, true, true, true, true, true, true],
+    progressFilter: [true, true, true, true, true, true, true],
     contractAddress:
       process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0x1044C1Fc1dfFE0361e1f01450ce69595AE921A1a",
     chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 322),

@@ -18,6 +18,7 @@ import FiltersView from "./FiltersView";
 import { MULTICALL2_CONTRACT_ADDRESSES } from "../constants";
 import { outputs } from "../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
+import FiltersView2 from "./FiltersView2";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -28,7 +29,8 @@ const multicallABI = require("../web3/abi/Multicall2.json");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const SessionsView = () => {
-  const { selectedToken, updateContext, tokenAddress, contractAddress } = useGameContext();
+  const { selectedToken, updateContext, tokenAddress, contractAddress, progressFilter } =
+    useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -256,7 +258,7 @@ const SessionsView = () => {
         <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
       )}
 
-      <FiltersView />
+      <FiltersView2 />
       <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
         <Text className={styles.title}>Sessions</Text>
         {selectedToken && !isTokenStaked(selectedToken) && (
@@ -274,8 +276,12 @@ const SessionsView = () => {
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
           {sessions.data.map((session, idx) => (
             <>
-              <SessionView3 key={idx} session={session} />
-              {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
+              {progressFilter[session.progress] && (
+                <>
+                  <SessionView3 key={idx} session={session} />
+                  {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
+                </>
+              )}
             </>
           ))}
         </Flex>
