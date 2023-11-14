@@ -1,0 +1,65 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    align-self: stretch;
+}
+
+.title {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 120%; /* 36px */
+}
+
+.subtitle {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%; /* 24px */
+}
+
+.label {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 18px */
+}
+
+.session {
+    display: flex;
+    padding: 20px 0px;
+    justify-content: space-between;
+    align-items: center;
+    place-self: stretch;
+    /*background-color: #112211;*/
+}
+
+
+.sessionSection {
+    display: flex;
+    padding: 15px 15px 0px 15px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    align-self: stretch;
+    border: 1px solid #4D4D4D;
+}
+
+.sessionSectionTitle {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 100%; /* 24px */
+}
+
+
