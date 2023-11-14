@@ -19,6 +19,7 @@ import {
   TbDoorExit,
 } from "react-icons/all";
 import { CloseIcon } from "@chakra-ui/icons";
+import Outcome from "./Outcome";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -84,10 +85,33 @@ const PlayView = () => {
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
       );
+
       console.log(session);
-      const { didPitcherCommit, didBatterCommit, didPitcherReveal, didBatterReveal, outcome } =
-        session;
-      console.log(didPitcherCommit);
+      const {
+        didPitcherCommit,
+        didBatterCommit,
+        didPitcherReveal,
+        didBatterReveal,
+        outcome,
+        phaseStartTimestamp,
+      } = session;
+      let isExpired = false;
+      if (progress === 3 || progress === 4) {
+        const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
+        const endTime = Number(phaseStartTimestamp) + (selectedSession?.secondsPerPhase ?? 0);
+        const remainingTime = endTime - currentTime;
+        if (remainingTime < 1) {
+          isExpired = true;
+        }
+        console.log(
+          currentTime,
+          phaseStartTimestamp,
+          selectedSession?.secondsPerPhase,
+          endTime,
+          isExpired,
+        );
+      }
+      console.log(didPitcherCommit, progress);
       return {
         progress,
         didPitcherCommit,
@@ -95,6 +119,7 @@ const PlayView = () => {
         didPitcherReveal,
         didBatterReveal,
         outcome,
+        isExpired,
       };
     },
     {
@@ -132,10 +157,20 @@ const PlayView = () => {
             </Text>
           </Flex>
         )}
-        {isPitcher(selectedToken) && sessionStatus.data && (
-          <PitcherView sessionStatus={sessionStatus.data} />
+        {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
+        !sessionStatus.data?.isExpired ? (
+          <>
+            {isPitcher(selectedToken) && sessionStatus.data && (
+              <PitcherView sessionStatus={sessionStatus.data} />
+            )}
+            {!isPitcher(selectedToken) && <BatterView />}
+          </>
+        ) : (
+          <Outcome
+            outcome={sessionStatus.data?.outcome}
+            isExpired={!!sessionStatus.data?.isExpired}
+          />
         )}
-        {!isPitcher(selectedToken) && <BatterView />}
         {/*{selectedSession?.pair}*/}
         {opponent(selectedToken) && (
           <Flex direction={"column"} gap="10px" alignItems={"center"}>

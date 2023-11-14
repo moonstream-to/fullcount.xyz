@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    width: 300px;
+    padding: 40px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    border: 1px solid #4D4D4D;
+    background: rgba(41, 41, 41, 0.70);
+}
+
+.result {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+}
