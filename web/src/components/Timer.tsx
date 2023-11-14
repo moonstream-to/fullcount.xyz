@@ -35,7 +35,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay }) => {
   }, [start, delay]);
 
   return (
-    <Text minW={"297px"} flex={"2"}>
+    <Text textAlign={"center"} minW={"297px"}>
       {timeLeft}
     </Text>
   );

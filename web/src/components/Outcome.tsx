@@ -4,7 +4,11 @@ const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run",
 const Outcome = ({ outcome, isExpired }: { outcome: number; isExpired: boolean }) => {
   return (
     <Flex className={styles.container}>
-      <Text className={styles.result}>{outcomes[outcome]}</Text>
+      {isExpired ? (
+        <Text className={styles.result}>Expired!</Text>
+      ) : (
+        <Text className={styles.result}>{outcomes[outcome].toUpperCase()}!</Text>
+      )}
     </Flex>
   );
 };
