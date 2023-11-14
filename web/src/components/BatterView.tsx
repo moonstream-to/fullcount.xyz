@@ -116,7 +116,9 @@ const BatterView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("sessions");
+        console.log("should invalidate");
+        // queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("sessions");
         toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
@@ -162,8 +164,34 @@ const BatterView = () => {
     },
   );
 
+  const gameStatus = (session: any) => {
+    if (session.progress === 2) {
+      return "waiting for pitcher";
+    }
+    if (session.progress === 3) {
+      if (session.didPitcherCommit) {
+        return "Pitcher committed. Waiting for your move";
+      }
+      return session.didBatterCommit ? "Waiting pitcher to commit" : "Waiting for commits";
+    }
+    if (session.progress === 4) {
+      if (session.didPitcherReveal) {
+        return "Pitcher revealed. Waiting for your move";
+      }
+      return session.didBatterReveal ? "Waiting pitcher to reveal" : "Waiting for reveals";
+    }
+    if (session.progress === 5) {
+      return `Outcome: ${session.outcome}`;
+    }
+    if (session.progress === 6) {
+      return "Session expired";
+    }
+    return "You have opened non-existing session somehow";
+  };
+
   return (
     <Flex direction={"column"} gap={"15px"}>
+      <Text>{gameStatus(selectedSession)}</Text>
       <Flex justifyContent={"center"} gap={"20px"}>
         <Flex
           className={kind === 0 ? styles.activeChoice : styles.inactiveChoice}

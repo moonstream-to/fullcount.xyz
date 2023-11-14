@@ -100,7 +100,7 @@ const SessionsView = () => {
   const sessions = useQuery<Session[]>(
     ["sessions", web3ctx.account, web3ctx.chainId],
     async () => {
-      console.log("sessions");
+      console.log("FETCHING SESSIONS");
 
       const numSessions = await gameContract.methods.NumSessions().call();
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
@@ -195,7 +195,8 @@ const SessionsView = () => {
       onSuccess: (data) => {
         updateContext({ sessions: data });
       },
-      ...queryCacheProps,
+      // ...queryCacheProps,
+      refetchInterval: 60 * 1000,
     },
   );
 

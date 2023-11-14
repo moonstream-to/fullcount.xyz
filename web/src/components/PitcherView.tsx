@@ -10,12 +10,14 @@ import Web3Context from "../contexts/Web3Context/context";
 import { useGameContext } from "../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../hooks/useMoonToast";
+import { SessionStatus } from "./PlayView";
+import { Session } from "../types";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 
 export type PLAY_STATUS = "TO_GENERATE" | "TO_COMMIT" | "TO_REVEAL" | "COMPLETE";
 
-const PitcherView = () => {
+const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [nonce, setNonce] = useState("0");
@@ -111,7 +113,9 @@ const PitcherView = () => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("sessions");
+        console.log("should invalidate");
+        queryClient.refetchQueries("sessions");
+        // queryClient.invalidateQueries("sessions");
         setStatus("TO_REVEAL");
         toast("Commit successful.", "success");
       },
@@ -168,8 +172,38 @@ const PitcherView = () => {
     console.log(res);
   };
 
+  const gameStatus = (session: SessionStatus) => {
+    if (session.progress === 2) {
+      return "waiting for batter";
+    }
+    if (session.progress === 3) {
+      if (session.didBatterCommit) {
+        return "Batter comitted. Waiting for your move";
+      }
+      return session.didPitcherCommit ? "Waiting batter to commit" : "Waiting for commits";
+    }
+    if (session.progress === 4) {
+      if (session.didBatterReveal) {
+        return "Batter revealed. Waiting for your move";
+      }
+      return session.didPitcherReveal ? "Waiting batter to reveal" : "Waiting for reveals";
+    }
+    if (session.progress === 5) {
+      return `Outcome: ${session.outcome}`;
+    }
+    if (session.progress === 6) {
+      return "Session expired";
+    }
+    return "You have opened non-existing session somehow";
+  };
+
+  useEffect(() => {
+    console.log(selectedSession);
+  }, [selectedSession]);
+
   return (
     <Flex direction={"column"} gap={"15px"}>
+      <Text>{gameStatus(sessionStatus)}</Text>
       <Flex justifyContent={"center"} gap={"20px"}>
         <Flex
           className={speed === 0 ? styles.activeChoice : styles.inactiveChoice}
