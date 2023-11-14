@@ -259,14 +259,16 @@ const SessionsView = () => {
       <FiltersView />
       <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
         <Text className={styles.title}>Sessions</Text>
-        <Flex gap={"20px"}>
-          <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
-            Start new session as pitcher
-          </button>
-          <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
-            Start new session as batter
-          </button>
-        </Flex>
+        {selectedToken && !isTokenStaked(selectedToken) && (
+          <Flex gap={"20px"}>
+            <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
+              Start new session as pitcher
+            </button>
+            <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
+              Start new session as batter
+            </button>
+          </Flex>
+        )}
       </Flex>
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>

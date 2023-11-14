@@ -1,7 +1,7 @@
 import { Flex, Text } from "@chakra-ui/react";
 import CharacterCard from "./CharacterCard";
 import globalStyles from "./OwnedTokens.module.css";
-import { Session } from "../types";
+import { Session, Token } from "../types";
 import { useGameContext } from "../contexts/GameContext";
 import Timer from "./Timer";
 import { useContext } from "react";
@@ -24,7 +24,8 @@ export const sessionStates = [
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
-  const { progressFilter, tokenAddress, selectedToken, contractAddress } = useGameContext();
+  const { progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
+    useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -56,10 +57,23 @@ const SessionView3 = ({ session }: { session: Session }) => {
     },
   );
 
+  const isTokenStaked = (token: Token) => {
+    return sessions?.find(
+      (s) =>
+        (s.pair.pitcher?.id === token.id && s.pair.pitcher?.address === token.address) ||
+        (s.pair.batter?.id === token.id && s.pair.batter?.address === token.address),
+    );
+  };
+
   const handleClick = () => {
+    if (!selectedToken || isTokenStaked(selectedToken)) {
+      toast("Select character first", "error");
+      return;
+    }
     console.log(session);
     joinSession.mutate(session.sessionID);
   };
+
   if (!progressFilter[session.progress]) {
     return <></>;
   }
