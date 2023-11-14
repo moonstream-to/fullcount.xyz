@@ -20,6 +20,7 @@ import {
 } from "react-icons/all";
 import { CloseIcon } from "@chakra-ui/icons";
 import Outcome from "./Outcome";
+import BatterView2 from "./BatterView2";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -163,7 +164,9 @@ const PlayView = () => {
             {isPitcher(selectedToken) && sessionStatus.data && (
               <PitcherView sessionStatus={sessionStatus.data} />
             )}
-            {!isPitcher(selectedToken) && <BatterView />}
+            {!isPitcher(selectedToken) && sessionStatus.data && (
+              <BatterView2 sessionStatus={sessionStatus.data} />
+            )}
           </>
         ) : (
           <Outcome
