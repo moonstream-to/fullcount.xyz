@@ -1,4 +1,4 @@
-name: Lightning and Smoke tests
+name: Fullcount.xyz smart contract tests
 
 on:
   pull_request:
