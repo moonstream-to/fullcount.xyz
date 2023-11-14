@@ -1,6 +1,6 @@
 import { useGameContext } from "../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Flex, Image, Text } from "@chakra-ui/react";
+import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import CharacterCard from "./CharacterCard";
 import BatterView from "./BatterView";
 import { sessionStates } from "./SessionViewSmall";
@@ -20,6 +20,8 @@ import {
 } from "react-icons/all";
 import { CloseIcon } from "@chakra-ui/icons";
 import Outcome from "./Outcome";
+import BatterView2 from "./BatterView2";
+import InviteLink from "./InviteLink";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -157,20 +159,35 @@ const PlayView = () => {
             </Text>
           </Flex>
         )}
-        {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
-        !sessionStatus.data?.isExpired ? (
-          <>
-            {isPitcher(selectedToken) && sessionStatus.data && (
-              <PitcherView sessionStatus={sessionStatus.data} />
-            )}
-            {!isPitcher(selectedToken) && <BatterView />}
-          </>
-        ) : (
-          <Outcome
-            outcome={sessionStatus.data?.outcome}
-            isExpired={!!sessionStatus.data?.isExpired}
-          />
+        {sessionStatus.data?.progress === 2 && selectedSession && (
+          <InviteLink session={selectedSession} />
         )}
+        <Flex direction={"column"} gap="10px" alignItems={"center"}>
+          {sessionStatus.data?.progress === 2 && (
+            <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
+          )}
+
+          {sessionStatus.data?.progress === 2 && <Box h={"21px"} w="300px" bg={"transparent"} />}
+        </Flex>
+        {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
+          !sessionStatus.data?.isExpired && (
+            <>
+              {isPitcher(selectedToken) && sessionStatus.data && (
+                <PitcherView sessionStatus={sessionStatus.data} />
+              )}
+              {!isPitcher(selectedToken) && sessionStatus.data && (
+                <BatterView2 sessionStatus={sessionStatus.data} />
+              )}
+            </>
+          )}
+        {(sessionStatus.data?.progress !== 2 || sessionStatus.data?.isExpired) &&
+          sessionStatus.data?.outcome &&
+          sessionStatus.data.progress > 4 && (
+            <Outcome
+              outcome={sessionStatus.data?.outcome}
+              isExpired={!!sessionStatus.data?.isExpired}
+            />
+          )}
         {/*{selectedSession?.pair}*/}
         {opponent(selectedToken) && (
           <Flex direction={"column"} gap="10px" alignItems={"center"}>

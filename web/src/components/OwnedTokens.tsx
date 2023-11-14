@@ -81,55 +81,9 @@ const OwnedTokens = () => {
     },
   );
 
-  const isApproved = useQuery<boolean>(
-    ["isApproved", web3ctx.account, web3ctx.chainId, contractAddress],
-    async () => {
-      console.log("isApproved");
-
-      const isApproved = await tokenContract.methods
-        .isApprovedForAll(web3ctx.account, contractAddress)
-        .call();
-      console.log(isApproved);
-      return isApproved;
-    },
-    {
-      ...queryCacheProps,
-    },
-  );
-
-  const setApproval = useMutation(
-    async ({ approval }: { approval: boolean }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
-      }
-
-      return tokenContract.methods.setApprovalForAll(contractAddress, approval).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("isApproved");
-        toast("SetApproval successful.", "success");
-      },
-      onError: (e: Error) => {
-        toast("SetApproval failed." + e?.message, "error");
-      },
-    },
-  );
-
   return (
     <>
       <Flex className={styles.cards} alignItems={"end"}>
-        {isApproved.isSuccess && isApproved.data === false && (
-          <button className={styles.button} onClick={() => setApproval.mutate({ approval: true })}>
-            {mintToken.isLoading ? <Spinner /> : "Approve"}
-          </button>
-        )}
         {ownedTokens.data &&
           ownedTokens.data.map((token: Token, idx: number) => (
             <CharacterCard

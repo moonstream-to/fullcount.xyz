@@ -14,7 +14,7 @@ const Playing = () => {
 
   return (
     <Flex className={styles.container}>
-      {!selectedSession ? (
+      {!selectedSession || !selectedToken ? (
         <>
           <SessionsView />
         </>
