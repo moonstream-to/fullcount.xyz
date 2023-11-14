@@ -1,0 +1,26 @@
+name: Check web client production build
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "web/*"
+      - ".github/workflows/frontend.build.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Set up node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Production build of React app
+        working-directory: ./web
+        run: |
+          npm install
+          npm run build
