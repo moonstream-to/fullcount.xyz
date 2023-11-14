@@ -8,7 +8,7 @@ import { Base64 } from "../lib/openzeppelin-contracts/contracts/utils/Base64.sol
 import { Strings } from "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
 
 contract BeerLeagueBallers is ERC721Enumerable {
-    string[11] public ProfileImages = [
+    string[12] public ProfileImages = [
         "https://badges.moonstream.to/blb/p0.png",
         "https://badges.moonstream.to/blb/p1.png",
         "https://badges.moonstream.to/blb/p2.png",
@@ -19,7 +19,8 @@ contract BeerLeagueBallers is ERC721Enumerable {
         "https://badges.moonstream.to/blb/p7.png",
         "https://badges.moonstream.to/blb/p8.png",
         "https://badges.moonstream.to/blb/p9.png",
-        "https://badges.moonstream.to/blb/p10.png"
+        "https://badges.moonstream.to/blb/p10.png",
+        "https://badges.moonstream.to/blb/p11.png"
     ];
 
     mapping(uint256 => string) public Name;
