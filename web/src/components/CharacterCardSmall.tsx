@@ -8,14 +8,16 @@ import { ReactNode, useEffect } from "react";
 const CharacterCard = ({
   token,
   session,
+  isClickable = false,
   ...props
 }: {
   token: Token | undefined;
   session?: Session;
+  isClickable?: boolean;
   [x: string]: any;
 }) => {
   const { updateContext } = useGameContext();
-  const isClickable = true;
+
   const handleClick = () => {
     updateContext({ selectedToken: token });
     if (session) {

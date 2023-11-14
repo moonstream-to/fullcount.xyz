@@ -96,7 +96,12 @@ const SessionView3 = ({ session }: { session: Session }) => {
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
         {session.pair.pitcher ? (
           <Flex gap={4}>
-            <CharacterCardSmall token={session.pair.pitcher} session={session} minW={"215px"} />
+            <CharacterCardSmall
+              token={session.pair.pitcher}
+              session={session}
+              minW={"215px"}
+              isClickable={session.pair.pitcher.staker === web3ctx.account}
+            />
           </Flex>
         ) : (
           <>
@@ -109,7 +114,12 @@ const SessionView3 = ({ session }: { session: Session }) => {
         )}
         {session.pair.batter ? (
           <Flex gap={4}>
-            <CharacterCardSmall token={session.pair.batter} session={session} minW={"215px"} />
+            <CharacterCardSmall
+              token={session.pair.batter}
+              session={session}
+              minW={"215px"}
+              isClickable={session.pair.batter.staker === web3ctx.account}
+            />
           </Flex>
         ) : (
           <>
