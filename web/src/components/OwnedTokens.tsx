@@ -19,7 +19,8 @@ const tokenABI = require("../web3/abi/BLBABI.json");
 
 const OwnedTokens = () => {
   const web3ctx = useContext(Web3Context);
-  const { tokenAddress, contractAddress, selectedToken, updateContext } = useGameContext();
+  const { sessions, tokenAddress, contractAddress, selectedToken, updateContext } =
+    useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -85,18 +86,23 @@ const OwnedTokens = () => {
     <>
       <Flex className={styles.cards} alignItems={"end"}>
         {ownedTokens.data &&
-          ownedTokens.data.map((token: Token, idx: number) => (
-            <CharacterCard
-              token={token}
-              key={idx}
-              isActive={false}
-              maxW={"70px"}
-              maxH={"85px"}
-              showName={false}
-              isClickable={true}
-              border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
-            />
-          ))}
+          ownedTokens.data
+            .filter(
+              (t) =>
+                !sessions?.some((s) => s.pair.batter?.id === t.id || s.pair.pitcher?.id === t.id),
+            )
+            .map((token: Token, idx: number) => (
+              <CharacterCard
+                token={token}
+                key={idx}
+                isActive={false}
+                maxW={"70px"}
+                maxH={"85px"}
+                showName={false}
+                isClickable={true}
+                border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
+              />
+            ))}
         <Flex w={"70px"} h={"85px"} className={styles.mintCard} onClick={onOpen} cursor={"pointer"}>
           {mintToken.isLoading ? <Spinner /> : " + Mint"}
         </Flex>

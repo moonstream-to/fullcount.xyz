@@ -133,6 +133,7 @@ const PlayView = () => {
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
       <Flex justifyContent={"space-between"} minW={"100%"}>
         <Text>{`Session ${selectedSession?.sessionID}`}</Text>
+
         {selectedSession?.progress === 3 || selectedSession?.progress === 4 ? (
           <Timer
             start={selectedSession.phaseStartTimestamp}
@@ -151,24 +152,49 @@ const PlayView = () => {
         </Flex>
       </Flex>
       <Flex alignItems={"center"} justifyContent={"space-between"}>
-        {selectedToken && (
-          <Flex direction={"column"} gap="10px" alignItems={"center"}>
-            <Image src={selectedToken?.image} h={"300px"} w={"300px"} alt={selectedToken?.name} />
-            <Text fontSize={"14px"} fontWeight={"700"}>
-              {selectedToken.name}
-            </Text>
-          </Flex>
+        {isPitcher(selectedToken) ? (
+          <>
+            {selectedToken && (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Image
+                  src={selectedToken?.image}
+                  h={"300px"}
+                  w={"300px"}
+                  alt={selectedToken?.name}
+                />
+                <Text fontSize={"14px"} fontWeight={"700"}>
+                  {selectedToken.name}
+                </Text>
+              </Flex>
+            )}
+          </>
+        ) : (
+          <>
+            {opponent(selectedToken) && (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Image
+                  src={opponent(selectedToken)?.image}
+                  h={"300px"}
+                  w={"300px"}
+                  alt={opponent(selectedToken)?.name}
+                />
+                <Text fontSize={"14px"} fontWeight={"700"}>
+                  {opponent(selectedToken)?.name}
+                </Text>
+              </Flex>
+            )}
+          </>
         )}
+
         {sessionStatus.data?.progress === 2 && selectedSession && (
           <InviteLink session={selectedSession} />
         )}
-        <Flex direction={"column"} gap="10px" alignItems={"center"}>
-          {sessionStatus.data?.progress === 2 && (
+        {sessionStatus.data?.progress === 2 && (
+          <Flex direction={"column"} gap="10px" alignItems={"center"}>
             <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-          )}
-
-          {sessionStatus.data?.progress === 2 && <Box h={"21px"} w="300px" bg={"transparent"} />}
-        </Flex>
+            <Box h={"21px"} w="300px" bg={"transparent"} />
+          </Flex>
+        )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
             <>
@@ -189,18 +215,38 @@ const PlayView = () => {
             />
           )}
         {/*{selectedSession?.pair}*/}
-        {opponent(selectedToken) && (
-          <Flex direction={"column"} gap="10px" alignItems={"center"}>
-            <Image
-              src={opponent(selectedToken)?.image}
-              h={"300px"}
-              w={"300px"}
-              alt={opponent(selectedToken)?.name}
-            />
-            <Text fontSize={"14px"} fontWeight={"700"}>
-              {opponent(selectedToken)?.name}
-            </Text>
-          </Flex>
+        {!isPitcher(selectedToken) ? (
+          <>
+            {selectedToken && (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Image
+                  src={selectedToken?.image}
+                  h={"300px"}
+                  w={"300px"}
+                  alt={selectedToken?.name}
+                />
+                <Text fontSize={"14px"} fontWeight={"700"}>
+                  {selectedToken.name}
+                </Text>
+              </Flex>
+            )}
+          </>
+        ) : (
+          <>
+            {opponent(selectedToken) && (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Image
+                  src={opponent(selectedToken)?.image}
+                  h={"300px"}
+                  w={"300px"}
+                  alt={opponent(selectedToken)?.name}
+                />
+                <Text fontSize={"14px"} fontWeight={"700"}>
+                  {opponent(selectedToken)?.name}
+                </Text>
+              </Flex>
+            )}
+          </>
         )}
       </Flex>
 
