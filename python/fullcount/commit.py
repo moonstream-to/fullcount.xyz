@@ -61,10 +61,10 @@ def handle_commit_pitch(args: argparse.Namespace) -> None:
     network.connect(args.network)
     signer = network.accounts.load(args.sender, args.password)
     contract = Fullcount(args.address)
-    nonce = args.nonce
-    pitch_speed = PitchType(args.pitch_speed)
-    pitch_vert = VerticalLocation(args.pitch_vert)
-    pitch_hor = HorizontalLocation(args.pitch_hor)
+    nonce = args.commit_nonce
+    pitch_speed = PitchType(args.commit_type)
+    pitch_vert = VerticalLocation(args.commit_vert)
+    pitch_hor = HorizontalLocation(args.commit_hor)
     message_hash, signature = commit_pitch(
         contract, signer, nonce, pitch_speed, pitch_vert, pitch_hor
     )
@@ -81,10 +81,10 @@ def handle_commit_swing(args: argparse.Namespace) -> None:
     network.connect(args.network)
     signer = network.accounts.load(args.sender, args.password)
     contract = Fullcount(args.address)
-    nonce = args.nonce
-    swing_type = SwingType(args.swing_type)
-    swing_vert = VerticalLocation(args.swing_vert)
-    swing_hor = HorizontalLocation(args.swing_hor)
+    nonce = args.commit_nonce
+    swing_type = SwingType(args.commit_type)
+    swing_vert = VerticalLocation(args.commit_vert)
+    swing_hor = HorizontalLocation(args.commit_hor)
     message_hash, signature = commit_swing(
         contract, signer, nonce, swing_type, swing_vert, swing_hor
     )
