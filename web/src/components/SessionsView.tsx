@@ -1,5 +1,5 @@
 import { useGameContext } from "../contexts/GameContext";
-import { Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Text } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
 import globalStyles from "./OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -230,6 +230,14 @@ const SessionsView = () => {
     );
   };
 
+  const isTokenStaked = (token: Token) => {
+    return sessions.data?.find(
+      (s) =>
+        (s.pair.pitcher?.id === token.id && s.pair.pitcher?.address === token.address) ||
+        (s.pair.batter?.id === token.id && s.pair.batter?.address === token.address),
+    );
+  };
+
   const filters = [
     {
       label: "Active",
@@ -244,7 +252,7 @@ const SessionsView = () => {
         <OwnedTokens />
         <StakedTokens />
       </Flex>
-      {selectedToken && (
+      {selectedToken && !isTokenStaked(selectedToken) && (
         <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
       )}
 
@@ -260,27 +268,13 @@ const SessionsView = () => {
           </button>
         </Flex>
       </Flex>
-      {sessions.data && activeSessions(sessions.data).length > 0 && (
-        <Flex className={styles.sessionSection}>
-          <Text className={styles.sessionSectionTitle}>Active</Text>
-          {activeSessions(sessions.data).map((session, idx) => (
-            <SessionView3 key={idx} session={session} />
-          ))}
-        </Flex>
-      )}
-      {sessions.data && liveSessions(sessions.data).length > 0 && (
-        <Flex className={styles.sessionSection}>
-          <Text className={styles.sessionSectionTitle}>Live</Text>
-          {liveSessions(sessions.data).map((session, idx) => (
-            <SessionView3 key={idx} session={session} />
-          ))}
-        </Flex>
-      )}
-      {sessions.data && otherSessions(sessions.data).length > 0 && (
-        <Flex className={styles.sessionSection}>
-          <Text className={styles.sessionSectionTitle}>Other</Text>
-          {otherSessions(sessions.data).map((session, idx) => (
-            <SessionView3 key={idx} session={session} />
+      {sessions.data && (
+        <Flex direction={"column"} gap={"10px"} w={"100%"}>
+          {sessions.data.map((session, idx) => (
+            <>
+              <SessionView3 key={idx} session={session} />
+              {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
+            </>
           ))}
         </Flex>
       )}
