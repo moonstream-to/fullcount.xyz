@@ -165,8 +165,8 @@ const SessionsView = () => {
           callData: tokenContract.methods.tokenURI(token.id).encodeABI(),
         });
         tokenQueries.push({
-          target: gameContract.options.address,
-          callData: gameContract.methods.Staker(token.address, token.id).encodeABI(),
+          target: tokenContract.options.address,
+          callData: tokenContract.methods.ownerOf(token.id).encodeABI(),
         });
       });
 
@@ -207,6 +207,7 @@ const SessionsView = () => {
           progress: session.progress,
         };
       });
+      console.log(sessionsWithTokens);
       return sessionsWithTokens.reverse();
     },
     {

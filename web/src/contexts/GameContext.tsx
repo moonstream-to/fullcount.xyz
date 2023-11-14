@@ -36,10 +36,10 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     horizontal: 0,
     progressFilter: [true, true, true, true, true, true, true],
     contractAddress:
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0x1044C1Fc1dfFE0361e1f01450ce69595AE921A1a",
+      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0xb583cA7758Bd1cF039e03b425b3d44FB124bCDB9",
     chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 322),
     tokenAddress:
-      process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0xF674839663C9353379b48fEb2AFb019a07CA00F4",
+      process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227",
     selectedToken: undefined,
     selectedSession: undefined,
     sessions: undefined,
