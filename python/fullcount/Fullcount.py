@@ -177,15 +177,6 @@ class Fullcount:
             arg1, arg2, block_identifier=block_number
         )
 
-    def staker(
-        self,
-        arg1: ChecksumAddress,
-        arg2: int,
-        block_number: Optional[Union[str, int]] = "latest",
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.Staker.call(arg1, arg2, block_identifier=block_number)
-
     def abort_session(self, session_id: int, transaction_config) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.abortSession(session_id, transaction_config)
@@ -493,15 +484,6 @@ def handle_staked_session(args: argparse.Namespace) -> None:
     print(result)
 
 
-def handle_staker(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.staker(
-        arg1=args.arg1, arg2=args.arg2, block_number=args.block_number
-    )
-    print(result)
-
-
 def handle_abort_session(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -776,12 +758,6 @@ def generate_cli() -> argparse.ArgumentParser:
         "--arg2", required=True, help="Type: uint256", type=int
     )
     staked_session_parser.set_defaults(func=handle_staked_session)
-
-    staker_parser = subcommands.add_parser("staker")
-    add_default_arguments(staker_parser, False)
-    staker_parser.add_argument("--arg1", required=True, help="Type: address")
-    staker_parser.add_argument("--arg2", required=True, help="Type: uint256", type=int)
-    staker_parser.set_defaults(func=handle_staker)
 
     abort_session_parser = subcommands.add_parser("abort-session")
     add_default_arguments(abort_session_parser, True)
