@@ -69,11 +69,6 @@ contract Fullcount is EIP712 {
     // NOTE: Sessions are 1-indexed
     mapping(uint256 => Session) public SessionState;
 
-    // TODO Do we need staker dictionary?
-    // ERC721 address => ERC721 token ID => address of player who staked that character into the Fullcount
-    // contract
-    mapping(address => mapping(uint256 => address)) public Staker;
-
     // ERC721 address => ERC721 token ID => session that that character is staked into
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
@@ -157,9 +152,8 @@ contract Fullcount is EIP712 {
     // - SessionStarted
     function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
         IERC721 nftContract = IERC721(nftAddress);
-        address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "Fullcount.startSession: msg.sender is not NFT owner");
+        require(msg.sender == nftContract.ownerOf(tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -173,7 +167,6 @@ contract Fullcount is EIP712 {
             SessionState[NumSessions].batterTokenID = tokenID;
         }
 
-        Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = NumSessions;
 
         SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
@@ -189,9 +182,8 @@ contract Fullcount is EIP712 {
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
         IERC721 nftContract = IERC721(nftAddress);
-        address currentOwner = nftContract.ownerOf(tokenID);
 
-        require(msg.sender == currentOwner, "Fullcount.joinSession: msg.sender is not NFT owner");
+        require(msg.sender == nftContract.ownerOf(tokenID), "Fullcount.joinSession: msg.sender is not NFT owner");
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
@@ -212,7 +204,6 @@ contract Fullcount is EIP712 {
 
         session.phaseStartTimestamp = block.timestamp;
 
-        Staker[nftAddress][tokenID] = currentOwner;
         StakedSession[nftAddress][tokenID] = sessionID;
 
         emit SessionJoined(sessionID, nftAddress, tokenID, role);
@@ -223,9 +214,9 @@ contract Fullcount is EIP712 {
         uint256 stakedSessionID = StakedSession[nftAddress][tokenID];
         require(stakedSessionID > 0, "Fullcount._unstakeNFT: NFT is not staked");
 
-        address tokenOwner = Staker[nftAddress][tokenID];
+        IERC721 nftContract = IERC721(nftAddress);
 
-        require(msg.sender == tokenOwner, "Fullcount._unstakeNFT: msg.sender is not NFT owner");
+        require(msg.sender == nftContract.ownerOf(tokenID), "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
         if (
             SessionState[stakedSessionID].pitcherAddress == nftAddress
@@ -244,7 +235,6 @@ contract Fullcount is EIP712 {
         }
 
         StakedSession[nftAddress][tokenID] = 0;
-        Staker[nftAddress][tokenID] = address(0);
     }
 
     function unstakeNFT(address nftAddress, uint256 tokenID) external {
@@ -350,11 +340,9 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        // TODO check for token ownership instead of staker dictionary
-        require(
-            msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
-            "Fullcount.commitPitch: msg.sender did not stake pitcher"
-        );
+        IERC721 nftContract = IERC721(session.pitcherAddress);
+
+        require(msg.sender == nftContract.ownerOf(session.pitcherTokenID), "Fullcount.commitPitch: msg.sender is not pitcher NFT owner");
 
         require(!session.didPitcherCommit, "Fullcount.commitPitch: pitcher already committed");
 
@@ -377,10 +365,9 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        require(
-            msg.sender == Staker[session.batterAddress][session.batterTokenID],
-            "Fullcount.commitSwing: msg.sender did not stake batter"
-        );
+        IERC721 nftContract = IERC721(session.batterAddress);
+
+        require(msg.sender == nftContract.ownerOf(session.batterTokenID), "Fullcount.commitSwing: msg.sender is not batter NFT owner");
 
         require(!session.didBatterCommit, "Fullcount.commitSwing: batter already committed");
 
@@ -527,10 +514,9 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        require(
-            msg.sender == Staker[session.pitcherAddress][session.pitcherTokenID],
-            "Fullcount.revealPitch: msg.sender did not stake pitcher"
-        );
+        IERC721 nftContract = IERC721(session.pitcherAddress);
+
+        require(msg.sender == nftContract.ownerOf(session.pitcherTokenID), "Fullcount.revealPitch: msg.sender is not pitcher NFT owner");
 
         require(!session.didPitcherReveal, "Fullcount.revealPitch: pitcher already revealed");
 
@@ -579,10 +565,9 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        require(
-            msg.sender == Staker[session.batterAddress][session.batterTokenID],
-            "Fullcount.revealSwing: msg.sender did not stake batter"
-        );
+        IERC721 nftContract = IERC721(session.batterAddress);
+
+        require(msg.sender == nftContract.ownerOf(session.batterTokenID), "Fullcount.revealSwing: msg.sender is not batter NFT owner");
 
         require(!session.didBatterReveal, "Fullcount.revealSwing: batter already revealed");
 

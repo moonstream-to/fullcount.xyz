@@ -242,7 +242,6 @@ contract FullcountTest_startSession is FullcountTestBase {
         assertEq(session.batterAddress, address(0));
         assertEq(session.batterTokenID, 0);
 
-        assertEq(game.Staker(address(characterNFTs), tokenID), player1);
         assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
     }
 
@@ -272,7 +271,6 @@ contract FullcountTest_startSession is FullcountTestBase {
         assertEq(session.pitcherAddress, address(0));
         assertEq(session.pitcherTokenID, 0);
 
-        assertEq(game.Staker(address(characterNFTs), tokenID), player1);
         assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
     }
 
@@ -366,7 +364,6 @@ contract FullcountTest_joinSession is FullcountTestBase {
         assertEq(session.batterTokenID, otherTokenID);
 
         assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
-        assertEq(game.Staker(address(otherCharacterNFTs), otherTokenID), player2);
     }
 
     function test_as_pitcher() public {
@@ -410,7 +407,6 @@ contract FullcountTest_joinSession is FullcountTestBase {
         assertEq(session.pitcherTokenID, otherTokenID);
 
         assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
-        assertEq(game.Staker(address(otherCharacterNFTs), otherTokenID), player2);
     }
 
     function testRevert_when_session_is_full() public {
@@ -1188,7 +1184,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
             game.pitchHash(pitcherNonce, pitcherPitch, pitcherVerticalLocation, pitcherHorizontalLocation);
         bytes memory pitcherCommitment = signMessageHash(player1PrivateKey, pitchMessageHash);
 
-        vm.expectRevert("Fullcount.commitPitch: msg.sender did not stake pitcher");
+        vm.expectRevert("Fullcount.commitPitch: msg.sender is not pitcher NFT owner");
         game.commitPitch(SessionID, pitcherCommitment);
 
         // Player 2 chooses to make a power swing in the middle of their strike zone.
@@ -1201,7 +1197,7 @@ contract FullcountTest_commitPitch_commitSwing is FullcountTestBase {
             game.swingHash(batterNonce, batterSwing, batterVerticalLocation, batterHorizontalLocation);
         bytes memory batterCommitment = signMessageHash(player2PrivateKey, swingMessageHash);
 
-        vm.expectRevert("Fullcount.commitSwing: msg.sender did not stake batter");
+        vm.expectRevert("Fullcount.commitSwing: msg.sender is not batter NFT owner");
         game.commitSwing(SessionID, batterCommitment);
 
         vm.stopPrank();
@@ -1249,6 +1245,9 @@ contract FullcountTest_reveal is FullcountTestBase {
         assertEq(session.pitcherTokenID, PitcherTokenID);
         assertEq(session.batterTokenID, BatterTokenID);
     }
+
+    // TODO Test that only pitcher NFT owner and batter NFT owner can reveal
+    // TODO Test that players cannot reveal in expired session
 
     function test_pitcher_reveal_then_batter_reveal() public {
         assertEq(game.sessionProgress(SessionID), 3);
