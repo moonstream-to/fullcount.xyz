@@ -181,7 +181,8 @@ const PlayView = () => {
             </>
           )}
         {(sessionStatus.data?.progress !== 2 || sessionStatus.data?.isExpired) &&
-          sessionStatus.data?.outcome && (
+          sessionStatus.data?.outcome &&
+          sessionStatus.data.progress > 4 && (
             <Outcome
               outcome={sessionStatus.data?.outcome}
               isExpired={!!sessionStatus.data?.isExpired}

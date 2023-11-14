@@ -14,7 +14,7 @@ export async function signPitch(
       name: "Fullcount",
       version: "0.0.2",
       chainId: "322",
-      verifyingContract: "0x1044C1Fc1dfFE0361e1f01450ce69595AE921A1a",
+      verifyingContract: "0xb583cA7758Bd1cF039e03b425b3d44FB124bCDB9",
     },
     message: {
       nonce,
@@ -76,7 +76,7 @@ export async function signSwing(
       name: "Fullcount",
       version: "0.0.2",
       chainId: "322",
-      verifyingContract: "0x1044C1Fc1dfFE0361e1f01450ce69595AE921A1a",
+      verifyingContract: "0xb583cA7758Bd1cF039e03b425b3d44FB124bCDB9",
     },
     message: {
       nonce,
