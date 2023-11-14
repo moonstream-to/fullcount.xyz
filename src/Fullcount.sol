@@ -54,7 +54,7 @@ Functionality:
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract Fullcount is EIP712 {
-    string public constant FullcountVersion = "0.0.1";
+    string public constant FullcountVersion = "0.0.2";
 
     uint256 public SecondsPerPhase;
 
