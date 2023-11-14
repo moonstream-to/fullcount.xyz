@@ -14,6 +14,7 @@ interface GameContextProps {
   selectedToken: Token | undefined;
   selectedSession: Session | undefined;
   sessions: Session[] | undefined;
+  invited: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -42,6 +43,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     selectedToken: undefined,
     selectedSession: undefined,
     sessions: undefined,
+    invited: false,
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {

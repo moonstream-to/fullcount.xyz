@@ -3,7 +3,7 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
 import globalStyles from "./OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Web3Context from "../contexts/Web3Context/context";
 import useMoonToast from "../hooks/useMoonToast";
 import queryCacheProps from "../hooks/hookCommon";
@@ -19,6 +19,7 @@ import { MULTICALL2_CONTRACT_ADDRESSES } from "../constants";
 import { outputs } from "../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
+import { useRouter } from "next/router";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -45,6 +46,21 @@ const SessionsView = () => {
     multicallABI,
     MULTICALL2_CONTRACT_ADDRESS,
   );
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.invite) {
+      updateContext({ invited: !!router.query.invite });
+    }
+    if (router.query.session) {
+      updateContext({
+        selectedSession: sessions.data?.find((s) => s.sessionID === Number(router.query.session)),
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router.query.invite, router.query.session]);
 
   const queryClient = useQueryClient();
   const toast = useMoonToast();
