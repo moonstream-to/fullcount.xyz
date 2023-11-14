@@ -97,7 +97,7 @@ const PlayView = () => {
         outcome,
         phaseStartTimestamp,
       } = session;
-      let isExpired = false;
+      let isExpired = progress === 6;
       if (progress === 3 || progress === 4) {
         const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
         const endTime = Number(phaseStartTimestamp) + (selectedSession?.secondsPerPhase ?? 0);
