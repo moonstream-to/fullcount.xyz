@@ -64,12 +64,34 @@ const SessionView3 = ({ session }: { session: Session }) => {
     return <></>;
   }
 
+  const progressMessages = [
+    "does not exist",
+    "Aborted",
+    "Waiting for Opponent",
+    "In progress",
+    "In progress",
+    "Complete",
+    "Expired",
+  ];
+  const progressMessageColors = [
+    "#FF8D8D",
+    "#FF8D8D",
+    "#FFDA7A",
+    "#00B94A",
+    "#00B94A",
+    "#FFFFFF",
+    "#FF8D8D",
+  ];
+
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
       <Flex direction={"column"}>
         {`Session ${session.sessionID}`}
-        <Text fontSize={"14px"}>{sessionStates[session.progress]}</Text>
+        {/*<Text fontSize={"14px"}>{sessionStates[session.progress]}</Text>*/}
       </Flex>
+      <Text color={progressMessageColors[session.progress]}>
+        {progressMessages[session.progress]}
+      </Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
         {session.pair.pitcher ? (
@@ -99,7 +121,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           </>
         )}
       </Flex>
-      <button className={globalStyles.spectateButton}>Spectate</button>
+      {/*<button className={globalStyles.spectateButton}>Spectate</button>*/}
     </Flex>
   );
 };

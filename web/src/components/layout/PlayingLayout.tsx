@@ -9,7 +9,7 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       minH={"100vh"}
       gap={"40px"}
       p={"0 7% 60px 7%"}
-      maxW={"1900px"}
+      maxW={"1440px"}
       placeSelf={"center"}
       w={"100%"}
       // bg={"#111133"}
