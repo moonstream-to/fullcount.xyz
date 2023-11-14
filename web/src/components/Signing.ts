@@ -13,8 +13,8 @@ export async function signPitch(
     domain: {
       name: "Fullcount",
       version: "0.0.2",
-      chainId: "322",
-      verifyingContract: "0xb583cA7758Bd1cF039e03b425b3d44FB124bCDB9",
+      chainId: "80001",
+      verifyingContract: "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F",
     },
     message: {
       nonce,
@@ -75,8 +75,8 @@ export async function signSwing(
     domain: {
       name: "Fullcount",
       version: "0.0.2",
-      chainId: "322",
-      verifyingContract: "0xb583cA7758Bd1cF039e03b425b3d44FB124bCDB9",
+      chainId: "80001",
+      verifyingContract: "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F",
     },
     message: {
       nonce,
