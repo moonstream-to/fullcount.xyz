@@ -4,7 +4,7 @@ import { Flex } from "@chakra-ui/react";
 
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 
-const assetsPath = `${FULLCOUNT_ASSETS_PATH}/fullcount`;
+const assetsPath = FULLCOUNT_ASSETS_PATH;
 
 export const siteTitle = "Fullcount - baseball game";
 
