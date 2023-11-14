@@ -92,6 +92,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   }, []);
   const handleGenerate = () => {
     window.addEventListener("mousemove", handleMouseMove);
+    setMovements((prevMovements) => [...prevMovements, 0, 0]);
   };
 
   const toast = useMoonToast();
@@ -162,6 +163,10 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
+  useEffect(() => {
+    console.log(sessionStatus);
+  }, [sessionStatus]);
+
   const resolve = async () => {
     const res = await gameContract.methods
       .resolve(
@@ -202,38 +207,68 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   }, [selectedSession]);
 
   return (
-    <Flex direction={"column"} gap={"15px"}>
-      <Text>{gameStatus(sessionStatus)}</Text>
+    <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
+      {/*<Text>{gameStatus(sessionStatus)}</Text>*/}
+      <Text fontSize={"24px"} fontWeight={"700"}>
+        One pitch to win the game
+      </Text>
+      <Text fontSize={"18px"} fontWeight={"500"}>
+        1. Select the type of pitch
+      </Text>
       <Flex justifyContent={"center"} gap={"20px"}>
         <Flex
           className={speed === 0 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={() => setSpeed(0)}
+          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(0)}
+          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
         >
           Fast
         </Flex>
         <Flex
           className={speed === 1 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={() => setSpeed(1)}
+          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(1)}
+          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
         >
           Slow
         </Flex>
       </Flex>
-      <GridComponent selectedIndex={gridIndex} setSelectedIndex={setGridIndex} />
-      <Text>{verticalLocations[getRowCol(gridIndex)[0] as keyof typeof horizontalLocations]}</Text>
-      <Text>
-        {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}
+      <Text fontSize={"18px"} fontWeight={"500"}>
+        2. Choose where to pitch
       </Text>
-      <Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>
-      {!seed && movements.length === 0 && (
-        <button className={globalStyles.button} onClick={handleGenerate}>
+      <GridComponent
+        selectedIndex={gridIndex}
+        setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
+      />
+      <Text fontSize={"18px"} fontWeight={"500"}>
+        3. Generate randomness
+      </Text>
+      {/*<Text>{verticalLocations[getRowCol(gridIndex)[0] as keyof typeof horizontalLocations]}</Text>*/}
+      {/*<Text>*/}
+      {/*  {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}*/}
+      {/*</Text>*/}
+      {/*<Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>*/}
+      {!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (
+        <button className={globalStyles.commitButton} onClick={handleGenerate}>
           Generate
         </button>
       )}
-      {movements.length > 0 && (
+      {!seed && movements.length === 0 && sessionStatus.didPitcherCommit && (
+        <Flex
+          w="180px"
+          h="31px"
+          alignItems={"center"}
+          justifyContent={"center"}
+          bg="#4D4D4D"
+          onClick={handleGenerate}
+          border={"#767676"}
+        >
+          Generated
+        </Flex>
+      )}
+      {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
         <Flex
           onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
-          w={"100%"}
-          h={"20px"}
+          w={"180px"}
+          h={"31px"}
           border={"1px solid white"}
         >
           <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
@@ -242,15 +277,21 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       )}
       {seed && status !== "TO_REVEAL" && (
         <>
-          <button className={globalStyles.button} onClick={handleCommit}>
+          <button className={globalStyles.commitButton} onClick={handleCommit}>
             Commit
           </button>
         </>
       )}
-      {status !== "TO_REVEAL" && (
-        <button className={globalStyles.button} onClick={handleReveal}>
+      {!sessionStatus.didPitcherReveal ? (
+        <button
+          className={globalStyles.commitButton}
+          onClick={handleReveal}
+          disabled={sessionStatus.progress !== 4}
+        >
           Reveal
         </button>
+      ) : (
+        <Flex className={globalStyles.commitButton}>Revealed</Flex>
       )}
     </Flex>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Text } from "@chakra-ui/react";
 
 interface TimerProps {
   start: number; // Start time in Unix timestamp format
@@ -6,7 +7,7 @@ interface TimerProps {
 }
 
 const Timer: React.FC<TimerProps> = ({ start, delay }) => {
-  const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState("88:88");
 
   useEffect(() => {
     const updateTimer = () => {
@@ -33,7 +34,11 @@ const Timer: React.FC<TimerProps> = ({ start, delay }) => {
     return () => clearInterval(intervalId);
   }, [start, delay]);
 
-  return <div>{timeLeft}</div>;
+  return (
+    <Text minW={"297px"} flex={"2"}>
+      {timeLeft}
+    </Text>
+  );
 };
 
 export default Timer;

@@ -1,6 +1,6 @@
 import { useGameContext } from "../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Image, Text } from "@chakra-ui/react";
 import CharacterCard from "./CharacterCard";
 import BatterView from "./BatterView";
 import { sessionStates } from "./SessionViewSmall";
@@ -9,6 +9,16 @@ import { useQuery } from "react-query";
 import { useContext } from "react";
 import Web3Context from "../contexts/Web3Context/context";
 import { Session, Token } from "../types";
+import {
+  AiOutlineFullscreenExit,
+  BiExit,
+  ImExit,
+  IoExit,
+  IoExitOutline,
+  IoIosExit,
+  TbDoorExit,
+} from "react-icons/all";
+import { CloseIcon } from "@chakra-ui/icons";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../web3/abi/FullcountABI.json");
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -61,7 +71,9 @@ const PlayView = () => {
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
-  const isPitcher = () => selectedSession?.pair.pitcher?.id === selectedToken?.id;
+  const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
+  const opponent = (token?: Token) =>
+    isPitcher(token) ? selectedSession?.pair.batter : selectedSession?.pair.pitcher;
 
   const sessionStatus = useQuery(
     ["session", selectedSession],
@@ -72,9 +84,10 @@ const PlayView = () => {
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
       );
+      console.log(session);
       const { didPitcherCommit, didBatterCommit, didPitcherReveal, didBatterReveal, outcome } =
         session;
-
+      console.log(didPitcherCommit);
       return {
         progress,
         didPitcherCommit,
@@ -90,22 +103,56 @@ const PlayView = () => {
   );
 
   return (
-    <Flex direction={"column"} gap={"20px"}>
-      <Text onClick={() => updateContext({ selectedSession: undefined })} cursor={"pointer"}>
-        Back
-      </Text>
-      <Text>{selectedSession?.progress}</Text>
+    <Flex direction={"column"} gap={"20px"} minW={"100%"}>
+      <Flex justifyContent={"space-between"} minW={"100%"}>
+        <Text>{`Session ${selectedSession?.sessionID}`}</Text>
+        {selectedSession?.progress === 3 || selectedSession?.progress === 4 ? (
+          <Timer
+            start={selectedSession.phaseStartTimestamp}
+            delay={selectedSession.secondsPerPhase}
+          />
+        ) : (
+          <Text textAlign={"center"} minW={"297px"}>
+            88:88
+          </Text>
+        )}
+        <Flex w={"74px"} justifyContent={"end"}>
+          <CloseIcon
+            onClick={() => updateContext({ selectedSession: undefined })}
+            cursor={"pointer"}
+          />
+        </Flex>
+      </Flex>
+      <Flex alignItems={"center"} justifyContent={"space-between"}>
+        {selectedToken && (
+          <Flex direction={"column"} gap="10px" alignItems={"center"}>
+            <Image src={selectedToken?.image} h={"300px"} w={"300px"} alt={selectedToken?.name} />
+            <Text fontSize={"14px"} fontWeight={"700"}>
+              {selectedToken.name}
+            </Text>
+          </Flex>
+        )}
+        {isPitcher(selectedToken) && sessionStatus.data && (
+          <PitcherView sessionStatus={sessionStatus.data} />
+        )}
+        {!isPitcher(selectedToken) && <BatterView />}
+        {/*{selectedSession?.pair}*/}
+        {opponent(selectedToken) && (
+          <Flex direction={"column"} gap="10px" alignItems={"center"}>
+            <Image
+              src={opponent(selectedToken)?.image}
+              h={"300px"}
+              w={"300px"}
+              alt={opponent(selectedToken)?.name}
+            />
+            <Text fontSize={"14px"} fontWeight={"700"}>
+              {opponent(selectedToken)?.name}
+            </Text>
+          </Flex>
+        )}
+      </Flex>
 
-      {(selectedSession?.progress === 3 || selectedSession?.progress === 4) && (
-        <Timer
-          start={selectedSession.phaseStartTimestamp}
-          delay={selectedSession.secondsPerPhase}
-        />
-      )}
-      {selectedToken && <CharacterCard token={selectedToken} isActive={false} />}
-      {isPitcher() && sessionStatus.data && <PitcherView sessionStatus={sessionStatus.data} />}
-
-      {!isPitcher() && <BatterView />}
+      {/*<Text>{selectedSession?.progress}</Text>*/}
     </Flex>
   );
 };

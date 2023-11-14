@@ -6,10 +6,12 @@ const GridComponent = ({
   setSelectedIndex,
 }: {
   selectedIndex: number;
-  setSelectedIndex: (value: number) => void;
+  setSelectedIndex?: (value: number) => void;
 }) => {
   const handleClick = (index: number) => {
-    setSelectedIndex(index);
+    if (setSelectedIndex) {
+      setSelectedIndex(index);
+    }
   };
 
   const numbers = [
@@ -29,7 +31,7 @@ const GridComponent = ({
       justifyContent="center"
       border="1px"
       borderColor={numbers[index] < 10 ? "white" : "#b0b0b0"}
-      cursor={"pointer"}
+      cursor={setSelectedIndex ? "pointer" : "default"}
       onClick={() => handleClick(index)}
       fontSize={index === selectedIndex ? "22px" : "16px"}
     >
@@ -38,7 +40,7 @@ const GridComponent = ({
   );
 
   return (
-    <Grid templateColumns="repeat(5, 1fr)">
+    <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
       {/* Generate cells for the grid */}
       {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
     </Grid>
