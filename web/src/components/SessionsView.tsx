@@ -214,7 +214,7 @@ const SessionsView = () => {
         updateContext({ sessions: data });
       },
       // ...queryCacheProps,
-      refetchInterval: 60 * 1000,
+      refetchInterval: 15 * 1000,
     },
   );
 
