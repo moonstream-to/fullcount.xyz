@@ -198,6 +198,9 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
       </Text>
+      <Text className={styles.text}>
+        Click on the button below and move mouse until the button is filled in
+      </Text>
       {!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (
         <button className={globalStyles.commitButton} onClick={handleGenerate}>
           Generate

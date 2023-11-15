@@ -10,7 +10,7 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
   const [timeLeft, setTimeLeft] = useState("88:88");
-  const [minutesLeft, setMinutesLeft] = useState("88");
+  const [minutesLeft, setMinutesLeft] = useState("8");
   const [secondsLeft, setSecondsLeft] = useState("88");
 
   useEffect(() => {
