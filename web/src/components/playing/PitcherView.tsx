@@ -216,7 +216,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           gap={"10px"}
         >
           Generated
-          <AiOutlineCheck />
         </Flex>
       )}
       {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
