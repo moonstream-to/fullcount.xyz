@@ -1,44 +1,35 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import globalStyles from "./GlobalStyles.module.css";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
 import { useCallback, useContext, useEffect, useState } from "react";
-import {
-  getRowCol,
-  horizontalLocations,
-  pitchSpeed,
-  swingKind,
-  verticalLocations,
-} from "./PlayView";
-import { signPitch, signSwing } from "./Signing";
-import web3Context from "../contexts/Web3Context";
-import Web3Context from "../contexts/Web3Context/context";
-import { useGameContext } from "../contexts/GameContext";
+import { getPitchDescription, getRowCol } from "./PlayView";
+import { signPitch } from "../Signing";
+import Web3Context from "../../contexts/Web3Context/context";
+import { useGameContext } from "../../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
-import useMoonToast from "../hooks/useMoonToast";
+import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
-import { Session } from "../types";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
+import { AiOutlineCheck } from "react-icons/all";
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { AbiItem } from "web3-utils";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-export type PLAY_STATUS = "TO_GENERATE" | "TO_COMMIT" | "TO_REVEAL" | "COMPLETE";
-
-const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
-  const [kind, setKind] = useState(0);
+const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+  const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [nonce, setNonce] = useState("0");
-  const [status, setStatus] = useState<PLAY_STATUS>("TO_GENERATE");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
   const handleCommit = async () => {
-    const sign = await signSwing(
+    const sign = await signPitch(
       web3ctx.account,
       window.ethereum,
       nonce,
-      kind,
+      speed,
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
@@ -46,13 +37,13 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
       JSON.stringify({
         nonce,
-        kind,
+        speed,
         vertical: getRowCol(gridIndex)[0],
         horizontal: getRowCol(gridIndex)[1],
       }),
     );
-    console.log(nonce, kind, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
-    commitSwing.mutate({ sign });
+    console.log(nonce, speed, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
+    commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {
@@ -62,9 +53,9 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       ) ?? "";
     const reveal = JSON.parse(item);
     console.log(reveal);
-    revealSwing.mutate({
+    revealPitch.mutate({
       nonce: reveal.nonce,
-      kind: reveal.kind,
+      speed: reveal.speed,
       vertical: reveal.vertical,
       horizontal: reveal.horizontal,
     });
@@ -89,7 +80,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     const dataString = movements.join("");
     const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
     const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-    console.log(uint256Seed, hash);
     setNonce(uint256Seed);
     return uint256Seed;
   };
@@ -104,7 +94,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const toast = useMoonToast();
   const queryClient = useQueryClient();
 
-  const commitSwing = useMutation(
+  const commitPitch = useMutation(
     async ({ sign }: { sign: string }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
@@ -112,7 +102,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods.commitSwing(selectedSession?.sessionID, sign).send({
+      return gameContract.methods.commitPitch(selectedSession?.sessionID, sign).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
@@ -122,8 +112,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       onSuccess: () => {
         console.log("should invalidate");
         queryClient.refetchQueries("sessions");
-        // queryClient.invalidateQueries("sessions");
-        setStatus("TO_REVEAL");
+        queryClient.refetchQueries("session");
         toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
@@ -132,15 +121,15 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
-  const revealSwing = useMutation(
+  const revealPitch = useMutation(
     async ({
       nonce,
-      kind,
+      speed,
       vertical,
       horizontal,
     }: {
       nonce: string;
-      kind: number;
+      speed: number;
       vertical: number;
       horizontal: number;
     }) => {
@@ -151,7 +140,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       }
 
       return gameContract.methods
-        .revealSwing(selectedSession?.sessionID, nonce, kind, vertical, horizontal)
+        .revealPitch(selectedSession?.sessionID, nonce, speed, vertical, horizontal)
         .send({
           from: web3ctx.account,
           maxPriorityFeePerGas: null,
@@ -161,6 +150,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("session");
         toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
@@ -169,85 +159,67 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
-  useEffect(() => {
-    console.log(sessionStatus);
-  }, [sessionStatus]);
-
-  const resolve = async () => {
-    const res = await gameContract.methods
-      .resolve(
-        { nonce: 0, speed: 0, vertical: 2, horizontal: 2 },
-        { nonce: 0, kind: 0, vertical: 2, horizontal: 2 },
-      )
-      .call();
-    console.log(res);
-  };
-
-  useEffect(() => {
-    console.log(selectedSession);
-  }, [selectedSession]);
-
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      {/*<Text>{gameStatus(sessionStatus)}</Text>*/}
       <Text fontSize={"24px"} fontWeight={"700"}>
         One pitch to win the game
       </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
-        1. Select the type of swing
+        1. Select the type of pitch
       </Text>
       <Flex justifyContent={"center"} gap={"20px"}>
         <Flex
-          className={kind === 0 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(0)}
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
+          className={speed === 0 ? styles.activeChoice : styles.inactiveChoice}
+          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(0)}
+          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
         >
-          {swingKind[0]}
+          Fast
         </Flex>
         <Flex
-          className={kind === 1 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(1)}
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
+          className={speed === 1 ? styles.activeChoice : styles.inactiveChoice}
+          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(1)}
+          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
         >
-          {swingKind[1]}
-        </Flex>
-        <Flex
-          className={kind === 2 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(2)}
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
-        >
-          {swingKind[2]}
+          Slow
         </Flex>
       </Flex>
       <Text fontSize={"18px"} fontWeight={"500"}>
-        2. Choose where to swing
+        2. Choose where to pitch
       </Text>
       <GridComponent
         selectedIndex={gridIndex}
-        setSelectedIndex={sessionStatus.didBatterCommit ? undefined : setGridIndex}
+        setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
       />
+      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"500"}>
+        You&apos;re throwing
+      </Text>
+      <Text className={styles.actionText}>
+        {getPitchDescription(speed, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
+      </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
       </Text>
-      {!seed && movements.length === 0 && !sessionStatus.didBatterCommit && (
+      {!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (
         <button className={globalStyles.commitButton} onClick={handleGenerate}>
           Generate
         </button>
       )}
-      {!seed && movements.length === 0 && sessionStatus.didBatterCommit && (
+      {seed && (
         <Flex
           w="180px"
-          h="31px"
+          h="27px"
           alignItems={"center"}
           justifyContent={"center"}
           bg="#4D4D4D"
           onClick={handleGenerate}
           border={"#767676"}
+          gap={"10px"}
         >
           Generated
+          <AiOutlineCheck />
         </Flex>
       )}
-      {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didBatterCommit && (
+      {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
         <Flex
           onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
           w={"180px"}
@@ -258,26 +230,36 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           <Box bg={"gray"} />
         </Flex>
       )}
-      {seed && status !== "TO_REVEAL" && (
-        <>
-          <button className={globalStyles.commitButton} onClick={handleCommit}>
-            Commit
-          </button>
-        </>
-      )}
-      {!sessionStatus.didBatterReveal ? (
-        <button
-          className={globalStyles.commitButton}
-          onClick={handleReveal}
-          disabled={sessionStatus.progress !== 4}
-        >
-          Reveal
-        </button>
-      ) : (
-        <Flex className={globalStyles.commitButton}>Revealed</Flex>
-      )}
+
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleCommit}
+        disabled={!seed || sessionStatus.didPitcherCommit}
+      >
+        {commitPitch.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didPitcherCommit ? "Committed" : "Commit"}</Text>
+        )}
+      </button>
+
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleReveal}
+        disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
+      >
+        {revealPitch.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didPitcherReveal ? "Revealed" : "Reveal"}</Text>
+        )}
+      </button>
+      <Text className={styles.text}>
+        Once both players have committed their moves, press{" "}
+        <span className={styles.textBold}> Reveal</span> to see the outcome
+      </Text>
     </Flex>
   );
 };
 
-export default BatterView2;
+export default PitcherView;
