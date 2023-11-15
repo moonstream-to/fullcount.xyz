@@ -1,19 +1,39 @@
 .container {
     display: flex;
-    width: 500px;
-    padding: 30px;
+    max-width: 650px;
+    padding: 40px;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 30px;
-    border-radius: 20px;
-    border: 1px solid #FFF;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    border: 1px solid #4D4D4D;
+    background: rgba(41, 41, 41, 0.70);
 }
 .message {
     color: #FFF;
-    font-size: 24px;
+    font-family: Inter;
+    font-size: 30px;
     font-style: normal;
     font-weight: 700;
-    line-height: 100%; /* 24px */
+    line-height: normal;
+}
+.text {
+    color: #BFBFBF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.label {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .input {
@@ -23,8 +43,8 @@
     gap: 10px;
     flex: 1 0 0;
     align-self: stretch;
-    border-radius: 10px;
-    border: 1px solid #FFF;
+    /*border-radius: 10px;*/
+    border: 1px solid #4D4D4D;
     background-color: #1A1D22;
     color: #FFF;
     font-size: 16px;
@@ -36,43 +56,36 @@
 .input:focus-visible {
     outline: none;
 }
+.input::placeholder {
+    color: #BFBFBF;
+}
 
 .buttons {
     display: flex;
     align-items: flex-start;
     gap: 20px;
+    width: 100%;
 }
 
 .cancelButton {
     display: flex;
-    width: 210px;
-    padding: 6px 40px;
-    flex-direction: column;
+    padding: 10px 40px;
+    justify-content: center;
     align-items: center;
-    border-radius: 10px;
-    background: #4D4D4D;
-    color: #FFF;
-    text-align: center;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
+    gap: 10px;
+    flex: 1 0 0;
+    border: 1px solid #FFF;
 }
 
 .saveButton {
     display: flex;
-    width: 210px;
-    padding: 6px 40px;
-    flex-direction: column;
+    padding: 10px 40px;
+    justify-content: center;
     align-items: center;
-    border-radius: 10px;
-    color: #FFF;
-    text-align: center;
-    font-size: 20px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    background: #F56646;
+    gap: 10px;
+    flex: 1 0 0;
+    border: 1px solid #F1E3BF;
+    background: #00A341;
 }
 
 

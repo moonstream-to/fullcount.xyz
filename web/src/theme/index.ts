@@ -63,9 +63,9 @@ const overrides = {
     }),
   },
   fonts: {
-    heading: '"Lora", serif',
-    body: '"Lora", serif',
-    mono: '"Lora", monospace',
+    heading: '"Inter", serif',
+    body: '"Inter", serif',
+    mono: '"Inter", monospace',
   },
   fontSizes: {
     xs: "0.625rem", //10px
