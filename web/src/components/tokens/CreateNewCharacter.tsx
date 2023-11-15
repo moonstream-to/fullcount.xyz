@@ -1,6 +1,6 @@
 import { Flex, Modal, ModalContent, Text, Image } from "@chakra-ui/react";
 import styles from "./CreateNewCharacter.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const NUMBER_OF_IMAGES = 24;
 
 const images: number[] = [];
@@ -19,6 +19,11 @@ const CreateNewCharacter = ({
 }) => {
   const [name, setName] = useState("");
   const [imageIndex, setImageIndex] = useState(-1);
+
+  useEffect(() => {
+    setName("");
+    setImageIndex(-1);
+  }, [isOpen]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {

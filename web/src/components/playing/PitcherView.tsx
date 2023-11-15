@@ -10,7 +10,6 @@ import { useGameContext } from "../../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
-import { AiOutlineCheck } from "react-icons/all";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
