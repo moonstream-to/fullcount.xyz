@@ -154,18 +154,17 @@ const PlayView = () => {
 
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
-      <Flex justifyContent={"space-between"} minW={"100%"}>
+      <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
         <Text>{`Session ${selectedSession?.sessionID}`}</Text>
 
-        {selectedSession?.progress === 3 || selectedSession?.progress === 4 ? (
+        {(selectedSession?.progress === 3 ||
+          selectedSession?.progress === 4 ||
+          selectedSession?.progress === 2) && (
           <Timer
             start={selectedSession.phaseStartTimestamp}
             delay={selectedSession.secondsPerPhase}
+            isActive={selectedSession.progress === 3 || selectedSession.progress === 4}
           />
-        ) : (
-          <Text textAlign={"center"} minW={"297px"}>
-            88:88
-          </Text>
         )}
         <Flex w={"74px"} justifyContent={"end"}>
           <CloseIcon

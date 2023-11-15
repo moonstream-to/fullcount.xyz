@@ -11,7 +11,14 @@ export default function Document() {
         />
         <link href="https://fonts.googleapis.com/css?family=Space Grotesk" rel="stylesheet" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter&family=Lora&display=swap"
+          rel="stylesheet"
+          media="screen"
+          href="https://fontlibrary.org//face/segment7"
+          type="text/css"
+        />
+
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
           rel="stylesheet"
         />
         <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet" />

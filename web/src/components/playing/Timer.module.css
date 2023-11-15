@@ -1,0 +1,39 @@
+.time {
+    color: #FF8D8D;
+    /*font-family: Segment7;*/
+    font-size: 27.027px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    height: 25px;
+}
+
+.title {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    text-transform: uppercase;
+}
+
+.timerContainer {
+    display: flex;
+    padding: 10px 12px;
+    align-items: center;
+    gap: 2px;
+    border: 1px solid #FFF;
+    background: #1B1B1B;
+    flex-direction: column;
+}
+
+.countLeft {
+    display: flex;
+    padding: 10px 12px;
+    align-items: center;
+    gap: 15px;
+    flex: 1 0 0;
+    border: 1px solid #F1E3BF;
+    background: #00B94A;
+}
