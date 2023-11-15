@@ -6,15 +6,11 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useContext, useEffect } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import useMoonToast from "../../hooks/useMoonToast";
-import queryCacheProps from "../../hooks/hookCommon";
 import { decodeBase64Json } from "../../utils/decoders";
 import CharacterCard from "../tokens/CharacterCard";
 import { Session, Token } from "../../types";
-import MySessions from "./MySessions";
 import OwnedTokens from "../tokens/OwnedTokens";
 import StakedTokens from "../tokens/StakedTokens";
-import SessionViewSmall from "./SessionViewSmall";
-import FiltersView from "./FiltersView";
 import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
 import { outputs } from "../../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
@@ -275,7 +271,6 @@ const SessionsView = () => {
         <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
       )}
 
-      <FiltersView2 />
       <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
         <Text className={styles.title}>Sessions</Text>
         {selectedToken && !isTokenStaked(selectedToken) && (
@@ -289,6 +284,7 @@ const SessionsView = () => {
           </Flex>
         )}
       </Flex>
+      <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
           {sessions.data.map((session, idx) => (
