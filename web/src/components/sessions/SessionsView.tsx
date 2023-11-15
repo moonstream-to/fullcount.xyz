@@ -1,5 +1,5 @@
 import { useGameContext } from "../../contexts/GameContext";
-import { Box, Flex, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -275,11 +275,27 @@ const SessionsView = () => {
         <Text className={styles.title}>Sessions</Text>
         {selectedToken && !isTokenStaked(selectedToken) && (
           <Flex gap={"20px"}>
-            <button className={globalStyles.button} onClick={() => startSession.mutate(0)}>
-              Start new session as pitcher
+            <button
+              className={globalStyles.button}
+              style={{ width: "230px" }}
+              onClick={() => startSession.mutate(0)}
+            >
+              {startSession.isLoading && startSession.variables === 0 ? (
+                <Spinner />
+              ) : (
+                "Start new session as pitcher"
+              )}
             </button>
-            <button className={globalStyles.button} onClick={() => startSession.mutate(1)}>
-              Start new session as batter
+            <button
+              className={globalStyles.button}
+              onClick={() => startSession.mutate(1)}
+              style={{ width: "230px" }}
+            >
+              {startSession.isLoading && startSession.variables === 1 ? (
+                <Spinner />
+              ) : (
+                "Start new session as batter"
+              )}
             </button>
           </Flex>
         )}

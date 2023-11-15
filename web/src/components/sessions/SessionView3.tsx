@@ -1,4 +1,4 @@
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
@@ -119,7 +119,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           <>
             {session.progress === 2 && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
-                join as pitcher
+                {joinSession.isLoading ? <Spinner /> : "join as pitcher"}
               </button>
             )}
           </>
@@ -138,7 +138,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           <>
             {session.progress === 2 && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
-                join as batter
+                {joinSession.isLoading ? <Spinner /> : "join as batter"}
               </button>
             )}
           </>
