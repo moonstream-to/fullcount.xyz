@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, FC } from "react";
 import { Session, Token } from "../types";
+import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
 
 interface GameContextProps {
   nonce: number;
@@ -35,11 +36,9 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     vertical: 0,
     horizontal: 0,
     progressFilter: [true, true, true, true, true, true, true],
-    contractAddress:
-      process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F",
-    chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? 80001),
-    tokenAddress:
-      process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? "0xe710FD102Ae9DEFC95137BCB5D227fe945bfc844",
+    contractAddress: process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ?? GAME_CONTRACT,
+    chainId: Number(process.env.NEXT_PUBLIC_CHAIN_ID ?? CHAIN_ID),
+    tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? TOKEN_CONTRACT,
     selectedToken: undefined,
     selectedSession: undefined,
     sessions: undefined,

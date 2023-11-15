@@ -1,4 +1,4 @@
-import { useGameContext } from "../contexts/GameContext";
+import { useGameContext } from "../../contexts/GameContext";
 import { Checkbox, Flex, Text } from "@chakra-ui/react";
 import { sessionStates } from "./SessionViewSmall";
 

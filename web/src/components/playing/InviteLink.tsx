@@ -1,5 +1,5 @@
 import { Flex, Text, useClipboard } from "@chakra-ui/react";
-import { Session } from "../types";
+import { Session } from "../../types";
 import { LinkIcon } from "@chakra-ui/icons";
 
 const InviteLink = ({ session }: { session: Session }) => {

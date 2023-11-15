@@ -1,33 +1,23 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import globalStyles from "./GlobalStyles.module.css";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
 import { useCallback, useContext, useEffect, useState } from "react";
-import {
-  getRowCol,
-  horizontalLocations,
-  pitchSpeed,
-  swingKind,
-  verticalLocations,
-} from "./PlayView";
-import { signPitch, signSwing } from "./Signing";
-import web3Context from "../contexts/Web3Context";
-import Web3Context from "../contexts/Web3Context/context";
-import { useGameContext } from "../contexts/GameContext";
+import { getRowCol, getSwingDescription, swingKind } from "./PlayView";
+import { signSwing } from "../Signing";
+import Web3Context from "../../contexts/Web3Context/context";
+import { useGameContext } from "../../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
-import useMoonToast from "../hooks/useMoonToast";
+import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
-import { Session } from "../types";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
-
-export type PLAY_STATUS = "TO_GENERATE" | "TO_COMMIT" | "TO_REVEAL" | "COMPLETE";
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { AbiItem } from "web3-utils";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [kind, setKind] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [nonce, setNonce] = useState("0");
-  const [status, setStatus] = useState<PLAY_STATUS>("TO_GENERATE");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -51,7 +41,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         horizontal: getRowCol(gridIndex)[1],
       }),
     );
-    console.log(nonce, kind, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
     commitSwing.mutate({ sign });
   };
 
@@ -61,7 +50,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
       ) ?? "";
     const reveal = JSON.parse(item);
-    console.log(reveal);
     revealSwing.mutate({
       nonce: reveal.nonce,
       kind: reveal.kind,
@@ -89,7 +77,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     const dataString = movements.join("");
     const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
     const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-    console.log(uint256Seed, hash);
     setNonce(uint256Seed);
     return uint256Seed;
   };
@@ -120,10 +107,8 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
     {
       onSuccess: () => {
-        console.log("should invalidate");
         queryClient.refetchQueries("sessions");
-        // queryClient.invalidateQueries("sessions");
-        setStatus("TO_REVEAL");
+        queryClient.refetchQueries("session");
         toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
@@ -161,6 +146,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("session");
         toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
@@ -169,27 +155,8 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
-  useEffect(() => {
-    console.log(sessionStatus);
-  }, [sessionStatus]);
-
-  const resolve = async () => {
-    const res = await gameContract.methods
-      .resolve(
-        { nonce: 0, speed: 0, vertical: 2, horizontal: 2 },
-        { nonce: 0, kind: 0, vertical: 2, horizontal: 2 },
-      )
-      .call();
-    console.log(res);
-  };
-
-  useEffect(() => {
-    console.log(selectedSession);
-  }, [selectedSession]);
-
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      {/*<Text>{gameStatus(sessionStatus)}</Text>*/}
       <Text fontSize={"24px"} fontWeight={"700"}>
         One pitch to win the game
       </Text>
@@ -226,23 +193,33 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         selectedIndex={gridIndex}
         setSelectedIndex={sessionStatus.didBatterCommit ? undefined : setGridIndex}
       />
+      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
+        You&apos;re swinging
+      </Text>
+      <Text className={styles.actionText}>
+        {getSwingDescription(kind, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
+      </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
+      </Text>
+      <Text className={styles.text}>
+        Click on the button below and move mouse until the button is filled in
       </Text>
       {!seed && movements.length === 0 && !sessionStatus.didBatterCommit && (
         <button className={globalStyles.commitButton} onClick={handleGenerate}>
           Generate
         </button>
       )}
-      {!seed && movements.length === 0 && sessionStatus.didBatterCommit && (
+      {seed && (
         <Flex
           w="180px"
-          h="31px"
+          h="27px"
           alignItems={"center"}
           justifyContent={"center"}
           bg="#4D4D4D"
           onClick={handleGenerate}
           border={"#767676"}
+          gap={"10px"}
         >
           Generated
         </Flex>
@@ -258,24 +235,33 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           <Box bg={"gray"} />
         </Flex>
       )}
-      {seed && status !== "TO_REVEAL" && (
-        <>
-          <button className={globalStyles.commitButton} onClick={handleCommit}>
-            Commit
-          </button>
-        </>
-      )}
-      {!sessionStatus.didBatterReveal ? (
-        <button
-          className={globalStyles.commitButton}
-          onClick={handleReveal}
-          disabled={sessionStatus.progress !== 4}
-        >
-          Reveal
-        </button>
-      ) : (
-        <Flex className={globalStyles.commitButton}>Revealed</Flex>
-      )}
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleCommit}
+        disabled={!seed || sessionStatus.didBatterCommit}
+      >
+        {commitSwing.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didBatterCommit ? "Committed" : "Commit"}</Text>
+        )}
+      </button>
+
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleReveal}
+        disabled={sessionStatus.progress !== 4 || sessionStatus.didBatterReveal}
+      >
+        {revealSwing.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didBatterReveal ? "Revealed" : "Reveal"}</Text>
+        )}
+      </button>
+      <Text className={styles.text}>
+        Once both players have committed their moves, press{" "}
+        <span className={styles.textBold}> Reveal</span> to see the outcome
+      </Text>
     </Flex>
   );
 };

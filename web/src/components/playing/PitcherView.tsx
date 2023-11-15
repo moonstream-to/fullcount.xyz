@@ -1,27 +1,23 @@
-import { Box, Flex, Text } from "@chakra-ui/react";
-import globalStyles from "./GlobalStyles.module.css";
+import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { getRowCol, horizontalLocations, pitchSpeed, verticalLocations } from "./PlayView";
-import { signPitch } from "./Signing";
-import web3Context from "../contexts/Web3Context";
-import Web3Context from "../contexts/Web3Context/context";
-import { useGameContext } from "../contexts/GameContext";
+import { getPitchDescription, getRowCol } from "./PlayView";
+import { signPitch } from "../Signing";
+import Web3Context from "../../contexts/Web3Context/context";
+import { useGameContext } from "../../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
-import useMoonToast from "../hooks/useMoonToast";
+import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
-import { Session } from "../types";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
-
-export type PLAY_STATUS = "TO_GENERATE" | "TO_COMMIT" | "TO_REVEAL" | "COMPLETE";
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { AbiItem } from "web3-utils";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [nonce, setNonce] = useState("0");
-  const [status, setStatus] = useState<PLAY_STATUS>("TO_GENERATE");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -83,7 +79,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     const dataString = movements.join("");
     const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
     const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-    console.log(uint256Seed, hash);
     setNonce(uint256Seed);
     return uint256Seed;
   };
@@ -116,8 +111,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       onSuccess: () => {
         console.log("should invalidate");
         queryClient.refetchQueries("sessions");
-        // queryClient.invalidateQueries("sessions");
-        setStatus("TO_REVEAL");
+        queryClient.refetchQueries("session");
         toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
@@ -155,6 +149,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     {
       onSuccess: () => {
         queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("session");
         toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
@@ -163,52 +158,8 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
-  useEffect(() => {
-    console.log(sessionStatus);
-  }, [sessionStatus]);
-
-  const resolve = async () => {
-    const res = await gameContract.methods
-      .resolve(
-        { nonce: 0, speed: 0, vertical: 2, horizontal: 2 },
-        { nonce: 0, kind: 0, vertical: 2, horizontal: 2 },
-      )
-      .call();
-    console.log(res);
-  };
-
-  const gameStatus = (session: SessionStatus) => {
-    if (session.progress === 2) {
-      return "waiting for batter";
-    }
-    if (session.progress === 3) {
-      if (session.didBatterCommit) {
-        return "Batter comitted. Waiting for your move";
-      }
-      return session.didPitcherCommit ? "Waiting batter to commit" : "Waiting for commits";
-    }
-    if (session.progress === 4) {
-      if (session.didBatterReveal) {
-        return "Batter revealed. Waiting for your move";
-      }
-      return session.didPitcherReveal ? "Waiting batter to reveal" : "Waiting for reveals";
-    }
-    if (session.progress === 5) {
-      return `Outcome: ${session.outcome}`;
-    }
-    if (session.progress === 6) {
-      return "Session expired";
-    }
-    return "You have opened non-existing session somehow";
-  };
-
-  useEffect(() => {
-    console.log(selectedSession);
-  }, [selectedSession]);
-
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      {/*<Text>{gameStatus(sessionStatus)}</Text>*/}
       <Text fontSize={"24px"} fontWeight={"700"}>
         One pitch to win the game
       </Text>
@@ -238,28 +189,33 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         selectedIndex={gridIndex}
         setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
       />
+      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
+        You&apos;re throwing
+      </Text>
+      <Text className={styles.actionText}>
+        {getPitchDescription(speed, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
+      </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
       </Text>
-      {/*<Text>{verticalLocations[getRowCol(gridIndex)[0] as keyof typeof horizontalLocations]}</Text>*/}
-      {/*<Text>*/}
-      {/*  {horizontalLocations[getRowCol(gridIndex)[1] as keyof typeof horizontalLocations]}*/}
-      {/*</Text>*/}
-      {/*<Text> {pitchSpeed[speed as keyof typeof pitchSpeed]}</Text>*/}
+      <Text className={styles.text}>
+        Click on the button below and move mouse until the button is filled in
+      </Text>
       {!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (
         <button className={globalStyles.commitButton} onClick={handleGenerate}>
           Generate
         </button>
       )}
-      {!seed && movements.length === 0 && sessionStatus.didPitcherCommit && (
+      {seed && (
         <Flex
           w="180px"
-          h="31px"
+          h="27px"
           alignItems={"center"}
           justifyContent={"center"}
           bg="#4D4D4D"
           onClick={handleGenerate}
           border={"#767676"}
+          gap={"10px"}
         >
           Generated
         </Flex>
@@ -275,24 +231,34 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           <Box bg={"gray"} />
         </Flex>
       )}
-      {seed && status !== "TO_REVEAL" && (
-        <>
-          <button className={globalStyles.commitButton} onClick={handleCommit}>
-            Commit
-          </button>
-        </>
-      )}
-      {!sessionStatus.didPitcherReveal ? (
-        <button
-          className={globalStyles.commitButton}
-          onClick={handleReveal}
-          disabled={sessionStatus.progress !== 4}
-        >
-          Reveal
-        </button>
-      ) : (
-        <Flex className={globalStyles.commitButton}>Revealed</Flex>
-      )}
+
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleCommit}
+        disabled={!seed || sessionStatus.didPitcherCommit}
+      >
+        {commitPitch.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didPitcherCommit ? "Committed" : "Commit"}</Text>
+        )}
+      </button>
+
+      <button
+        className={globalStyles.commitButton}
+        onClick={handleReveal}
+        disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
+      >
+        {revealPitch.isLoading ? (
+          <Spinner h={"14px"} w={"14px"} />
+        ) : (
+          <Text>{sessionStatus.didPitcherReveal ? "Revealed" : "Reveal"}</Text>
+        )}
+      </button>
+      <Text className={styles.text}>
+        Once both players have committed their moves, press{" "}
+        <span className={styles.textBold}> Reveal</span> to see the outcome
+      </Text>
     </Flex>
   );
 };

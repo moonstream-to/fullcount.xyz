@@ -1,21 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
+import { MoonstreamWeb3ProviderInterface } from "../../types/Moonstream";
 import styles from "./OwnedTokens.module.css";
 import { Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
-import Web3Context from "../contexts/Web3Context/context";
+import Web3Context from "../../contexts/Web3Context/context";
 import { useContext } from "react";
-import { useGameContext } from "../contexts/GameContext";
-import useMoonToast from "../hooks/useMoonToast";
+import { useGameContext } from "../../contexts/GameContext";
+import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
-import queryCacheProps from "../hooks/hookCommon";
+import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { decodeBase64Json } from "../utils/decoders";
-import { Token } from "../types";
+import { decodeBase64Json } from "../../utils/decoders";
+import { Token } from "../../types";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
+const FullcountABI = require("../../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const tokenABI = require("../web3/abi/BLBABI.json");
+const tokenABI = require("../../web3/abi/BLBABI.json");
 
 const OwnedTokens = () => {
   const web3ctx = useContext(Web3Context);

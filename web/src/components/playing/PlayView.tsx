@@ -1,30 +1,19 @@
-import { useGameContext } from "../contexts/GameContext";
+import { useGameContext } from "../../contexts/GameContext";
 import PitcherView from "./PitcherView";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
-import CharacterCard from "./CharacterCard";
-import BatterView from "./BatterView";
-import { sessionStates } from "./SessionViewSmall";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext } from "react";
-import Web3Context from "../contexts/Web3Context/context";
-import { Session, Token } from "../types";
-import {
-  AiOutlineFullscreenExit,
-  BiExit,
-  ImExit,
-  IoExit,
-  IoExitOutline,
-  IoIosExit,
-  TbDoorExit,
-} from "react-icons/all";
+import Web3Context from "../../contexts/Web3Context/context";
+import { Token } from "../../types";
 import { CloseIcon } from "@chakra-ui/icons";
 import Outcome from "./Outcome";
 import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { AbiItem } from "web3-utils";
+
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 export function getRowCol(index: number): [number, number] {
   const size = 5; // Size of the grid (5x5)
@@ -56,6 +45,40 @@ export const verticalLocations = {
   2: "Middle",
   3: "Low Strike",
   4: "Low Ball",
+};
+
+export const getPitchDescription = (s: number, h: number, v: number) => {
+  const isStrike = h === 0 || h === 4 || v === 4 || v === 0 ? "A ball" : "A strike";
+  const speed = s === 0 ? "Fast" : "Slow";
+  let point = "";
+  if (v < 2) {
+    point = h < 2 ? ", high and inside" : h === 2 ? " and high" : ", high and outside";
+  }
+  if (v === 2) {
+    point = h < 2 ? " and inside" : h === 2 ? " and down the middle" : " and outside";
+  }
+  if (v > 2) {
+    point = h < 2 ? ", low and inside" : h === 2 ? " and low" : ", low and outside";
+  }
+  return `${isStrike}: ${speed}${point}.`;
+};
+
+export const getSwingDescription = (k: number, h: number, v: number) => {
+  if (k === 2) {
+    return "Nope. You are taking the pitch.";
+  }
+  const kind = k === 0 ? "For contact" : "For power";
+  let point = "";
+  if (v < 2) {
+    point = h < 2 ? "high and inside" : h === 2 ? "high" : "high and outside";
+  }
+  if (v === 2) {
+    point = h < 2 ? "inside" : h === 2 ? "down the middle" : "outside";
+  }
+  if (v > 2) {
+    point = h < 2 ? "low and inside" : h === 2 ? "low" : "low and outside";
+  }
+  return `${kind}; ${point}.`;
 };
 
 export const pitchSpeed = {
@@ -131,20 +154,19 @@ const PlayView = () => {
 
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
-      <Flex justifyContent={"space-between"} minW={"100%"}>
-        <Text>{`Session ${selectedSession?.sessionID}`}</Text>
+      <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
+        <Text w={"150px"}>{`Session ${selectedSession?.sessionID}`}</Text>
 
-        {selectedSession?.progress === 3 || selectedSession?.progress === 4 ? (
+        {(selectedSession?.progress === 3 ||
+          selectedSession?.progress === 4 ||
+          selectedSession?.progress === 2) && (
           <Timer
             start={selectedSession.phaseStartTimestamp}
             delay={selectedSession.secondsPerPhase}
+            isActive={selectedSession.progress === 3 || selectedSession.progress === 4}
           />
-        ) : (
-          <Text textAlign={"center"} minW={"297px"}>
-            88:88
-          </Text>
         )}
-        <Flex w={"74px"} justifyContent={"end"}>
+        <Flex w={"150px"} justifyContent={"end"}>
           <CloseIcon
             onClick={() => updateContext({ selectedSession: undefined })}
             cursor={"pointer"}
@@ -171,11 +193,11 @@ const PlayView = () => {
         ) : (
           <>
             {opponent(selectedToken) && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
-                  h={"300px"}
-                  w={"300px"}
+                  h={"150px"}
+                  w={"150px"}
                   alt={opponent(selectedToken)?.name}
                 />
                 <Text fontSize={"14px"} fontWeight={"700"}>
@@ -234,11 +256,11 @@ const PlayView = () => {
         ) : (
           <>
             {opponent(selectedToken) && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
-                  h={"300px"}
-                  w={"300px"}
+                  h={"150px"}
+                  w={"150px"}
                   alt={opponent(selectedToken)?.name}
                 />
                 <Text fontSize={"14px"} fontWeight={"700"}>

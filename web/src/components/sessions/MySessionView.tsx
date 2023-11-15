@@ -1,9 +1,9 @@
-import { Session } from "../types";
+import { Session } from "../../types";
 import { Flex, Text } from "@chakra-ui/react";
-import CharacterCard from "./CharacterCard";
-import globalStyles from "./OwnedTokens.module.css";
+import CharacterCard from "../tokens/CharacterCard";
+import globalStyles from "../tokens/OwnedTokens.module.css";
 import { useContext } from "react";
-import Web3Context from "../contexts/Web3Context/context";
+import Web3Context from "../../contexts/Web3Context/context";
 
 const MySessionView = ({ session }: { session: Session }) => {
   const web3ctx = useContext(Web3Context);

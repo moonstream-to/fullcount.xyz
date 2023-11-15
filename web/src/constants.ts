@@ -1,9 +1,6 @@
-export const USER_NAV_PATHES = [
-  {
-    title: "Learn how to use Moonstream",
-    path: "https://moonstream.to/welcome",
-  },
-];
+export const GAME_CONTRACT = "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F";
+export const TOKEN_CONTRACT = "0xe710FD102Ae9DEFC95137BCB5D227fe945bfc844";
+export const CHAIN_ID = 80001;
 
 const MULTICALL2_POLYGON_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_MULTICALL2_POLYGON_CONTRACT_ADDRESS;

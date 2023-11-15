@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import SecondStep from "./SecondStep";
+import ConnectingView from "./ConnectingView";
 import Web3Context from "../contexts/Web3Context/context";
 import TitleScreenLayout from "./layout/TitleScreenLayout";
 import PlayingLayout from "./layout/PlayingLayout";
@@ -9,8 +9,8 @@ import { useQuery, useQueryClient } from "react-query";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import queryCacheProps from "../hooks/hookCommon";
 import { useGameContext } from "../contexts/GameContext";
-import OwnedTokens from "./OwnedTokens";
-import SessionsView from "./SessionsView";
+import OwnedTokens from "./tokens/OwnedTokens";
+import SessionsView from "./sessions/SessionsView";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 
 const TitleScreen = () => {
@@ -39,7 +39,7 @@ const TitleScreen = () => {
     <>
       {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chainId ? (
         <TitleScreenLayout>
-          <SecondStep nextStep={() => setStep(3)} />
+          <ConnectingView nextStep={() => setStep(3)} />
         </TitleScreenLayout>
       ) : (
         <>

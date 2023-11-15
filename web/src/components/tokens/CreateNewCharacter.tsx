@@ -3,10 +3,11 @@ import styles from "./CreateNewCharacter.module.css";
 import { useEffect, useState } from "react";
 const NUMBER_OF_IMAGES = 24;
 
-const images: number[] = [
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
-];
-images.length = NUMBER_OF_IMAGES;
+const images: number[] = [];
+for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
+  images.push(i);
+}
+
 const CreateNewCharacter = ({
   isOpen,
   onClose,
@@ -19,6 +20,11 @@ const CreateNewCharacter = ({
   const [name, setName] = useState("");
   const [imageIndex, setImageIndex] = useState(-1);
 
+  useEffect(() => {
+    setName("");
+    setImageIndex(-1);
+  }, [isOpen]);
+
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       onSave(name, imageIndex);
@@ -26,16 +32,8 @@ const CreateNewCharacter = ({
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent className={styles.container} bg="#1A1D22" minW={"fit-content"}>
+      <ModalContent className={styles.container} bg="#1A1D22" minW={"782px"}>
         <Text className={styles.message}>Create character</Text>
-        <input
-          type={"text"}
-          className={styles.input}
-          placeholder={"name"}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
         <Flex wrap={"wrap"} gap={"20px"} maxW={"800px"} placeSelf={"center"}>
           {images.map((_, idx: number) => (
             <Image
@@ -46,10 +44,22 @@ const CreateNewCharacter = ({
               src={`https://badges.moonstream.to/blb/p${idx}.png`}
               cursor={"pointer"}
               onClick={() => setImageIndex(idx)}
-              border={imageIndex === idx ? "2px solid white" : "none"}
+              border={imageIndex === idx ? "2px solid white" : "1px solid #4D4D4D"}
             />
           ))}
         </Flex>
+        <Text className={styles.text} mt={"-30px"}>
+          Select an image for your NFT
+        </Text>
+
+        <input
+          type={"text"}
+          className={styles.input}
+          placeholder={"Enter name"}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
         <Flex className={styles.buttons}>
           <button className={styles.cancelButton} onClick={onClose}>
             Cancel
