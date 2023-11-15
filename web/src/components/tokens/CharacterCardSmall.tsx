@@ -1,28 +1,23 @@
 import { Flex, Image, Text } from "@chakra-ui/react";
 import styles from "./CharacterCard.module.css";
 import globalStyles from "./OwnedTokens.module.css";
-import { useGameContext } from "../contexts/GameContext";
-import { Session, Token } from "../types";
+import { useGameContext } from "../../contexts/GameContext";
+import { Session, Token } from "../../types";
 import { ReactNode, useEffect } from "react";
 
 const CharacterCard = ({
   token,
-  isActive = true,
   session,
   isClickable = false,
-  showName = true,
-  children,
   ...props
 }: {
   token: Token | undefined;
-  isActive?: boolean;
   session?: Session;
   isClickable?: boolean;
-  showName?: boolean;
-  children?: ReactNode;
   [x: string]: any;
 }) => {
   const { updateContext } = useGameContext();
+
   const handleClick = () => {
     updateContext({ selectedToken: token });
     if (session) {
@@ -36,9 +31,8 @@ const CharacterCard = ({
 
   return (
     <Flex
-      className={styles.container}
+      className={styles.containerSmall}
       {...props}
-      h={isActive || children ? "216px" : "fit-content"}
       w={"fit-content"}
       onClick={() => {
         if (isClickable) {
@@ -47,18 +41,11 @@ const CharacterCard = ({
       }}
       cursor={isClickable ? "pointer" : "default"}
     >
-      <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
-      {(showName || isActive || children) && (
-        <Flex className={styles.bottom}>
-          {showName && <Text>{token.name}</Text>}
-          {isActive && (
-            <button className={globalStyles.button} onClick={handleClick}>
-              Play
-            </button>
-          )}
-          {children}
-        </Flex>
-      )}
+      <Image h={"40px"} w={"40px"} alt={""} src={token.image} />
+      <Flex direction={"column"} fontSize={"14px"}>
+        <Text>{token.name}</Text>
+        <Text>{`owner ${token.staker?.slice(0, 6)}...${token.staker?.slice(-4)}`}</Text>
+      </Flex>
     </Flex>
   );
 };

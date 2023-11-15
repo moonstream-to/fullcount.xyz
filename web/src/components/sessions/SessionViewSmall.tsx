@@ -1,11 +1,11 @@
 import { Flex, Text } from "@chakra-ui/react";
-import CharacterCard from "./CharacterCard";
-import globalStyles from "./OwnedTokens.module.css";
-import { Session } from "../types";
-import { useGameContext } from "../contexts/GameContext";
-import Timer from "./Timer";
+import CharacterCard from "../tokens/CharacterCard";
+import globalStyles from "../tokens/OwnedTokens.module.css";
+import { Session } from "../../types";
+import { useGameContext } from "../../contexts/GameContext";
+import Timer from "../playing/Timer";
 import { useContext } from "react";
-import Web3Context from "../contexts/Web3Context/context";
+import Web3Context from "../../contexts/Web3Context/context";
 
 export const sessionStates = [
   "session does not exist",

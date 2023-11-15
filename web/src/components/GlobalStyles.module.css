@@ -29,12 +29,26 @@
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+    height: 31px;
 }
 
 .commitButton:disabled {
     border: 1px solid #F1E3BF;
     opacity: 0.3;
     background: #00A341;
+}
+
+.gradientText {
+    background: -webkit-linear-gradient(180deg, #F1E3BF, #D9DFB3, #00B94A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #FFF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 700;
+    line-height: normal;
 }
 
 

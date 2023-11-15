@@ -1,31 +1,31 @@
-import { useGameContext } from "../contexts/GameContext";
+import { useGameContext } from "../../contexts/GameContext";
 import { Box, Flex, Text } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
-import globalStyles from "./OwnedTokens.module.css";
+import globalStyles from "../tokens/OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import { useContext, useEffect } from "react";
-import Web3Context from "../contexts/Web3Context/context";
-import useMoonToast from "../hooks/useMoonToast";
-import queryCacheProps from "../hooks/hookCommon";
-import { decodeBase64Json } from "../utils/decoders";
-import CharacterCard from "./CharacterCard";
-import { Session, Token } from "../types";
+import Web3Context from "../../contexts/Web3Context/context";
+import useMoonToast from "../../hooks/useMoonToast";
+import queryCacheProps from "../../hooks/hookCommon";
+import { decodeBase64Json } from "../../utils/decoders";
+import CharacterCard from "../tokens/CharacterCard";
+import { Session, Token } from "../../types";
 import MySessions from "./MySessions";
-import OwnedTokens from "./OwnedTokens";
-import StakedTokens from "./StakedTokens";
+import OwnedTokens from "../tokens/OwnedTokens";
+import StakedTokens from "../tokens/StakedTokens";
 import SessionViewSmall from "./SessionViewSmall";
 import FiltersView from "./FiltersView";
-import { MULTICALL2_CONTRACT_ADDRESSES } from "../constants";
-import { outputs } from "../web3/abi/ABIITems";
+import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
+import { outputs } from "../../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
 import { useRouter } from "next/router";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
+const FullcountABI = require("../../web3/abi/FullcountABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const tokenABI = require("../web3/abi/BLBABI.json");
+const tokenABI = require("../../web3/abi/BLBABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const multicallABI = require("../web3/abi/Multicall2.json");
+const multicallABI = require("../../web3/abi/Multicall2.json");
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 

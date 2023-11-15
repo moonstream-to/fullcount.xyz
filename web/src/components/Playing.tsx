@@ -1,9 +1,9 @@
 import styles from "./Playing.module.css";
 import { Flex, Text } from "@chakra-ui/react";
 import { useGameContext } from "../contexts/GameContext";
-import SessionsView from "./SessionsView";
+import SessionsView from "./sessions/SessionsView";
 import { useEffect } from "react";
-import PlayView from "./PlayView";
+import PlayView from "./playing/PlayView";
 
 const Playing = () => {
   const { selectedSession, updateContext, selectedToken } = useGameContext();

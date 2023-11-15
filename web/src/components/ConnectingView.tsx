@@ -1,5 +1,5 @@
-import styles from "./SecondStep.module.css";
-import globalStyles from "./OwnedTokens.module.css";
+import styles from "./ConnectingView.module.css";
+import globalStyles from "./tokens/OwnedTokens.module.css";
 import { Flex, Text } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
 import Web3Context from "../contexts/Web3Context/context";
@@ -7,7 +7,7 @@ import { supportedChains } from "../types";
 import { useGameContext } from "../contexts/GameContext";
 import { chainByChainId } from "../contexts/Web3Context";
 
-const SecondStep = ({ nextStep }: { nextStep: () => void }) => {
+const ConnectingView = ({ nextStep }: { nextStep: () => void }) => {
   const web3Provider = useContext(Web3Context);
   const { chainId } = useGameContext();
   useEffect(() => {
@@ -42,4 +42,4 @@ const SecondStep = ({ nextStep }: { nextStep: () => void }) => {
   );
 };
 
-export default SecondStep;
+export default ConnectingView;

@@ -1,7 +1,7 @@
-import { Session } from "../types";
+import { Session } from "../../types";
 import { Flex, Text } from "@chakra-ui/react";
-import CharacterCard from "./CharacterCard";
-import globalStyles from "./OwnedTokens.module.css";
+import CharacterCard from "../tokens/CharacterCard";
+import globalStyles from "../tokens/OwnedTokens.module.css";
 
 const SessionView = ({
   session,

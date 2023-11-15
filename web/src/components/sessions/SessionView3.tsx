@@ -1,17 +1,17 @@
 import { Flex, Text } from "@chakra-ui/react";
-import CharacterCard from "./CharacterCard";
-import globalStyles from "./OwnedTokens.module.css";
-import { Session, Token } from "../types";
-import { useGameContext } from "../contexts/GameContext";
-import Timer from "./Timer";
+import CharacterCard from "../tokens/CharacterCard";
+import globalStyles from "../tokens/OwnedTokens.module.css";
+import { Session, Token } from "../../types";
+import { useGameContext } from "../../contexts/GameContext";
+import Timer from "../playing/Timer";
 import { useContext } from "react";
-import Web3Context from "../contexts/Web3Context/context";
-import CharacterCardSmall from "./CharacterCardSmall";
+import Web3Context from "../../contexts/Web3Context/context";
+import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import * as querystring from "querystring";
-import useMoonToast from "../hooks/useMoonToast";
+import useMoonToast from "../../hooks/useMoonToast";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../web3/abi/FullcountABI.json");
+const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
 export const sessionStates = [
   "session does not exist",
