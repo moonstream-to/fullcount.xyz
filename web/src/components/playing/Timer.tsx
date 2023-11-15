@@ -23,6 +23,8 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
       const remainingTime = endTime - currentTime;
 
       if (remainingTime <= 0) {
+        setMinutesLeft("0");
+        setSecondsLeft("0");
         setTimeLeft("00:00");
         return;
       }
