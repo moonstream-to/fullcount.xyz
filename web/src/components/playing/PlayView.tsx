@@ -155,7 +155,7 @@ const PlayView = () => {
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
-        <Text>{`Session ${selectedSession?.sessionID}`}</Text>
+        <Text w={"150px"}>{`Session ${selectedSession?.sessionID}`}</Text>
 
         {(selectedSession?.progress === 3 ||
           selectedSession?.progress === 4 ||
@@ -166,7 +166,7 @@ const PlayView = () => {
             isActive={selectedSession.progress === 3 || selectedSession.progress === 4}
           />
         )}
-        <Flex w={"74px"} justifyContent={"end"}>
+        <Flex w={"150px"} justifyContent={"end"}>
           <CloseIcon
             onClick={() => updateContext({ selectedSession: undefined })}
             cursor={"pointer"}
@@ -193,11 +193,11 @@ const PlayView = () => {
         ) : (
           <>
             {opponent(selectedToken) && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
-                  h={"300px"}
-                  w={"300px"}
+                  h={"150px"}
+                  w={"150px"}
                   alt={opponent(selectedToken)?.name}
                 />
                 <Text fontSize={"14px"} fontWeight={"700"}>
@@ -256,11 +256,11 @@ const PlayView = () => {
         ) : (
           <>
             {opponent(selectedToken) && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
-                  h={"300px"}
-                  w={"300px"}
+                  h={"150px"}
+                  w={"150px"}
                   alt={opponent(selectedToken)?.name}
                 />
                 <Text fontSize={"14px"} fontWeight={"700"}>
