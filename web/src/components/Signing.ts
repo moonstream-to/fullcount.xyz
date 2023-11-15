@@ -1,3 +1,12 @@
+import { CHAIN_ID, GAME_CONTRACT } from "../constants";
+
+const domain = {
+  name: "Fullcount",
+  version: "0.0.2",
+  chainId: String(CHAIN_ID),
+  verifyingContract: String(GAME_CONTRACT),
+};
+
 export async function signPitch(
   account: string,
   provider: any,
@@ -10,12 +19,7 @@ export async function signPitch(
   if (!account) throw new Error("signAccessToken: account must be defined");
 
   const msgParams = JSON.stringify({
-    domain: {
-      name: "Fullcount",
-      version: "0.0.2",
-      chainId: "80001",
-      verifyingContract: "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F",
-    },
+    domain,
     message: {
       nonce,
       speed,
@@ -72,12 +76,7 @@ export async function signSwing(
   if (!account) throw new Error("signAccessToken: account must be defined");
 
   const msgParams = JSON.stringify({
-    domain: {
-      name: "Fullcount",
-      version: "0.0.2",
-      chainId: "80001",
-      verifyingContract: "0x83930B5AaB9Fd82022De284F016f5C53e4749C9F",
-    },
+    domain,
     message: {
       nonce,
       kind,
