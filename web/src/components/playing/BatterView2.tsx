@@ -193,7 +193,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         selectedIndex={gridIndex}
         setSelectedIndex={sessionStatus.didBatterCommit ? undefined : setGridIndex}
       />
-      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"500"}>
+      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
         You&apos;re swinging
       </Text>
       <Text className={styles.actionText}>

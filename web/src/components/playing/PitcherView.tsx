@@ -189,7 +189,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         selectedIndex={gridIndex}
         setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
       />
-      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"500"}>
+      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
         You&apos;re throwing
       </Text>
       <Text className={styles.actionText}>
