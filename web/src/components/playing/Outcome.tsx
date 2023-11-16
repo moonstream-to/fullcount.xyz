@@ -67,10 +67,10 @@ const Outcome = ({
 
     if (isVisible) {
       setIsPitchSpeedVisible(true);
-      timer1 = setTimeout(() => setIsSwingKindVisible(true), 0);
-      timer2 = setTimeout(() => setIsPitchVisible(true), 1000);
-      timer3 = setTimeout(() => setIsSwingVisible(true), 2500);
-      timer4 = setTimeout(() => setIsOutcomeVisible(true), 3500);
+      timer1 = setTimeout(() => setIsSwingKindVisible(true), 1500);
+      timer2 = setTimeout(() => setIsPitchVisible(true), 1500);
+      timer3 = setTimeout(() => setIsSwingVisible(true), 5000);
+      timer4 = setTimeout(() => setIsOutcomeVisible(true), 5500);
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -89,10 +89,10 @@ const Outcome = ({
     <Flex direction={"column"} h={"700px"} justifyContent={"center"} position={"relative"}>
       {/*<button onClick={() => setIsVisible(!isVisible)}>{isVisible ? "Reset" : "Start"}</button>*/}
 
-      <GrowingText isVisible={isPitchSpeedVisible} right={"110%"}>
+      <GrowingText isVisible={isPitchSpeedVisible} right={"110%"} duration={"0.5s"}>
         <Text>{pitchSpeed[pitch.speed]}</Text>
       </GrowingText>
-      <GrowingText isVisible={isSwingKindVisible} left={"110%"} duration={"1.5s"}>
+      <GrowingText isVisible={isSwingKindVisible} left={"110%"} duration={"0.5s"}>
         <Text>{swingKind[swing.kind]}</Text>
       </GrowingText>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
@@ -100,6 +100,7 @@ const Outcome = ({
           isVisible={isPitchVisible}
           left={`${(Number(pitch.horizontal) + 1) * 50 - 25 - 20}px`}
           top={`${(Number(pitch.vertical) + 1) * 50 - 25 - 20}px`}
+          duration={"3.5s"}
         >
           <Image src={`${assets}/ball2.png`} h={"40px"} w={"40px"} alt={"o"} />
         </GrowingText>
