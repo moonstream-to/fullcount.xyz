@@ -109,10 +109,8 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
     {
       onSuccess: () => {
-        console.log("should invalidate");
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
-        toast("Commit successful.", "success");
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -150,7 +148,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       onSuccess: () => {
         queryClient.invalidateQueries("sessions");
         queryClient.refetchQueries("session");
-        toast("Reveal successful.", "success");
       },
       onError: (e: Error) => {
         toast("Reveal failed." + e?.message, "error");

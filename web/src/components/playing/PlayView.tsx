@@ -12,6 +12,7 @@ import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
+import { ZERO_ADDRESS } from "../../constants";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -98,14 +99,14 @@ const PlayView = () => {
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
   const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
-  const opponent = (token?: Token) =>
-    isPitcher(token) ? selectedSession?.pair.batter : selectedSession?.pair.pitcher;
+  const opponent = (token?: Token) => {
+    const result = isPitcher(token) ? selectedSession?.pair.batter : selectedSession?.pair.pitcher;
+    return result?.address === ZERO_ADDRESS ? undefined : result;
+  };
 
   const sessionStatus = useQuery(
     ["session", selectedSession],
     async () => {
-      console.log("selected session");
-
       const session = await gameContract.methods.getSession(selectedSession?.sessionID).call();
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
@@ -119,7 +120,11 @@ const PlayView = () => {
         didBatterReveal,
         outcome,
         phaseStartTimestamp,
+        pitcherReveal,
+        batterReveal,
       } = session;
+
+      console.log(session, pitcherReveal, batterReveal);
       let isExpired = progress === 6;
       if (progress === 3 || progress === 4) {
         const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
@@ -128,15 +133,11 @@ const PlayView = () => {
         if (remainingTime < 1) {
           isExpired = true;
         }
-        console.log(
-          currentTime,
-          phaseStartTimestamp,
-          selectedSession?.secondsPerPhase,
-          endTime,
-          isExpired,
-        );
       }
-      console.log(didPitcherCommit, progress);
+      const speed: 0 | 1 = Number(pitcherReveal[1]) === 0 ? 0 : 1;
+      const kind: 0 | 1 | 2 =
+        Number(pitcherReveal[1]) === 0 ? 0 : Number(pitcherReveal[1]) === 1 ? 1 : 2;
+
       return {
         progress,
         didPitcherCommit,
@@ -145,6 +146,16 @@ const PlayView = () => {
         didBatterReveal,
         outcome,
         isExpired,
+        pitcherReveal: {
+          speed,
+          vertical: Number(pitcherReveal[2]),
+          horizontal: Number(pitcherReveal[3]),
+        },
+        batterReveal: {
+          kind,
+          vertical: Number(batterReveal[2]),
+          horizontal: Number(batterReveal[3]),
+        },
       };
     },
     {
@@ -192,7 +203,7 @@ const PlayView = () => {
           </>
         ) : (
           <>
-            {opponent(selectedToken) && (
+            {opponent(selectedToken) ? (
               <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
@@ -204,18 +215,17 @@ const PlayView = () => {
                   {opponent(selectedToken)?.name}
                 </Text>
               </Flex>
+            ) : (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
+                <Box h={"21px"} w="300px" bg={"transparent"} />
+              </Flex>
             )}
           </>
         )}
 
         {sessionStatus.data?.progress === 2 && selectedSession && (
           <InviteLink session={selectedSession} />
-        )}
-        {sessionStatus.data?.progress === 2 && (
-          <Flex direction={"column"} gap="10px" alignItems={"center"}>
-            <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-            <Box h={"21px"} w="300px" bg={"transparent"} />
-          </Flex>
         )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
@@ -228,14 +238,14 @@ const PlayView = () => {
               )}
             </>
           )}
-        {(sessionStatus.data?.progress !== 2 || sessionStatus.data?.isExpired) &&
-          sessionStatus.data?.outcome &&
-          sessionStatus.data.progress > 4 && (
-            <Outcome
-              outcome={sessionStatus.data?.outcome}
-              isExpired={!!sessionStatus.data?.isExpired}
-            />
-          )}
+        {sessionStatus.data && sessionStatus.data.progress === 5 && (
+          <Outcome
+            outcome={sessionStatus.data?.outcome}
+            isExpired={!!sessionStatus.data?.isExpired}
+            pitch={sessionStatus.data.pitcherReveal}
+            swing={sessionStatus.data.batterReveal}
+          />
+        )}
         {/*{selectedSession?.pair}*/}
         {!isPitcher(selectedToken) ? (
           <>
@@ -255,7 +265,7 @@ const PlayView = () => {
           </>
         ) : (
           <>
-            {opponent(selectedToken) && (
+            {opponent(selectedToken) ? (
               <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
                 <Image
                   src={opponent(selectedToken)?.image}
@@ -266,6 +276,11 @@ const PlayView = () => {
                 <Text fontSize={"14px"} fontWeight={"700"}>
                   {opponent(selectedToken)?.name}
                 </Text>
+              </Flex>
+            ) : (
+              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
+                <Box h={"21px"} w="300px" bg={"transparent"} />
               </Flex>
             )}
           </>

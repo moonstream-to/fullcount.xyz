@@ -12,10 +12,10 @@
 
 .result {
     color: #FFF;
-    font-family: Inter;
     font-size: 24px;
     font-style: normal;
     font-weight: 700;
     line-height: normal;
     text-transform: uppercase;
+    transform: translateX(-50%);
 }
