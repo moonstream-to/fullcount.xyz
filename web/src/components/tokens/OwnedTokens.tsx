@@ -62,7 +62,6 @@ const OwnedTokens = () => {
         const tokenMetadata = decodeBase64Json(
           await tokenContract.methods.tokenURI(tokenId).call(),
         );
-        console.log(tokenMetadata);
         tokens.push({
           id: tokenId,
           name: tokenMetadata.name.split(` - ${tokenId}`)[0],
@@ -70,7 +69,6 @@ const OwnedTokens = () => {
           address: tokenContract.options.address,
         });
       }
-      console.log(tokens);
       if (!selectedToken && tokens.length > 0) {
         const randomIndex = Math.floor(Math.random() * tokens.length);
         updateContext({ selectedToken: tokens[randomIndex] });
@@ -86,23 +84,18 @@ const OwnedTokens = () => {
     <>
       <Flex className={styles.cards} alignItems={"end"}>
         {ownedTokens.data &&
-          ownedTokens.data
-            .filter(
-              (t) =>
-                !sessions?.some((s) => s.pair.batter?.id === t.id || s.pair.pitcher?.id === t.id),
-            )
-            .map((token: Token, idx: number) => (
-              <CharacterCard
-                token={token}
-                key={idx}
-                isActive={false}
-                maxW={"70px"}
-                maxH={"85px"}
-                showName={false}
-                isClickable={true}
-                border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
-              />
-            ))}
+          ownedTokens.data.map((token: Token, idx: number) => (
+            <CharacterCard
+              token={token}
+              key={idx}
+              isActive={false}
+              maxW={"70px"}
+              maxH={"85px"}
+              showName={false}
+              isClickable={true}
+              border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
+            />
+          ))}
         <Flex w={"70px"} h={"85px"} className={styles.mintCard} onClick={onOpen} cursor={"pointer"}>
           {mintToken.isLoading ? <Spinner /> : " + Mint"}
         </Flex>

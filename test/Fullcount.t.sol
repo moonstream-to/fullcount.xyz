@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import { Test, console2 } from "../lib/forge-std/src/Test.sol";
+import { Test, console } from "../lib/forge-std/src/Test.sol";
 import { Fullcount } from "../src/Fullcount.sol";
 import {
     PlayerType,
@@ -198,9 +198,9 @@ contract FullcountTestBase is Test {
 contract FullcountTestDeployment is FullcountTestBase {
     function test_Deployment() public {
         vm.expectEmit();
-        emit FullcountDeployed("0.0.2", secondsPerPhase);
+        emit FullcountDeployed("0.0.3", secondsPerPhase);
         Fullcount newGame = new Fullcount(secondsPerPhase);
-        assertEq(newGame.FullcountVersion(), "0.0.2");
+        assertEq(newGame.FullcountVersion(), "0.0.3");
         assertEq(newGame.SecondsPerPhase(), secondsPerPhase);
         assertEq(newGame.NumSessions(), 0);
     }
@@ -237,10 +237,10 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         Session memory session = game.getSession(sessionID);
         assertEq(session.phaseStartTimestamp, block.timestamp);
-        assertEq(session.pitcherAddress, address(characterNFTs));
-        assertEq(session.pitcherTokenID, tokenID);
-        assertEq(session.batterAddress, address(0));
-        assertEq(session.batterTokenID, 0);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.pitcherNFT.tokenID, tokenID);
+        assertEq(session.batterNFT.nftAddress, address(0));
+        assertEq(session.batterNFT.tokenID, 0);
 
         assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
     }
@@ -266,10 +266,10 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         Session memory session = game.getSession(sessionID);
         assertEq(session.phaseStartTimestamp, block.timestamp);
-        assertEq(session.batterAddress, address(characterNFTs));
-        assertEq(session.batterTokenID, tokenID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.pitcherTokenID, 0);
+        assertEq(session.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(session.batterNFT.tokenID, tokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(0));
+        assertEq(session.pitcherNFT.tokenID, 0);
 
         assertEq(game.StakedSession(address(characterNFTs), tokenID), sessionID);
     }
@@ -286,6 +286,24 @@ contract FullcountTest_startSession is FullcountTestBase {
         game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
 
         assertEq(game.NumSessions(), initialNumSessions);
+    }
+
+    function testRevert_if_nft_starts_a_session_when_already_staked() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.expectRevert("Fullcount.startSession: NFT is already staked to a session.");
+        game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.stopPrank();       
     }
 }
 
@@ -358,10 +376,10 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         Session memory session = game.getSession(sessionID);
         assertEq(session.phaseStartTimestamp, expectedNextPhaseTimestamp);
-        assertEq(session.pitcherAddress, address(characterNFTs));
-        assertEq(session.pitcherTokenID, tokenID);
-        assertEq(session.batterAddress, address(otherCharacterNFTs));
-        assertEq(session.batterTokenID, otherTokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.pitcherNFT.tokenID, tokenID);
+        assertEq(session.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.batterNFT.tokenID, otherTokenID);
 
         assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
     }
@@ -401,10 +419,10 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         Session memory session = game.getSession(sessionID);
         assertEq(session.phaseStartTimestamp, expectedNextPhaseTimestamp);
-        assertEq(session.batterAddress, address(characterNFTs));
-        assertEq(session.batterTokenID, tokenID);
-        assertEq(session.pitcherAddress, address(otherCharacterNFTs));
-        assertEq(session.pitcherTokenID, otherTokenID);
+        assertEq(session.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(session.batterNFT.tokenID, tokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherNFT.tokenID, otherTokenID);
 
         assertEq(game.StakedSession(address(otherCharacterNFTs), otherTokenID), sessionID);
     }
@@ -487,10 +505,42 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         assertEq(game.sessionProgress(sessionID), 1);
 
+        Session memory session = game.getSession(sessionID);
+        assertTrue(session.pitcherLeftSession);
+
         vm.startPrank(player2);
 
         vm.expectRevert("Fullcount.joinSession: opponent left session");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_if_nft_joins_a_session_when_already_staked() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 firstSession = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.stopPrank();   
+
+        vm.startPrank(player2);
+
+        emit SessionStarted(initialNumSessions + 2, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        game.startSession(address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+
+        vm.expectRevert("Fullcount.joinSession: NFT is already staked to a session.");
+        game.joinSession(firstSession, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
     }
@@ -521,10 +571,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory initialSession = game.getSession(sessionID);
-        assertEq(initialSession.pitcherAddress, address(characterNFTs));
-        assertEq(initialSession.pitcherTokenID, tokenID);
-        assertEq(initialSession.batterAddress, address(0));
-        assertEq(initialSession.batterTokenID, 0);
+        assertEq(initialSession.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(initialSession.pitcherNFT.tokenID, tokenID);
+        assertEq(initialSession.batterNFT.nftAddress, address(0));
+        assertEq(initialSession.batterNFT.tokenID, 0);
 
         vm.expectEmit();
         emit SessionAborted(sessionID, address(characterNFTs), tokenID);
@@ -533,10 +583,12 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 1);
 
         Session memory terminalSession = game.getSession(sessionID);
-        assertEq(terminalSession.pitcherAddress, address(0));
-        assertEq(terminalSession.pitcherTokenID, 0);
-        assertEq(terminalSession.batterAddress, address(0));
-        assertEq(terminalSession.batterTokenID, 0);
+        assertEq(terminalSession.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(terminalSession.pitcherNFT.tokenID, tokenID);
+        assertTrue(terminalSession.pitcherLeftSession);
+        assertEq(terminalSession.batterNFT.nftAddress, address(0));
+        assertEq(terminalSession.batterNFT.tokenID, 0);
+        assertFalse(terminalSession.batterLeftSession);
 
         vm.stopPrank();
     }
@@ -553,10 +605,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory initialSession = game.getSession(sessionID);
-        assertEq(initialSession.batterAddress, address(characterNFTs));
-        assertEq(initialSession.batterTokenID, tokenID);
-        assertEq(initialSession.pitcherAddress, address(0));
-        assertEq(initialSession.pitcherTokenID, 0);
+        assertEq(initialSession.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(initialSession.batterNFT.tokenID, tokenID);
+        assertEq(initialSession.pitcherNFT.nftAddress, address(0));
+        assertEq(initialSession.pitcherNFT.tokenID, 0);
 
         vm.expectEmit();
         emit SessionAborted(sessionID, address(characterNFTs), tokenID);
@@ -565,10 +617,12 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 1);
 
         Session memory terminalSession = game.getSession(sessionID);
-        assertEq(terminalSession.batterAddress, address(0));
-        assertEq(terminalSession.batterTokenID, 0);
-        assertEq(terminalSession.pitcherAddress, address(0));
-        assertEq(terminalSession.pitcherTokenID, 0);
+        assertEq(terminalSession.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(terminalSession.batterNFT.tokenID, tokenID);
+        assertTrue(terminalSession.batterLeftSession);
+        assertEq(terminalSession.pitcherNFT.nftAddress, address(0));
+        assertEq(terminalSession.pitcherNFT.tokenID, 0);
+        assertFalse(terminalSession.pitcherLeftSession);
 
         vm.stopPrank();
     }
@@ -585,10 +639,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory initialSession = game.getSession(sessionID);
-        assertEq(initialSession.pitcherAddress, address(characterNFTs));
-        assertEq(initialSession.pitcherTokenID, tokenID);
-        assertEq(initialSession.batterAddress, address(0));
-        assertEq(initialSession.batterTokenID, 0);
+        assertEq(initialSession.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(initialSession.pitcherNFT.tokenID, tokenID);
+        assertEq(initialSession.batterNFT.nftAddress, address(0));
+        assertEq(initialSession.batterNFT.tokenID, 0);
 
         vm.prank(player2);
 
@@ -598,10 +652,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory terminalSession = game.getSession(sessionID);
-        assertEq(terminalSession.pitcherAddress, address(characterNFTs));
-        assertEq(terminalSession.pitcherTokenID, tokenID);
-        assertEq(terminalSession.batterAddress, address(0));
-        assertEq(terminalSession.batterTokenID, 0);
+        assertEq(terminalSession.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(terminalSession.pitcherNFT.tokenID, tokenID);
+        assertEq(terminalSession.batterNFT.nftAddress, address(0));
+        assertEq(terminalSession.batterNFT.tokenID, 0);
     }
 
     function testRevert_when_batter_aborted_by_nonstaker() public {
@@ -616,10 +670,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory initialSession = game.getSession(sessionID);
-        assertEq(initialSession.batterAddress, address(characterNFTs));
-        assertEq(initialSession.batterTokenID, tokenID);
-        assertEq(initialSession.pitcherAddress, address(0));
-        assertEq(initialSession.pitcherTokenID, 0);
+        assertEq(initialSession.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(initialSession.batterNFT.tokenID, tokenID);
+        assertEq(initialSession.pitcherNFT.nftAddress, address(0));
+        assertEq(initialSession.pitcherNFT.tokenID, 0);
 
         vm.prank(player2);
 
@@ -629,10 +683,10 @@ contract FullcountTest_abortSession is FullcountTestBase {
         assertEq(game.sessionProgress(sessionID), 2);
 
         Session memory terminalSession = game.getSession(sessionID);
-        assertEq(terminalSession.batterAddress, address(characterNFTs));
-        assertEq(terminalSession.batterTokenID, tokenID);
-        assertEq(terminalSession.pitcherAddress, address(0));
-        assertEq(terminalSession.pitcherTokenID, 0);
+        assertEq(terminalSession.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(terminalSession.batterNFT.tokenID, tokenID);
+        assertEq(terminalSession.pitcherNFT.nftAddress, address(0));
+        assertEq(terminalSession.pitcherNFT.tokenID, 0);
     }
 
     function testRevert_when_aborting_nonexistent_session() public {
@@ -1240,10 +1294,10 @@ contract FullcountTest_reveal is FullcountTestBase {
         BatterTokenID = otherTokenID;
 
         Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(characterNFTs));
-        assertEq(session.batterAddress, address(otherCharacterNFTs));
-        assertEq(session.pitcherTokenID, PitcherTokenID);
-        assertEq(session.batterTokenID, BatterTokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
     }
 
     // TODO Test that only pitcher NFT owner and batter NFT owner can reveal
@@ -1275,10 +1329,12 @@ contract FullcountTest_reveal is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 5);
 
         Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(characterNFTs));
-        assertEq(session.batterAddress, address(0));
-        assertEq(session.pitcherTokenID, PitcherTokenID);
-        assertEq(session.batterTokenID, 0);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertTrue(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertTrue(session.batterLeftSession);
     }
 
     function test_batter_reveal_then_pitcher_reveal() public {
@@ -1307,10 +1363,12 @@ contract FullcountTest_reveal is FullcountTestBase {
         assertEq(game.sessionProgress(SessionID), 5);
 
         Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.batterAddress, address(otherCharacterNFTs));
-        assertEq(session.pitcherTokenID, 0);
-        assertEq(session.batterTokenID, BatterTokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertTrue(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertTrue(session.batterLeftSession);
     }
 }
 
@@ -1352,10 +1410,10 @@ contract FullcountTest_unstake is FullcountTestBase {
         BatterTokenID = otherTokenID;
 
         Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(characterNFTs));
-        assertEq(session.batterAddress, address(otherCharacterNFTs));
-        assertEq(session.pitcherTokenID, PitcherTokenID);
-        assertEq(session.batterTokenID, BatterTokenID);
+        assertEq(session.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(session.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
     }
 
     function _try_unstake_and_expect_invalid_state_revert(
@@ -1373,6 +1431,70 @@ contract FullcountTest_unstake is FullcountTestBase {
         vm.stopPrank();
     }
 
+    function test_pitcher_can_unstake_when_session_expired_in_phase_2() public {
+        PitcherTokenID = charactersMinted + 1;
+        characterNFTs.mint(player1, PitcherTokenID); 
+
+        BatterTokenID = otherCharactersMinted + 1;
+        otherCharacterNFTs.mint(player2, BatterTokenID);
+
+        vm.startPrank(player1);
+
+        uint256 startTimestamp = block.timestamp;
+        uint256 newSessionID = game.startSession(PitcherNFTAddress, PitcherTokenID, PlayerType.Pitcher);
+
+        Session memory session = game.getSession(newSessionID);
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertFalse(session.pitcherLeftSession);
+
+        assertEq(game.sessionProgress(newSessionID), 2);
+
+        vm.warp(startTimestamp + game.SecondsPerPhase() + 1);
+
+        assertEq(game.sessionProgress(newSessionID), 6);
+        game.unstakeNFT(PitcherNFTAddress, PitcherTokenID);
+
+        session = game.getSession(newSessionID);
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertTrue(session.pitcherLeftSession);
+
+        vm.stopPrank();
+    }
+
+    function test_batter_can_unstake_when_session_expired_in_phase_2() public {
+        PitcherTokenID = charactersMinted + 1;
+        characterNFTs.mint(player1, PitcherTokenID); 
+
+        BatterTokenID = otherCharactersMinted + 1;
+        otherCharacterNFTs.mint(player2, BatterTokenID);
+
+        vm.startPrank(player2);
+
+        uint256 startTimestamp = block.timestamp;
+        uint256 newSessionID = game.startSession(BatterNFTAddress, BatterTokenID, PlayerType.Batter);
+
+        Session memory session = game.getSession(newSessionID);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertFalse(session.batterLeftSession);
+
+        assertEq(game.sessionProgress(newSessionID), 2);
+
+        vm.warp(startTimestamp + game.SecondsPerPhase() + 1);
+
+        assertEq(game.sessionProgress(newSessionID), 6);
+        game.unstakeNFT(BatterNFTAddress, BatterTokenID);
+
+        session = game.getSession(newSessionID);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertTrue(session.batterLeftSession);
+
+        vm.stopPrank();
+    }
+
     function testRevert_if_trying_unstake_in_state_3() public {
         assertEq(game.sessionProgress(SessionID), 3);
 
@@ -1380,6 +1502,40 @@ contract FullcountTest_unstake is FullcountTestBase {
 
         _try_unstake_and_expect_invalid_state_revert(player2, BatterNFTAddress, BatterTokenID);
     }
+
+    function test_players_can_unstake_when_session_expired_in_phase_3() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        vm.warp(block.timestamp + game.SecondsPerPhase() + 1);
+
+        assertEq(game.sessionProgress(SessionID), 6);
+
+        Session memory session = game.getSession(SessionID);
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertFalse(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertFalse(session.batterLeftSession);
+
+        vm.prank(player1);
+        game.unstakeNFT(PitcherNFTAddress, PitcherTokenID);
+
+        session = game.getSession(SessionID);
+        assertTrue(session.pitcherLeftSession);
+        assertFalse(session.batterLeftSession);
+
+        vm.prank(player2);
+        game.unstakeNFT(BatterNFTAddress, BatterTokenID);
+
+        session = game.getSession(SessionID);
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertTrue(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertTrue(session.batterLeftSession);
+    }    
 
     function testRevert_if_trying_to_unstake_in_state_4() public {
         assertEq(game.sessionProgress(SessionID), 3);
@@ -1403,8 +1559,13 @@ contract FullcountTest_unstake is FullcountTestBase {
         _try_unstake_and_expect_invalid_state_revert(player2, BatterNFTAddress, BatterTokenID);
     }
 
-    function test_batter_can_unstake_after_completed_session() public {
+    function test_players_can_unstake_when_session_expired_in_phase_4() public {
         assertEq(game.sessionProgress(SessionID), 3);
+
+        // Player 1 chooses to pitch a fastball over the middle of the plate
+        Pitch memory pitch =
+            Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         // Player 2 chooses to make a contact swing in the middle of their strike zone.
         Swing memory swing = Swing(
@@ -1413,144 +1574,51 @@ contract FullcountTest_unstake is FullcountTestBase {
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
         assertEq(game.sessionProgress(SessionID), 4);
 
-        // Batter reveals first.
-        _revealSwing(SessionID, player2, swing);
+        vm.warp(block.timestamp + game.SecondsPerPhase() + 1);
 
-        _revealPitch(SessionID, player1, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 5);
+        assertEq(game.sessionProgress(SessionID), 6);
 
         Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.batterAddress, BatterNFTAddress);
-        assertEq(session.pitcherTokenID, 0);
-        assertEq(session.batterTokenID, BatterTokenID);
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertFalse(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertFalse(session.batterLeftSession);
 
-        vm.startPrank(player2);
-
-        game.unstakeNFT(BatterNFTAddress, BatterTokenID);
-
-        vm.stopPrank();
-
-        session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.batterAddress, address(0));
-        assertEq(session.pitcherTokenID, 0);
-        assertEq(session.batterTokenID, 0);
-    }
-
-    function test_pitcher_can_unstake_after_completed_session() public {
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        _revealSwing(SessionID, player2, swing);
-
-        assertEq(game.sessionProgress(SessionID), 5);
-
-        Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, PitcherNFTAddress);
-        assertEq(session.batterAddress, address(0));
-        assertEq(session.pitcherTokenID, PitcherTokenID);
-        assertEq(session.batterTokenID, 0);
-
-        vm.startPrank(player1);
-
+        vm.prank(player1);
         game.unstakeNFT(PitcherNFTAddress, PitcherTokenID);
 
-        vm.stopPrank();
+        session = game.getSession(SessionID);
+        assertTrue(session.pitcherLeftSession);
+        assertFalse(session.batterLeftSession);
+
+        vm.prank(player2);
+        game.unstakeNFT(BatterNFTAddress, BatterTokenID);
 
         session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.batterAddress, address(0));
-        assertEq(session.pitcherTokenID, 0);
-        assertEq(session.batterTokenID, 0);
-    }
-
-
-    function test_players_can_unstake_after_expired_session() public {
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        // TODO Finish test
-    }
+        assertEq(session.pitcherNFT.nftAddress, PitcherNFTAddress);
+        assertEq(session.pitcherNFT.tokenID, PitcherTokenID);
+        assertTrue(session.pitcherLeftSession);
+        assertEq(session.batterNFT.nftAddress, BatterNFTAddress);
+        assertEq(session.batterNFT.tokenID, BatterTokenID);
+        assertTrue(session.batterLeftSession);
+    }    
 
     function testRevert_if_non_owner_attempts_to_unstake() public {
+        // TODO Rewrite test with expired session
         assertEq(game.sessionProgress(SessionID), 3);
 
-        // Player 2 chooses to make a contact swing in the middle of their strike zone.
-        Swing memory swing = Swing(
-            239_480_239_842_390_842_390_482_390, SwingType.Contact, VerticalLocation.Middle, HorizontalLocation.Middle
-        );
+        vm.warp(block.timestamp + game.SecondsPerPhase() + 1);
 
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        // Player 1 chooses to pitch a fastball over the middle of the plate
-        Pitch memory pitch =
-            Pitch(287_349_237_429_034_239_084, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Batter reveals first.
-        _revealSwing(SessionID, player2, swing);
-        _revealPitch(SessionID, player1, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 5);
-
-        Session memory session = game.getSession(SessionID);
-        assertEq(session.pitcherAddress, address(0));
-        assertEq(session.batterAddress, BatterNFTAddress);
-        assertEq(session.pitcherTokenID, 0);
-        assertEq(session.batterTokenID, BatterTokenID);
+        assertEq(game.sessionProgress(SessionID), 6);
 
         vm.startPrank(randomPerson);
+
+        vm.expectRevert("Fullcount._unstakeNFT: msg.sender is not NFT owner");
+        game.unstakeNFT(PitcherNFTAddress, PitcherTokenID);
 
         vm.expectRevert("Fullcount._unstakeNFT: msg.sender is not NFT owner");
         game.unstakeNFT(BatterNFTAddress, BatterTokenID);

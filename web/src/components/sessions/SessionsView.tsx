@@ -3,7 +3,7 @@ import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import { useContext, useEffect } from "react";
+import React, { Fragment, useContext, useEffect } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import useMoonToast from "../../hooks/useMoonToast";
 import { decodeBase64Json } from "../../utils/decoders";
@@ -16,8 +16,9 @@ import { outputs } from "../../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
 import { useRouter } from "next/router";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const FullcountABI = require("../../web3/abi/FullcountABI.json");
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { AbiItem } from "web3-utils";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -37,7 +38,6 @@ const SessionsView = () => {
     MULTICALL2_CONTRACT_ADDRESSES[
       String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
     ];
-  console.log(web3ctx.chainId, MULTICALL2_CONTRACT_ADDRESS);
   const multicallContract = new web3ctx.web3.eth.Contract(
     multicallABI,
     MULTICALL2_CONTRACT_ADDRESS,
@@ -68,7 +68,6 @@ const SessionsView = () => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      console.log(tokenAddress, selectedToken, role);
       return gameContract.methods.startSession(tokenAddress, selectedToken?.id, role).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
@@ -93,7 +92,6 @@ const SessionsView = () => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      console.log(sessionID, tokenAddress, selectedToken);
       return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
@@ -132,19 +130,29 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
+      const session = await gameContract.methods.getSession(1).call();
+
       const res = [];
       for (let i = 0; i < multicallRes.length; i += 2) {
         res.push({ progress: multicallRes[i][1], session: multicallRes[i + 1][1] });
       }
       const decodedRes = res.map((data: any) => {
+        const sessionRaw = web3ctx.web3.eth.abi.decodeParameters(outputs, data.session)[0];
+        const session = {
+          ...sessionRaw,
+          pitcherAddress: sessionRaw.pitcherNFT.nftAddress,
+          pitcherTokenID: sessionRaw.pitcherNFT.tokenID,
+          batterAddress: sessionRaw.batterNFT.nftAddress,
+          batterTokenID: sessionRaw.batterNFT.tokenID,
+        };
         return {
           progress: Number(data.progress),
-          session: web3ctx.web3.eth.abi.decodeParameters(outputs, data.session)[0],
+          session,
         };
       });
-
       const tokens: any[] = [];
       decodedRes.forEach((res) => {
+        console.log(res.session);
         if (res.session.pitcherAddress !== ZERO_ADDRESS) {
           tokens.push({ address: res.session.pitcherAddress, id: res.session.pitcherTokenID });
         }
@@ -152,6 +160,7 @@ const SessionsView = () => {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
+      console.log(contractAddress, decodedRes);
 
       const tokenQueries: any[] = [];
       tokens.forEach((token) => {
@@ -197,6 +206,8 @@ const SessionsView = () => {
 
         return {
           pair,
+          batterLeft: session.session.batterLeftSession,
+          pitcherLeft: session.session.pitcherLeftSession,
           sessionID: idx + 1,
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
@@ -248,10 +259,55 @@ const SessionsView = () => {
   const isTokenStaked = (token: Token) => {
     return sessions.data?.find(
       (s) =>
-        (s.pair.pitcher?.id === token.id && s.pair.pitcher?.address === token.address) ||
-        (s.pair.batter?.id === token.id && s.pair.batter?.address === token.address),
+        (s.pair.pitcher?.id === token.id &&
+          s.pair.pitcher?.address === token.address &&
+          !s.pitcherLeft) ||
+        (s.pair.batter?.id === token.id &&
+          s.pair.batter?.address === token.address &&
+          !s.batterLeft),
     );
   };
+
+  const tokenProgress = (token: Token) => {
+    return sessions.data?.find(
+      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
+    )?.progress;
+  };
+
+  const tokenSessionID = (token: Token) => {
+    return sessions.data?.find(
+      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
+    )?.sessionID;
+  };
+
+  const unstakeNFT = useMutation(
+    async (token: Token) => {
+      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
+        return gameContract.methods.abortSession(tokenSessionID(token)).send({
+          from: web3ctx.account,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+      }
+      if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
+        return gameContract.methods.unstakeNFT(token.address, token.id).send({
+          from: web3ctx.account,
+          maxPriorityFeePerGas: null,
+          maxFeePerGas: null,
+        });
+      }
+    },
+    {
+      onSuccess: () => {
+        // queryClient.invalidateQueries("sessions");
+        queryClient.refetchQueries("sessions");
+        queryClient.refetchQueries("owned_tokens");
+      },
+      onError: (e: Error) => {
+        toast("Unstake failed." + e?.message, "error");
+      },
+    },
+  );
 
   const filters = [
     {
@@ -263,55 +319,67 @@ const SessionsView = () => {
   ];
   return (
     <Flex className={styles.container}>
-      <Flex gap={"30px"}>
-        <OwnedTokens />
-        <StakedTokens />
-      </Flex>
-      {selectedToken && !isTokenStaked(selectedToken) && (
-        <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-      )}
-
-      <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
-        <Text className={styles.title}>Sessions</Text>
+      <Flex gap={"20px"} alignItems={"start"}>
         {selectedToken && !isTokenStaked(selectedToken) && (
-          <Flex gap={"20px"}>
+          <Flex direction={"column"}>
+            <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             <button
               className={globalStyles.button}
-              style={{ width: "230px" }}
+              style={{ width: "139px" }}
               onClick={() => startSession.mutate(0)}
             >
               {startSession.isLoading && startSession.variables === 0 ? (
-                <Spinner />
+                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
               ) : (
-                "Start new session as pitcher"
+                "Pitch"
               )}
             </button>
             <button
               className={globalStyles.button}
               onClick={() => startSession.mutate(1)}
-              style={{ width: "230px" }}
+              style={{ width: "139px" }}
             >
               {startSession.isLoading && startSession.variables === 1 ? (
-                <Spinner />
+                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
               ) : (
-                "Start new session as batter"
+                "Bat"
               )}
             </button>
           </Flex>
         )}
+        {selectedToken && isTokenStaked(selectedToken) && (
+          <Flex direction={"column"}>
+            <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
+            <button
+              className={globalStyles.button}
+              onClick={() => unstakeNFT.mutate(selectedToken)}
+            >
+              unstake
+            </button>
+            <Box w={"139px"} h={"26px"} />
+          </Flex>
+        )}
+        <Flex gap={"30px"}>
+          <OwnedTokens />
+          {/*<StakedTokens />*/}
+        </Flex>
+      </Flex>
+
+      <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
+        <Text className={styles.title}>Sessions</Text>
       </Flex>
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
           {sessions.data.map((session, idx) => (
-            <>
+            <Fragment key={idx}>
               {progressFilter[session.progress] && (
                 <>
-                  <SessionView3 key={idx} session={session} />
+                  <SessionView3 session={session} />
                   {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
                 </>
               )}
-            </>
+            </Fragment>
           ))}
         </Flex>
       )}

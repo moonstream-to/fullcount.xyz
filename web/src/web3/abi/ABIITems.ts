@@ -7,14 +7,21 @@ export const outputs = [
         type: "uint256",
       },
       {
-        internalType: "address",
-        name: "pitcherAddress",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "pitcherTokenID",
-        type: "uint256",
+        components: [
+          {
+            internalType: "address",
+            name: "nftAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct NFT",
+        name: "pitcherNFT",
+        type: "tuple",
       },
       {
         internalType: "bool",
@@ -59,14 +66,21 @@ export const outputs = [
         type: "tuple",
       },
       {
-        internalType: "address",
-        name: "batterAddress",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "batterTokenID",
-        type: "uint256",
+        components: [
+          {
+            internalType: "address",
+            name: "nftAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct NFT",
+        name: "batterNFT",
+        type: "tuple",
       },
       {
         internalType: "bool",
@@ -114,6 +128,16 @@ export const outputs = [
         internalType: "enum Outcome",
         name: "outcome",
         type: "uint8",
+      },
+      {
+        internalType: "bool",
+        name: "pitcherLeftSession",
+        type: "bool",
+      },
+      {
+        internalType: "bool",
+        name: "batterLeftSession",
+        type: "bool",
       },
     ],
     internalType: "struct Session",
