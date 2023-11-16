@@ -152,6 +152,8 @@ contract Fullcount is EIP712 {
     function startSession(address nftAddress, uint256 tokenID, PlayerType role) external virtual returns (uint256) {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
 
+        require(StakedSession[nftAddress][tokenID] == 0, "Fullcount.startSession: NFT is already staked to a session.");
+
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
         NumSessions++;
@@ -179,6 +181,8 @@ contract Fullcount is EIP712 {
         require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
 
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount.joinSession: msg.sender is not NFT owner");
+
+        require(StakedSession[nftAddress][tokenID] == 0, "Fullcount.joinSession: NFT is already staked to a session.");
 
         Session storage session = SessionState[sessionID];
         if (session.pitcherNFT.nftAddress != address(0) && session.batterNFT.nftAddress != address(0)) {
