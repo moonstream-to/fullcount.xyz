@@ -114,22 +114,27 @@ struct Swing {
     HorizontalLocation horizontal;
 }
 
+struct NFT {
+    address nftAddress;
+    uint256 tokenID;
+}
+
 /*
 Session represents the state of a Fullcount session.
 */
 struct Session {
     uint256 phaseStartTimestamp;
-    address pitcherAddress;
-    uint256 pitcherTokenID;
+    NFT pitcherNFT;
     bool didPitcherCommit;
     bool didPitcherReveal;
     bytes pitcherCommit;
     Pitch pitcherReveal;
-    address batterAddress;
-    uint256 batterTokenID;
+    NFT batterNFT;
     bool didBatterCommit;
     bool didBatterReveal;
     bytes batterCommit;
     Swing batterReveal;
     Outcome outcome;
+    bool pitcherLeftSession;
+    bool batterLeftSession;
 }
