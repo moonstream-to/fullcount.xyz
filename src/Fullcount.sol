@@ -123,12 +123,12 @@ contract Fullcount is EIP712 {
         }
 
         Session storage session = SessionState[sessionID];
-        if (session.didPitcherReveal && session.didBatterReveal) {
-            return 5;
-        } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
-            return 1;
-        } else if (session.pitcherAddress == address(0) || session.batterAddress == address(0)) {
-            return 2;
+        if (session.pitcherNFT.nftAddress == address(0) || session.batterNFT.nftAddress == address(0)) {
+            if(session.pitcherLeftSession || session.batterLeftSession) {
+                return 1;
+            } else {
+                return 2;
+            }
         } else if (!session.didPitcherCommit || !session.didBatterCommit) {
             if (session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
                 return 6;
@@ -139,6 +139,8 @@ contract Fullcount is EIP712 {
                 return 6;
             }
             return 4;
+        } else if (session.didPitcherReveal && session.didBatterReveal) {
+            return 5;
         }
 
         revert("Fullcount._sessionProgress: idiot programmer");
@@ -160,11 +162,11 @@ contract Fullcount is EIP712 {
         NumSessions++;
 
         if (role == PlayerType.Pitcher) {
-            SessionState[NumSessions].pitcherAddress = nftAddress;
-            SessionState[NumSessions].pitcherTokenID = tokenID;
+            SessionState[NumSessions].pitcherNFT.nftAddress = nftAddress;
+            SessionState[NumSessions].pitcherNFT.tokenID = tokenID;
         } else {
-            SessionState[NumSessions].batterAddress = nftAddress;
-            SessionState[NumSessions].batterTokenID = tokenID;
+            SessionState[NumSessions].batterNFT.nftAddress = nftAddress;
+            SessionState[NumSessions].batterNFT.tokenID = tokenID;
         }
 
         StakedSession[nftAddress][tokenID] = NumSessions;
@@ -186,20 +188,20 @@ contract Fullcount is EIP712 {
         require(msg.sender == nftContract.ownerOf(tokenID), "Fullcount.joinSession: msg.sender is not NFT owner");
 
         Session storage session = SessionState[sessionID];
-        if (session.pitcherAddress != address(0) && session.batterAddress != address(0)) {
+        if (session.pitcherNFT.nftAddress != address(0) && session.batterNFT.nftAddress != address(0)) {
             revert("Fullcount.joinSession: session is already full");
-        } else if (session.pitcherAddress == address(0) && session.batterAddress == address(0)) {
+        } else if (session.pitcherLeftSession || session.batterLeftSession) {
             revert("Fullcount.joinSession: opponent left session");
         }
 
         PlayerType role = PlayerType.Pitcher;
-        if (session.batterAddress == address(0)) {
+        if (session.batterNFT.nftAddress == address(0)) {
             role = PlayerType.Batter;
-            session.batterAddress = nftAddress;
-            session.batterTokenID = tokenID;
+            session.batterNFT.nftAddress = nftAddress;
+            session.batterNFT.tokenID = tokenID;
         } else {
-            session.pitcherAddress = nftAddress;
-            session.pitcherTokenID = tokenID;
+            session.pitcherNFT.nftAddress = nftAddress;
+            session.pitcherNFT.tokenID = tokenID;
         }
 
         session.phaseStartTimestamp = block.timestamp;
@@ -219,17 +221,15 @@ contract Fullcount is EIP712 {
         require(msg.sender == nftContract.ownerOf(tokenID), "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
         if (
-            SessionState[stakedSessionID].pitcherAddress == nftAddress
-                && SessionState[stakedSessionID].pitcherTokenID == tokenID
+            SessionState[stakedSessionID].pitcherNFT.nftAddress == nftAddress
+                && SessionState[stakedSessionID].pitcherNFT.tokenID == tokenID
         ) {
-            SessionState[stakedSessionID].pitcherAddress = address(0);
-            SessionState[stakedSessionID].pitcherTokenID = 0;
+            SessionState[stakedSessionID].pitcherLeftSession = true;
         } else if (
-            SessionState[stakedSessionID].batterAddress == nftAddress
-                && SessionState[stakedSessionID].batterTokenID == tokenID
+            SessionState[stakedSessionID].batterNFT.nftAddress == nftAddress
+                && SessionState[stakedSessionID].batterNFT.tokenID == tokenID
         ) {
-            SessionState[stakedSessionID].batterAddress = address(0);
-            SessionState[stakedSessionID].batterTokenID = 0;
+            SessionState[stakedSessionID].batterLeftSession = true;
         } else {
             revert("Fullcount._unstakeNFT: idiot programmer");
         }
@@ -252,14 +252,14 @@ contract Fullcount is EIP712 {
         require(_sessionProgress(sessionID) == 2, "Fullcount.abortSession: cannot abort from session in this state");
 
         // In each branch, we emit SessionAborted before unstaking because unstaking changes SessionState.
-        if (SessionState[sessionID].pitcherAddress != address(0)) {
+        if (SessionState[sessionID].pitcherNFT.nftAddress != address(0)) {
             emit SessionAborted(
-                sessionID, SessionState[sessionID].pitcherAddress, SessionState[sessionID].pitcherTokenID
+                sessionID, SessionState[sessionID].pitcherNFT.nftAddress, SessionState[sessionID].pitcherNFT.tokenID
             );
-            _unstakeNFT(SessionState[sessionID].pitcherAddress, SessionState[sessionID].pitcherTokenID);
-        } else if (SessionState[sessionID].batterAddress != address(0)) {
-            emit SessionAborted(sessionID, SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
-            _unstakeNFT(SessionState[sessionID].batterAddress, SessionState[sessionID].batterTokenID);
+            _unstakeNFT(SessionState[sessionID].pitcherNFT.nftAddress, SessionState[sessionID].pitcherNFT.tokenID);
+        } else if (SessionState[sessionID].batterNFT.nftAddress != address(0)) {
+            emit SessionAborted(sessionID, SessionState[sessionID].batterNFT.nftAddress, SessionState[sessionID].batterNFT.tokenID);
+            _unstakeNFT(SessionState[sessionID].batterNFT.nftAddress, SessionState[sessionID].batterNFT.tokenID);
         } else {
             revert("Fullcount.abortSession: idiot programmer");
         }
@@ -340,9 +340,7 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        IERC721 nftContract = IERC721(session.pitcherAddress);
-
-        require(msg.sender == nftContract.ownerOf(session.pitcherTokenID), "Fullcount.commitPitch: msg.sender is not pitcher NFT owner");
+        require(msg.sender == IERC721(session.pitcherNFT.nftAddress).ownerOf(session.pitcherNFT.tokenID), "Fullcount.commitPitch: msg.sender is not pitcher NFT owner");
 
         require(!session.didPitcherCommit, "Fullcount.commitPitch: pitcher already committed");
 
@@ -365,9 +363,7 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        IERC721 nftContract = IERC721(session.batterAddress);
-
-        require(msg.sender == nftContract.ownerOf(session.batterTokenID), "Fullcount.commitSwing: msg.sender is not batter NFT owner");
+        require(msg.sender == IERC721(session.batterNFT.nftAddress).ownerOf(session.batterNFT.tokenID), "Fullcount.commitSwing: msg.sender is not batter NFT owner");
 
         require(!session.didBatterCommit, "Fullcount.commitSwing: batter already committed");
 
@@ -514,9 +510,7 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        IERC721 nftContract = IERC721(session.pitcherAddress);
-
-        require(msg.sender == nftContract.ownerOf(session.pitcherTokenID), "Fullcount.revealPitch: msg.sender is not pitcher NFT owner");
+        require(msg.sender == IERC721(session.pitcherNFT.nftAddress).ownerOf(session.pitcherNFT.tokenID), "Fullcount.revealPitch: msg.sender is not pitcher NFT owner");
 
         require(!session.didPitcherReveal, "Fullcount.revealPitch: pitcher already revealed");
 
@@ -536,15 +530,15 @@ contract Fullcount is EIP712 {
             emit SessionResolved(
                 sessionID,
                 outcome,
-                session.pitcherAddress,
-                session.pitcherTokenID,
-                session.batterAddress,
-                session.batterTokenID
+                session.pitcherNFT.nftAddress,
+                session.pitcherNFT.tokenID,
+                session.batterNFT.nftAddress,
+                session.batterNFT.tokenID
             );
 
             session.outcome = outcome;
 
-            _unstakeNFT(session.pitcherAddress, session.pitcherTokenID);
+            _unstakeNFT(session.pitcherNFT.nftAddress, session.pitcherNFT.tokenID);
         }
     }
 
@@ -565,9 +559,7 @@ contract Fullcount is EIP712 {
 
         Session storage session = SessionState[sessionID];
 
-        IERC721 nftContract = IERC721(session.batterAddress);
-
-        require(msg.sender == nftContract.ownerOf(session.batterTokenID), "Fullcount.revealSwing: msg.sender is not batter NFT owner");
+        require(msg.sender == IERC721(session.batterNFT.nftAddress).ownerOf(session.batterNFT.tokenID), "Fullcount.revealSwing: msg.sender is not batter NFT owner");
 
         require(!session.didBatterReveal, "Fullcount.revealSwing: batter already revealed");
 
@@ -587,15 +579,15 @@ contract Fullcount is EIP712 {
             emit SessionResolved(
                 sessionID,
                 outcome,
-                session.pitcherAddress,
-                session.pitcherTokenID,
-                session.batterAddress,
-                session.batterTokenID
+                session.pitcherNFT.nftAddress,
+                session.pitcherNFT.tokenID,
+                session.batterNFT.nftAddress,
+                session.batterNFT.tokenID
             );
 
             session.outcome = outcome;
 
-            _unstakeNFT(session.batterAddress, session.batterTokenID);
+            _unstakeNFT(session.batterNFT.nftAddress, session.batterNFT.tokenID);
         }
     }
 }
