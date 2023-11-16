@@ -3,6 +3,7 @@ import { AWS_STATIC_ASSETS_PATH } from "../../constants";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useContext } from "react";
 const assetsPath = `${AWS_STATIC_ASSETS_PATH}/fullcount`;
+import styles from "../GlobalStyles.module.css";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -21,7 +22,9 @@ const Navbar = () => {
       gap={"15px"}
       fontSize={{ sm: "16px", base: "14px" }}
     >
-      <Text>Fullcount</Text>
+      <Text className={styles.gradientText} fontSize={"14px"}>
+        Fullcount
+      </Text>
       <Flex
         justifyContent="space-between"
         alignItems="center"
