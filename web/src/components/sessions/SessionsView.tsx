@@ -325,17 +325,25 @@ const SessionsView = () => {
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             <button
               className={globalStyles.button}
-              style={{ width: "137px" }}
+              style={{ width: "139px" }}
               onClick={() => startSession.mutate(0)}
             >
-              {startSession.isLoading && startSession.variables === 0 ? <Spinner /> : "Pitch"}
+              {startSession.isLoading && startSession.variables === 0 ? (
+                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+              ) : (
+                "Pitch"
+              )}
             </button>
             <button
               className={globalStyles.button}
               onClick={() => startSession.mutate(1)}
-              style={{ width: "137px" }}
+              style={{ width: "139px" }}
             >
-              {startSession.isLoading && startSession.variables === 1 ? <Spinner /> : "Bat"}
+              {startSession.isLoading && startSession.variables === 1 ? (
+                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+              ) : (
+                "Bat"
+              )}
             </button>
           </Flex>
         )}
@@ -348,6 +356,7 @@ const SessionsView = () => {
             >
               unstake
             </button>
+            <Box w={"139px"} h={"26px"} />
           </Flex>
         )}
         <Flex gap={"30px"}>
