@@ -287,6 +287,24 @@ contract FullcountTest_startSession is FullcountTestBase {
 
         assertEq(game.NumSessions(), initialNumSessions);
     }
+
+    function testRevert_if_nft_starts_a_session_when_already_staked() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.expectRevert("Fullcount.startSession: NFT is already staked to a session.");
+        game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.stopPrank();       
+    }
 }
 
 /**
@@ -494,6 +512,35 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.expectRevert("Fullcount.joinSession: opponent left session");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+
+        vm.stopPrank();
+    }
+
+    function testRevert_if_nft_joins_a_session_when_already_staked() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+        characterNFTs.mint(player1, tokenID);
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+
+        vm.startPrank(player1);
+
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        uint256 firstSession = game.startSession(address(characterNFTs), tokenID, PlayerType.Batter);
+
+        vm.stopPrank();   
+
+        vm.startPrank(player2);
+
+        emit SessionStarted(initialNumSessions + 2, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        game.startSession(address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+
+        vm.expectRevert("Fullcount.joinSession: NFT is already staked to a session.");
+        game.joinSession(firstSession, address(otherCharacterNFTs), otherTokenID);
 
         vm.stopPrank();
     }
@@ -1385,6 +1432,12 @@ contract FullcountTest_unstake is FullcountTestBase {
     }
 
     function test_pitcher_can_unstake_when_session_expired_in_phase_2() public {
+        PitcherTokenID = charactersMinted + 1;
+        characterNFTs.mint(player1, PitcherTokenID); 
+
+        BatterTokenID = otherCharactersMinted + 1;
+        otherCharacterNFTs.mint(player2, BatterTokenID);
+
         vm.startPrank(player1);
 
         uint256 startTimestamp = block.timestamp;
@@ -1411,6 +1464,12 @@ contract FullcountTest_unstake is FullcountTestBase {
     }
 
     function test_batter_can_unstake_when_session_expired_in_phase_2() public {
+        PitcherTokenID = charactersMinted + 1;
+        characterNFTs.mint(player1, PitcherTokenID); 
+
+        BatterTokenID = otherCharactersMinted + 1;
+        otherCharacterNFTs.mint(player2, BatterTokenID);
+
         vm.startPrank(player2);
 
         uint256 startTimestamp = block.timestamp;
