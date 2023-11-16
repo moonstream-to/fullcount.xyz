@@ -445,21 +445,14 @@
         "type": "uint256"
       },
       {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "nftAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "tokenID",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct NFT",
-        "name": "pitcherNFT",
-        "type": "tuple"
+        "internalType": "address",
+        "name": "pitcherAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "pitcherTokenID",
+        "type": "uint256"
       },
       {
         "internalType": "bool",
@@ -504,21 +497,14 @@
         "type": "tuple"
       },
       {
-        "components": [
-          {
-            "internalType": "address",
-            "name": "nftAddress",
-            "type": "address"
-          },
-          {
-            "internalType": "uint256",
-            "name": "tokenID",
-            "type": "uint256"
-          }
-        ],
-        "internalType": "struct NFT",
-        "name": "batterNFT",
-        "type": "tuple"
+        "internalType": "address",
+        "name": "batterAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "batterTokenID",
+        "type": "uint256"
       },
       {
         "internalType": "bool",
@@ -566,16 +552,6 @@
         "internalType": "enum Outcome",
         "name": "outcome",
         "type": "uint8"
-      },
-      {
-        "internalType": "bool",
-        "name": "pitcherLeftSession",
-        "type": "bool"
-      },
-      {
-        "internalType": "bool",
-        "name": "batterLeftSession",
-        "type": "bool"
       }
     ],
     "stateMutability": "view",
@@ -600,6 +576,30 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "Staker",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -715,21 +715,14 @@
             "type": "uint256"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "nftAddress",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "tokenID",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct NFT",
-            "name": "pitcherNFT",
-            "type": "tuple"
+            "internalType": "address",
+            "name": "pitcherAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pitcherTokenID",
+            "type": "uint256"
           },
           {
             "internalType": "bool",
@@ -774,21 +767,14 @@
             "type": "tuple"
           },
           {
-            "components": [
-              {
-                "internalType": "address",
-                "name": "nftAddress",
-                "type": "address"
-              },
-              {
-                "internalType": "uint256",
-                "name": "tokenID",
-                "type": "uint256"
-              }
-            ],
-            "internalType": "struct NFT",
-            "name": "batterNFT",
-            "type": "tuple"
+            "internalType": "address",
+            "name": "batterAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "batterTokenID",
+            "type": "uint256"
           },
           {
             "internalType": "bool",
@@ -836,16 +822,6 @@
             "internalType": "enum Outcome",
             "name": "outcome",
             "type": "uint8"
-          },
-          {
-            "internalType": "bool",
-            "name": "pitcherLeftSession",
-            "type": "bool"
-          },
-          {
-            "internalType": "bool",
-            "name": "batterLeftSession",
-            "type": "bool"
           }
         ],
         "internalType": "struct Session",

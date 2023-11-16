@@ -1,8 +1,8 @@
-import { CHAIN_ID, GAME_CONTRACT } from "../constants";
+import { CHAIN_ID, GAME_CONTRACT, GAME_CONTRACT_VERSION } from "../constants";
 
 const domain = {
   name: "Fullcount",
-  version: "0.0.2",
+  version: GAME_CONTRACT_VERSION,
   chainId: String(CHAIN_ID),
   verifyingContract: String(GAME_CONTRACT),
 };
