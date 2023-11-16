@@ -57,8 +57,12 @@ const SessionView3 = ({ session }: { session: Session }) => {
   const isTokenStaked = (token: Token) => {
     return sessions?.find(
       (s) =>
-        (s.pair.pitcher?.id === token.id && s.pair.pitcher?.address === token.address) ||
-        (s.pair.batter?.id === token.id && s.pair.batter?.address === token.address),
+        (s.pair.pitcher?.id === token.id &&
+          s.pair.pitcher?.address === token.address &&
+          !s.pitcherLeft) ||
+        (s.pair.batter?.id === token.id &&
+          s.pair.batter?.address === token.address &&
+          !s.batterLeft),
     );
   };
 
