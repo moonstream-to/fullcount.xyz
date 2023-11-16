@@ -67,10 +67,10 @@ const Outcome = ({
 
     if (isVisible) {
       setIsPitchSpeedVisible(true);
-      timer1 = setTimeout(() => setIsSwingKindVisible(true), 3000);
-      timer2 = setTimeout(() => setIsPitchVisible(true), 6000);
-      timer3 = setTimeout(() => setIsSwingVisible(true), 9000);
-      timer4 = setTimeout(() => setIsOutcomeVisible(true), 12000);
+      timer1 = setTimeout(() => setIsSwingKindVisible(true), 0);
+      timer2 = setTimeout(() => setIsPitchVisible(true), 1000);
+      timer3 = setTimeout(() => setIsSwingVisible(true), 2500);
+      timer4 = setTimeout(() => setIsOutcomeVisible(true), 3500);
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -92,7 +92,7 @@ const Outcome = ({
       <GrowingText isVisible={isPitchSpeedVisible} right={"110%"}>
         <Text>{pitchSpeed[pitch.speed]}</Text>
       </GrowingText>
-      <GrowingText isVisible={isSwingKindVisible} left={"110%"}>
+      <GrowingText isVisible={isSwingKindVisible} left={"110%"} duration={"1.5s"}>
         <Text>{swingKind[swing.kind]}</Text>
       </GrowingText>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
@@ -107,6 +107,7 @@ const Outcome = ({
           isVisible={isSwingVisible}
           left={`${(Number(swing.horizontal) + 1) * 50 - 25 - 20}px`}
           top={`${(Number(swing.vertical) + 1) * 50 - 25 - 20}px`}
+          duration={"0s"}
         >
           <Image src={`${assets}/bat2.png`} h={"40px"} w={"40px"} alt={"x"} />
         </GrowingText>
