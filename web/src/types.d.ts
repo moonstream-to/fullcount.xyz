@@ -68,6 +68,8 @@ interface Session {
   progress: number;
   secondsPerPhase: number;
   phaseStartTimestamp: number;
+  batterLeft: boolean;
+  pitcherLeft: boolean;
 }
 
 interface SessionsQueryData {
