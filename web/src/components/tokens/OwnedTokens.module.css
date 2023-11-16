@@ -133,5 +133,5 @@
     font-weight: 500;
     line-height: normal;
     height: 26px;
-    width: 144px;
+    min-width: 144px;
 }
