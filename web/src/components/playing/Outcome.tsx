@@ -69,8 +69,8 @@ const Outcome = ({
       setIsPitchSpeedVisible(true);
       timer1 = setTimeout(() => setIsSwingKindVisible(true), 1500);
       timer2 = setTimeout(() => setIsPitchVisible(true), 1500);
-      timer3 = setTimeout(() => setIsSwingVisible(true), 5000);
-      timer4 = setTimeout(() => setIsOutcomeVisible(true), 5500);
+      timer3 = setTimeout(() => setIsSwingVisible(true), 4500);
+      timer4 = setTimeout(() => setIsOutcomeVisible(true), 5000);
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -100,18 +100,20 @@ const Outcome = ({
           isVisible={isPitchVisible}
           left={`${(Number(pitch.horizontal) + 1) * 50 - 25 - 20}px`}
           top={`${(Number(pitch.vertical) + 1) * 50 - 25 - 20}px`}
-          duration={"3.5s"}
+          duration={"3.0s"}
         >
           <Image src={`${assets}/ball2.png`} h={"40px"} w={"40px"} alt={"o"} />
         </GrowingText>
-        <GrowingText
-          isVisible={isSwingVisible}
-          left={`${(Number(swing.horizontal) + 1) * 50 - 25 - 20}px`}
-          top={`${(Number(swing.vertical) + 1) * 50 - 25 - 20}px`}
-          duration={"0s"}
-        >
-          <Image src={`${assets}/bat2.png`} h={"40px"} w={"40px"} alt={"x"} />
-        </GrowingText>
+        {swing.kind !== 2 && (
+          <GrowingText
+            isVisible={isSwingVisible}
+            left={`${(Number(swing.horizontal) + 1) * 50 - 25 - 20}px`}
+            top={`${(Number(swing.vertical) + 1) * 50 - 25 - 20}px`}
+            duration={"0s"}
+          >
+            <Image src={`${assets}/bat2.png`} h={"40px"} w={"40px"} alt={"x"} />
+          </GrowingText>
+        )}
         <GrowingText
           isVisible={isOutcomeVisible}
           left={"50%"}
