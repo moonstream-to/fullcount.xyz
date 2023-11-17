@@ -136,7 +136,7 @@ const PlayView = () => {
       }
       const speed: 0 | 1 = Number(pitcherReveal[1]) === 0 ? 0 : 1;
       const kind: 0 | 1 | 2 =
-        Number(pitcherReveal[1]) === 0 ? 0 : Number(pitcherReveal[1]) === 1 ? 1 : 2;
+        Number(batterReveal[1]) === 0 ? 0 : Number(batterReveal[1]) === 1 ? 1 : 2;
 
       return {
         progress,

@@ -114,6 +114,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           </Text>
           <Flex gap={1}>
             <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
+            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
           </Flex>
         </Flex>
       </Flex>
