@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import GrowingText from "./GrowingText";
 import { pitchSpeed, swingKind } from "./PlayView";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import BallAnimation from "./BallAnimation";
 const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
 const assets = FULLCOUNT_ASSETS_PATH;
 
@@ -69,8 +70,8 @@ const Outcome = ({
       setIsPitchSpeedVisible(true);
       timer1 = setTimeout(() => setIsSwingKindVisible(true), 1500);
       timer2 = setTimeout(() => setIsPitchVisible(true), 1500);
-      timer3 = setTimeout(() => setIsSwingVisible(true), 4500);
-      timer4 = setTimeout(() => setIsOutcomeVisible(true), 5000);
+      timer3 = setTimeout(() => setIsSwingVisible(true), 3350);
+      timer4 = setTimeout(() => setIsOutcomeVisible(true), 4000);
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -96,14 +97,18 @@ const Outcome = ({
         <Text>{swingKind[swing.kind]}</Text>
       </GrowingText>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
-        <GrowingText
+        <BallAnimation
           isVisible={isPitchVisible}
-          left={`${(Number(pitch.horizontal) + 1) * 50 - 25 - 20}px`}
-          top={`${(Number(pitch.vertical) + 1) * 50 - 25 - 20}px`}
-          duration={"3.0s"}
+          startLeft={Number(1) * 50 - 25 - 20}
+          startTop={-220}
+          endLeft={(Number(pitch.horizontal) + 1) * 50 - 25 - 20}
+          endTop={(Number(pitch.vertical) + 1) * 50 - 25 - 20}
+          curve={pitch.speed === 1 ? 40 : 0}
+          duration={"2.0s"}
+          zIndex={"-1"}
         >
           <Image src={`${assets}/ball2.png`} h={"40px"} w={"40px"} alt={"o"} />
-        </GrowingText>
+        </BallAnimation>
         {swing.kind !== 2 && (
           <GrowingText
             isVisible={isSwingVisible}
