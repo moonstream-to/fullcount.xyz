@@ -21,7 +21,7 @@ export const sessionStates = [
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
-  const { progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
+  const { updateContext, progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
     useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -44,7 +44,25 @@ const SessionView3 = ({ session }: { session: Session }) => {
       });
     },
     {
-      onSuccess: () => {
+      onSuccess: (_, variables) => {
+        queryClient.setQueryData(["sessions"], (oldData: any) => {
+          const newSessions = oldData.map((s: Session) => {
+            if (s.sessionID !== variables) {
+              return s;
+            }
+            if (!s.pair.batter) {
+              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
+            }
+            if (!s.pair.pitcher) {
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
+            }
+          });
+          updateContext({
+            sessions: newSessions,
+            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
+          });
+          return newSessions;
+        });
         queryClient.invalidateQueries("sessions");
         queryClient.invalidateQueries("owned_tokens");
       },
