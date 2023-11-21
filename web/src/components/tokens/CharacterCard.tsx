@@ -50,7 +50,7 @@ const CharacterCard = ({
       <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
       {(showName || isActive || children) && (
         <Flex className={styles.bottom}>
-          {showName && <Text>{token.name}</Text>}
+          {showName && <Text maxW={"137px"}>{token.name}</Text>}
           {isActive && (
             <button className={globalStyles.button} onClick={handleClick}>
               Play

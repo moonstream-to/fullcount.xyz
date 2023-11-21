@@ -21,7 +21,7 @@ export const sessionStates = [
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
-  const { progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
+  const { updateContext, progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
     useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -36,7 +36,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      console.log(sessionID, tokenAddress, selectedToken);
       return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
@@ -44,7 +43,25 @@ const SessionView3 = ({ session }: { session: Session }) => {
       });
     },
     {
-      onSuccess: () => {
+      onSuccess: (_, variables) => {
+        queryClient.setQueryData(["sessions"], (oldData: any) => {
+          const newSessions = oldData.map((s: Session) => {
+            if (s.sessionID !== variables) {
+              return s;
+            }
+            if (!s.pair.batter) {
+              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
+            }
+            if (!s.pair.pitcher) {
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
+            }
+          });
+          updateContext({
+            sessions: newSessions,
+            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
+          });
+          return newSessions;
+        });
         queryClient.invalidateQueries("sessions");
         queryClient.invalidateQueries("owned_tokens");
       },
@@ -71,7 +88,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
       toast("Select character first", "error");
       return;
     }
-    console.log(session);
     joinSession.mutate(session.sessionID);
   };
 
@@ -115,7 +131,9 @@ const SessionView3 = ({ session }: { session: Session }) => {
               token={session.pair.pitcher}
               session={session}
               minW={"215px"}
-              isClickable={session.pair.pitcher.staker === web3ctx.account}
+              isClickable={
+                session.progress === 5 || session.pair.pitcher.staker === web3ctx.account
+              }
               isOwned={session.pair.pitcher.staker === web3ctx.account}
             />
           </Flex>
@@ -134,7 +152,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
               token={session.pair.batter}
               session={session}
               minW={"215px"}
-              isClickable={session.pair.batter.staker === web3ctx.account}
+              isClickable={session.progress === 5 || session.pair.batter.staker === web3ctx.account}
               isOwned={session.pair.batter.staker === web3ctx.account}
             />
           </Flex>

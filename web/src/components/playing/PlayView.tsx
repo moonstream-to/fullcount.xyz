@@ -3,7 +3,7 @@ import PitcherView from "./PitcherView";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import { Token } from "../../types";
 import { CloseIcon } from "@chakra-ui/icons";
@@ -13,6 +13,9 @@ import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { ZERO_ADDRESS } from "../../constants";
+import { decodeBase64Json } from "../../utils/decoders";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const tokenABI = require("../../web3/abi/BLBABI.json");
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -93,26 +96,51 @@ export const swingKind = {
   2: "Take",
 };
 
-const PlayView = () => {
-  const { selectedSession, selectedToken, updateContext, contractAddress } = useGameContext();
+const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
+  const { selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
+  const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
   const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
-  const opponent = (token?: Token) => {
-    const result = isPitcher(token) ? selectedSession?.pair.batter : selectedSession?.pair.pitcher;
-    return result?.address === ZERO_ADDRESS ? undefined : result;
-  };
+  const [opponent, setOpponent] = useState<Token | undefined>(undefined);
 
   const sessionStatus = useQuery(
     ["session", selectedSession],
     async () => {
+      console.log("session status");
       const session = await gameContract.methods.getSession(selectedSession?.sessionID).call();
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
       );
+      const pitcherAddress = session.pitcherNFT.nftAddress;
+      const pitcherTokenID = session.pitcherNFT.tokenID;
+      const batterAddress = session.batterNFT.nftAddress;
+      const batterTokenID = session.batterNFT.tokenID;
+      const otherToken =
+        batterAddress === selectedToken.address && batterTokenID === selectedToken.id
+          ? { address: pitcherAddress, id: pitcherTokenID }
+          : { address: batterAddress, id: batterTokenID };
 
-      console.log(session);
+      if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
+        console.log("fetching opponent");
+        tokenContract.options.address = otherToken.address;
+        const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
+        const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
+        let tokenMetadata = { name: "qq", image: "ww" };
+        try {
+          tokenMetadata = decodeBase64Json(URI.split("data:application/json;base64")[1]);
+        } catch (e) {
+          console.log(e);
+        }
+        setOpponent({
+          ...otherToken,
+          staker,
+          image: tokenMetadata.image,
+          name: tokenMetadata.name.split(` - ${otherToken.id}`)[0],
+        });
+      }
+
       const {
         didPitcherCommit,
         didBatterCommit,
@@ -124,11 +152,12 @@ const PlayView = () => {
         batterReveal,
       } = session;
 
-      console.log(session, pitcherReveal, batterReveal);
+      const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
+
       let isExpired = progress === 6;
       if (progress === 3 || progress === 4) {
         const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
-        const endTime = Number(phaseStartTimestamp) + (selectedSession?.secondsPerPhase ?? 0);
+        const endTime = Number(phaseStartTimestamp) + (secondsPerPhase ?? 0);
         const remainingTime = endTime - currentTime;
         if (remainingTime < 1) {
           isExpired = true;
@@ -145,6 +174,8 @@ const PlayView = () => {
         didPitcherReveal,
         didBatterReveal,
         outcome,
+        phaseStartTimestamp: Number(phaseStartTimestamp),
+        secondsPerPhase: Number(secondsPerPhase),
         isExpired,
         pitcherReveal: {
           speed,
@@ -159,7 +190,7 @@ const PlayView = () => {
       };
     },
     {
-      refetchInterval: 15 * 1000,
+      refetchInterval: 5 * 1000,
     },
   );
 
@@ -168,18 +199,18 @@ const PlayView = () => {
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
         <Text w={"150px"}>{`Session ${selectedSession?.sessionID}`}</Text>
 
-        {(selectedSession?.progress === 3 ||
-          selectedSession?.progress === 4 ||
-          selectedSession?.progress === 2) && (
+        {(sessionStatus.data?.progress === 3 ||
+          sessionStatus.data?.progress === 4 ||
+          sessionStatus.data?.progress === 2) && (
           <Timer
-            start={selectedSession.phaseStartTimestamp}
-            delay={selectedSession.secondsPerPhase}
-            isActive={selectedSession.progress === 3 || selectedSession.progress === 4}
+            start={Number(sessionStatus.data?.phaseStartTimestamp)}
+            delay={sessionStatus.data?.secondsPerPhase}
+            isActive={sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4}
           />
         )}
         <Flex w={"150px"} justifyContent={"end"}>
           <CloseIcon
-            onClick={() => updateContext({ selectedSession: undefined })}
+            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
             cursor={"pointer"}
           />
         </Flex>
@@ -203,16 +234,11 @@ const PlayView = () => {
           </>
         ) : (
           <>
-            {opponent(selectedToken) ? (
+            {opponent ? (
               <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                <Image
-                  src={opponent(selectedToken)?.image}
-                  h={"150px"}
-                  w={"150px"}
-                  alt={opponent(selectedToken)?.name}
-                />
+                <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
                 <Text fontSize={"14px"} fontWeight={"700"}>
-                  {opponent(selectedToken)?.name}
+                  {opponent?.name}
                 </Text>
               </Flex>
             ) : (
@@ -224,8 +250,8 @@ const PlayView = () => {
           </>
         )}
 
-        {sessionStatus.data?.progress === 2 && selectedSession && (
-          <InviteLink session={selectedSession} />
+        {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
+          <InviteLink session={selectedSession} token={selectedToken} />
         )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
@@ -265,16 +291,11 @@ const PlayView = () => {
           </>
         ) : (
           <>
-            {opponent(selectedToken) ? (
+            {opponent ? (
               <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                <Image
-                  src={opponent(selectedToken)?.image}
-                  h={"150px"}
-                  w={"150px"}
-                  alt={opponent(selectedToken)?.name}
-                />
+                <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
                 <Text fontSize={"14px"} fontWeight={"700"}>
-                  {opponent(selectedToken)?.name}
+                  {opponent?.name}
                 </Text>
               </Flex>
             ) : (

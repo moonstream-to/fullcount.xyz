@@ -1,7 +1,6 @@
 import { Session } from "../../types";
 import { Flex } from "@chakra-ui/react";
 import { useGameContext } from "../../contexts/GameContext";
-import MySessionView from "./MySessionView";
 import SessionViewSmall from "./SessionViewSmall";
 import SessionView from "./SessionView";
 

@@ -5,7 +5,7 @@ import { css } from "@emotion/react";
 // Define the keyframes
 const growAnimation = keyframes`
   0% { transform: scale(0); }
-  //90% { transform: scale(1); }
+  90% { transform: scale(1.5); }
   100% { transform: scale(1); }
 `;
 

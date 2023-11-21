@@ -6,22 +6,14 @@ import { useEffect } from "react";
 import PlayView from "./playing/PlayView";
 
 const Playing = () => {
-  const { selectedSession, updateContext, selectedToken } = useGameContext();
-
-  useEffect(() => {
-    console.log(selectedSession, selectedToken);
-  }, [selectedSession, selectedToken]);
+  const { selectedSession, updateContext, selectedToken, watchingToken } = useGameContext();
 
   return (
     <Flex className={styles.container}>
-      {!selectedSession || !selectedToken ? (
-        <>
-          <SessionsView />
-        </>
-      ) : (
-        <>
-          <PlayView />
-        </>
+      {!selectedSession && <SessionsView />}
+      {selectedSession && watchingToken && <PlayView selectedToken={watchingToken} />}
+      {selectedSession && !watchingToken && selectedToken && (
+        <PlayView selectedToken={selectedToken} />
       )}
     </Flex>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, FC } from "react";
+import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
 import { Session, Token } from "../types";
 import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
 
@@ -15,7 +15,10 @@ interface GameContextProps {
   selectedToken: Token | undefined;
   selectedSession: Session | undefined;
   sessions: Session[] | undefined;
-  invited: boolean;
+  invitedBy: string;
+  invitedTo: number | undefined;
+  watchingToken: Token | undefined;
+  isTokenSelected: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -42,11 +45,18 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     selectedToken: undefined,
     selectedSession: undefined,
     sessions: undefined,
-    invited: false,
+    invitedBy: "",
+    invitedTo: undefined,
+    watchingToken: undefined,
+    isTokenSelected: false,
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {
-    setContextState((prevState) => ({ ...prevState, ...newState }));
+    setContextState((prevState) => {
+      const isTokenSelected =
+        prevState.isTokenSelected || !!newState.selectedToken || !!prevState.selectedToken;
+      return { ...prevState, ...newState, isTokenSelected };
+    });
   };
 
   return (
