@@ -1,9 +1,9 @@
 import { useGameContext } from "../../contexts/GameContext";
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import styles from "./SessionsView.module.css";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { useMutation, useQuery, useQueryClient } from "react-query";
-import React, { Fragment, useContext, useEffect } from "react";
+import React, { Fragment, useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import useMoonToast from "../../hooks/useMoonToast";
 import { decodeBase64Json } from "../../utils/decoders";
@@ -16,6 +16,7 @@ import { outputs } from "../../web3/abi/ABIITems";
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
 import { useRouter } from "next/router";
+import InviteView from "./InviteView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
@@ -44,17 +45,21 @@ const SessionsView = () => {
   );
 
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  // const [sessionInviteTo, setSessionInviteTo] = useState<Session | undefined>(undefined);
 
   useEffect(() => {
-    if (router.query.invite) {
-      updateContext({ invited: !!router.query.invite });
+    if (router.query.invitedBy && router.query.session) {
+      const invitedBy = Array.isArray(router.query.invitedBy)
+        ? router.query.invitedBy[0]
+        : router.query.invitedBy;
+      const invitedTo = Number(
+        Array.isArray(router.query.session) ? router.query.session[0] : router.query.session,
+      );
+      updateContext({ invitedBy, invitedTo });
+      router.push("/", undefined, { shallow: true });
+      onOpen();
     }
-    if (router.query.session) {
-      updateContext({
-        selectedSession: sessions.data?.find((s) => s.sessionID === Number(router.query.session)),
-      });
-    }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.invite, router.query.session]);
 
@@ -85,32 +90,8 @@ const SessionsView = () => {
     },
   );
 
-  const joinSession = useMutation(
-    async (sessionID: number) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
-      }
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("sessions");
-        queryClient.invalidateQueries("owned_tokens");
-      },
-      onError: (e: Error) => {
-        toast("Join failed" + e?.message, "error");
-      },
-    },
-  );
-
   const sessions = useQuery<Session[]>(
-    ["sessions", web3ctx.account, web3ctx.chainId],
+    ["sessions"],
     async () => {
       console.log("FETCHING SESSIONS");
 
@@ -130,7 +111,7 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
-      const session = await gameContract.methods.getSession(1).call();
+      // const session = await gameContract.methods.getSession(1).call();
 
       const res = [];
       for (let i = 0; i < multicallRes.length; i += 2) {
@@ -152,7 +133,6 @@ const SessionsView = () => {
       });
       const tokens: any[] = [];
       decodedRes.forEach((res) => {
-        console.log(res.session);
         if (res.session.pitcherAddress !== ZERO_ADDRESS) {
           tokens.push({ address: res.session.pitcherAddress, id: res.session.pitcherTokenID });
         }
@@ -160,7 +140,7 @@ const SessionsView = () => {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
-      console.log(contractAddress, decodedRes);
+      // console.log(contractAddress, decodedRes);
 
       const tokenQueries: any[] = [];
       tokens.forEach((token) => {
@@ -185,7 +165,7 @@ const SessionsView = () => {
         return {
           ...token,
           image: tokenMetadata.image,
-          name: tokenMetadata.name,
+          name: tokenMetadata.name.split(` - ${token.id}`)[0],
           staker,
         };
       });
@@ -214,7 +194,7 @@ const SessionsView = () => {
           progress: session.progress,
         };
       });
-      console.log(sessionsWithTokens);
+      // console.log(sessionsWithTokens);
       return sessionsWithTokens.reverse();
     },
     {
@@ -225,36 +205,6 @@ const SessionsView = () => {
       refetchInterval: 15 * 1000,
     },
   );
-
-  const mySessions = (sessions: any[]) => {
-    return sessions.filter(
-      (session) =>
-        session.pair.batter?.staker === web3ctx.account ||
-        session.pair.pitcher?.staker === web3ctx.account,
-    );
-  };
-
-  const notMySessions = (sessions: any[]) => {
-    return sessions.filter(
-      (session) =>
-        session.pair.batter?.staker !== web3ctx.account &&
-        session.pair.pitcher?.staker !== web3ctx.account,
-    );
-  };
-
-  const activeSessions = (sessions: any[]) => {
-    return sessions.filter((session) => session.progress === 2);
-  };
-
-  const liveSessions = (sessions: any[]) => {
-    return sessions.filter((session) => session.progress === 3 || session.progress === 4);
-  };
-
-  const otherSessions = (sessions: any[]) => {
-    return sessions.filter(
-      (session) => session.progress !== 3 && session.progress !== 4 && session.progress !== 2,
-    );
-  };
 
   const isTokenStaked = (token: Token) => {
     return sessions.data?.find(
@@ -320,45 +270,52 @@ const SessionsView = () => {
   return (
     <Flex className={styles.container}>
       <Flex gap={"20px"} alignItems={"start"}>
-        {selectedToken && !isTokenStaked(selectedToken) && (
-          <Flex direction={"column"}>
-            <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            <button
-              className={globalStyles.button}
-              style={{ width: "139px" }}
-              onClick={() => startSession.mutate(0)}
-            >
-              {startSession.isLoading && startSession.variables === 0 ? (
-                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-              ) : (
-                "Pitch"
-              )}
-            </button>
-            <button
-              className={globalStyles.button}
-              onClick={() => startSession.mutate(1)}
-              style={{ width: "139px" }}
-            >
-              {startSession.isLoading && startSession.variables === 1 ? (
-                <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-              ) : (
-                "Bat"
-              )}
-            </button>
-          </Flex>
-        )}
-        {selectedToken && isTokenStaked(selectedToken) && (
-          <Flex direction={"column"}>
-            <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            <button
-              className={globalStyles.button}
-              onClick={() => unstakeNFT.mutate(selectedToken)}
-            >
-              unstake
-            </button>
-            <Box w={"139px"} h={"26px"} />
-          </Flex>
-        )}
+        <InviteView isOpen={isOpen} onClose={onClose} />
+
+        {/*{selectedToken && !isTokenStaked(selectedToken) && (*/}
+        {/*  <Flex direction={"column"}>*/}
+        {/*    <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />*/}
+        {/*    <button*/}
+        {/*      className={globalStyles.button}*/}
+        {/*      style={{ width: "139px" }}*/}
+        {/*      onClick={() => startSession.mutate(0)}*/}
+        {/*    >*/}
+        {/*      {startSession.isLoading && startSession.variables === 0 ? (*/}
+        {/*        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
+        {/*      ) : (*/}
+        {/*        "Pitch"*/}
+        {/*      )}*/}
+        {/*    </button>*/}
+        {/*    <button*/}
+        {/*      className={globalStyles.button}*/}
+        {/*      onClick={() => startSession.mutate(1)}*/}
+        {/*      style={{ width: "139px" }}*/}
+        {/*    >*/}
+        {/*      {startSession.isLoading && startSession.variables === 1 ? (*/}
+        {/*        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
+        {/*      ) : (*/}
+        {/*        "Bat"*/}
+        {/*      )}*/}
+        {/*    </button>*/}
+        {/*  </Flex>*/}
+        {/*)}*/}
+        {/*{selectedToken && isTokenStaked(selectedToken) && (*/}
+        {/*  <Flex direction={"column"} minH={"229px"} mr={"-5px"}>*/}
+        {/*    <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />*/}
+        {/*    {tokenProgress(selectedToken) !== 3 && tokenProgress(selectedToken) !== 4 && (*/}
+        {/*      <button*/}
+        {/*        className={globalStyles.button}*/}
+        {/*        onClick={() => unstakeNFT.mutate(selectedToken)}*/}
+        {/*      >*/}
+        {/*        {unstakeNFT.isLoading ? (*/}
+        {/*          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
+        {/*        ) : (*/}
+        {/*          "unstake"*/}
+        {/*        )}*/}
+        {/*      </button>*/}
+        {/*    )}*/}
+        {/*  </Flex>*/}
+        {/*)}*/}
         <Flex gap={"30px"}>
           <OwnedTokens />
           {/*<StakedTokens />*/}
