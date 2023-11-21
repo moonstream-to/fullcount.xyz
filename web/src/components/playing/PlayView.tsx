@@ -143,6 +143,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         didPitcherReveal,
         didBatterReveal,
         outcome,
+        phaseStartTimestamp,
         isExpired,
         pitcherReveal: {
           speed,
@@ -170,7 +171,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           selectedSession?.progress === 4 ||
           selectedSession?.progress === 2) && (
           <Timer
-            start={selectedSession.phaseStartTimestamp}
+            start={Number(sessionStatus.data?.phaseStartTimestamp)}
             delay={selectedSession.secondsPerPhase}
             isActive={selectedSession.progress === 3 || selectedSession.progress === 4}
           />

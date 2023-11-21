@@ -145,10 +145,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               return s;
             }
             if (!s.pair.batter) {
-              return { ...s, pair: { ...s.pair, batter: selectedToken } };
+              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
             }
             if (!s.pair.pitcher) {
-              return { ...s, pair: { ...s.pair, pitcher: { ...selectedToken } } };
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
             }
           });
           updateContext({
