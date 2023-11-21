@@ -99,8 +99,8 @@ const Outcome = ({
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
         <BallAnimation
           isVisible={isPitchVisible}
-          startLeft={Number(1) * 50 - 25 - 20}
-          startTop={-220}
+          startLeft={Number(3) * 50 - 25 - 20}
+          startTop={-3 * 50 - 25 - 20}
           endLeft={(Number(pitch.horizontal) + 1) * 50 - 25 - 20}
           endTop={(Number(pitch.vertical) + 1) * 50 - 25 - 20}
           curve={pitch.speed === 1 ? 40 : 0}
