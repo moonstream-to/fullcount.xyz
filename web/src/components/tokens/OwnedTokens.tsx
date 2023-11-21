@@ -73,9 +73,15 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       const tokens = [];
       for (let i = 0; i < balanceOf; i++) {
         const tokenId = await tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).call();
-        const tokenMetadata = decodeBase64Json(
-          await tokenContract.methods.tokenURI(tokenId).call(),
-        );
+        const URI = await tokenContract.methods.tokenURI(tokenId).call();
+        let tokenMetadata = { name: "", image: "" };
+
+        try {
+          tokenMetadata = decodeBase64Json(URI);
+        } catch (e) {
+          console.log(e);
+        }
+
         tokens.push({
           id: tokenId,
           name: tokenMetadata.name.split(` - ${tokenId}`)[0],
@@ -111,8 +117,28 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       });
     },
     {
-      onSuccess: async () => {
-        console.log("refetching");
+      onSuccess: async (data, variables) => {
+        console.log(data);
+        queryClient.setQueryData(["sessions"], (oldData: any) => {
+          const newSession: Session = {
+            batterLeft: false,
+            pitcherLeft: false,
+            progress: 2,
+            sessionID: Number(data.events.SessionStarted.returnValues.sessionID),
+            pair: {
+              batter: variables === 0 ? undefined : selectedToken,
+              pitcher: variables === 1 ? undefined : selectedToken,
+            },
+            phaseStartTimestamp: 0,
+            secondsPerPhase: 0,
+          };
+          updateContext({
+            sessions: [...oldData, newSession],
+            selectedSession: newSession,
+          });
+          return [...oldData, newSession];
+        });
+
         await queryClient.refetchQueries("sessions");
         console.log("refetched");
         queryClient.invalidateQueries("owned_tokens");
@@ -209,7 +235,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     !sessions?.find((s) => s.sessionID === invitedTo)?.pair.pitcher?.id;
 
   const isTokenStaked = (token: Token) => {
-    console.log("Is token staked: ", sessions);
     return sessions?.find(
       (s) =>
         (s.pair.pitcher?.id === token.id &&
@@ -351,7 +376,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   )}
                 </Flex>
               ))}
-          {ownedTokens.data && ownedTokens.data.filter((t) => !isTokenStaked(t)).length > 0 && (
+          {ownedTokens.data && ownedTokens.data.length > 0 && (
             <Flex
               w={"70px"}
               h={"85px"}
