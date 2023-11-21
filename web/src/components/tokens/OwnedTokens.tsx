@@ -100,6 +100,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       ...queryCacheProps,
+      refetchInterval: 5000,
     },
   );
 

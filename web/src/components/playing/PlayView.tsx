@@ -191,7 +191,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       };
     },
     {
-      refetchInterval: 15 * 1000,
+      refetchInterval: 5 * 1000,
     },
   );
 
