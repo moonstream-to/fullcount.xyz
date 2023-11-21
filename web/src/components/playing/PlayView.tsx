@@ -93,8 +93,8 @@ export const swingKind = {
   2: "Take",
 };
 
-const PlayView = () => {
-  const { selectedSession, selectedToken, updateContext, contractAddress } = useGameContext();
+const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
+  const { selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -112,7 +112,6 @@ const PlayView = () => {
         await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
       );
 
-      console.log(session);
       const {
         didPitcherCommit,
         didBatterCommit,
@@ -124,7 +123,6 @@ const PlayView = () => {
         batterReveal,
       } = session;
 
-      console.log(session, pitcherReveal, batterReveal);
       let isExpired = progress === 6;
       if (progress === 3 || progress === 4) {
         const currentTime = Math.floor(Date.now() / 1000); // Convert to seconds
@@ -179,7 +177,7 @@ const PlayView = () => {
         )}
         <Flex w={"150px"} justifyContent={"end"}>
           <CloseIcon
-            onClick={() => updateContext({ selectedSession: undefined })}
+            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
             cursor={"pointer"}
           />
         </Flex>
@@ -224,8 +222,8 @@ const PlayView = () => {
           </>
         )}
 
-        {sessionStatus.data?.progress === 2 && selectedSession && (
-          <InviteLink session={selectedSession} />
+        {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
+          <InviteLink session={selectedSession} token={selectedToken} />
         )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (

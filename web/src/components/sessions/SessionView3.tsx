@@ -115,7 +115,9 @@ const SessionView3 = ({ session }: { session: Session }) => {
               token={session.pair.pitcher}
               session={session}
               minW={"215px"}
-              isClickable={session.pair.pitcher.staker === web3ctx.account}
+              isClickable={
+                session.progress === 5 || session.pair.pitcher.staker === web3ctx.account
+              }
               isOwned={session.pair.pitcher.staker === web3ctx.account}
             />
           </Flex>
@@ -134,7 +136,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
               token={session.pair.batter}
               session={session}
               minW={"215px"}
-              isClickable={session.pair.batter.staker === web3ctx.account}
+              isClickable={session.progress === 5 || session.pair.batter.staker === web3ctx.account}
               isOwned={session.pair.batter.staker === web3ctx.account}
             />
           </Flex>

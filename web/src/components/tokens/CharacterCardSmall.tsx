@@ -19,7 +19,11 @@ const CharacterCard = ({
   const { updateContext } = useGameContext();
 
   const handleClick = () => {
-    updateContext({ selectedToken: token });
+    if (isOwned) {
+      updateContext({ selectedToken: token });
+    } else {
+      updateContext({ watchingToken: token });
+    }
     if (session) {
       updateContext({ selectedSession: session });
     }
