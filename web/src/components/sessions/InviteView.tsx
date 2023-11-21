@@ -10,10 +10,6 @@ const InviteView = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const { sessions, updateContext, invitedBy, selectedToken, invitedTo, selectedSession } =
     useGameContext();
 
-  useEffect(() => {
-    console.log("InviteView: ", sessions);
-  }, [sessions]);
-
   return (
     <>
       <Modal isOpen={isOpen || !!selectedSession} onClose={onClose}>

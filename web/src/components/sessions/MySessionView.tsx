@@ -8,9 +8,6 @@ import Web3Context from "../../contexts/Web3Context/context";
 const MySessionView = ({ session }: { session: Session }) => {
   const web3ctx = useContext(Web3Context);
 
-  const handleInvite = () => {
-    console.log(session.sessionID);
-  };
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"}>
       {session.pair.pitcher ? (

@@ -119,7 +119,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       onSuccess: async (data, variables) => {
-        console.log(data);
         queryClient.setQueryData(["sessions"], (oldData: any) => {
           const newSession: Session = {
             batterLeft: false,
@@ -157,7 +156,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      console.log(sessionID, tokenAddress, selectedToken);
       return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,

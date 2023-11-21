@@ -36,7 +36,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      console.log(sessionID, tokenAddress, selectedToken);
       return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
@@ -89,7 +88,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
       toast("Select character first", "error");
       return;
     }
-    console.log(session);
     joinSession.mutate(session.sessionID);
   };
 

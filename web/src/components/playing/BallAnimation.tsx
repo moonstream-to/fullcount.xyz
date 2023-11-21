@@ -25,9 +25,6 @@ const BallAnimation: React.FC<BallAnimationProps> = ({
   curve,
   ...props
 }) => {
-  useEffect(() => {
-    console.log(startLeft, endLeft, endLeft - startLeft);
-  }, [startTop, startLeft, endTop, endLeft]);
   const growAndMoveCurlyAnimation = keyframes`
   0% {
     transform: translate(${startLeft - endLeft}px, ${-100 - endTop}px) scale(0);

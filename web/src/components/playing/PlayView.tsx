@@ -124,7 +124,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
 
       if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
         console.log("fetching opponent");
-        console.log(otherToken);
         tokenContract.options.address = otherToken.address;
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
         const staker = await tokenContract.methods.ownerOf(otherToken.id).call();

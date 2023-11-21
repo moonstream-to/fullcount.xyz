@@ -41,7 +41,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         horizontal: getRowCol(gridIndex)[1],
       }),
     );
-    console.log(nonce, speed, getRowCol(gridIndex)[0], getRowCol(gridIndex)[1], sign);
     commitPitch.mutate({ sign });
   };
 
@@ -51,7 +50,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
       ) ?? "";
     const reveal = JSON.parse(item);
-    console.log(reveal);
     revealPitch.mutate({
       nonce: reveal.nonce,
       speed: reveal.speed,

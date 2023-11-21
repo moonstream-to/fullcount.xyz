@@ -52,11 +52,9 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {
-    console.log(contextState, newState);
     setContextState((prevState) => {
       const isTokenSelected =
         prevState.isTokenSelected || !!newState.selectedToken || !!prevState.selectedToken;
-      console.log(isTokenSelected);
       return { ...prevState, ...newState, isTokenSelected };
     });
   };

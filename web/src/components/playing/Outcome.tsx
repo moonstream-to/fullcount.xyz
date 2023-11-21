@@ -60,7 +60,6 @@ const Outcome = ({
   const [isOutcomeVisible, setIsOutcomeVisible] = useState(false);
 
   useEffect(() => {
-    console.log(pitch, swing);
     let timer1: NodeJS.Timeout;
     let timer2: NodeJS.Timeout;
     let timer3: NodeJS.Timeout;

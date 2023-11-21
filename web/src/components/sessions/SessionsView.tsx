@@ -116,7 +116,6 @@ const SessionsView = () => {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
-      // console.log(contractAddress, decodedRes);
 
       const tokenQueries: any[] = [];
       tokens.forEach((token) => {
@@ -170,7 +169,6 @@ const SessionsView = () => {
           progress: session.progress,
         };
       });
-      // console.log(sessionsWithTokens);
       return sessionsWithTokens.reverse();
     },
     {
