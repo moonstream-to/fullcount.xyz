@@ -4,8 +4,6 @@ import { LinkIcon } from "@chakra-ui/icons";
 import { useRouter } from "next/router";
 
 const InviteLink = ({ session, token }: { session: Session; token: Token }) => {
-  const router = useRouter();
-  console.log(router);
   const path = `${window.location.href}?session=${session.sessionID}&invitedBy=${token.name}`;
   const { onCopy } = useClipboard(path);
   return (

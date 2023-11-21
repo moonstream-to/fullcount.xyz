@@ -66,30 +66,6 @@ const SessionsView = () => {
   const queryClient = useQueryClient();
   const toast = useMoonToast();
 
-  const startSession = useMutation(
-    async (role: number) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
-      }
-      return gameContract.methods.startSession(tokenAddress, selectedToken?.id, role).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries("sessions");
-        queryClient.invalidateQueries("owned_tokens");
-      },
-      onError: (e: Error) => {
-        toast("Start failed" + e?.message, "error");
-      },
-    },
-  );
-
   const sessions = useQuery<Session[]>(
     ["sessions"],
     async () => {
@@ -206,59 +182,6 @@ const SessionsView = () => {
     },
   );
 
-  const isTokenStaked = (token: Token) => {
-    return sessions.data?.find(
-      (s) =>
-        (s.pair.pitcher?.id === token.id &&
-          s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeft) ||
-        (s.pair.batter?.id === token.id &&
-          s.pair.batter?.address === token.address &&
-          !s.batterLeft),
-    );
-  };
-
-  const tokenProgress = (token: Token) => {
-    return sessions.data?.find(
-      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
-    )?.progress;
-  };
-
-  const tokenSessionID = (token: Token) => {
-    return sessions.data?.find(
-      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
-    )?.sessionID;
-  };
-
-  const unstakeNFT = useMutation(
-    async (token: Token) => {
-      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
-        return gameContract.methods.abortSession(tokenSessionID(token)).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
-      }
-      if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
-        return gameContract.methods.unstakeNFT(token.address, token.id).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
-      }
-    },
-    {
-      onSuccess: () => {
-        // queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("owned_tokens");
-      },
-      onError: (e: Error) => {
-        toast("Unstake failed." + e?.message, "error");
-      },
-    },
-  );
-
   const filters = [
     {
       label: "Active",
@@ -271,51 +194,6 @@ const SessionsView = () => {
     <Flex className={styles.container}>
       <Flex gap={"20px"} alignItems={"start"}>
         <InviteView isOpen={isOpen} onClose={onClose} />
-
-        {/*{selectedToken && !isTokenStaked(selectedToken) && (*/}
-        {/*  <Flex direction={"column"}>*/}
-        {/*    <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />*/}
-        {/*    <button*/}
-        {/*      className={globalStyles.button}*/}
-        {/*      style={{ width: "139px" }}*/}
-        {/*      onClick={() => startSession.mutate(0)}*/}
-        {/*    >*/}
-        {/*      {startSession.isLoading && startSession.variables === 0 ? (*/}
-        {/*        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
-        {/*      ) : (*/}
-        {/*        "Pitch"*/}
-        {/*      )}*/}
-        {/*    </button>*/}
-        {/*    <button*/}
-        {/*      className={globalStyles.button}*/}
-        {/*      onClick={() => startSession.mutate(1)}*/}
-        {/*      style={{ width: "139px" }}*/}
-        {/*    >*/}
-        {/*      {startSession.isLoading && startSession.variables === 1 ? (*/}
-        {/*        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
-        {/*      ) : (*/}
-        {/*        "Bat"*/}
-        {/*      )}*/}
-        {/*    </button>*/}
-        {/*  </Flex>*/}
-        {/*)}*/}
-        {/*{selectedToken && isTokenStaked(selectedToken) && (*/}
-        {/*  <Flex direction={"column"} minH={"229px"} mr={"-5px"}>*/}
-        {/*    <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />*/}
-        {/*    {tokenProgress(selectedToken) !== 3 && tokenProgress(selectedToken) !== 4 && (*/}
-        {/*      <button*/}
-        {/*        className={globalStyles.button}*/}
-        {/*        onClick={() => unstakeNFT.mutate(selectedToken)}*/}
-        {/*      >*/}
-        {/*        {unstakeNFT.isLoading ? (*/}
-        {/*          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
-        {/*        ) : (*/}
-        {/*          "unstake"*/}
-        {/*        )}*/}
-        {/*      </button>*/}
-        {/*    )}*/}
-        {/*  </Flex>*/}
-        {/*)}*/}
         <Flex gap={"30px"}>
           <OwnedTokens />
           {/*<StakedTokens />*/}
