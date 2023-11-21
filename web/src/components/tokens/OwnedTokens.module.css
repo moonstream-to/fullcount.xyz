@@ -50,6 +50,25 @@
   min-height: 41px;
 }
 
+.inviteButton {
+  display: flex;
+  padding: 8px 20px;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  /*align-self: stretch;*/
+  border: 1px solid white;
+  border-top-style: none;
+  /*background: #00a341;*/
+  color: #fff;
+  /*padding: 12px;*/
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  min-height: 41px;
+}
+
 .mintCard {
   display: flex;
   width: 130px;

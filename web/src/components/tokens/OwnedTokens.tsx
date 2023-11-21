@@ -244,7 +244,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             </Flex>
           </>
         )}
-        {selectedToken && !isTokenStaked(selectedToken) && (
+        {selectedToken && !isTokenStaked(selectedToken) && !forJoin && (
           <Flex direction={"column"} minH={"229px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             {forJoin && invitedTo ? (
@@ -316,17 +316,40 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             ownedTokens.data
               .filter((t) => !forJoin || !isTokenStaked(t))
               .map((token: Token, idx: number) => (
-                <CharacterCard
-                  token={token}
-                  key={idx}
-                  isActive={false}
-                  maxW={"70px"}
-                  maxH={"85px"}
-                  showName={false}
-                  isClickable={true}
-                  border={selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"}
-                  flexShrink={"0"}
-                />
+                <Flex direction={"column"} key={idx}>
+                  <CharacterCard
+                    token={token}
+                    isActive={false}
+                    maxW={"70px"}
+                    maxH={"85px"}
+                    showName={false}
+                    isClickable={true}
+                    border={
+                      selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"
+                    }
+                    flexShrink={"0"}
+                  />
+                  {forJoin && invitedTo && selectedToken?.id === token.id && (
+                    <button
+                      className={globalStyles.inviteButton}
+                      style={{ width: "70px" }}
+                      onClick={() => joinSession.mutate(invitedTo)}
+                    >
+                      {joinSession.isLoading ? (
+                        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                      ) : (
+                        <Image
+                          src={`${assets}/${
+                            isPitcherInvited(selectedToken) ? "ball2.png" : "bat2.png"
+                          }`}
+                          h={"24px"}
+                          w={"24px"}
+                          alt={"o"}
+                        />
+                      )}
+                    </button>
+                  )}
+                </Flex>
               ))}
           {ownedTokens.data && ownedTokens.data.filter((t) => !isTokenStaked(t)).length > 0 && (
             <Flex
