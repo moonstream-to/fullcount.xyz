@@ -189,7 +189,7 @@ const SessionsView = () => {
         .filter(
           (s) =>
             (s.progress !== 6 && s.progress !== 1) ||
-            s.pair.pitcher?.staker === web3ctx.account ||
+            s.pair.batter?.staker === web3ctx.account ||
             s.pair.pitcher?.staker === web3ctx.account,
         )
         .reverse();
