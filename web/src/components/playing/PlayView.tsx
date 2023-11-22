@@ -13,7 +13,7 @@ import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { ZERO_ADDRESS } from "../../constants";
-import { decodeBase64Jsxwon } from "../../utils/decoders";
+import { decodeBase64Json } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 
