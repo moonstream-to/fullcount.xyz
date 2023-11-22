@@ -1,7 +1,6 @@
 import { Session } from "../types";
 
 export const progressMessage = (session: Session) => {
-  // console.log(session);
   if (session.progress === 1) {
     return "aborted";
   }
