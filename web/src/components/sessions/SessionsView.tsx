@@ -109,16 +109,26 @@ const SessionsView = () => {
       });
       const tokens: any[] = [];
       decodedRes.forEach((res) => {
-        if (res.session.pitcherAddress !== ZERO_ADDRESS) {
+        if (
+          res.session.pitcherAddress !== ZERO_ADDRESS &&
+          !tokens.some(
+            (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
+          )
+        ) {
           tokens.push({ address: res.session.pitcherAddress, id: res.session.pitcherTokenID });
         }
-        if (res.session.batterAddress !== ZERO_ADDRESS) {
+        if (
+          res.session.batterAddress !== ZERO_ADDRESS &&
+          !tokens.some(
+            (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
+          )
+        ) {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
-      const uniqTokens = [...new Set(tokens)];
+
       const tokenQueries: any[] = [];
-      uniqTokens.forEach((token) => {
+      tokens.forEach((token) => {
         tokenContract.options.address = token.address;
         tokenQueries.push({
           target: token.address,
