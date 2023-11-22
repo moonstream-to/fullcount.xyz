@@ -76,24 +76,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
         try {
           tokenMetadata = decodeBase64Json(URI);
+          tokens.push({
+            id: tokenId,
+            name: tokenMetadata.name.split(` - ${tokenId}`)[0],
+            image: tokenMetadata.image,
+            address: tokenContract.options.address,
+          });
         } catch (e) {
           console.log(e);
         }
-
-        tokens.push({
-          id: tokenId,
-          name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-          image: tokenMetadata.image,
-          address: tokenContract.options.address,
-        });
       }
-      // const notStakedTokens = tokens.filter((t) => !isTokenStaked(t));
-      // console.log(isTokenSelected);
-      // if (!isTokenSelected && tokens.length > 0) {
-      //   console.log("setting token");
-      //   const randomIndex = Math.floor(Math.random() * tokens.length);
-      //   updateContext({ selectedToken: tokens[randomIndex] });
-      // }
       return tokens;
     },
     {
