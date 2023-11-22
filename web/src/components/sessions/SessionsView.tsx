@@ -116,9 +116,9 @@ const SessionsView = () => {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
-
+      const uniqTokens = [...new Set(tokens)];
       const tokenQueries: any[] = [];
-      tokens.forEach((token) => {
+      uniqTokens.forEach((token) => {
         tokenContract.options.address = token.address;
         tokenQueries.push({
           target: token.address,
