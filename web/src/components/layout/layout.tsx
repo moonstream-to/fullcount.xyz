@@ -21,7 +21,7 @@ export default function Layout({
   return (
     <div>
       <Head>
-        <link rel="icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.png?v1" />
         <title>{title ?? "Fullcount"}</title>
         <meta name="description" content="Baseball game" />
         <meta name="og:title" content={siteTitle} />

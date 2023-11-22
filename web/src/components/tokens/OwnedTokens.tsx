@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { MoonstreamWeb3ProviderInterface } from "../../types/Moonstream";
 import styles from "./OwnedTokens.module.css";
 import { Flex, Image, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
@@ -13,7 +12,6 @@ import { decodeBase64Json } from "../../utils/decoders";
 import { Session, Token } from "../../types";
 import globalStyles from "./OwnedTokens.module.css";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
@@ -78,24 +76,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
         try {
           tokenMetadata = decodeBase64Json(URI);
+          tokens.push({
+            id: tokenId,
+            name: tokenMetadata.name.split(` - ${tokenId}`)[0],
+            image: tokenMetadata.image,
+            address: tokenContract.options.address,
+          });
         } catch (e) {
           console.log(e);
         }
-
-        tokens.push({
-          id: tokenId,
-          name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-          image: tokenMetadata.image,
-          address: tokenContract.options.address,
-        });
       }
-      // const notStakedTokens = tokens.filter((t) => !isTokenStaked(t));
-      // console.log(isTokenSelected);
-      // if (!isTokenSelected && tokens.length > 0) {
-      //   console.log("setting token");
-      //   const randomIndex = Math.floor(Math.random() * tokens.length);
-      //   updateContext({ selectedToken: tokens[randomIndex] });
-      // }
       return tokens;
     },
     {
@@ -121,8 +111,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       onSuccess: async (data, variables) => {
         queryClient.setQueryData(["sessions"], (oldData: any) => {
           const newSession: Session = {
-            batterLeft: false,
-            pitcherLeft: false,
+            batterLeftSession: false,
+            pitcherLeftSession: false,
             progress: 2,
             sessionID: Number(data.events.SessionStarted.returnValues.sessionID),
             pair: {
@@ -131,6 +121,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             },
             phaseStartTimestamp: 0,
             secondsPerPhase: 0,
+            outcome: 0,
+            didPitcherCommit: false,
+            didBatterCommit: false,
+            didPitcherReveal: false,
+            didBatterReveal: false,
           };
           updateContext({
             sessions: [...oldData, newSession],
@@ -219,10 +214,31 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
     },
     {
-      onSuccess: () => {
-        // queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("owned_tokens");
+      onSuccess: (_, variables) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
+          const newSessions =
+            oldData?.map((s) => {
+              if (
+                s.pair.pitcher?.address === variables.address &&
+                s.pair.pitcher.id === variables.id &&
+                !s.pitcherLeftSession
+              ) {
+                return { ...s, pitcherLeftSession: true };
+              }
+              if (
+                s.pair.batter?.address === variables.address &&
+                s.pair.batter.id === variables.id &&
+                !s.batterLeftSession
+              ) {
+                return { ...s, batterLeftSession: true };
+              }
+              return s;
+            }) ?? [];
+          updateContext({
+            sessions: newSessions,
+          });
+          return newSessions;
+        });
       },
       onError: (e: Error) => {
         toast("Unstake failed." + e?.message, "error");
@@ -238,10 +254,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       (s) =>
         (s.pair.pitcher?.id === token.id &&
           s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeft) ||
+          !s.pitcherLeftSession) ||
         (s.pair.batter?.id === token.id &&
           s.pair.batter?.address === token.address &&
-          !s.batterLeft),
+          !s.batterLeftSession),
     );
   };
 
@@ -344,14 +360,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   <CharacterCard
                     token={token}
                     isActive={false}
-                    maxW={"70px"}
-                    maxH={"85px"}
+                    w={"70px"}
+                    h={"85px"}
                     showName={false}
                     isClickable={true}
                     border={
                       selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"
                     }
-                    flexShrink={"0"}
                   />
                   {forJoin && invitedTo && selectedToken?.id === token.id && (
                     <button
@@ -382,6 +397,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               className={styles.mintCard}
               onClick={onOpen}
               cursor={"pointer"}
+              flexShrink={"0"}
             >
               {mintToken.isLoading ? <Spinner /> : " + Create"}
             </Flex>

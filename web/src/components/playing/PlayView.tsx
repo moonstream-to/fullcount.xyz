@@ -108,6 +108,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const sessionStatus = useQuery(
     ["session", selectedSession],
     async () => {
+      if (!selectedSession) return undefined;
       console.log("session status");
       const session = await gameContract.methods.getSession(selectedSession?.sessionID).call();
       const progress = Number(
@@ -150,6 +151,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         phaseStartTimestamp,
         pitcherReveal,
         batterReveal,
+        pitcherLeftSession,
+        batterLeftSession,
       } = session;
 
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
@@ -168,11 +171,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         Number(batterReveal[1]) === 0 ? 0 : Number(batterReveal[1]) === 1 ? 1 : 2;
 
       return {
+        sessionID: selectedSession?.sessionID,
         progress,
         didPitcherCommit,
         didBatterCommit,
         didPitcherReveal,
         didBatterReveal,
+        pitcherLeftSession,
+        batterLeftSession,
         outcome,
         phaseStartTimestamp: Number(phaseStartTimestamp),
         secondsPerPhase: Number(secondsPerPhase),
@@ -270,9 +276,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             isExpired={!!sessionStatus.data?.isExpired}
             pitch={sessionStatus.data.pitcherReveal}
             swing={sessionStatus.data.batterReveal}
+            session={{
+              ...sessionStatus.data,
+              pair: isPitcher(selectedToken)
+                ? { pitcher: selectedToken, batter: opponent }
+                : { pitcher: opponent, batter: selectedToken },
+            }}
           />
         )}
-        {/*{selectedSession?.pair}*/}
         {!isPitcher(selectedToken) ? (
           <>
             {selectedToken && (
@@ -307,8 +318,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           </>
         )}
       </Flex>
-
-      {/*<Text>{selectedSession?.progress}</Text>*/}
     </Flex>
   );
 };

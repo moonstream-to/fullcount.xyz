@@ -63,6 +63,15 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   useEffect(() => {
     setMovements([]);
+    const item =
+      localStorage.getItem(
+        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+      ) ?? "";
+    if (item) {
+      const reveal = JSON.parse(item);
+      setKind(reveal.kind);
+      setGridIndex(reveal.vertical * 5 + reveal.horizontal);
+    }
   }, [selectedSession]);
 
   useEffect(() => {

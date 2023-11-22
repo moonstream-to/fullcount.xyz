@@ -63,6 +63,15 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   useEffect(() => {
     setMovements([]);
+    const item =
+      localStorage.getItem(
+        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+      ) ?? "";
+    if (item) {
+      const reveal = JSON.parse(item);
+      setSpeed(reveal.speed);
+      setGridIndex(reveal.vertical * 5 + reveal.horizontal);
+    }
   }, [selectedSession]);
 
   useEffect(() => {

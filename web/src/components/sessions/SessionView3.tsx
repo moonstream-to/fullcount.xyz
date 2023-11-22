@@ -7,6 +7,7 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
+import { progressMessage } from "../utils";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -76,10 +77,10 @@ const SessionView3 = ({ session }: { session: Session }) => {
       (s) =>
         (s.pair.pitcher?.id === token.id &&
           s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeft) ||
+          !s.pitcherLeftSession) ||
         (s.pair.batter?.id === token.id &&
           s.pair.batter?.address === token.address &&
-          !s.batterLeft),
+          !s.batterLeftSession),
     );
   };
 
@@ -95,15 +96,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
     return <></>;
   }
 
-  const progressMessages = [
-    "does not exist",
-    "Aborted",
-    "Waiting for Opponent",
-    "In progress",
-    "In progress",
-    "Complete",
-    "Expired",
-  ];
   const progressMessageColors = [
     "#FF8D8D",
     "#FF8D8D",
@@ -116,13 +108,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
-      <Flex direction={"column"}>
-        {`Session ${session.sessionID}`}
-        {/*<Text fontSize={"14px"}>{sessionStates[session.progress]}</Text>*/}
-      </Flex>
-      <Text color={progressMessageColors[session.progress]}>
-        {progressMessages[session.progress]}
-      </Text>
+      <Text color={progressMessageColors[session.progress]}>{progressMessage(session)}</Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
         {session.pair.pitcher ? (

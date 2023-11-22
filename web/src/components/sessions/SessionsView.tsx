@@ -109,10 +109,20 @@ const SessionsView = () => {
       });
       const tokens: any[] = [];
       decodedRes.forEach((res) => {
-        if (res.session.pitcherAddress !== ZERO_ADDRESS) {
+        if (
+          res.session.pitcherAddress !== ZERO_ADDRESS &&
+          !tokens.some(
+            (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
+          )
+        ) {
           tokens.push({ address: res.session.pitcherAddress, id: res.session.pitcherTokenID });
         }
-        if (res.session.batterAddress !== ZERO_ADDRESS) {
+        if (
+          res.session.batterAddress !== ZERO_ADDRESS &&
+          !tokens.some(
+            (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
+          )
+        ) {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
@@ -161,15 +171,28 @@ const SessionsView = () => {
 
         return {
           pair,
-          batterLeft: session.session.batterLeftSession,
-          pitcherLeft: session.session.pitcherLeftSession,
+          batterLeftSession: session.session.batterLeftSession,
+          pitcherLeftSession: session.session.pitcherLeftSession,
           sessionID: idx + 1,
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
           progress: session.progress,
+          didPitcherCommit: session.session.didPitcherCommit,
+          didPitcherReveal: session.session.didPitcherReveal,
+          didBatterCommit: session.session.didBatterCommit,
+          didBatterReveal: session.session.didBatterReveal,
+          outcome: Number(session.session.outcome),
         };
       });
-      return sessionsWithTokens.reverse();
+
+      return sessionsWithTokens
+        .filter(
+          (s) =>
+            (s.progress !== 6 && s.progress !== 1) ||
+            s.pair.pitcher?.staker === web3ctx.account ||
+            s.pair.pitcher?.staker === web3ctx.account,
+        )
+        .reverse();
     },
     {
       onSuccess: (data) => {
@@ -198,9 +221,6 @@ const SessionsView = () => {
         </Flex>
       </Flex>
 
-      <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
-        <Text className={styles.title}>Sessions</Text>
-      </Flex>
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
