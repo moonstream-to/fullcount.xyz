@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from "react-query";
-import { MoonstreamWeb3ProviderInterface } from "../../types/Moonstream";
 import styles from "./OwnedTokens.module.css";
 import { Flex, Image, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
@@ -13,7 +12,6 @@ import { decodeBase64Json } from "../../utils/decoders";
 import { Session, Token } from "../../types";
 import globalStyles from "./OwnedTokens.module.css";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
@@ -365,14 +363,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   <CharacterCard
                     token={token}
                     isActive={false}
-                    maxW={"70px"}
-                    maxH={"85px"}
+                    w={"70px"}
+                    h={"85px"}
                     showName={false}
                     isClickable={true}
                     border={
                       selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"
                     }
-                    flexShrink={"0"}
                   />
                   {forJoin && invitedTo && selectedToken?.id === token.id && (
                     <button
@@ -403,6 +400,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               className={styles.mintCard}
               onClick={onOpen}
               cursor={"pointer"}
+              flexShrink={"0"}
             >
               {mintToken.isLoading ? <Spinner /> : " + Create"}
             </Flex>

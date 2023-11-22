@@ -37,9 +37,9 @@ const CharacterCard = ({
   return (
     <Flex
       className={styles.container}
-      {...props}
       h={isActive || children ? "216px" : "fit-content"}
       w={"fit-content"}
+      {...props}
       onClick={() => {
         if (isClickable) {
           handleClick();
