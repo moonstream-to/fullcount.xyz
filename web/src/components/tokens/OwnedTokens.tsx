@@ -219,10 +219,31 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
     },
     {
-      onSuccess: () => {
-        // queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("owned_tokens");
+      onSuccess: (_, variables) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
+          const newSessions =
+            oldData?.map((s) => {
+              if (
+                s.pair.pitcher?.address === variables.address &&
+                s.pair.pitcher.id === variables.id &&
+                !s.pitcherLeft
+              ) {
+                return { ...s, pitcherLeft: true };
+              }
+              if (
+                s.pair.batter?.address === variables.address &&
+                s.pair.batter.id === variables.id &&
+                !s.batterLeft
+              ) {
+                return { ...s, batterLeft: true };
+              }
+              return s;
+            }) ?? [];
+          updateContext({
+            sessions: newSessions,
+          });
+          return newSessions;
+        });
       },
       onError: (e: Error) => {
         toast("Unstake failed." + e?.message, "error");
