@@ -95,15 +95,50 @@ const SessionView3 = ({ session }: { session: Session }) => {
     return <></>;
   }
 
-  const progressMessages = [
-    "does not exist",
-    "Aborted",
-    "Waiting for Opponent",
-    "In progress",
-    "In progress",
-    "Complete",
-    "Expired",
-  ];
+  const progressMessage = () => {
+    if (session.progress === 1) {
+      return "aborted";
+    }
+    if (session.progress === 6) {
+      return "expired";
+    }
+    if (session.progress === 2) {
+      if (session.pair.pitcher) {
+        return `${session.pair.pitcher.name} is waiting for a batter`;
+      }
+      return `${session.pair.batter?.name} is waiting for a pitcher`;
+    }
+    if (session.progress === 3) {
+      if (!session.didPitcherCommit && !session.didBatterCommit) {
+        return `${session.pair.pitcher?.name} is pitching to ${session.pair.batter?.name}`;
+      }
+      if (session.didPitcherCommit) {
+        return `${session.pair.pitcher?.name} is winding up`;
+      }
+      return `${session.pair.batter?.name} is ready`;
+    }
+    if (session.progress === 4) {
+      if (!session.didPitcherReveal && !session.didBatterReveal) {
+        return `Here comes the pitch…`;
+      }
+      if (session.didPitcherReveal) {
+        return `${session.pair.pitcher?.name} reveals`;
+      }
+      return `${session.pair.batter?.name} reveals`;
+    }
+    if (session.progress === 5) {
+      if (Number(session.outcome) > 1 && Number(session.outcome) < 6) {
+        return `A hit! ${session.pair.batter?.name} wins it for the home team`;
+      }
+      if (Number(session.outcome) === 1) {
+        return `Ball four! ${session.pair.batter?.name}’s eye has tied the game for the home team`;
+      }
+      if (Number(session.outcome) === 6) {
+        return `${session.pair.pitcher?.name} secures the win for the visitors`;
+      }
+      return `Strike three! ${session.pair.pitcher?.name} wins it for the visitors `;
+    }
+  };
   const progressMessageColors = [
     "#FF8D8D",
     "#FF8D8D",
@@ -116,13 +151,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
-      <Flex direction={"column"}>
-        {`Session ${session.sessionID}`}
-        {/*<Text fontSize={"14px"}>{sessionStates[session.progress]}</Text>*/}
-      </Flex>
-      <Text color={progressMessageColors[session.progress]}>
-        {progressMessages[session.progress]}
-      </Text>
+      <Text color={progressMessageColors[session.progress]}>{progressMessage()}</Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
         {session.pair.pitcher ? (

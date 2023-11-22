@@ -167,6 +167,11 @@ const SessionsView = () => {
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
           progress: session.progress,
+          didPitcherCommit: session.session.didPitcherCommit,
+          didPitcherReveal: session.session.didPitcherReveal,
+          didBatterCommit: session.session.didBatterCommit,
+          didBatterReveal: session.session.didBatterReveal,
+          outcome: Number(session.session.outcome),
         };
       });
 
@@ -206,9 +211,6 @@ const SessionsView = () => {
         </Flex>
       </Flex>
 
-      <Flex gap={"20px"} w={"100%"} justifyContent={"space-between"}>
-        <Text className={styles.title}>Sessions</Text>
-      </Flex>
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>

@@ -70,6 +70,11 @@ interface Session {
   phaseStartTimestamp: number;
   batterLeft: boolean;
   pitcherLeft: boolean;
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  outcome: number;
 }
 
 interface SessionsQueryData {

@@ -129,6 +129,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             },
             phaseStartTimestamp: 0,
             secondsPerPhase: 0,
+            outcome: 0,
+            didPitcherCommit: false,
+            didBatterCommit: false,
+            didPitcherReveal: false,
+            didBatterReveal: false,
           };
           updateContext({
             sessions: [...oldData, newSession],
