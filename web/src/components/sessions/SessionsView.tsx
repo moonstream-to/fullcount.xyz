@@ -161,8 +161,8 @@ const SessionsView = () => {
 
         return {
           pair,
-          batterLeft: session.session.batterLeftSession,
-          pitcherLeft: session.session.pitcherLeftSession,
+          batterLeftSession: session.session.batterLeftSession,
+          pitcherLeftSession: session.session.pitcherLeftSession,
           sessionID: idx + 1,
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,

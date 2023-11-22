@@ -119,8 +119,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       onSuccess: async (data, variables) => {
         queryClient.setQueryData(["sessions"], (oldData: any) => {
           const newSession: Session = {
-            batterLeft: false,
-            pitcherLeft: false,
+            batterLeftSession: false,
+            pitcherLeftSession: false,
             progress: 2,
             sessionID: Number(data.events.SessionStarted.returnValues.sessionID),
             pair: {
@@ -229,16 +229,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               if (
                 s.pair.pitcher?.address === variables.address &&
                 s.pair.pitcher.id === variables.id &&
-                !s.pitcherLeft
+                !s.pitcherLeftSession
               ) {
-                return { ...s, pitcherLeft: true };
+                return { ...s, pitcherLeftSession: true };
               }
               if (
                 s.pair.batter?.address === variables.address &&
                 s.pair.batter.id === variables.id &&
-                !s.batterLeft
+                !s.batterLeftSession
               ) {
-                return { ...s, batterLeft: true };
+                return { ...s, batterLeftSession: true };
               }
               return s;
             }) ?? [];
@@ -262,10 +262,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       (s) =>
         (s.pair.pitcher?.id === token.id &&
           s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeft) ||
+          !s.pitcherLeftSession) ||
         (s.pair.batter?.id === token.id &&
           s.pair.batter?.address === token.address &&
-          !s.batterLeft),
+          !s.batterLeftSession),
     );
   };
 

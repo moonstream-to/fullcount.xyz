@@ -68,8 +68,8 @@ interface Session {
   progress: number;
   secondsPerPhase: number;
   phaseStartTimestamp: number;
-  batterLeft: boolean;
-  pitcherLeft: boolean;
+  batterLeftSession: boolean;
+  pitcherLeftSession: boolean;
   didPitcherCommit: boolean;
   didPitcherReveal: boolean;
   didBatterCommit: boolean;
