@@ -19,6 +19,7 @@ interface GameContextProps {
   invitedTo: number | undefined;
   watchingToken: Token | undefined;
   isTokenSelected: boolean;
+  tokensCache: Token[];
 }
 
 interface GameContextType extends GameContextProps {
@@ -49,6 +50,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     invitedTo: undefined,
     watchingToken: undefined,
     isTokenSelected: false,
+    tokensCache: [],
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {

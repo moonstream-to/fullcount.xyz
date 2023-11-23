@@ -27,7 +27,8 @@ import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const SessionsView = () => {
-  const { updateContext, tokenAddress, contractAddress, progressFilter } = useGameContext();
+  const { updateContext, tokenAddress, contractAddress, progressFilter, tokensCache } =
+    useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
@@ -91,7 +92,6 @@ const SessionsView = () => {
           outputs,
           data.session,
         )[0] as FullcountContractSession;
-        console.log(sessionRaw);
         const session = {
           ...sessionRaw,
           pitcherAddress: sessionRaw.pitcherNFT.nftAddress,
@@ -110,6 +110,9 @@ const SessionsView = () => {
           res.session.pitcherAddress !== ZERO_ADDRESS &&
           !tokens.some(
             (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
+          ) &&
+          !tokensCache.some(
+            (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
           )
         ) {
           tokens.push({ address: res.session.pitcherAddress, id: res.session.pitcherTokenID });
@@ -117,6 +120,9 @@ const SessionsView = () => {
         if (
           res.session.batterAddress !== ZERO_ADDRESS &&
           !tokens.some(
+            (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
+          ) &&
+          !tokensCache.some(
             (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
           )
         ) {
@@ -151,15 +157,17 @@ const SessionsView = () => {
           staker,
         };
       });
+      const tokensFromChainAndCache = tokensParsed.concat(tokensCache);
+      updateContext({ tokensCache: tokensFromChainAndCache });
 
       const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
-          pitcher: tokensParsed.find(
+          pitcher: tokensFromChainAndCache.find(
             (token) =>
               token.address === session.session.pitcherAddress &&
               token.id === session.session.pitcherTokenID,
           ),
-          batter: tokensParsed.find(
+          batter: tokensFromChainAndCache.find(
             (token) =>
               token.address === session.session.batterAddress &&
               token.id === session.session.batterTokenID,
