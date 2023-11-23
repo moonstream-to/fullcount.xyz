@@ -68,3 +68,21 @@
     font-weight: 700;
     line-height: normal;
 }
+
+.pitcherGrid {
+    cursor: url("https://static.simiotics.com/fullcount/ball4.png"), pointer;
+}
+.pitcherGridSelected {
+    cursor: pointer;
+}
+
+.moveMouseTip {
+    white-space: nowrap;
+    font-size: 12px;
+    position: absolute;
+    color: #CCCCCC;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}

@@ -16,7 +16,7 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
-  const [gridIndex, setGridIndex] = useState(12);
+  const [gridIndex, setGridIndex] = useState(-1);
   const [nonce, setNonce] = useState("0");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
@@ -230,9 +230,11 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           w={"180px"}
           h={"31px"}
           border={"1px solid white"}
+          position={"relative"}
         >
           <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
           <Box bg={"gray"} />
+          <Text className={styles.moveMouseTip}>move mouse</Text>
         </Flex>
       )}
 

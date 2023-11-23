@@ -16,6 +16,7 @@ import { ZERO_ADDRESS } from "../../constants";
 import { decodeBase64Json } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
+import styles from "./PlayView.module.css";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -248,7 +249,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 </Text>
               </Flex>
             ) : (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex
+                direction={"column"}
+                gap="10px"
+                alignItems={"center"}
+                className={styles.pitcherGrid}
+              >
                 <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
                 <Box h={"21px"} w="300px" bg={"transparent"} />
               </Flex>
@@ -310,7 +316,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 </Text>
               </Flex>
             ) : (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex
+                direction={"column"}
+                gap="10px"
+                alignItems={"center"}
+                className={styles.pitcherGrid}
+              >
                 <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
                 <Box h={"21px"} w="300px" bg={"transparent"} />
               </Flex>
