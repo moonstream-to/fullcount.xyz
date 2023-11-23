@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
-import { Session, Token } from "../types";
+import { OwnedToken, Session, Token } from "../types";
 import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
 
 interface GameContextProps {
@@ -12,7 +12,7 @@ interface GameContextProps {
   contractAddress: string;
   tokenAddress: string;
   chainId: number;
-  selectedToken: Token | undefined;
+  selectedToken: OwnedToken | undefined;
   selectedSession: Session | undefined;
   sessions: Session[] | undefined;
   invitedBy: string;

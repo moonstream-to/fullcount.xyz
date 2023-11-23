@@ -9,7 +9,7 @@ import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
 import { decodeBase64Json } from "../../utils/decoders";
-import { Session, Token } from "../../types";
+import { OwnedToken, Session, Token } from "../../types";
 import globalStyles from "./OwnedTokens.module.css";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
@@ -23,8 +23,15 @@ const assets = FULLCOUNT_ASSETS_PATH;
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
-  const { sessions, tokenAddress, contractAddress, selectedToken, updateContext, invitedTo } =
-    useGameContext();
+  const {
+    tokensCache,
+    sessions,
+    tokenAddress,
+    contractAddress,
+    selectedToken,
+    updateContext,
+    invitedTo,
+  } = useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -49,7 +56,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       onSuccess: () => {
-        queryClient.invalidateQueries("owned_tokens");
+        queryClient.invalidateQueries("owned_tokens"); //TODO data update
       },
       onError: (e: Error) => {
         console.log(e);
@@ -58,46 +65,59 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
   );
 
-  const ownedTokens = useQuery<Token[]>(
+  const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", web3ctx.account, web3ctx.chainId],
     async () => {
       console.log("ownedTokens");
 
       const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
-      const tokens = [];
+      const tokens: OwnedToken[] = [];
       for (let i = 0; i < balanceOf; i++) {
         const tokenId = await tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).call();
-        const URI = await tokenContract.methods.tokenURI(tokenId).call();
-        let tokenMetadata = { name: "", image: "" };
-
-        try {
-          tokenMetadata = decodeBase64Json(URI);
-          tokens.push({
-            id: tokenId,
-            name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-            image: tokenMetadata.image,
-            address: tokenContract.options.address,
-          });
-        } catch (e) {
-          console.log(e);
+        const stakedSessionID = Number(
+          await gameContract.methods.StakedSession(tokenContract.options.address).call(),
+        );
+        const isStaked = stakedSessionID !== 0;
+        const tokenFromCache = tokensCache.find(
+          (t) => t.id === tokenId && t.address === tokenContract.options.address,
+        );
+        if (!tokenFromCache) {
+          const URI = await tokenContract.methods.tokenURI(tokenId).call();
+          let tokenMetadata = { name: "", image: "" };
+          try {
+            tokenMetadata = decodeBase64Json(URI);
+            tokens.push({
+              id: tokenId,
+              name: tokenMetadata.name.split(` - ${tokenId}`)[0],
+              image: tokenMetadata.image,
+              address: tokenContract.options.address,
+              staker: web3ctx.account,
+              isStaked,
+              stakedSessionID,
+            });
+          } catch (e) {
+            console.log(e);
+          }
+        } else {
+          tokens.push({ ...tokenFromCache, isStaked, stakedSessionID });
         }
       }
       return tokens;
     },
     {
       ...queryCacheProps,
-      refetchInterval: 5000,
+      refetchInterval: 50000,
     },
   );
 
   const startSession = useMutation(
-    async (role: number) => {
+    async ({ role, token }: { role: number; token: Token }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.startSession(tokenAddress, selectedToken?.id, role).send({
+      return gameContract.methods.startSession(token.address, token.id, role).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
@@ -112,8 +132,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             progress: 2,
             sessionID: Number(data.events.SessionStarted.returnValues.sessionID),
             pair: {
-              batter: variables === 0 ? undefined : selectedToken,
-              pitcher: variables === 1 ? undefined : selectedToken,
+              batter: variables.role === 0 ? undefined : variables.token,
+              pitcher: variables.role === 1 ? undefined : variables.token,
             },
             phaseStartTimestamp: 0,
             secondsPerPhase: 0,
@@ -129,6 +149,21 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return oldData ? [...oldData, newSession] : [newSession];
         });
+        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            console.log("Token created session but ownedTokens undefined");
+            return [];
+          }
+          return oldData.map((t) =>
+            t.address === variables.token.address && t.id === variables.token.id
+              ? {
+                  ...t,
+                  isStaked: true,
+                  stakedSession: Number(data.events.SessionStarted.returnValues.sessionID),
+                }
+              : t,
+          );
+        });
       },
       onError: (e: Error) => {
         toast("Start failed" + e?.message, "error");
@@ -137,13 +172,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const joinSession = useMutation(
-    async (sessionID: number) => {
+    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
+      return gameContract.methods.joinSession(sessionID, token.address, token.id).send({
         from: web3ctx.account,
         maxPriorityFeePerGas: null,
         maxFeePerGas: null,
@@ -156,22 +191,34 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             return [];
           }
           const newSessions = oldData.map((s: Session) => {
-            if (s.sessionID !== variables) {
+            if (s.sessionID !== variables.sessionID) {
               return s;
             }
             if (!s.pair.pitcher) {
-              return { ...s, progress: 3, pair: { ...s.pair, pitcher: selectedToken } };
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...variables.token } } };
             }
             if (!s.pair.batter) {
-              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
+              return { ...s, progress: 3, pair: { ...s.pair, batter: { ...variables.token } } };
             }
             return s;
           });
           updateContext({
             sessions: newSessions,
-            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
+            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables.sessionID),
           });
+
           return newSessions ?? [];
+        });
+        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            console.log("Token joined but ownedTokens undefined");
+            return [];
+          }
+          return oldData.map((t: OwnedToken) =>
+            t.address === variables.token.address && t.id === variables.token.id
+              ? { ...t, isStaked: true, stakedSessionID: variables.sessionID }
+              : t,
+          );
         });
       },
       onError: (e: Error) => {
@@ -185,16 +232,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
     )?.progress;
   };
-  const tokenSessionID = (token: Token) => {
-    return sessions?.find(
-      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
-    )?.sessionID;
-  }; //TODO StakedSession
 
   const unstakeNFT = useMutation(
-    async (token: Token) => {
-      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
-        return gameContract.methods.abortSession(tokenSessionID(token)).send({
+    async (token: OwnedToken) => {
+      if (tokenProgress(token) === 2 && token.isStaked) {
+        return gameContract.methods.abortSession(token.stakedSessionID).send({
           from: web3ctx.account,
           maxPriorityFeePerGas: null,
           maxFeePerGas: null,
@@ -234,6 +276,17 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return newSessions;
         });
+        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            console.log("Token joined but ownedTokens undefined");
+            return [];
+          }
+          return oldData.map((t: OwnedToken) =>
+            t.address === variables.address && t.id === variables.id
+              ? { ...t, isStaked: false, stakedSessionID: 0 }
+              : t,
+          );
+        });
       },
       onError: (e: Error) => {
         console.log(e);
@@ -244,18 +297,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
   const isPitcherInvited = () =>
     !sessions?.find((s) => s.sessionID === invitedTo)?.pair.pitcher?.id;
-
-  const isTokenStaked = (token: Token) => {
-    return sessions?.find(
-      (s) =>
-        (s.pair.pitcher?.id === token.id &&
-          s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeftSession) ||
-        (s.pair.batter?.id === token.id &&
-          s.pair.batter?.address === token.address &&
-          !s.batterLeftSession),
-    );
-  }; //TODO StakedSession
 
   return (
     <>
@@ -280,14 +321,14 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             </Flex>
           </>
         )}
-        {selectedToken && !isTokenStaked(selectedToken) && !forJoin && (
+        {selectedToken && !selectedToken?.isStaked && !forJoin && (
           <Flex direction={"column"} minH={"229px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             {forJoin && invitedTo ? (
               <button
                 className={globalStyles.button}
                 style={{ width: "139px" }}
-                onClick={() => joinSession.mutate(invitedTo)}
+                onClick={() => joinSession.mutate({ sessionID: invitedTo, token: selectedToken })}
               >
                 {joinSession.isLoading ? (
                   <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
@@ -306,9 +347,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   <button
                     className={globalStyles.button}
                     style={{ width: "70px" }}
-                    onClick={() => startSession.mutate(0)}
+                    onClick={() => startSession.mutate({ role: 0, token: selectedToken })}
                   >
-                    {startSession.isLoading && startSession.variables === 0 ? (
+                    {startSession.isLoading && startSession.variables?.role === 0 ? (
                       <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
                     ) : (
                       <Image src={`${assets}/ball2.png`} h={"24px"} w={"24px"} alt={"o"} />
@@ -316,10 +357,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   </button>
                   <button
                     className={globalStyles.button}
-                    onClick={() => startSession.mutate(1)}
+                    onClick={() => startSession.mutate({ role: 1, token: selectedToken })}
                     style={{ width: "69px" }}
                   >
-                    {startSession.isLoading && startSession.variables === 1 ? (
+                    {startSession.isLoading && startSession.variables?.role === 1 ? (
                       <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
                     ) : (
                       <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"x"} />
@@ -330,7 +371,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             )}
           </Flex>
         )}
-        {selectedToken && isTokenStaked(selectedToken) && (
+        {selectedToken && selectedToken.isStaked && (
           <Flex direction={"column"} minH={"229px"} mr={"-5px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             {tokenProgress(selectedToken) !== 3 && tokenProgress(selectedToken) !== 4 && (
@@ -350,7 +391,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         <Flex className={styles.cards}>
           {ownedTokens.data &&
             ownedTokens.data
-              .filter((t) => !forJoin || !isTokenStaked(t))
+              .filter((t) => !forJoin || !t.isStaked)
               .map((token: Token, idx: number) => (
                 <Flex direction={"column"} key={idx}>
                   <CharacterCard
@@ -368,7 +409,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                     <button
                       className={globalStyles.inviteButton}
                       style={{ width: "70px" }}
-                      onClick={() => joinSession.mutate(invitedTo)}
+                      onClick={() =>
+                        joinSession.mutate({ sessionID: invitedTo, token: selectedToken })
+                      }
                     >
                       {joinSession.isLoading ? (
                         <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
