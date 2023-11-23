@@ -15,6 +15,7 @@ import globalStyles from "./OwnedTokens.module.css";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { sendTransactionWithEstimate } from "../utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
@@ -46,11 +47,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return tokenContract.methods.mint(name, imageIndex).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        tokenContract.methods.mint(name, imageIndex),
+      );
     },
     {
       onSuccess: () => {
@@ -81,6 +81,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             name: tokenMetadata.name.split(` - ${tokenId}`)[0],
             image: tokenMetadata.image,
             address: tokenContract.options.address,
+            staker: web3ctx.account,
           });
         } catch (e) {
           console.log(e);
@@ -101,11 +102,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.startSession(tokenAddress, selectedToken?.id, role).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.startSession(tokenAddress, selectedToken?.id, role),
+      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -151,11 +151,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id),
+      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -199,18 +198,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const unstakeNFT = useMutation(
     async (token: Token) => {
       if (tokenProgress(token) === 2 && tokenSessionID(token)) {
-        return gameContract.methods.abortSession(tokenSessionID(token)).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+        return sendTransactionWithEstimate(
+          web3ctx.account,
+          gameContract.methods.abortSession(tokenSessionID(token)),
+        );
       }
       if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
-        return gameContract.methods.unstakeNFT(token.address, token.id).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+        return sendTransactionWithEstimate(
+          web3ctx.account,
+          gameContract.methods.unstakeNFT(token.address, token.id),
+        );
       }
     },
     {
