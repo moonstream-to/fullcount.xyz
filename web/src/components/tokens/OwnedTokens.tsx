@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "react-query";
 import styles from "./OwnedTokens.module.css";
 import { Flex, Image, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { useGameContext } from "../../contexts/GameContext";
 import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
@@ -66,7 +66,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const ownedTokens = useQuery<OwnedToken[]>(
-    ["owned_tokens", web3ctx.account, web3ctx.chainId],
+    ["owned_tokens"],
     async () => {
       console.log("ownedTokens");
 
@@ -75,7 +75,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       for (let i = 0; i < balanceOf; i++) {
         const tokenId = await tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).call();
         const stakedSessionID = Number(
-          await gameContract.methods.StakedSession(tokenContract.options.address).call(),
+          await gameContract.methods.StakedSession(tokenContract.options.address, tokenId).call(),
         );
         const isStaked = stakedSessionID !== 0;
         const tokenFromCache = tokensCache.find(
@@ -151,18 +151,23 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
           if (!oldData) {
+            console.log(variables, oldData);
             console.log("Token created session but ownedTokens undefined");
             return [];
           }
-          return oldData.map((t) =>
-            t.address === variables.token.address && t.id === variables.token.id
-              ? {
-                  ...t,
-                  isStaked: true,
-                  stakedSession: Number(data.events.SessionStarted.returnValues.sessionID),
-                }
-              : t,
-          );
+          return oldData.map((t) => {
+            const newToken = {
+              ...t,
+              isStaked: true,
+              stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
+            };
+            if (selectedToken === t) {
+              updateContext({ selectedToken: newToken });
+            }
+            return t.address === variables.token.address && t.id === variables.token.id
+              ? newToken
+              : t;
+          });
         });
       },
       onError: (e: Error) => {
@@ -235,7 +240,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
   const unstakeNFT = useMutation(
     async (token: OwnedToken) => {
+      console.log(tokenProgress(token) === 2, token);
       if (tokenProgress(token) === 2 && token.isStaked) {
+        console.log("qq");
         return gameContract.methods.abortSession(token.stakedSessionID).send({
           from: web3ctx.account,
           maxPriorityFeePerGas: null,
@@ -277,15 +284,20 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           return newSessions;
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          console.log(oldData, variables);
+          const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
           if (!oldData) {
-            console.log("Token joined but ownedTokens undefined");
-            return [];
+            console.log("Token unstaked but ownedTokens undefined");
+            return [newToken];
           }
-          return oldData.map((t: OwnedToken) =>
-            t.address === variables.address && t.id === variables.id
-              ? { ...t, isStaked: false, stakedSessionID: 0 }
-              : t,
+          const newData = oldData.map((t: OwnedToken) =>
+            t.address === variables.address && t.id === variables.id ? newToken : t,
           );
+          if (selectedToken === variables) {
+            console.log(newToken);
+            updateContext({ selectedToken: newToken });
+          }
+          return newData;
         });
       },
       onError: (e: Error) => {
