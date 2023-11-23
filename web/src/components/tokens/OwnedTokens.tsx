@@ -16,27 +16,22 @@ import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const tokenABI = require("../../web3/abi/BLBABI.json");
+import TokenABIImported from "../../web3/abi/BLBABI.json";
+const TokenABI = TokenABIImported as unknown as AbiItem[];
+
 const assets = FULLCOUNT_ASSETS_PATH;
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
-  const {
-    isTokenSelected,
-    sessions,
-    tokenAddress,
-    contractAddress,
-    selectedToken,
-    updateContext,
-    invitedTo,
-  } = useGameContext();
+  const { sessions, tokenAddress, contractAddress, selectedToken, updateContext, invitedTo } =
+    useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
+
+  const tokenContract = new web3ctx.web3.eth.Contract(TokenABI);
   tokenContract.options.address = tokenAddress;
-  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
+  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
 
   const mintToken = useMutation(
@@ -57,7 +52,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         queryClient.invalidateQueries("owned_tokens");
       },
       onError: (e: Error) => {
-        toast("Minting failed." + e?.message, "error");
+        console.log(e);
+        toast("Minting failed.", "error");
       },
     },
   );
@@ -109,7 +105,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       onSuccess: async (data, variables) => {
-        queryClient.setQueryData(["sessions"], (oldData: any) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           const newSession: Session = {
             batterLeftSession: false,
             pitcherLeftSession: false,
@@ -128,15 +124,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             didBatterReveal: false,
           };
           updateContext({
-            sessions: [...oldData, newSession],
+            sessions: oldData ? [...oldData, newSession] : [newSession],
             selectedSession: newSession,
           });
-          return [...oldData, newSession];
+          return oldData ? [...oldData, newSession] : [newSession];
         });
-
-        await queryClient.refetchQueries("sessions");
-        console.log("refetched");
-        queryClient.invalidateQueries("owned_tokens");
       },
       onError: (e: Error) => {
         toast("Start failed" + e?.message, "error");
@@ -159,25 +151,28 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       onSuccess: async (data, variables) => {
-        queryClient.setQueryData(["sessions"], (oldData: any) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
+          if (!oldData) {
+            return [];
+          }
           const newSessions = oldData.map((s: Session) => {
             if (s.sessionID !== variables) {
               return s;
             }
+            if (!s.pair.pitcher) {
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: selectedToken } };
+            }
             if (!s.pair.batter) {
               return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
             }
-            if (!s.pair.pitcher) {
-              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
-            }
+            return s;
           });
           updateContext({
             sessions: newSessions,
             selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
           });
-          return newSessions;
+          return newSessions ?? [];
         });
-        queryClient.invalidateQueries("owned_tokens");
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -194,7 +189,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     return sessions?.find(
       (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
     )?.sessionID;
-  };
+  }; //TODO StakedSession
 
   const unstakeNFT = useMutation(
     async (token: Token) => {
@@ -241,12 +236,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         });
       },
       onError: (e: Error) => {
-        toast("Unstake failed." + e?.message, "error");
+        console.log(e);
+        toast("Unstake failed", "error");
       },
     },
   );
 
-  const isPitcherInvited = (token?: Token) =>
+  const isPitcherInvited = () =>
     !sessions?.find((s) => s.sessionID === invitedTo)?.pair.pitcher?.id;
 
   const isTokenStaked = (token: Token) => {
@@ -259,7 +255,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           s.pair.batter?.address === token.address &&
           !s.batterLeftSession),
     );
-  };
+  }; //TODO StakedSession
 
   return (
     <>
@@ -297,7 +293,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
                 ) : (
                   <Image
-                    src={`${assets}/${isPitcherInvited(selectedToken) ? "ball2.png" : "bat2.png"}`}
+                    src={`${assets}/${isPitcherInvited() ? "ball2.png" : "bat2.png"}`}
                     h={"24px"}
                     w={"24px"}
                     alt={"o"}
@@ -378,9 +374,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                         <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
                       ) : (
                         <Image
-                          src={`${assets}/${
-                            isPitcherInvited(selectedToken) ? "ball2.png" : "bat2.png"
-                          }`}
+                          src={`${assets}/${isPitcherInvited() ? "ball2.png" : "bat2.png"}`}
                           h={"24px"}
                           w={"24px"}
                           alt={"o"}
