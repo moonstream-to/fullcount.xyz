@@ -54,7 +54,12 @@ interface Token {
   id: string;
   name: string;
   image: string;
-  staker?: string;
+  staker: string;
+}
+
+interface OwnedToken extends Token {
+  isStaked: boolean;
+  stakedSessionID: number;
 }
 
 interface Pair {
