@@ -15,6 +15,7 @@ import globalStyles from "./OwnedTokens.module.css";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { sendTransactionWithEstimate } from "../utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 import TokenABIImported from "../../web3/abi/BLBABI.json";
 const TokenABI = TokenABIImported as unknown as AbiItem[];
@@ -48,11 +49,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return tokenContract.methods.mint(name, imageIndex).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        tokenContract.methods.mint(name, imageIndex),
+      );
     },
     {
       onSuccess: () => {
@@ -117,11 +117,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.startSession(token.address, token.id, role).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.startSession(tokenAddress, selectedToken?.id, role),
+      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -183,11 +182,10 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.joinSession(sessionID, token.address, token.id).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id),
+      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -239,22 +237,18 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   };
 
   const unstakeNFT = useMutation(
-    async (token: OwnedToken) => {
-      console.log(tokenProgress(token) === 2, token);
-      if (tokenProgress(token) === 2 && token.isStaked) {
-        console.log("qq");
-        return gameContract.methods.abortSession(token.stakedSessionID).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+    async (token: Token) => {
+      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
+        return sendTransactionWithEstimate(
+          web3ctx.account,
+          gameContract.methods.abortSession(tokenSessionID(token)),
+        );
       }
       if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
-        return gameContract.methods.unstakeNFT(token.address, token.id).send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+        return sendTransactionWithEstimate(
+          web3ctx.account,
+          gameContract.methods.unstakeNFT(token.address, token.id),
+        );
       }
     },
     {

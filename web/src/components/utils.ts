@@ -44,3 +44,11 @@ export const progressMessage = (session: Session) => {
     return `Strike three! ${session.pair.pitcher?.name} wins it for the visitors `;
   }
 };
+
+export const sendTransactionWithEstimate = async (account: string, method: any) => {
+  const estimatedGas = await method.estimateGas({ from: account });
+  return method.send({
+    from: account,
+    gas: Math.ceil(1.5 * estimatedGas),
+  });
+};

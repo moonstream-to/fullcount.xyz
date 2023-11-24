@@ -7,7 +7,7 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
-import { progressMessage } from "../utils";
+import { progressMessage, sendTransactionWithEstimate } from "../utils";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -37,11 +37,10 @@ const SessionView3 = ({ session }: { session: Session }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id),
+      );
     },
     {
       onSuccess: (_, variables) => {

@@ -12,6 +12,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
+import { sendTransactionWithEstimate } from "../utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
@@ -108,11 +109,10 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods.commitPitch(selectedSession?.sessionID, sign).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.commitPitch(selectedSession?.sessionID, sign),
+      );
     },
     {
       onSuccess: () => {
@@ -143,13 +143,16 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods
-        .revealPitch(selectedSession?.sessionID, nonce, speed, vertical, horizontal)
-        .send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.revealPitch(
+          selectedSession?.sessionID,
+          nonce,
+          speed,
+          vertical,
+          horizontal,
+        ),
+      );
     },
     {
       onSuccess: () => {
