@@ -111,7 +111,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       ...queryCacheProps,
-      refetchInterval: 50000,
+      refetchInterval: 5000,
     },
   );
 
@@ -167,10 +167,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                 stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
                 tokenProgress: 2,
               };
-              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
-                console.log("to select: ", newToken);
-                updateContext({ selectedToken: newToken });
-              }
               return newToken;
             }
             return t;
@@ -233,10 +229,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                 stakedSessionID: variables.sessionID,
                 tokenProgress: 3,
               };
-              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
-                console.log("to select: ", newToken);
-                updateContext({ selectedToken: newToken });
-              }
               return newToken;
             }
             return t;
@@ -300,10 +292,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           const newData = oldData.map((t: OwnedToken) =>
             t.address === variables.address && t.id === variables.id ? newToken : t,
           );
-          if (selectedToken === variables) {
-            console.log(newToken);
-            updateContext({ selectedToken: newToken });
-          }
           return newData;
         });
       },
@@ -316,6 +304,14 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
   const isPitcherInvited = () =>
     !sessions?.find((s) => s.sessionID === invitedTo)?.pair.pitcher?.id;
+
+  useEffect(() => {
+    if (!selectedToken || !ownedTokens.data) return;
+    const newSelectedToken = ownedTokens.data.find(
+      (t) => t.address === selectedToken.address && t.id === selectedToken.id,
+    );
+    updateContext({ selectedToken: newSelectedToken });
+  }, [ownedTokens.data]);
 
   return (
     <>
