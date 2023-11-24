@@ -1,6 +1,6 @@
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
-import { Session, Token } from "../../types";
+import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import { useContext } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
@@ -31,7 +31,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
   const toast = useMoonToast();
 
   const joinSession = useMutation(
-    async (sessionID: number) => {
+    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
@@ -39,31 +39,56 @@ const SessionView3 = ({ session }: { session: Session }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id),
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
       );
     },
     {
       onSuccess: (_, variables) => {
-        queryClient.setQueryData(["sessions"], (oldData: any) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
+          if (!oldData) {
+            return [];
+          }
           const newSessions = oldData.map((s: Session) => {
-            if (s.sessionID !== variables) {
+            if (s.sessionID !== variables.sessionID) {
               return s;
             }
-            if (!s.pair.batter) {
-              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
-            }
             if (!s.pair.pitcher) {
-              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...variables.token } } };
             }
+            if (!s.pair.batter) {
+              return { ...s, progress: 3, pair: { ...s.pair, batter: { ...variables.token } } };
+            }
+            return s;
           });
           updateContext({
             sessions: newSessions,
-            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
+            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables.sessionID),
           });
-          return newSessions;
+
+          return newSessions ?? [];
         });
-        queryClient.invalidateQueries("sessions");
-        queryClient.invalidateQueries("owned_tokens");
+        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            console.log("Token joined but ownedTokens undefined");
+            return [];
+          }
+          return oldData.map((t) => {
+            if (t.address === variables.token.address && t.id === variables.token.id) {
+              const newToken = {
+                ...t,
+                isStaked: true,
+                stakedSessionID: variables.sessionID,
+                tokenProgress: 3,
+              };
+              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
+                console.log("to select: ", newToken);
+                updateContext({ selectedToken: newToken });
+              }
+              return newToken;
+            }
+            return t;
+          });
+        });
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -88,7 +113,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
       toast("Select character first", "error");
       return;
     }
-    joinSession.mutate(session.sessionID);
+    joinSession.mutate({ sessionID: session.sessionID, token: selectedToken });
   };
 
   if (!progressFilter[session.progress]) {

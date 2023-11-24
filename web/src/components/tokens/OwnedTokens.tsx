@@ -77,6 +77,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         const stakedSessionID = Number(
           await gameContract.methods.StakedSession(tokenContract.options.address, tokenId).call(),
         );
+        const tokenProgress = Number(
+          await gameContract.methods.sessionProgress(stakedSessionID).call(),
+        );
         const isStaked = stakedSessionID !== 0;
         const tokenFromCache = tokensCache.find(
           (t) => t.id === tokenId && t.address === tokenContract.options.address,
@@ -94,14 +97,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               staker: web3ctx.account,
               isStaked,
               stakedSessionID,
+              tokenProgress,
             });
           } catch (e) {
             console.log(e);
           }
         } else {
-          tokens.push({ ...tokenFromCache, isStaked, stakedSessionID });
+          tokens.push({ ...tokenFromCache, isStaked, stakedSessionID, tokenProgress });
         }
       }
+      console.log(tokens);
       return tokens;
     },
     {
@@ -119,7 +124,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.startSession(tokenAddress, selectedToken?.id, role),
+        gameContract.methods.startSession(tokenAddress, token.id, role),
       );
     },
     {
@@ -155,17 +160,20 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             return [];
           }
           return oldData.map((t) => {
-            const newToken = {
-              ...t,
-              isStaked: true,
-              stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
-            };
-            if (selectedToken === t) {
-              updateContext({ selectedToken: newToken });
+            if (t.address === variables.token.address && t.id === variables.token.id) {
+              const newToken = {
+                ...t,
+                isStaked: true,
+                stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
+                tokenProgress: 2,
+              };
+              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
+                console.log("to select: ", newToken);
+                updateContext({ selectedToken: newToken });
+              }
+              return newToken;
             }
-            return t.address === variables.token.address && t.id === variables.token.id
-              ? newToken
-              : t;
+            return t;
           });
         });
       },
@@ -184,7 +192,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id),
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
       );
     },
     {
@@ -217,11 +225,22 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             console.log("Token joined but ownedTokens undefined");
             return [];
           }
-          return oldData.map((t: OwnedToken) =>
-            t.address === variables.token.address && t.id === variables.token.id
-              ? { ...t, isStaked: true, stakedSessionID: variables.sessionID }
-              : t,
-          );
+          return oldData.map((t) => {
+            if (t.address === variables.token.address && t.id === variables.token.id) {
+              const newToken = {
+                ...t,
+                isStaked: true,
+                stakedSessionID: variables.sessionID,
+                tokenProgress: 3,
+              };
+              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
+                console.log("to select: ", newToken);
+                updateContext({ selectedToken: newToken });
+              }
+              return newToken;
+            }
+            return t;
+          });
         });
       },
       onError: (e: Error) => {
@@ -230,21 +249,15 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
   );
 
-  const tokenProgress = (token: Token) => {
-    return sessions?.find(
-      (session) => session.pair.pitcher?.id === token.id || session.pair.batter?.id === token.id,
-    )?.progress;
-  };
-
   const unstakeNFT = useMutation(
-    async (token: Token) => {
-      if (tokenProgress(token) === 2 && tokenSessionID(token)) {
+    async (token: OwnedToken) => {
+      if (token.tokenProgress === 2 && token.stakedSessionID) {
         return sendTransactionWithEstimate(
           web3ctx.account,
-          gameContract.methods.abortSession(tokenSessionID(token)),
+          gameContract.methods.abortSession(token.stakedSessionID),
         );
       }
-      if (tokenProgress(token) === 5 || tokenProgress(token) === 6) {
+      if (token.tokenProgress === 5 || token.tokenProgress === 6) {
         return sendTransactionWithEstimate(
           web3ctx.account,
           gameContract.methods.unstakeNFT(token.address, token.id),
@@ -380,7 +393,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         {selectedToken && selectedToken.isStaked && (
           <Flex direction={"column"} minH={"229px"} mr={"-5px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            {tokenProgress(selectedToken) !== 3 && tokenProgress(selectedToken) !== 4 && (
+            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
               <button
                 className={globalStyles.button}
                 onClick={() => unstakeNFT.mutate(selectedToken)}
@@ -398,7 +411,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           {ownedTokens.data &&
             ownedTokens.data
               .filter((t) => !forJoin || !t.isStaked)
-              .map((token: Token, idx: number) => (
+              .map((token: OwnedToken, idx: number) => (
                 <Flex direction={"column"} key={idx}>
                   <CharacterCard
                     token={token}

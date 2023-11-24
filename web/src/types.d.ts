@@ -60,6 +60,7 @@ interface Token {
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
+  tokenProgress: number;
 }
 
 interface Pair {

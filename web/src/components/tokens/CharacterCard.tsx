@@ -2,7 +2,7 @@ import { Flex, Image, Text } from "@chakra-ui/react";
 import styles from "./CharacterCard.module.css";
 import globalStyles from "./OwnedTokens.module.css";
 import { useGameContext } from "../../contexts/GameContext";
-import { Session, Token } from "../../types";
+import { OwnedToken, Session, Token } from "../../types";
 import { ReactNode, useEffect } from "react";
 
 const CharacterCard = ({
@@ -14,7 +14,7 @@ const CharacterCard = ({
   children,
   ...props
 }: {
-  token: Token | undefined;
+  token: OwnedToken | undefined;
   isActive?: boolean;
   session?: Session;
   isClickable?: boolean;
