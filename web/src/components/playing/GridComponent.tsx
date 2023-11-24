@@ -10,8 +10,9 @@ const GridComponent = ({
   setSelectedIndex,
 }: {
   selectedIndex: number;
-  setSelectedIndex?: (value: number) => void;
+  setSelectedIndex: (value: number) => void;
 }) => {
+  const [isDragging, setIsDragging] = useState(false);
   const handleClick = (index: number) => {
     if (setSelectedIndex) {
       if (selectedIndex > -1 && selectedIndex === index) {
@@ -20,6 +21,20 @@ const GridComponent = ({
       if (selectedIndex === -1) {
         setSelectedIndex(index);
       }
+    }
+  };
+
+  const handleMouseDown = (index: number) => {
+    if (selectedIndex === -1) {
+      setSelectedIndex(index);
+    }
+    setIsDragging(true);
+  };
+
+  const handleMouseUp = (index: number) => {
+    if (isDragging) {
+      setIsDragging(false);
+      setSelectedIndex(index);
     }
   };
 
@@ -48,24 +63,38 @@ const GridComponent = ({
       borderTopColor={topBorder.includes(index) ? "#AAA" : "#333333"}
       borderBottomColor={bottomBorder.includes(index) ? "#AAA" : "#333333"}
       // borderColor={numbers[index] < 10 ? "white" : "#b0b0b0"}
-      cursor={selectedIndex === index ? "pointer" : selectedIndex > -1 ? "default" : "inherit"}
-      onClick={() => handleClick(index)}
+      cursor={
+        selectedIndex === index && !isDragging
+          ? "pointer"
+          : selectedIndex === -1 || isDragging
+          ? "inherit"
+          : "default"
+      }
+      // onClick={() => handleClick(index)}
       fontSize={index === selectedIndex ? "22px" : "16px"}
       bg={"#111111"}
+      onMouseUp={() => handleMouseUp(index)}
+      onMouseDown={() => handleMouseDown(index)}
     >
-      {index === selectedIndex && (
+      {index === selectedIndex && !isDragging && (
         <Image
           h={"32px"}
           w={"32px"}
           src={"https://static.simiotics.com/fullcount/ball4.png"}
           alt={"ball"}
+          draggable={false}
+          userSelect={"none"}
         />
       )}
     </Box>
   );
 
   return (
-    <Flex className={selectedIndex === -1 ? styles.pitcherGrid : styles.pitcherGridSelected}>
+    <Flex
+      className={
+        selectedIndex === -1 || isDragging ? styles.pitcherGrid : styles.pitcherGridSelected
+      }
+    >
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
         {/* Generate cells for the grid */}
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
