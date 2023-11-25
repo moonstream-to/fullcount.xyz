@@ -1,5 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import styles from "./OwnedTokens.module.css";
+import globalStyles from "./OwnedTokens.module.css";
 import { Flex, Image, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
 import React, { useContext, useEffect } from "react";
@@ -10,14 +11,14 @@ import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
 import { decodeBase64Json } from "../../utils/decoders";
 import { OwnedToken, Session, Token } from "../../types";
-import globalStyles from "./OwnedTokens.module.css";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { sendTransactionWithEstimate } from "../utils";
-const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 import TokenABIImported from "../../web3/abi/BLBABI.json";
+
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 
 const assets = FULLCOUNT_ASSETS_PATH;
@@ -68,8 +69,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens"],
     async () => {
-      console.log("ownedTokens");
-
       const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
       const tokens: OwnedToken[] = [];
       for (let i = 0; i < balanceOf; i++) {
@@ -106,7 +105,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           tokens.push({ ...tokenFromCache, isStaked, stakedSessionID, tokenProgress });
         }
       }
-      console.log(tokens);
       return tokens;
     },
     {
@@ -155,19 +153,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
           if (!oldData) {
-            console.log(variables, oldData);
-            console.log("Token created session but ownedTokens undefined");
             return [];
           }
           return oldData.map((t) => {
             if (t.address === variables.token.address && t.id === variables.token.id) {
-              const newToken = {
+              return {
                 ...t,
                 isStaked: true,
                 stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
                 tokenProgress: 2,
               };
-              return newToken;
             }
             return t;
           });
@@ -218,18 +213,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
           if (!oldData) {
-            console.log("Token joined but ownedTokens undefined");
             return [];
           }
           return oldData.map((t) => {
             if (t.address === variables.token.address && t.id === variables.token.id) {
-              const newToken = {
+              return {
                 ...t,
                 isStaked: true,
                 stakedSessionID: variables.sessionID,
                 tokenProgress: 3,
               };
-              return newToken;
             }
             return t;
           });
@@ -283,16 +276,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           return newSessions;
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          console.log(oldData, variables);
           const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
           if (!oldData) {
-            console.log("Token unstaked but ownedTokens undefined");
             return [newToken];
           }
-          const newData = oldData.map((t: OwnedToken) =>
+          return oldData.map((t: OwnedToken) =>
             t.address === variables.address && t.id === variables.id ? newToken : t,
           );
-          return newData;
         });
       },
       onError: (e: Error) => {

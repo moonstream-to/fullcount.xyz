@@ -132,7 +132,12 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
-      <Text color={progressMessageColors[session.progress]}>{progressMessage(session)}</Text>
+      <Text
+        color={progressMessageColors[session.progress]}
+        title={`Session ${session.sessionID}. Progress - ${session.progress}`}
+      >
+        {progressMessage(session)}
+      </Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
         {session.pair.pitcher ? (

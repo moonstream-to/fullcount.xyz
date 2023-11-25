@@ -203,7 +203,7 @@ const SessionsView = () => {
       onSuccess: (data) => {
         updateContext({ sessions: data });
       },
-      refetchInterval: 45 * 1000,
+      refetchInterval: 5 * 1000,
     },
   );
 
