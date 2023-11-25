@@ -9,7 +9,6 @@ export function decodeBase64Json(encodedData: string): any {
     // Parse the JSON string to an object
     return JSON.parse(decodedStr);
   } catch (error) {
-    console.error("Failed to decode base64 JSON data:", error);
-    return null;
+    return { image: "", name: "Unparsable" };
   }
 }
