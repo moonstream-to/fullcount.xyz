@@ -9,7 +9,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { decodeBase64Json } from "../../utils/decoders";
+import { getTokenMetadata } from "../../utils/decoders";
 import { OwnedToken, Session, Token } from "../../types";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
@@ -87,7 +87,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           const URI = await tokenContract.methods.tokenURI(tokenId).call();
           let tokenMetadata = { name: "", image: "" };
           try {
-            tokenMetadata = decodeBase64Json(URI);
+            tokenMetadata = await getTokenMetadata(URI);
             tokens.push({
               id: tokenId,
               name: tokenMetadata.name.split(` - ${tokenId}`)[0],

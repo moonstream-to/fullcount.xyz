@@ -22,6 +22,8 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const AWS_STATIC_ASSETS_PATH = "https://static.simiotics.com/moonstream/assets";
 
 export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
+export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
+
 export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
 
 export type ChainName = "ethereum" | "localhost" | "mumbai" | "polygon" | "wyrm" | "gnosis";

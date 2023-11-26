@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import React, { Fragment, useContext, useEffect } from "react";
 import { useQuery } from "react-query";
 import { Box, Flex, useDisclosure } from "@chakra-ui/react";
-import { decodeBase64Json } from "../../utils/decoders";
+import { getTokenMetadata } from "../../utils/decoders";
 
 import { useGameContext } from "../../contexts/GameContext";
 import Web3Context from "../../contexts/Web3Context/context";
@@ -144,19 +144,21 @@ const SessionsView = () => {
       });
 
       const tokenRes = await multicallContract.methods.tryAggregate(false, tokenQueries).call();
+      const tokensParsed: Token[] = await Promise.all(
+        tokens.map(async (token, idx) => {
+          const uri = web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]);
+          const tokenMetadata = await getTokenMetadata(uri);
 
-      const tokensParsed: Token[] = tokens.map((token, idx) => {
-        const tokenMetadata = decodeBase64Json(web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]));
-
-        const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
-        const staker = web3ctx.web3.utils.toChecksumAddress(adr);
-        return {
-          ...token,
-          image: tokenMetadata.image,
-          name: tokenMetadata.name.split(` - ${token.id}`)[0],
-          staker,
-        };
-      });
+          const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
+          const staker = web3ctx.web3.utils.toChecksumAddress(adr);
+          return {
+            ...token,
+            image: tokenMetadata.image,
+            name: tokenMetadata.name.split(` - ${token.id}`)[0],
+            staker,
+          };
+        }),
+      );
       const tokensFromChainAndCache = tokensParsed.concat(tokensCache);
       updateContext({ tokensCache: tokensFromChainAndCache });
 

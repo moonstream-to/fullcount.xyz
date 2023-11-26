@@ -1,4 +1,6 @@
-export function decodeBase64Json(encodedData: string): any {
+import { TOKEN_IMAGE_FALLBACK } from "../constants";
+
+export function decodeBase64Json(encodedData: string) {
   try {
     // Split the encoded data to remove the data URI scheme if present
     const base64String = encodedData.split(",")[1] || encodedData;
@@ -13,3 +15,16 @@ export function decodeBase64Json(encodedData: string): any {
     return null;
   }
 }
+
+export const getTokenMetadata = async (uri: string) => {
+  const base64Encoded = decodeBase64Json(uri);
+  if (base64Encoded) {
+    return base64Encoded;
+  }
+  try {
+    const response = await fetch(uri.slice(uri.indexOf("https://"))); //MULTICALL returns URL with a letter ('a', 'b') at the first position
+    return await response.json();
+  } catch {
+    return { image: TOKEN_IMAGE_FALLBACK, name: "Unparsable" };
+  }
+};
