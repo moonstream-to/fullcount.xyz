@@ -69,22 +69,16 @@ const SessionView3 = ({ session }: { session: Session }) => {
         });
         queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
           if (!oldData) {
-            console.log("Token joined but ownedTokens undefined");
             return [];
           }
           return oldData.map((t) => {
             if (t.address === variables.token.address && t.id === variables.token.id) {
-              const newToken = {
+              return {
                 ...t,
                 isStaked: true,
                 stakedSessionID: variables.sessionID,
                 tokenProgress: 3,
               };
-              if (selectedToken?.address === t.address && selectedToken.id === t.id) {
-                console.log("to select: ", newToken);
-                updateContext({ selectedToken: newToken });
-              }
-              return newToken;
             }
             return t;
           });
