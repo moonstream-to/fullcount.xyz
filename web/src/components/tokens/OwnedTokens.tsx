@@ -8,7 +8,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { decodeBase64Json } from "../../utils/decoders";
+import { decodeBase64Json, getTokenMetadata } from "../../utils/decoders";
 import { Session, Token } from "../../types";
 import globalStyles from "./OwnedTokens.module.css";
 
@@ -75,7 +75,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         let tokenMetadata = { name: "", image: "" };
 
         try {
-          tokenMetadata = decodeBase64Json(URI);
+          tokenMetadata = await getTokenMetadata(URI);
           tokens.push({
             id: tokenId,
             name: tokenMetadata.name.split(` - ${tokenId}`)[0],
