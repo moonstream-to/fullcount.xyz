@@ -1,5 +1,4 @@
 import { TOKEN_IMAGE_FALLBACK } from "../constants";
-import { base } from "next/dist/build/webpack/config/blocks/base";
 
 export function decodeBase64Json(encodedData: string): any {
   try {
@@ -18,7 +17,7 @@ export function decodeBase64Json(encodedData: string): any {
 
 export const getTokenMetadata = async (uri: string) => {
   const base64Encoded = decodeBase64Json(uri);
-  if (base64Encoded && (base64Encoded.name || base64Encoded.image)) {
+  if (base64Encoded) {
     return {
       ...base64Encoded,
       name: base64Encoded.name ?? "Unparsable",
