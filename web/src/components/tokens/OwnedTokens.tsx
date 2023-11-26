@@ -8,7 +8,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { decodeBase64Json, getTokenMetadata } from "../../utils/decoders";
+import { getTokenMetadata } from "../../utils/decoders";
 import { Session, Token } from "../../types";
 import globalStyles from "./OwnedTokens.module.css";
 
