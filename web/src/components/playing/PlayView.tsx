@@ -13,7 +13,7 @@ import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { ZERO_ADDRESS } from "../../constants";
-import { decodeBase64Json, getTokenMetadata } from "../../utils/decoders";
+import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 
@@ -109,10 +109,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     ["session", selectedSession],
     async () => {
       if (!selectedSession) return undefined;
-      console.log("session status");
-      const session = await gameContract.methods.getSession(selectedSession?.sessionID).call();
+      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
       const progress = Number(
-        await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
+        await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
       );
       const pitcherAddress = session.pitcherNFT.nftAddress;
       const pitcherTokenID = session.pitcherNFT.tokenID;
@@ -124,7 +123,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           : { address: batterAddress, id: batterTokenID };
 
       if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
-        console.log("fetching opponent");
         tokenContract.options.address = otherToken.address;
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
         const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
@@ -192,7 +190,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       };
     },
     {
-      refetchInterval: 5 * 1000,
+      refetchInterval: 3 * 1000,
     },
   );
 
