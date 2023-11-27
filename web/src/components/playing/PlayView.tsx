@@ -127,6 +127,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
         const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
         const tokenMetadata = await getTokenMetadata(URI);
+
         setOpponent({
           ...otherToken,
           staker,

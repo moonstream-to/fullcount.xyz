@@ -1,6 +1,6 @@
 import { TOKEN_IMAGE_FALLBACK } from "../constants";
 
-export function decodeBase64Json(encodedData: string) {
+export function decodeBase64Json(encodedData: string): {image: string; name: string} | null {
   try {
     // Split the encoded data to remove the data URI scheme if present
     const base64String = encodedData.split(",")[1] || encodedData;
@@ -11,7 +11,6 @@ export function decodeBase64Json(encodedData: string) {
     // Parse the JSON string to an object
     return JSON.parse(decodedStr);
   } catch (error) {
-    console.error("Failed to decode base64 JSON data:", error);
     return null;
   }
 }
@@ -19,11 +18,21 @@ export function decodeBase64Json(encodedData: string) {
 export const getTokenMetadata = async (uri: string) => {
   const base64Encoded = decodeBase64Json(uri);
   if (base64Encoded) {
-    return base64Encoded;
+    return {
+      ...base64Encoded,
+      name: base64Encoded.name ?? "Unparsable",
+      image: base64Encoded.image ?? TOKEN_IMAGE_FALLBACK,
+    };
   }
+
   try {
     const response = await fetch(uri.slice(uri.indexOf("https://"))); //MULTICALL returns URL with a letter ('a', 'b') at the first position
-    return await response.json();
+    const fromUrl = await response.json();
+    return {
+      ...fromUrl,
+      name: fromUrl.name ?? "Unparsable",
+      image: fromUrl.image ?? TOKEN_IMAGE_FALLBACK,
+    };
   } catch {
     return { image: TOKEN_IMAGE_FALLBACK, name: "Unparsable" };
   }

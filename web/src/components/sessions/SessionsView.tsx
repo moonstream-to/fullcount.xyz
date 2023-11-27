@@ -6,6 +6,7 @@ import { getTokenMetadata } from "../../utils/decoders";
 
 import { useGameContext } from "../../contexts/GameContext";
 import Web3Context from "../../contexts/Web3Context/context";
+
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
 import InviteView from "./InviteView";
@@ -144,6 +145,7 @@ const SessionsView = () => {
       });
 
       const tokenRes = await multicallContract.methods.tryAggregate(false, tokenQueries).call();
+
       const tokensParsed: Token[] = await Promise.all(
         tokens.map(async (token, idx) => {
           const uri = web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]);
@@ -159,8 +161,10 @@ const SessionsView = () => {
           };
         }),
       );
+
       const tokensFromChainAndCache = tokensParsed.concat(tokensCache);
       updateContext({ tokensCache: tokensFromChainAndCache });
+
 
       const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
