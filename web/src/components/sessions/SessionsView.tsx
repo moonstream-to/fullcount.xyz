@@ -165,7 +165,6 @@ const SessionsView = () => {
       const tokensFromChainAndCache = tokensParsed.concat(tokensCache);
       updateContext({ tokensCache: tokensFromChainAndCache });
 
-
       const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
           pitcher: tokensFromChainAndCache.find(
