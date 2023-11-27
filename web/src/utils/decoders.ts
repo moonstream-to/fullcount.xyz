@@ -1,6 +1,6 @@
 import { TOKEN_IMAGE_FALLBACK } from "../constants";
 
-export function decodeBase64Json(encodedData: string): {image: string; name: string} | null {
+export function decodeBase64Json(encodedData: string): { image: string; name: string } | null {
   try {
     // Split the encoded data to remove the data URI scheme if present
     const base64String = encodedData.split(",")[1] || encodedData;
