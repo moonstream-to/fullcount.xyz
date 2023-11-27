@@ -13,7 +13,7 @@ import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { ZERO_ADDRESS } from "../../constants";
-import { decodeBase64Json } from "../../utils/decoders";
+import { decodeBase64Json, getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 
@@ -128,12 +128,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         tokenContract.options.address = otherToken.address;
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
         const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
-        let tokenMetadata = { name: "qq", image: "ww" };
-        try {
-          tokenMetadata = decodeBase64Json(URI.split("data:application/json;base64")[1]);
-        } catch (e) {
-          console.log(e);
-        }
+        const tokenMetadata = await getTokenMetadata(URI);
+
         setOpponent({
           ...otherToken,
           staker,

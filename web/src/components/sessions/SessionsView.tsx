@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from "react-query";
 import React, { Fragment, useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import useMoonToast from "../../hooks/useMoonToast";
-import { decodeBase64Json } from "../../utils/decoders";
+import { decodeBase64Json, getTokenMetadata } from "../../utils/decoders";
 import CharacterCard from "../tokens/CharacterCard";
 import { Session, Token } from "../../types";
 import OwnedTokens from "../tokens/OwnedTokens";
@@ -142,18 +142,21 @@ const SessionsView = () => {
 
       const tokenRes = await multicallContract.methods.tryAggregate(false, tokenQueries).call();
 
-      const tokensParsed = tokens.map((token, idx) => {
-        const tokenMetadata = decodeBase64Json(web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]));
+      const tokensParsed: Token[] = await Promise.all(
+        tokens.map(async (token, idx) => {
+          const uri = web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]);
+          const tokenMetadata = await getTokenMetadata(uri);
 
-        const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
-        const staker = web3ctx.web3.utils.toChecksumAddress(adr);
-        return {
-          ...token,
-          image: tokenMetadata.image,
-          name: tokenMetadata.name.split(` - ${token.id}`)[0],
-          staker,
-        };
-      });
+          const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
+          const staker = web3ctx.web3.utils.toChecksumAddress(adr);
+          return {
+            ...token,
+            image: tokenMetadata.image,
+            name: tokenMetadata.name.split(` - ${token.id}`)[0],
+            staker,
+          };
+        }),
+      );
 
       const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
