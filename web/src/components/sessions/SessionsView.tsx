@@ -1,52 +1,51 @@
+import { useRouter } from "next/router";
+import React, { Fragment, useContext, useEffect } from "react";
+import { useQuery } from "react-query";
+import { Box, Flex, useDisclosure } from "@chakra-ui/react";
+import { getTokenMetadata } from "../../utils/decoders";
+
 import { useGameContext } from "../../contexts/GameContext";
-import { Box, Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
-import styles from "./SessionsView.module.css";
-import globalStyles from "../tokens/OwnedTokens.module.css";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import React, { Fragment, useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import useMoonToast from "../../hooks/useMoonToast";
-import { decodeBase64Json } from "../../utils/decoders";
-import CharacterCard from "../tokens/CharacterCard";
-import { Session, Token } from "../../types";
-import OwnedTokens from "../tokens/OwnedTokens";
-import StakedTokens from "../tokens/StakedTokens";
-import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
-import { outputs } from "../../web3/abi/ABIITems";
+
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
-import { useRouter } from "next/router";
 import InviteView from "./InviteView";
-import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import OwnedTokens from "../tokens/OwnedTokens";
+
+import styles from "./SessionsView.module.css";
+import { FullcountContractSession, Session, Token } from "../../types";
+
+import { outputs } from "../../web3/abi/ABIITems";
 import { AbiItem } from "web3-utils";
+import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import TokenABIImported from "../../web3/abi/BLBABI.json";
+import MulticallABIImported from "../../web3/abi/Multicall2.json";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const tokenABI = require("../../web3/abi/BLBABI.json");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const multicallABI = require("../../web3/abi/Multicall2.json");
+const TokenABI = TokenABIImported as unknown as AbiItem[];
+const MulticallABI = MulticallABIImported as unknown as AbiItem[];
+import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const SessionsView = () => {
-  const { selectedToken, updateContext, tokenAddress, contractAddress, progressFilter } =
+  const { updateContext, tokenAddress, contractAddress, progressFilter, tokensCache } =
     useGameContext();
   const web3ctx = useContext(Web3Context);
-  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
+  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
-  const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
+  const tokenContract = new web3ctx.web3.eth.Contract(TokenABI);
   tokenContract.options.address = tokenAddress;
   const MULTICALL2_CONTRACT_ADDRESS =
     MULTICALL2_CONTRACT_ADDRESSES[
       String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
     ];
   const multicallContract = new web3ctx.web3.eth.Contract(
-    multicallABI,
+    MulticallABI,
     MULTICALL2_CONTRACT_ADDRESS,
   );
 
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  // const [sessionInviteTo, setSessionInviteTo] = useState<Session | undefined>(undefined);
 
   useEffect(() => {
     if (router.query.invitedBy && router.query.session) {
@@ -63,9 +62,6 @@ const SessionsView = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query.invite, router.query.session]);
 
-  const queryClient = useQueryClient();
-  const toast = useMoonToast();
-
   const sessions = useQuery<Session[]>(
     ["sessions"],
     async () => {
@@ -74,12 +70,12 @@ const SessionsView = () => {
       const numSessions = await gameContract.methods.NumSessions().call();
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
       const target = contractAddress;
-      const callDatas = [];
+      const callData: string[] = [];
       for (let i = 1; i <= numSessions; i += 1) {
-        callDatas.push(gameContract.methods.sessionProgress(i).encodeABI());
-        callDatas.push(gameContract.methods.getSession(i).encodeABI());
+        callData.push(gameContract.methods.sessionProgress(i).encodeABI());
+        callData.push(gameContract.methods.getSession(i).encodeABI());
       }
-      const queries = callDatas.map((callData) => {
+      const queries = callData.map((callData) => {
         return {
           target,
           callData,
@@ -87,14 +83,16 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
-      // const session = await gameContract.methods.getSession(1).call();
 
-      const res = [];
+      const res: { progress: string; session: string }[] = [];
       for (let i = 0; i < multicallRes.length; i += 2) {
         res.push({ progress: multicallRes[i][1], session: multicallRes[i + 1][1] });
       }
-      const decodedRes = res.map((data: any) => {
-        const sessionRaw = web3ctx.web3.eth.abi.decodeParameters(outputs, data.session)[0];
+      const decodedRes = res.map((data) => {
+        const sessionRaw = web3ctx.web3.eth.abi.decodeParameters(
+          outputs,
+          data.session,
+        )[0] as FullcountContractSession;
         const session = {
           ...sessionRaw,
           pitcherAddress: sessionRaw.pitcherNFT.nftAddress,
@@ -107,11 +105,14 @@ const SessionsView = () => {
           session,
         };
       });
-      const tokens: any[] = [];
+      const tokens: { address: string; id: string }[] = [];
       decodedRes.forEach((res) => {
         if (
           res.session.pitcherAddress !== ZERO_ADDRESS &&
           !tokens.some(
+            (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
+          ) &&
+          !tokensCache.some(
             (t) => t.address === res.session.pitcherAddress && t.id === res.session.pitcherTokenID,
           )
         ) {
@@ -121,13 +122,16 @@ const SessionsView = () => {
           res.session.batterAddress !== ZERO_ADDRESS &&
           !tokens.some(
             (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
+          ) &&
+          !tokensCache.some(
+            (t) => t.address === res.session.batterAddress && t.id === res.session.batterTokenID,
           )
         ) {
           tokens.push({ address: res.session.batterAddress, id: res.session.batterTokenID });
         }
       });
 
-      const tokenQueries: any[] = [];
+      const tokenQueries: { target: string; callData: string }[] = [];
       tokens.forEach((token) => {
         tokenContract.options.address = token.address;
         tokenQueries.push({
@@ -142,27 +146,33 @@ const SessionsView = () => {
 
       const tokenRes = await multicallContract.methods.tryAggregate(false, tokenQueries).call();
 
-      const tokensParsed = tokens.map((token, idx) => {
-        const tokenMetadata = decodeBase64Json(web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]));
+      const tokensParsed: Token[] = await Promise.all(
+        tokens.map(async (token, idx) => {
+          const uri = web3ctx.web3.utils.hexToAscii(tokenRes[idx * 2][1]);
+          const tokenMetadata = await getTokenMetadata(uri);
 
-        const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
-        const staker = web3ctx.web3.utils.toChecksumAddress(adr);
-        return {
-          ...token,
-          image: tokenMetadata.image,
-          name: tokenMetadata.name.split(` - ${token.id}`)[0],
-          staker,
-        };
-      });
+          const adr = "0x" + tokenRes[idx * 2 + 1][1].slice(-40);
+          const staker = web3ctx.web3.utils.toChecksumAddress(adr);
+          return {
+            ...token,
+            image: tokenMetadata.image,
+            name: tokenMetadata.name.split(` - ${token.id}`)[0],
+            staker,
+          };
+        }),
+      );
+
+      const tokensFromChainAndCache = tokensParsed.concat(tokensCache);
+      updateContext({ tokensCache: tokensFromChainAndCache });
 
       const sessionsWithTokens = decodedRes.map((session, idx) => {
         const pair: { pitcher: Token | undefined; batter: Token | undefined } = {
-          pitcher: tokensParsed.find(
+          pitcher: tokensFromChainAndCache.find(
             (token) =>
               token.address === session.session.pitcherAddress &&
               token.id === session.session.pitcherTokenID,
           ),
-          batter: tokensParsed.find(
+          batter: tokensFromChainAndCache.find(
             (token) =>
               token.address === session.session.batterAddress &&
               token.id === session.session.batterTokenID,
@@ -198,26 +208,16 @@ const SessionsView = () => {
       onSuccess: (data) => {
         updateContext({ sessions: data });
       },
-      // ...queryCacheProps,
       refetchInterval: 5 * 1000,
     },
   );
 
-  const filters = [
-    {
-      label: "Active",
-      progress: [2],
-    },
-    { lable: "Live", progress: [3, 4] },
-    { label: "Other", progress: [0, 1, 5, 6] },
-  ];
   return (
     <Flex className={styles.container}>
       <Flex gap={"20px"} alignItems={"start"}>
         <InviteView isOpen={isOpen} onClose={onClose} />
         <Flex gap={"30px"}>
           <OwnedTokens />
-          {/*<StakedTokens />*/}
         </Flex>
       </Flex>
 

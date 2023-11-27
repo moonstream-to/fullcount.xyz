@@ -1,7 +1,8 @@
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import styles from "./CharacterCard.module.css";
 import { useGameContext } from "../../contexts/GameContext";
-import { Session, Token } from "../../types";
+import { OwnedToken, Session, Token } from "../../types";
+import OwnedTokens from "./OwnedTokens";
 
 const CharacterCard = ({
   token,
@@ -20,7 +21,8 @@ const CharacterCard = ({
 
   const handleClick = () => {
     if (isOwned) {
-      updateContext({ selectedToken: token });
+      //TODO check token's type
+      updateContext({ selectedToken: token as OwnedToken });
     } else {
       updateContext({ watchingToken: token });
     }

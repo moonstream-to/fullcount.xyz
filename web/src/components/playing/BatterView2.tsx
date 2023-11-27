@@ -12,6 +12,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
+import { sendTransactionWithEstimate } from "../utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
@@ -108,11 +109,10 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods.commitSwing(selectedSession?.sessionID, sign).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.commitSwing(selectedSession?.sessionID, sign),
+      );
     },
     {
       onSuccess: () => {
@@ -142,14 +142,16 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-
-      return gameContract.methods
-        .revealSwing(selectedSession?.sessionID, nonce, kind, vertical, horizontal)
-        .send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.revealSwing(
+          selectedSession?.sessionID,
+          nonce,
+          kind,
+          vertical,
+          horizontal,
+        ),
+      );
     },
     {
       onSuccess: () => {

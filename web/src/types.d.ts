@@ -51,10 +51,16 @@ interface TokenMetadata {
 
 interface Token {
   address: string;
-  id: number;
+  id: string;
   name: string;
   image: string;
-  staker?: string;
+  staker: string;
+}
+
+interface OwnedToken extends Token {
+  isStaked: boolean;
+  stakedSessionID: number;
+  tokenProgress: number;
 }
 
 interface Pair {
@@ -75,6 +81,23 @@ interface Session {
   didBatterCommit: boolean;
   didBatterReveal: boolean;
   outcome: number;
+}
+
+interface FullcountContractSession {
+  phaseStartTimestamp: string;
+  pitcherNFT: { nftAddress: string; tokenID: string };
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  pitcherCommit: string;
+  pitcherReveal: { nonce: string; speed: string; vertical: string; horizontal: string };
+  batterNFT: { nftAddress: string; tokenID: string };
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  batterCommit: string;
+  batterReveal: { nonce: string; kind: string; vertical: string; horizontal: string };
+  outcome: string;
+  pitcherLeftSession: boolean;
+  batterLeftSession: boolean;
 }
 
 interface SessionsQueryData {
