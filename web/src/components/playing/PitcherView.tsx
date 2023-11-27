@@ -18,6 +18,7 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
+  const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("0");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
@@ -156,6 +157,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
     {
       onSuccess: () => {
+        setIsRevealed(true);
         queryClient.invalidateQueries("sessions");
         queryClient.refetchQueries("session");
       },
@@ -194,6 +196,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       </Text>
       <GridComponent
         selectedIndex={gridIndex}
+        isPitcher={true}
         setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
       />
       <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
@@ -213,20 +216,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           Generate
         </button>
       )}
-      {seed && (
-        <Flex
-          w="180px"
-          h="27px"
-          alignItems={"center"}
-          justifyContent={"center"}
-          bg="#4D4D4D"
-          onClick={handleGenerate}
-          border={"#767676"}
-          gap={"10px"}
-        >
-          Generated
-        </Flex>
-      )}
+      {seed && <Flex className={styles.completedAction}>Generated</Flex>}
       {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
         <Flex
           onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
@@ -240,30 +230,28 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           <Text className={styles.moveMouseTip}>move mouse</Text>
         </Flex>
       )}
-
-      <button
-        className={globalStyles.commitButton}
-        onClick={handleCommit}
-        disabled={!seed || sessionStatus.didPitcherCommit}
-      >
-        {commitPitch.isLoading ? (
-          <Spinner h={"14px"} w={"14px"} />
-        ) : (
-          <Text>{sessionStatus.didPitcherCommit ? "Committed" : "Commit"}</Text>
-        )}
-      </button>
-
-      <button
-        className={globalStyles.commitButton}
-        onClick={handleReveal}
-        disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
-      >
-        {revealPitch.isLoading ? (
-          <Spinner h={"14px"} w={"14px"} />
-        ) : (
-          <Text>{sessionStatus.didPitcherReveal ? "Revealed" : "Reveal"}</Text>
-        )}
-      </button>
+      {!sessionStatus.didPitcherCommit ? (
+        <button
+          className={globalStyles.commitButton}
+          onClick={handleCommit}
+          disabled={!seed || sessionStatus.didPitcherCommit}
+        >
+          {commitPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
+        </button>
+      ) : (
+        <Flex className={styles.completedAction}>Committed</Flex>
+      )}
+      {sessionStatus.didPitcherReveal || isRevealed ? (
+        <Flex className={styles.completedAction}>Revealed</Flex>
+      ) : (
+        <button
+          className={globalStyles.commitButton}
+          onClick={handleReveal}
+          disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
+        >
+          {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+        </button>
+      )}
       <Text className={styles.text}>
         Once both players have committed their moves, press{" "}
         <span className={styles.textBold}> Reveal</span> to see the outcome
