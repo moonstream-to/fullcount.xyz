@@ -103,3 +103,40 @@ interface FullcountContractSession {
 interface SessionsQueryData {
   sessions: Session[];
 }
+
+interface PlayerStats {
+  address: string;
+  score: number;
+  points_data: {
+    batting_data: {
+      strikeouts: number;
+      walks: number;
+      singles: number;
+      doubles: number;
+      triples: number;
+      home_runs: number;
+      in_play_outs: number;
+      at_bats: number;
+      hits: number;
+      runs_batted_in: number;
+      batting_average: number;
+      on_base: number;
+      slugging: number;
+      ops: number;
+    };
+    pitching_data: {
+      strikeouts: number;
+      walks: number;
+      singles: number;
+      doubles: number;
+      triples: number;
+      home_runs: number;
+      in_play_outs: number;
+      innings: number;
+      earned_runs: number;
+      earned_run_average: number;
+      whip: number;
+      batting_average_against: number;
+    };
+  };
+}
