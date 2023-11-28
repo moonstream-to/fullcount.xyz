@@ -17,6 +17,8 @@ import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 import styles from "./PlayView.module.css";
+import axios from "axios";
+import MainStat from "./MainStat";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -195,6 +197,21 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
+  const opponentStats = useQuery(
+    ["opponent", opponent],
+    async () => {
+      if (!opponent) {
+        return;
+      }
+      const API_URL = "https://api.fullcount.xyz/stats";
+      const stat = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
+      return stat.data;
+    },
+    {
+      enabled: !!opponent,
+    },
+  );
+
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
@@ -241,6 +258,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 <Text fontSize={"14px"} fontWeight={"700"}>
                   {opponent?.name}
                 </Text>
+                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={true} />}
               </Flex>
             ) : (
               <Flex
@@ -308,6 +326,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 <Text fontSize={"14px"} fontWeight={"700"}>
                   {opponent?.name}
                 </Text>
+                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={false} />}
               </Flex>
             ) : (
               <Flex
