@@ -205,7 +205,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       }
       const API_URL = "https://api.fullcount.xyz/stats";
       const stat = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
-      console.log(`${API_URL}/${opponent.address}/${opponent.id}`, stat.data);
       return stat.data;
     },
     {
