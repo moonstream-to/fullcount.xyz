@@ -68,3 +68,37 @@
     font-weight: 700;
     line-height: normal;
 }
+
+.pitcherGrid {
+    cursor: url("https://static.simiotics.com/fullcount/ball4.png"), pointer;
+}
+.pitcherGridSelected {
+    cursor: pointer;
+}
+.batterGrid {
+    cursor: url("https://static.simiotics.com/fullcount/bat-cursor.png"), pointer;
+}
+
+.moveMouseTip {
+    white-space: nowrap;
+    font-size: 12px;
+    position: absolute;
+    color: #CCCCCC;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+}
+
+.completedAction {
+    display: flex;
+    height: 31px;
+    width: 180px;
+    padding: 6px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #767676;
+    background: #4D4D4D;
+    line-height: normal;
+}
