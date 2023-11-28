@@ -22,10 +22,18 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [nonce, setNonce] = useState("0");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const [showTooltip, setShowTooltip] = useState(false);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
   const handleCommit = async () => {
+    if (gridIndex === -1) {
+      setShowTooltip(true);
+      setTimeout(() => {
+        setShowTooltip(false);
+      }, 3000);
+      return;
+    }
     const sign = await signPitch(
       web3ctx.account,
       window.ethereum,
@@ -237,6 +245,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           disabled={!seed || sessionStatus.didPitcherCommit}
         >
           {commitPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
+          {showTooltip && <div className={globalStyles.tooltip}>Choose where to pitch first</div>}
         </button>
       ) : (
         <Flex className={styles.completedAction}>Committed</Flex>

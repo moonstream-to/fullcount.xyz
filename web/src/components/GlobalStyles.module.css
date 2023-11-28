@@ -30,6 +30,7 @@
     font-weight: 500;
     line-height: normal;
     height: 31px;
+    position: relative;
 }
 
 .commitButton:disabled {
@@ -50,5 +51,22 @@
     font-weight: 700;
     line-height: normal;
 }
+
+
+    .tooltip {
+        position: absolute;
+        bottom: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+        background-color: #333;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+        font-size: 0.9rem;
+    }
+
 
 

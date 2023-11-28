@@ -20,12 +20,20 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [gridIndex, setGridIndex] = useState(-1);
   const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("0");
+  const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
   const handleCommit = async () => {
+    if (gridIndex === -1) {
+      setShowTooltip(true);
+      setTimeout(() => {
+        setShowTooltip(false);
+      }, 3000);
+      return;
+    }
     const sign = await signSwing(
       web3ctx.account,
       window.ethereum,
@@ -243,6 +251,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           disabled={!seed || sessionStatus.didBatterCommit}
         >
           {commitSwing.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
+          {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
       ) : (
         <Flex className={styles.completedAction}>Committed</Flex>
