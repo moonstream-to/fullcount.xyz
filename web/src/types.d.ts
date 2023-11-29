@@ -51,10 +51,16 @@ interface TokenMetadata {
 
 interface Token {
   address: string;
-  id: number;
+  id: string;
   name: string;
   image: string;
-  staker?: string;
+  staker: string;
+}
+
+interface OwnedToken extends Token {
+  isStaked: boolean;
+  stakedSessionID: number;
+  tokenProgress: number;
 }
 
 interface Pair {
@@ -68,10 +74,69 @@ interface Session {
   progress: number;
   secondsPerPhase: number;
   phaseStartTimestamp: number;
-  batterLeft: boolean;
-  pitcherLeft: boolean;
+  batterLeftSession: boolean;
+  pitcherLeftSession: boolean;
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  outcome: number;
+}
+
+interface FullcountContractSession {
+  phaseStartTimestamp: string;
+  pitcherNFT: { nftAddress: string; tokenID: string };
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  pitcherCommit: string;
+  pitcherReveal: { nonce: string; speed: string; vertical: string; horizontal: string };
+  batterNFT: { nftAddress: string; tokenID: string };
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  batterCommit: string;
+  batterReveal: { nonce: string; kind: string; vertical: string; horizontal: string };
+  outcome: string;
+  pitcherLeftSession: boolean;
+  batterLeftSession: boolean;
 }
 
 interface SessionsQueryData {
   sessions: Session[];
+}
+
+interface PlayerStats {
+  address: string;
+  score: number;
+  points_data: {
+    batting_data: {
+      strikeouts: number;
+      walks: number;
+      singles: number;
+      doubles: number;
+      triples: number;
+      home_runs: number;
+      in_play_outs: number;
+      at_bats: number;
+      hits: number;
+      runs_batted_in: number;
+      batting_average: number;
+      on_base: number;
+      slugging: number;
+      ops: number;
+    };
+    pitching_data: {
+      strikeouts: number;
+      walks: number;
+      singles: number;
+      doubles: number;
+      triples: number;
+      home_runs: number;
+      in_play_outs: number;
+      innings: number;
+      earned_runs: number;
+      earned_run_average: number;
+      whip: number;
+      batting_average_against: number;
+    };
+  };
 }

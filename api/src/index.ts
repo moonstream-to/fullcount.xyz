@@ -1,8 +1,10 @@
+import cors from "cors";
 import express, { Application, Request, Response } from 'express';
 import { AxiosResponse } from "axios";
 import { getAllStats, getPlayerStats, getAllPitchLocatinoDistributions, getPitcherLocationDistribution} from './stats';
 
 const app: Application = express();
+app.use(cors());
 
 // Number of hits in Pete Rose's career
 const PORT: number = 4256;

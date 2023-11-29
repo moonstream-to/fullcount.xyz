@@ -1,12 +1,13 @@
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
-import { Session, Token } from "../../types";
+import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import { useContext } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
+import { progressMessage, sendTransactionWithEstimate } from "../utils";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -30,40 +31,58 @@ const SessionView3 = ({ session }: { session: Session }) => {
   const toast = useMoonToast();
 
   const joinSession = useMutation(
-    async (sessionID: number) => {
+    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      return gameContract.methods.joinSession(sessionID, tokenAddress, selectedToken?.id).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
+      );
     },
     {
       onSuccess: (_, variables) => {
-        queryClient.setQueryData(["sessions"], (oldData: any) => {
+        queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
+          if (!oldData) {
+            return [];
+          }
           const newSessions = oldData.map((s: Session) => {
-            if (s.sessionID !== variables) {
+            if (s.sessionID !== variables.sessionID) {
               return s;
             }
-            if (!s.pair.batter) {
-              return { ...s, progress: 3, pair: { ...s.pair, batter: selectedToken } };
-            }
             if (!s.pair.pitcher) {
-              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...selectedToken } } };
+              return { ...s, progress: 3, pair: { ...s.pair, pitcher: { ...variables.token } } };
             }
+            if (!s.pair.batter) {
+              return { ...s, progress: 3, pair: { ...s.pair, batter: { ...variables.token } } };
+            }
+            return s;
           });
           updateContext({
             sessions: newSessions,
-            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables),
+            selectedSession: newSessions?.find((s: Session) => s.sessionID === variables.sessionID),
           });
-          return newSessions;
+
+          return newSessions ?? [];
         });
-        queryClient.invalidateQueries("sessions");
-        queryClient.invalidateQueries("owned_tokens");
+        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            return [];
+          }
+          return oldData.map((t) => {
+            if (t.address === variables.token.address && t.id === variables.token.id) {
+              return {
+                ...t,
+                isStaked: true,
+                stakedSessionID: variables.sessionID,
+                tokenProgress: 3,
+              };
+            }
+            return t;
+          });
+        });
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -76,10 +95,10 @@ const SessionView3 = ({ session }: { session: Session }) => {
       (s) =>
         (s.pair.pitcher?.id === token.id &&
           s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeft) ||
+          !s.pitcherLeftSession) ||
         (s.pair.batter?.id === token.id &&
           s.pair.batter?.address === token.address &&
-          !s.batterLeft),
+          !s.batterLeftSession),
     );
   };
 
@@ -88,22 +107,13 @@ const SessionView3 = ({ session }: { session: Session }) => {
       toast("Select character first", "error");
       return;
     }
-    joinSession.mutate(session.sessionID);
+    joinSession.mutate({ sessionID: session.sessionID, token: selectedToken });
   };
 
   if (!progressFilter[session.progress]) {
     return <></>;
   }
 
-  const progressMessages = [
-    "does not exist",
-    "Aborted",
-    "Waiting for Opponent",
-    "In progress",
-    "In progress",
-    "Complete",
-    "Expired",
-  ];
   const progressMessageColors = [
     "#FF8D8D",
     "#FF8D8D",
@@ -116,12 +126,11 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
   return (
     <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
-      <Flex direction={"column"}>
-        {`Session ${session.sessionID}`}
-        {/*<Text fontSize={"14px"}>{sessionStates[session.progress]}</Text>*/}
-      </Flex>
-      <Text color={progressMessageColors[session.progress]}>
-        {progressMessages[session.progress]}
+      <Text
+        color={progressMessageColors[session.progress]}
+        title={`Session ${session.sessionID}. Progress - ${session.progress}`}
+      >
+        {progressMessage(session)}
       </Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>

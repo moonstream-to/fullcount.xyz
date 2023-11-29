@@ -5,6 +5,8 @@ import GrowingText from "./GrowingText";
 import { pitchSpeed, swingKind } from "./PlayView";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import BallAnimation from "./BallAnimation";
+import { progressMessage } from "../utils";
+import { Session } from "../../types";
 const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
 const assets = FULLCOUNT_ASSETS_PATH;
 
@@ -46,11 +48,13 @@ const Outcome = ({
   isExpired,
   pitch,
   swing,
+  session,
 }: {
   outcome: number;
   isExpired: boolean;
   pitch: Pitch;
   swing: Swing;
+  session: Session;
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isPitchSpeedVisible, setIsPitchSpeedVisible] = useState(false);
@@ -58,6 +62,7 @@ const Outcome = ({
   const [isPitchVisible, setIsPitchVisible] = useState(false);
   const [isSwingVisible, setIsSwingVisible] = useState(false);
   const [isOutcomeVisible, setIsOutcomeVisible] = useState(false);
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
 
   useEffect(() => {
     let timer1: NodeJS.Timeout;
@@ -71,6 +76,7 @@ const Outcome = ({
       timer2 = setTimeout(() => setIsPitchVisible(true), 1500);
       timer3 = setTimeout(() => setIsSwingVisible(true), 3350);
       timer4 = setTimeout(() => setIsOutcomeVisible(true), 4000);
+      timer4 = setTimeout(() => setIsDescriptionVisible(true), 5000);
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -125,8 +131,20 @@ const Outcome = ({
           className={styles.result}
           css={{ transform: "translateX(-50%)" }}
           textAlign={"center"}
+          w={"300px"}
         >
           {outcomes[outcome].toUpperCase()}!
+        </GrowingText>
+        <GrowingText
+          isVisible={isDescriptionVisible}
+          left={"50%"}
+          top={"130%"}
+          className={styles.result}
+          css={{ transform: "translateX(-50%)" }}
+          textAlign={"center"}
+          w={"300px"}
+        >
+          {progressMessage(session)}
         </GrowingText>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>

@@ -27,9 +27,8 @@
   display: flex;
   align-items: flex-start;
   gap: 15px;
-  flex-wrap: nowrap;
-  /*width: 600px;*/
-  overflow-x: auto;
+  row-gap: 15px;
+  flex-wrap: wrap;
 }
 
 .button {

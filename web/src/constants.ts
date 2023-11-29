@@ -2,6 +2,7 @@ export const GAME_CONTRACT = "0x391FFCcea2BC1a615e2d4923fFd9373278707504";
 export const TOKEN_CONTRACT = "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227";
 export const CHAIN_ID = 322;
 export const GAME_CONTRACT_VERSION = "0.0.3";
+export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
 
 const MULTICALL2_POLYGON_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_MULTICALL2_POLYGON_CONTRACT_ADDRESS;
@@ -22,6 +23,8 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const AWS_STATIC_ASSETS_PATH = "https://static.simiotics.com/moonstream/assets";
 
 export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
+export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
+
 export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
 
 export type ChainName = "ethereum" | "localhost" | "mumbai" | "polygon" | "wyrm" | "gnosis";

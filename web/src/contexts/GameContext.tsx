@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
-import { Session, Token } from "../types";
+import { OwnedToken, Session, Token } from "../types";
 import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
 
 interface GameContextProps {
@@ -12,13 +12,14 @@ interface GameContextProps {
   contractAddress: string;
   tokenAddress: string;
   chainId: number;
-  selectedToken: Token | undefined;
+  selectedToken: OwnedToken | undefined;
   selectedSession: Session | undefined;
   sessions: Session[] | undefined;
   invitedBy: string;
   invitedTo: number | undefined;
   watchingToken: Token | undefined;
   isTokenSelected: boolean;
+  tokensCache: Token[];
 }
 
 interface GameContextType extends GameContextProps {
@@ -49,6 +50,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     invitedTo: undefined,
     watchingToken: undefined,
     isTokenSelected: false,
+    tokensCache: [],
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {

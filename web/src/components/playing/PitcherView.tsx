@@ -12,18 +12,28 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
+import { sendTransactionWithEstimate } from "../utils";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
-  const [gridIndex, setGridIndex] = useState(12);
+  const [gridIndex, setGridIndex] = useState(-1);
+  const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("0");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const [showTooltip, setShowTooltip] = useState(false);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
   const handleCommit = async () => {
+    if (gridIndex === -1) {
+      setShowTooltip(true);
+      setTimeout(() => {
+        setShowTooltip(false);
+      }, 3000);
+      return;
+    }
     const sign = await signPitch(
       web3ctx.account,
       window.ethereum,
@@ -63,6 +73,15 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   useEffect(() => {
     setMovements([]);
+    const item =
+      localStorage.getItem(
+        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+      ) ?? "";
+    if (item) {
+      const reveal = JSON.parse(item);
+      setSpeed(reveal.speed);
+      setGridIndex(reveal.vertical * 5 + reveal.horizontal);
+    }
   }, [selectedSession]);
 
   useEffect(() => {
@@ -99,11 +118,10 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods.commitPitch(selectedSession?.sessionID, sign).send({
-        from: web3ctx.account,
-        maxPriorityFeePerGas: null,
-        maxFeePerGas: null,
-      });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.commitPitch(selectedSession?.sessionID, sign),
+      );
     },
     {
       onSuccess: () => {
@@ -134,16 +152,20 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         });
       }
 
-      return gameContract.methods
-        .revealPitch(selectedSession?.sessionID, nonce, speed, vertical, horizontal)
-        .send({
-          from: web3ctx.account,
-          maxPriorityFeePerGas: null,
-          maxFeePerGas: null,
-        });
+      return sendTransactionWithEstimate(
+        web3ctx.account,
+        gameContract.methods.revealPitch(
+          selectedSession?.sessionID,
+          nonce,
+          speed,
+          vertical,
+          horizontal,
+        ),
+      );
     },
     {
       onSuccess: () => {
+        setIsRevealed(true);
         queryClient.invalidateQueries("sessions");
         queryClient.refetchQueries("session");
       },
@@ -182,6 +204,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       </Text>
       <GridComponent
         selectedIndex={gridIndex}
+        isPitcher={true}
         setSelectedIndex={sessionStatus.didPitcherCommit ? undefined : setGridIndex}
       />
       <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
@@ -201,55 +224,43 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           Generate
         </button>
       )}
-      {seed && (
-        <Flex
-          w="180px"
-          h="27px"
-          alignItems={"center"}
-          justifyContent={"center"}
-          bg="#4D4D4D"
-          onClick={handleGenerate}
-          border={"#767676"}
-          gap={"10px"}
-        >
-          Generated
-        </Flex>
-      )}
+      {seed && <Flex className={styles.completedAction}>Generated</Flex>}
       {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
         <Flex
           onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
           w={"180px"}
           h={"31px"}
           border={"1px solid white"}
+          position={"relative"}
         >
           <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
           <Box bg={"gray"} />
+          <Text className={styles.moveMouseTip}>move mouse</Text>
         </Flex>
       )}
-
-      <button
-        className={globalStyles.commitButton}
-        onClick={handleCommit}
-        disabled={!seed || sessionStatus.didPitcherCommit}
-      >
-        {commitPitch.isLoading ? (
-          <Spinner h={"14px"} w={"14px"} />
-        ) : (
-          <Text>{sessionStatus.didPitcherCommit ? "Committed" : "Commit"}</Text>
-        )}
-      </button>
-
-      <button
-        className={globalStyles.commitButton}
-        onClick={handleReveal}
-        disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
-      >
-        {revealPitch.isLoading ? (
-          <Spinner h={"14px"} w={"14px"} />
-        ) : (
-          <Text>{sessionStatus.didPitcherReveal ? "Revealed" : "Reveal"}</Text>
-        )}
-      </button>
+      {!sessionStatus.didPitcherCommit ? (
+        <button
+          className={globalStyles.commitButton}
+          onClick={handleCommit}
+          disabled={!seed || sessionStatus.didPitcherCommit}
+        >
+          {commitPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
+          {showTooltip && <div className={globalStyles.tooltip}>Choose where to pitch first</div>}
+        </button>
+      ) : (
+        <Flex className={styles.completedAction}>Committed</Flex>
+      )}
+      {sessionStatus.didPitcherReveal || isRevealed ? (
+        <Flex className={styles.completedAction}>Revealed</Flex>
+      ) : (
+        <button
+          className={globalStyles.commitButton}
+          onClick={handleReveal}
+          disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
+        >
+          {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+        </button>
+      )}
       <Text className={styles.text}>
         Once both players have committed their moves, press{" "}
         <span className={styles.textBold}> Reveal</span> to see the outcome

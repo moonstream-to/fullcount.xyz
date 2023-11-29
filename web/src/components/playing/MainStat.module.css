@@ -1,0 +1,39 @@
+.container {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    gap: 10px;
+    border: 0.5px solid #BFBFBF;
+    background: #232323;
+    align-items: baseline;
+}
+.data {
+    color: #FFF;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 100%;
+    height: fit-content;
+}
+
+.label {
+    margin-left: -7px;
+    color: #BFBFBF;
+    text-align: center;
+    leading-trim: both;
+    text-edge: cap;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: 100%;
+    text-transform: uppercase;
+}
+
+.divider {
+    width: 0.5px;
+    height: 9px;
+    background: #4D4D4D;
+}

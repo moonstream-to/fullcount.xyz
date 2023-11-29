@@ -13,9 +13,12 @@ import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { ZERO_ADDRESS } from "../../constants";
-import { decodeBase64Json } from "../../utils/decoders";
+import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
+import styles from "./PlayView.module.css";
+import axios from "axios";
+import MainStat from "./MainStat";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -108,10 +111,10 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const sessionStatus = useQuery(
     ["session", selectedSession],
     async () => {
-      console.log("session status");
-      const session = await gameContract.methods.getSession(selectedSession?.sessionID).call();
+      if (!selectedSession) return undefined;
+      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
       const progress = Number(
-        await gameContract.methods.sessionProgress(selectedSession?.sessionID).call(),
+        await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
       );
       const pitcherAddress = session.pitcherNFT.nftAddress;
       const pitcherTokenID = session.pitcherNFT.tokenID;
@@ -123,16 +126,11 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           : { address: batterAddress, id: batterTokenID };
 
       if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
-        console.log("fetching opponent");
         tokenContract.options.address = otherToken.address;
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
         const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
-        let tokenMetadata = { name: "qq", image: "ww" };
-        try {
-          tokenMetadata = decodeBase64Json(URI.split("data:application/json;base64")[1]);
-        } catch (e) {
-          console.log(e);
-        }
+        const tokenMetadata = await getTokenMetadata(URI);
+
         setOpponent({
           ...otherToken,
           staker,
@@ -150,6 +148,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         phaseStartTimestamp,
         pitcherReveal,
         batterReveal,
+        pitcherLeftSession,
+        batterLeftSession,
       } = session;
 
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
@@ -168,11 +168,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         Number(batterReveal[1]) === 0 ? 0 : Number(batterReveal[1]) === 1 ? 1 : 2;
 
       return {
+        sessionID: selectedSession?.sessionID,
         progress,
         didPitcherCommit,
         didBatterCommit,
         didPitcherReveal,
         didBatterReveal,
+        pitcherLeftSession,
+        batterLeftSession,
         outcome,
         phaseStartTimestamp: Number(phaseStartTimestamp),
         secondsPerPhase: Number(secondsPerPhase),
@@ -190,7 +193,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       };
     },
     {
-      refetchInterval: 5 * 1000,
+      refetchInterval: 3 * 1000,
+    },
+  );
+
+  const opponentStats = useQuery(
+    ["opponent", opponent],
+    async () => {
+      if (!opponent) {
+        return;
+      }
+      const API_URL = "https://api.fullcount.xyz/stats";
+      const stat = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
+      return stat.data;
+    },
+    {
+      enabled: !!opponent,
     },
   );
 
@@ -240,9 +258,15 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 <Text fontSize={"14px"} fontWeight={"700"}>
                   {opponent?.name}
                 </Text>
+                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={true} />}
               </Flex>
             ) : (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex
+                direction={"column"}
+                gap="10px"
+                alignItems={"center"}
+                className={styles.pitcherGrid}
+              >
                 <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
                 <Box h={"21px"} w="300px" bg={"transparent"} />
               </Flex>
@@ -270,9 +294,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             isExpired={!!sessionStatus.data?.isExpired}
             pitch={sessionStatus.data.pitcherReveal}
             swing={sessionStatus.data.batterReveal}
+            session={{
+              ...sessionStatus.data,
+              pair: isPitcher(selectedToken)
+                ? { pitcher: selectedToken, batter: opponent }
+                : { pitcher: opponent, batter: selectedToken },
+            }}
           />
         )}
-        {/*{selectedSession?.pair}*/}
         {!isPitcher(selectedToken) ? (
           <>
             {selectedToken && (
@@ -297,9 +326,15 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 <Text fontSize={"14px"} fontWeight={"700"}>
                   {opponent?.name}
                 </Text>
+                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={false} />}
               </Flex>
             ) : (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
+              <Flex
+                direction={"column"}
+                gap="10px"
+                alignItems={"center"}
+                className={styles.pitcherGrid}
+              >
                 <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
                 <Box h={"21px"} w="300px" bg={"transparent"} />
               </Flex>
@@ -307,8 +342,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           </>
         )}
       </Flex>
-
-      {/*<Text>{selectedSession?.progress}</Text>*/}
     </Flex>
   );
 };
