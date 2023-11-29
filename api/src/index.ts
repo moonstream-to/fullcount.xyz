@@ -1,6 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import { AxiosResponse } from "axios";
-import { getAllStats, getPlayerStats } from './stats';
+import { getAllStats, getPlayerStats, getAllPitchLocatinoDistributions, getPitcherLocationDistribution} from './stats';
 
 const app: Application = express();
 
@@ -23,6 +23,24 @@ app.get("/stats/", async (req: Request, res: Response) => {
 
 app.get("/stats/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
     let stats: object | string = await getPlayerStats(req.params.nftAddress, req.params.nftTokenId);
+    if (typeof stats == "string") {
+        return res.status(500).send(stats);
+    } else {
+        return res.status(200).json(stats);
+    }
+});
+
+app.get("/pitch_location_distribution/", async (req: Request, res: Response) => {
+    let stats: object | string = await getAllPitchLocatinoDistributions();
+    if (typeof stats == "string") {
+        return res.status(500).send(stats);
+    } else {
+        return res.status(200).json(stats);
+    }
+});
+
+app.get("/pitch_location_distribution/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
+    let stats: object | string = await getPitcherLocationDistribution(req.params.nftAddress, req.params.nftTokenId);
     if (typeof stats == "string") {
         return res.status(500).send(stats);
     } else {
