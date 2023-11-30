@@ -19,12 +19,13 @@ with  dedup_events as (
 ), PitchRevealed as (
     SELECT
         label_data->'args'->>'sessionID' as session_id,
+        label_data->'args'->'pitch'-> 1 as pitch_speed,
         label_data->'args'->'pitch'-> 2 as pitch_vertical,
         label_data->'args'->'pitch'-> 3 as pitch_horizontal,
         log_index
     FROM dedup_events
     WHERE label_data->>'name'='PitchRevealed'
-), PitchLocations as (
+), PitchLocation as (
     SELECT
         pitcher_address || '_' || pitcher_token_id as address,
         pitch_vertical,
@@ -33,13 +34,38 @@ with  dedup_events as (
     FROM SessionResolved LEFT JOIN PitchRevealed ON SessionResolved.session_id = PitchRevealed.session_id
     GROUP BY pitcher_address, pitcher_token_id, pitch_vertical, pitch_horizontal
     ORDER BY pitch_vertical, pitch_horizontal
+), PitchSpeed as (
+    SELECT
+        pitcher_address || '_' || pitcher_token_id as address,
+        pitch_speed,
+        count(*) as pitch_count
+    FROM SessionResolved LEFT JOIN PitchRevealed ON SessionResolved.session_id = PitchRevealed.session_id
+    GROUP BY pitcher_address, pitcher_token_id, pitch_speed
+    ORDER BY pitch_speed
+), AggregatePitchLocation as (
+    SELECT
+        address,
+        json_agg(json_build_object(
+            'pitch_vertical', pitch_vertical,
+            'pitch_horizontal', pitch_horizontal,
+            'count', pitch_count
+        )) as location
+    FROM PitchLocation
+    GROUP BY address
+), AggregatePitchSpeed as (
+    SELECT
+        address,
+        json_agg(json_build_object(
+            'speed', pitch_speed,
+            'count', pitch_count
+        )) as speed
+    FROM PitchSpeed
+    GROUP BY address   
 )
 SELECT
-    address,
-    json_agg(json_build_object(
-        'pitch_vertical', pitch_vertical,
-        'pitch_horizontal', pitch_horizontal,
-        'count', pitch_count
-    )) as pitch_loations
-FROM PitchLocations
-GROUP BY address
+    COALESCE(AggregatePitchLocation.address, AggregatePitchSpeed.address) as address,
+    json_build_object(
+        'pitch_location', location,
+        'pitch_speed', speed
+    ) as pitch
+FROM AggregatePitchLocation FULL OUTER JOIN AggregatePitchSpeed ON AggregatePitchLocation.address = AggregatePitchSpeed.address

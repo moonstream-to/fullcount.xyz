@@ -1,5 +1,7 @@
 import axios, { AxiosResponse } from "axios";
 
+const MOONSTREAM_QUERY_API = "https://api.moonstream.to/queries"
+
 function playerFilter(data: any, nftAddress: string, nftTokenId: string): object {
     const nftConcat = nftAddress + "_" + nftTokenId;
     const playerStats = data.find((stats: any) => {
@@ -9,7 +11,7 @@ function playerFilter(data: any, nftAddress: string, nftTokenId: string): object
 };
 
 export async function getAllStats(): Promise<object | string> {
-    const statsQueryUrl = "https://api.moonstream.to/queries/fullcount_player_stats/update_data";
+    const statsQueryUrl = `${MOONSTREAM_QUERY_API}/fullcount_player_stats/update_data`;
     const apiKey = process.env.MOONSTREAM_PUBLIC_QUERIES_DATA_ACCESS_TOKEN;
     const authHeader =  { Authorization: `Bearer ${apiKey}` };
 
@@ -47,8 +49,8 @@ export async function getPlayerStats(nftAddress: string, nftTokenId: string): Pr
     }
 };
 
-export async function getAllPitchLocatinoDistributions(): Promise<object | string> {
-    const statsQueryUrl = "https://api.moonstream.to/queries/fullcount_pitcher_locations/update_data";
+export async function getAllPitcherDistributions(): Promise<object | string> {
+    const statsQueryUrl = `${MOONSTREAM_QUERY_API}/fullcount_pitch_distribution/update_data`;
     const apiKey = process.env.MOONSTREAM_PUBLIC_QUERIES_DATA_ACCESS_TOKEN;
     const authHeader =  { Authorization: `Bearer ${apiKey}` };
 
@@ -76,9 +78,9 @@ export async function getAllPitchLocatinoDistributions(): Promise<object | strin
         });
 };
 
-export async function getPitcherLocationDistribution(nftAddress: string, nftTokenId: string): Promise<any> {
+export async function getPitcherDistribution(nftAddress: string, nftTokenId: string): Promise<any> {
     const
-     allDataResponse: string | any = await getAllPitchLocatinoDistributions();
+     allDataResponse: string | any = await getAllPitcherDistributions();
     if (typeof allDataResponse == "string") {
         return allDataResponse;
     } else {

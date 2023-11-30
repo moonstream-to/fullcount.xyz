@@ -1,7 +1,6 @@
 import cors from "cors";
 import express, { Application, Request, Response } from 'express';
-import { AxiosResponse } from "axios";
-import { getAllStats, getPlayerStats, getAllPitchLocatinoDistributions, getPitcherLocationDistribution} from './stats';
+import { getAllStats, getPlayerStats, getAllPitcherDistributions, getPitcherDistribution} from './stats';
 
 const app: Application = express();
 app.use(cors());
@@ -32,8 +31,8 @@ app.get("/stats/:nftAddress/:nftTokenId", async (req: Request, res: Response) =>
     }
 });
 
-app.get("/pitch_location_distribution/", async (req: Request, res: Response) => {
-    let stats: object | string = await getAllPitchLocatinoDistributions();
+app.get("/pitch_distribution/", async (req: Request, res: Response) => {
+    let stats: object | string = await getAllPitcherDistributions();
     if (typeof stats == "string") {
         return res.status(500).send(stats);
     } else {
@@ -41,8 +40,8 @@ app.get("/pitch_location_distribution/", async (req: Request, res: Response) => 
     }
 });
 
-app.get("/pitch_location_distribution/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
-    let stats: object | string = await getPitcherLocationDistribution(req.params.nftAddress, req.params.nftTokenId);
+app.get("/pitch_distribution/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
+    let stats: object | string = await getPitcherDistribution(req.params.nftAddress, req.params.nftTokenId);
     if (typeof stats == "string") {
         return res.status(500).send(stats);
     } else {
