@@ -140,3 +140,9 @@ interface PlayerStats {
     };
   };
 }
+
+interface PitchLocation {
+  pitch_vertical: number;
+  pitch_horizontal: number;
+  count: number;
+}

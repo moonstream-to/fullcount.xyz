@@ -5,7 +5,7 @@ import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { Token } from "../../types";
+import { PitchLocation, Token } from "../../types";
 import { CloseIcon } from "@chakra-ui/icons";
 import Outcome from "./Outcome";
 import BatterView2 from "./BatterView2";
@@ -19,6 +19,7 @@ const tokenABI = require("../../web3/abi/BLBABI.json");
 import styles from "./PlayView.module.css";
 import axios from "axios";
 import MainStat from "./MainStat";
+import HeatMap from "./HeatMap";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -107,6 +108,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
   const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
   const [opponent, setOpponent] = useState<Token | undefined>(undefined);
+  const [gameOver, setGameOver] = useState(false);
 
   const sessionStatus = useQuery(
     ["session", selectedSession],
@@ -116,6 +118,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
       );
+      if (progress < 2 || progress > 4) {
+        setGameOver(true);
+      }
       const pitcherAddress = session.pitcherNFT.nftAddress;
       const pitcherTokenID = session.pitcherNFT.tokenID;
       const batterAddress = session.batterNFT.nftAddress;
@@ -193,12 +198,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       };
     },
     {
-      refetchInterval: 3 * 1000,
+      refetchInterval: () => (gameOver ? false : 3000),
     },
   );
 
   const opponentStats = useQuery(
-    ["opponent", opponent],
+    ["opponent_stat", opponent],
     async () => {
       if (!opponent) {
         return;
@@ -209,6 +214,31 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
     {
       enabled: !!opponent,
+    },
+  );
+
+  const mockLocations = [
+    19, 11, 5, 1, 2, 45, 29, 13, 8, 6, 70, 59, 47, 23, 12, 40, 35, 40, 32, 31, 11, 12, 23, 24, 34,
+  ];
+
+  const opponentPitchLocations = useQuery(
+    ["pitch_locations", opponent],
+    async () => {
+      if (!opponent) {
+        return;
+      }
+      const API_URL = "https://api.fullcount.xyz/pitch_location_distribution";
+      const res = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
+      const counts = new Array(25).fill(0);
+      res.data.pitch_loations.forEach(
+        (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
+      );
+      const total = counts.reduce((acc, value) => acc + value);
+      const rates = counts.map((value) => value / total);
+      return { rates, counts };
+    },
+    {
+      enabled: !!opponent && !isPitcher(selectedToken),
     },
   );
 
@@ -259,6 +289,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                   {opponent?.name}
                 </Text>
                 {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={true} />}
+                {opponentPitchLocations.data && (
+                  <HeatMap
+                    rates={opponentPitchLocations.data.rates}
+                    counts={opponentPitchLocations.data.counts}
+                    isPitcher
+                    showStrikeZone
+                  />
+                )}
               </Flex>
             ) : (
               <Flex
