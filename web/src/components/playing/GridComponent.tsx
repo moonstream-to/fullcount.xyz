@@ -90,7 +90,7 @@ const GridComponent = ({
   return (
     <Flex
       className={
-        selectedIndex !== -1 && !isDragging
+        (selectedIndex !== -1 && !isDragging) || !setSelectedIndex
           ? styles.pitcherGridSelected
           : isPitcher
           ? styles.pitcherGrid

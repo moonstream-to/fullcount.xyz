@@ -3,6 +3,9 @@ import { PlayerStats } from "../../types";
 import { Box, Flex, Text } from "@chakra-ui/react";
 
 const formatDecimal = (value: number) => {
+  if (!value) {
+    return ".000";
+  }
   const formattedNumber = value.toFixed(3);
 
   // removing the leading zero:

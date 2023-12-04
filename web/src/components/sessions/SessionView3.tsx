@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
@@ -8,6 +8,7 @@ import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
 import { progressMessage, sendTransactionWithEstimate } from "../utils";
+import SelectToken from "./SelectToken";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -29,6 +30,11 @@ const SessionView3 = ({ session }: { session: Session }) => {
   gameContract.options.address = contractAddress;
   const queryClient = useQueryClient();
   const toast = useMoonToast();
+  const {
+    isOpen: isSelectTokenOpen,
+    onOpen: onSelectTokenOpen,
+    onClose: onSelectTokenClose,
+  } = useDisclosure();
 
   const joinSession = useMutation(
     async ({ sessionID, token }: { sessionID: number; token: Token }) => {
@@ -103,8 +109,14 @@ const SessionView3 = ({ session }: { session: Session }) => {
   };
 
   const handleClick = () => {
-    if (!selectedToken || isTokenStaked(selectedToken)) {
-      toast("Select character first", "error");
+    if (!selectedToken) {
+      updateContext({ invitedTo: session.sessionID });
+      onSelectTokenOpen();
+      return;
+    }
+    if (selectedToken?.stakedSessionID) {
+      updateContext({ invitedTo: session.sessionID, selectedToken: undefined });
+      onSelectTokenOpen();
       return;
     }
     joinSession.mutate({ sessionID: session.sessionID, token: selectedToken });
@@ -134,6 +146,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
       </Text>
 
       <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
+        <SelectToken isOpen={isSelectTokenOpen} onClose={onSelectTokenClose} />
         {session.pair.pitcher ? (
           <Flex gap={4}>
             <CharacterCardSmall
