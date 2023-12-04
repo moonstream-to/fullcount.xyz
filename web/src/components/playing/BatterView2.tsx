@@ -27,28 +27,32 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   gameContract.options.address = contractAddress;
 
   const handleCommit = async () => {
-    if (gridIndex === -1) {
+    if (gridIndex === -1 && kind !== 2) {
       setShowTooltip(true);
       setTimeout(() => {
         setShowTooltip(false);
       }, 3000);
       return;
     }
+
+    const vertical = kind === 2 ? 0 : getRowCol(gridIndex)[0];
+    const horizontal = kind === 2 ? 0 : getRowCol(gridIndex)[1];
+
     const sign = await signSwing(
       web3ctx.account,
       window.ethereum,
       nonce,
       kind,
-      getRowCol(gridIndex)[0],
-      getRowCol(gridIndex)[1],
+      vertical,
+      horizontal,
     );
     localStorage.setItem(
       `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
       JSON.stringify({
         nonce,
         kind,
-        vertical: getRowCol(gridIndex)[0],
-        horizontal: getRowCol(gridIndex)[1],
+        vertical,
+        horizontal,
       }),
     );
     commitSwing.mutate({ sign });
@@ -199,7 +203,14 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
         </Flex>
         <Flex
           className={kind === 2 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(2)}
+          onClick={
+            sessionStatus.didBatterCommit
+              ? undefined
+              : () => {
+                  setKind(2);
+                  setGridIndex(-1);
+                }
+          }
           cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
         >
           {swingKind[2]}
@@ -211,7 +222,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <GridComponent
         selectedIndex={gridIndex}
         isPitcher={false}
-        setSelectedIndex={sessionStatus.didBatterCommit ? undefined : setGridIndex}
+        setSelectedIndex={sessionStatus.didBatterCommit || kind === 2 ? undefined : setGridIndex}
       />
       <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
         You&apos;re swinging
