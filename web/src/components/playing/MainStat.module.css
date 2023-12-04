@@ -17,6 +17,7 @@
     font-weight: 500;
     line-height: 100%;
     height: fit-content;
+    white-space: nowrap;
 }
 
 .label {
@@ -30,6 +31,8 @@
     font-weight: 300;
     line-height: 100%;
     text-transform: uppercase;
+    white-space: nowrap;
+
 }
 
 .divider {

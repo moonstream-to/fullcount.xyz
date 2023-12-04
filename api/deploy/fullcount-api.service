@@ -1,0 +1,17 @@
+[Unit]
+Description=Fullcount API server
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=3
+
+[Service]
+WorkingDirectory=/home/ubuntu/fullcount.xyz/api
+EnvironmentFile=/home/ubuntu/fullcount-secrets/app.env
+Environment=NODE_VERSION=19.9.0 NODE_ENV=production
+Restart=on-failure
+RestartSec=15s
+ExecStart=/home/ubuntu/.nvm/nvm-exec npm run prod
+SyslogIdentifier=fullcount-api
+
+[Install]
+WantedBy=multi-user.target

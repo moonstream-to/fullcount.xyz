@@ -2,8 +2,17 @@ import { Flex, Image, Text } from "@chakra-ui/react";
 import styles from "./CharacterCard.module.css";
 import globalStyles from "./OwnedTokens.module.css";
 import { useGameContext } from "../../contexts/GameContext";
-import { OwnedToken, Session, Token } from "../../types";
-import { ReactNode, useEffect } from "react";
+import { OwnedToken, Session } from "../../types";
+import React, { ReactNode } from "react";
+
+const playSound = () => {
+  const sound = document.getElementById("selectSound") as HTMLAudioElement;
+  if (!sound) {
+    return;
+  }
+  sound.play();
+};
+const soundSrc = "sounds/select.wav";
 
 const CharacterCard = ({
   token,
@@ -24,6 +33,7 @@ const CharacterCard = ({
 }) => {
   const { updateContext } = useGameContext();
   const handleClick = () => {
+    playSound();
     updateContext({ selectedToken: token });
     if (session) {
       updateContext({ selectedSession: session });
@@ -47,6 +57,7 @@ const CharacterCard = ({
       }}
       cursor={isClickable ? "pointer" : "default"}
     >
+      <audio id="selectSound" src={soundSrc} preload={"auto"}></audio>
       <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
       {(showName || isActive || children) && (
         <Flex className={styles.bottom}>

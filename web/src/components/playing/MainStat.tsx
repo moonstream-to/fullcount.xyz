@@ -3,6 +3,9 @@ import { PlayerStats } from "../../types";
 import { Box, Flex, Text } from "@chakra-ui/react";
 
 const formatDecimal = (value: number) => {
+  if (!value) {
+    return ".000";
+  }
   const formattedNumber = value.toFixed(3);
 
   // removing the leading zero:
@@ -23,7 +26,7 @@ const pitcherRecord = (stats: PlayerStats): string => {
 const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
   return (
     <>
-      {isPitcher ? (
+      {isPitcher && stats.points_data?.pitching_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>{pitcherRecord(stats)}</Text>
           <Text className={styles.label}>W-L</Text>
@@ -39,7 +42,8 @@ const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean
           <Text className={styles.data}>{formatDecimal(stats.points_data.pitching_data.whip)}</Text>
           <Text className={styles.label}>WHIP</Text>
         </Flex>
-      ) : (
+      )}
+      {!isPitcher && stats.points_data?.batting_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>
             {formatDecimal(stats.points_data.batting_data.batting_average)}

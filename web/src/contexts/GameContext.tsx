@@ -20,6 +20,7 @@ interface GameContextProps {
   watchingToken: Token | undefined;
   isTokenSelected: boolean;
   tokensCache: Token[];
+  sessionOffset: number;
 }
 
 interface GameContextType extends GameContextProps {
@@ -51,6 +52,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     watchingToken: undefined,
     isTokenSelected: false,
     tokensCache: [],
+    sessionOffset: 20,
   });
 
   const updateContext = (newState: Partial<GameContextProps>) => {
