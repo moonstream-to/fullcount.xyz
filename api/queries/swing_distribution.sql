@@ -16,33 +16,33 @@ with  dedup_events as (
         log_index
     FROM dedup_events
     WHERE label_data->>'name'='SessionResolved'
-), PitchRevealed as (
+), SwingRevealed as (
     SELECT
         label_data->'args'->>'sessionID' as session_id,
-        label_data->'args'->'pitch'-> 1 as pitch_speed,
-        label_data->'args'->'pitch'-> 2 as pitch_vertical,
-        label_data->'args'->'pitch'-> 3 as pitch_horizontal,
+        label_data->'args'->'swing'-> 1 as swing_type,
+        label_data->'args'->'swing'-> 2 as swing_vertical,
+        label_data->'args'->'swing'-> 3 as swing_horizontal,
         log_index
     FROM dedup_events
-    WHERE label_data->>'name'='PitchRevealed'
-), PitchDistribution as (
+    WHERE label_data->>'name'='SwingRevealed'
+), SwingDistribution as (
     SELECT
-        pitcher_address || '_' || pitcher_token_id as address,
-        pitch_speed,
-        pitch_vertical,
-        pitch_horizontal,
-        count(*) as pitch_count
-    FROM SessionResolved LEFT JOIN PitchRevealed ON SessionResolved.session_id = PitchRevealed.session_id
-    GROUP BY pitcher_address, pitcher_token_id, pitch_speed, pitch_vertical, pitch_horizontal
-    ORDER BY pitch_speed, pitch_vertical, pitch_horizontal
+        batter_address || '_' || batter_token_id as address,
+        swing_type,
+        swing_vertical,
+        swing_horizontal,
+        count(*) as swing_count
+    FROM SessionResolved LEFT JOIN SwingRevealed ON SessionResolved.session_id = SwingRevealed.session_id
+    GROUP BY batter_address, batter_token_id, swing_type, swing_vertical, swing_horizontal
+    ORDER BY swing_type, swing_vertical, swing_horizontal
 )
 SELECT
     address,
     json_agg(json_build_object(
-        'pitch_speed', pitch_speed,
-        'pitch_vertical', pitch_vertical,
-        'pitch_horizontal', pitch_horizontal,
-        'count', pitch_count
-    )) as pitch_distribution
-FROM PitchDistribution
+        'swing_type', swing_type,
+        'swing_vertical', swing_vertical,
+        'swing_horizontal', swing_horizontal,
+        'count', swing_count
+    )) as swing_distribution
+FROM SwingDistribution
 GROUP BY address
