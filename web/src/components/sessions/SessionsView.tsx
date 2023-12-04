@@ -28,8 +28,14 @@ import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const SessionsView = () => {
-  const { updateContext, tokenAddress, contractAddress, progressFilter, tokensCache } =
-    useGameContext();
+  const {
+    updateContext,
+    tokenAddress,
+    contractAddress,
+    progressFilter,
+    tokensCache,
+    sessionOffset,
+  } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
@@ -63,7 +69,7 @@ const SessionsView = () => {
   }, [router.query.invite, router.query.session]);
 
   const sessions = useQuery<Session[]>(
-    ["sessions"],
+    ["sessions", sessionOffset],
     async () => {
       console.log("FETCHING SESSIONS");
 
@@ -71,7 +77,8 @@ const SessionsView = () => {
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
       const target = contractAddress;
       const callData: string[] = [];
-      for (let i = 1; i <= numSessions; i += 1) {
+      const oldestSessionNumber = Math.max(numSessions - sessionOffset, 1);
+      for (let i = oldestSessionNumber; i <= numSessions; i += 1) {
         callData.push(gameContract.methods.sessionProgress(i).encodeABI());
         callData.push(gameContract.methods.getSession(i).encodeABI());
       }
@@ -183,7 +190,7 @@ const SessionsView = () => {
           pair,
           batterLeftSession: session.session.batterLeftSession,
           pitcherLeftSession: session.session.pitcherLeftSession,
-          sessionID: idx + 1,
+          sessionID: oldestSessionNumber + idx,
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
           progress: session.progress,
