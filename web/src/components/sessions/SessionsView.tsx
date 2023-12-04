@@ -69,7 +69,7 @@ const SessionsView = () => {
   }, [router.query.invite, router.query.session]);
 
   const sessions = useQuery<Session[]>(
-    ["sessions", sessionOffset],
+    ["sessions"],
     async () => {
       console.log("FETCHING SESSIONS");
 
