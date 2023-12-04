@@ -240,7 +240,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               <Flex direction={"column"} gap="10px" alignItems={"center"}>
                 <Image
                   src={selectedToken?.image}
-                  h={"300px"}
+                  aspectRatio={1}
                   w={"300px"}
                   alt={selectedToken?.name}
                 />
@@ -308,7 +308,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               <Flex direction={"column"} gap="10px" alignItems={"center"}>
                 <Image
                   src={selectedToken?.image}
-                  h={"300px"}
+                  aspectRatio={1}
                   w={"300px"}
                   alt={selectedToken?.name}
                 />

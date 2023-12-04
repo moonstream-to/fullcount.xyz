@@ -93,15 +93,13 @@ const Outcome = ({
   }, []);
   return (
     <Flex direction={"column"} h={"700px"} justifyContent={"center"} position={"relative"}>
-      {/*<button onClick={() => setIsVisible(!isVisible)}>{isVisible ? "Reset" : "Start"}</button>*/}
-
-      <GrowingText isVisible={isPitchSpeedVisible} right={"110%"} duration={"0.5s"}>
-        <Text>{pitchSpeed[pitch.speed]}</Text>
-      </GrowingText>
-      <GrowingText isVisible={isSwingKindVisible} left={"110%"} duration={"0.5s"}>
-        <Text>{swingKind[swing.kind]}</Text>
-      </GrowingText>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
+        <GrowingText isVisible={isPitchSpeedVisible} right={"110%"} top="-75px" duration={"0.5s"}>
+          <Text>{pitchSpeed[pitch.speed]}</Text>
+        </GrowingText>
+        <GrowingText isVisible={isSwingKindVisible} left={"110%"} top="-75px" duration={"0.5s"}>
+          <Text>{swingKind[swing.kind]}</Text>
+        </GrowingText>
         <BallAnimation
           isVisible={isPitchVisible}
           startLeft={Number(3) * 50 - 25 - 20}
