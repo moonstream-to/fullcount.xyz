@@ -83,11 +83,11 @@ with  dedup_events as (
             'triples', triples,
             'home_runs', home_runs,
             'in_play_outs', in_play_outs,
-            'innings', strikeouts + in_play_outs,
+            'innings', (strikeouts + in_play_outs) / 3.0,
             'earned_runs', 1.5 * singles + 2.5 * doubles + 3 * triples + 4 * home_runs,
-            'earned_run_average', COALESCE(EXP(LN(NULLIF(9.0 * (1.5 * singles + 2.5 * doubles + 3 * triples + 4 * home_runs),0)) - LN(NULLIF(strikeouts + in_play_outs, 0))), 0),
-            'whip', COALESCE(EXP(LN(NULLIF((walks + singles + doubles + triples + home_runs),0)) - LN(NULLIF(strikeouts + in_play_outs, 0))), 0),
-            'batting_average_against', COALESCE(EXP(LN(NULLIF(1.0 * (singles + doubles + triples + home_runs),0)) - LN(NULLIF(total_pitcher_events - walks, 0))), 0)   
+            'earned_run_average', 9.0 * (1.5 * singles + 2.5 * doubles + 3 * triples + 4 * home_runs) / NULLIF((strikeouts + in_play_outs) / 3.0, 0),
+            'whip', (walks + singles + doubles + triples + home_runs) / NULLIF((strikeouts + in_play_outs) / 3.0, 0),
+            'batting_average_against', 1.0 * (singles + doubles + triples + home_runs) / NULLIF(total_pitcher_events - walks, 0)  
         ) as points_data
     from pitcher_stats
 ), batter_data as (
@@ -104,11 +104,11 @@ with  dedup_events as (
             'at_bats', total_batter_events - walks,
             'hits', singles + doubles + triples + home_runs,
             'runs_batted_in', walks + 1.5 * singles + 2.5 * doubles + 3 * triples + 4 * home_runs,
-            'batting_average', COALESCE(EXP(LN(NULLIF(1.0 * (singles + doubles + triples + home_runs),0)) - LN(NULLIF(total_batter_events - walks, 0))), 0),
-            'on-base', COALESCE(EXP(LN(NULLIF(1.0 * (walks + singles + doubles + triples + home_runs),0)) - LN(NULLIF(total_batter_events, 0))), 0),
-            'slugging', COALESCE(EXP(LN(NULLIF((1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs),0)) - LN(NULLIF(total_batter_events - walks, 0))), 0),
-            'ops', COALESCE(EXP(LN(NULLIF((walks + singles + doubles + triples + home_runs),0)) - LN(NULLIF(total_batter_events, 0))) +
-                COALESCE(EXP(LN(NULLIF((1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs),0)) - LN(NULLIF(total_batter_events - walks, 0))),0), 0)
+            'batting_average', 1.0 * (singles + doubles + triples + home_runs) / NULLIF(total_batter_events - walks, 0),
+            'on-base', 1.0 * (walks + singles + doubles + triples + home_runs) / NULLIF(total_batter_events, 0),
+            'slugging', (1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs) / NULLIF(total_batter_events - walks, 0),
+            'ops', COALESCE(1.0 * (walks + singles + doubles + triples + home_runs) / NULLIF(total_batter_events, 0), 0) +
+                COALESCE((1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs) / NULLIF(total_batter_events - walks, 0), 0)
         ) as points_data
     from batter_stats
 )

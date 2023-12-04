@@ -1,6 +1,13 @@
 import cors from "cors";
 import express, { Application, Request, Response } from 'express';
-import { getAllStats, getPlayerStats, getAllPitcherDistributions, getPitcherDistribution} from './stats';
+import { 
+    getAllStats, 
+    getPlayerStats, 
+    getAllPitcherDistributions, 
+    getPitcherDistribution,
+    getAllBatterDistributions,
+    getBatterDistribution,
+} from './stats';
 
 const app: Application = express();
 app.use(cors());
@@ -42,6 +49,24 @@ app.get("/pitch_distribution/", async (req: Request, res: Response) => {
 
 app.get("/pitch_distribution/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
     let stats: object | string = await getPitcherDistribution(req.params.nftAddress, req.params.nftTokenId);
+    if (typeof stats == "string") {
+        return res.status(500).send(stats);
+    } else {
+        return res.status(200).json(stats);
+    }
+});
+
+app.get("/swing_distribution/", async (req: Request, res: Response) => {
+    let stats: object | string = await getAllBatterDistributions();
+    if (typeof stats == "string") {
+        return res.status(500).send(stats);
+    } else {
+        return res.status(200).json(stats);
+    }
+});
+
+app.get("/swing_distribution/:nftAddress/:nftTokenId", async (req: Request, res: Response) => {
+    let stats: object | string = await getBatterDistribution(req.params.nftAddress, req.params.nftTokenId);
     if (typeof stats == "string") {
         return res.status(500).send(stats);
     } else {
