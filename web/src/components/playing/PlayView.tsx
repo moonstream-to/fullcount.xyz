@@ -3,9 +3,9 @@ import PitcherView from "./PitcherView";
 import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { PitchLocation, Token } from "../../types";
+import { PitchLocation, SwingLocation, Token } from "../../types";
 import { CloseIcon } from "@chakra-ui/icons";
 import Outcome from "./Outcome";
 import BatterView2 from "./BatterView2";
@@ -110,6 +110,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [opponent, setOpponent] = useState<Token | undefined>(undefined);
   const [gameOver, setGameOver] = useState(false);
 
+  const [pitcher, setPitcher] = useState<Token | undefined>(undefined);
+  const [batter, setBatter] = useState<Token | undefined>(undefined);
+
   const sessionStatus = useQuery(
     ["session", selectedSession],
     async () => {
@@ -202,18 +205,33 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
-  const opponentStats = useQuery(
-    ["opponent_stat", opponent],
+  const pitcherStats = useQuery(
+    ["pitcher_stat", pitcher],
     async () => {
-      if (!opponent) {
+      if (!pitcher) {
         return;
       }
       const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
+      const stat = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
       return stat.data;
     },
     {
-      enabled: !!opponent,
+      enabled: !!pitcher,
+    },
+  );
+
+  const batterStats = useQuery(
+    ["batter_stat", batter],
+    async () => {
+      if (!batter) {
+        return;
+      }
+      const API_URL = "https://api.fullcount.xyz/stats";
+      const stat = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
+      return stat.data;
+    },
+    {
+      enabled: !!batter,
     },
   );
 
@@ -221,16 +239,16 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     19, 11, 5, 1, 2, 45, 29, 13, 8, 6, 70, 59, 47, 23, 12, 40, 35, 40, 32, 31, 11, 12, 23, 24, 34,
   ];
 
-  const opponentPitchLocations = useQuery(
-    ["pitch_locations", opponent],
+  const pitchDistributions = useQuery(
+    ["pitch_distribution", pitcher],
     async () => {
-      if (!opponent) {
+      if (!pitcher) {
         return;
       }
-      const API_URL = "https://api.fullcount.xyz/pitch_location_distribution";
-      const res = await axios.get(`${API_URL}/${opponent.address}/${opponent.id}`);
+      const API_URL = "https://api.fullcount.xyz/pitch_distribution";
+      const res = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
       const counts = new Array(25).fill(0);
-      res.data.pitch_loations.forEach(
+      res.data.pitch_distribution.forEach(
         (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
       );
       const total = counts.reduce((acc, value) => acc + value);
@@ -238,9 +256,35 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       return { rates, counts };
     },
     {
-      enabled: !!opponent && !isPitcher(selectedToken),
+      enabled: !!pitcher,
     },
   );
+
+  const swingDistributions = useQuery(
+    ["swing_distribution", batter],
+    async () => {
+      if (!batter) {
+        return;
+      }
+      const API_URL = "https://api.fullcount.xyz/swing_distribution";
+      const res = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
+      const counts = new Array(25).fill(0);
+      res.data.swing_distribution.forEach(
+        (l: SwingLocation) => (counts[l.swing_vertical * 5 + l.swing_horizontal] = l.count),
+      );
+      const total = counts.reduce((acc, value) => acc + value);
+      const rates = counts.map((value) => value / total);
+      return { rates, counts };
+    },
+    {
+      enabled: !!batter,
+    },
+  );
+
+  useEffect(() => {
+    setPitcher(isPitcher(selectedToken) ? selectedToken : opponent);
+    setBatter(isPitcher(selectedToken) ? opponent : selectedToken);
+  }, [selectedToken, opponent]);
 
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
@@ -264,53 +308,55 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         </Flex>
       </Flex>
       <Flex alignItems={"center"} justifyContent={"space-between"}>
-        {isPitcher(selectedToken) ? (
-          <>
-            {selectedToken && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
-                <Image
-                  src={selectedToken?.image}
-                  h={"300px"}
-                  w={"300px"}
-                  alt={selectedToken?.name}
-                />
-                <Text fontSize={"14px"} fontWeight={"700"}>
-                  {selectedToken.name}
-                </Text>
-              </Flex>
-            )}
-          </>
-        ) : (
-          <>
-            {opponent ? (
-              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
-                <Text fontSize={"14px"} fontWeight={"700"}>
-                  {opponent?.name}
-                </Text>
-                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={true} />}
-                {opponentPitchLocations.data && (
-                  <HeatMap
-                    rates={opponentPitchLocations.data.rates}
-                    counts={opponentPitchLocations.data.counts}
-                    isPitcher
-                    showStrikeZone
+        <Flex direction={"column"} gap={"10px"}>
+          {isPitcher(selectedToken) ? (
+            <>
+              {selectedToken && (
+                <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                  <Image
+                    src={selectedToken?.image}
+                    h={"300px"}
+                    w={"300px"}
+                    alt={selectedToken?.name}
                   />
-                )}
-              </Flex>
-            ) : (
-              <Flex
-                direction={"column"}
-                gap="10px"
-                alignItems={"center"}
-                className={styles.pitcherGrid}
-              >
-                <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-                <Box h={"21px"} w="300px" bg={"transparent"} />
-              </Flex>
-            )}
-          </>
-        )}
+                  <Text fontSize={"14px"} fontWeight={"700"}>
+                    {selectedToken.name}
+                  </Text>
+                </Flex>
+              )}
+            </>
+          ) : (
+            <>
+              {opponent ? (
+                <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
+                  <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
+                  <Text fontSize={"14px"} fontWeight={"700"}>
+                    {opponent?.name}
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex
+                  direction={"column"}
+                  gap="10px"
+                  alignItems={"center"}
+                  className={styles.pitcherGrid}
+                >
+                  <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
+                  <Box h={"21px"} w="300px" bg={"transparent"} />
+                </Flex>
+              )}
+            </>
+          )}
+          {pitcherStats.data && <MainStat stats={pitcherStats.data} isPitcher={true} />}
+
+          {pitchDistributions.data && (
+            <HeatMap
+              rates={pitchDistributions.data.rates}
+              counts={pitchDistributions.data.counts}
+              isPitcher
+            />
+          )}
+        </Flex>
 
         {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
           <InviteLink session={selectedSession} token={selectedToken} />
@@ -340,45 +386,55 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             }}
           />
         )}
-        {!isPitcher(selectedToken) ? (
-          <>
-            {selectedToken && (
-              <Flex direction={"column"} gap="10px" alignItems={"center"}>
-                <Image
-                  src={selectedToken?.image}
-                  h={"300px"}
-                  w={"300px"}
-                  alt={selectedToken?.name}
-                />
-                <Text fontSize={"14px"} fontWeight={"700"}>
-                  {selectedToken.name}
-                </Text>
-              </Flex>
-            )}
-          </>
-        ) : (
-          <>
-            {opponent ? (
-              <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
-                <Text fontSize={"14px"} fontWeight={"700"}>
-                  {opponent?.name}
-                </Text>
-                {opponentStats.data && <MainStat stats={opponentStats.data} isPitcher={false} />}
-              </Flex>
-            ) : (
-              <Flex
-                direction={"column"}
-                gap="10px"
-                alignItems={"center"}
-                className={styles.pitcherGrid}
-              >
-                <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-                <Box h={"21px"} w="300px" bg={"transparent"} />
-              </Flex>
-            )}
-          </>
-        )}
+        <Flex direction={"column"} gap={"20px"}>
+          {!isPitcher(selectedToken) ? (
+            <>
+              {selectedToken && (
+                <Flex direction={"column"} gap="10px" alignItems={"center"}>
+                  <Image
+                    src={selectedToken?.image}
+                    h={"300px"}
+                    w={"300px"}
+                    alt={selectedToken?.name}
+                  />
+                  <Text fontSize={"14px"} fontWeight={"700"}>
+                    {selectedToken.name}
+                  </Text>
+                </Flex>
+              )}
+            </>
+          ) : (
+            <>
+              {opponent ? (
+                <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
+                  <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
+                  <Text fontSize={"14px"} fontWeight={"700"}>
+                    {opponent?.name}
+                  </Text>
+                </Flex>
+              ) : (
+                <Flex
+                  direction={"column"}
+                  gap="10px"
+                  alignItems={"center"}
+                  className={styles.pitcherGrid}
+                >
+                  <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
+                  <Box h={"21px"} w="300px" bg={"transparent"} />
+                </Flex>
+              )}
+            </>
+          )}
+          {batterStats.data && <MainStat stats={batterStats.data} isPitcher={false} />}
+
+          {swingDistributions.data && (
+            <HeatMap
+              rates={swingDistributions.data.rates}
+              counts={swingDistributions.data.counts}
+              isPitcher={false}
+            />
+          )}
+        </Flex>
       </Flex>
     </Flex>
   );

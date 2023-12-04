@@ -146,3 +146,10 @@ interface PitchLocation {
   pitch_horizontal: number;
   count: number;
 }
+
+interface SwingLocation {
+  swing_vertical: number;
+  swing_horizontal: number;
+  count: number;
+  swing_type: number;
+}

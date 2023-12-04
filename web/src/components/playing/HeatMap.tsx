@@ -22,6 +22,7 @@ const HeatMap = ({
 
   const generateCell = (index: number) => (
     <Box
+      key={index}
       p={"2px"}
       border={"1px solid #aaa"}
       borderLeftStyle={leftBorder.includes(index) && showStrikeZone ? "solid" : "none"}
@@ -30,7 +31,6 @@ const HeatMap = ({
       borderBottomStyle={bottomBorder.includes(index) && showStrikeZone ? "solid" : "none"}
     >
       <Box
-        key={index}
         height="20px"
         width="20px"
         display="flex"
