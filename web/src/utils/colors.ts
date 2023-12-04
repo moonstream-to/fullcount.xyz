@@ -15,15 +15,15 @@ function interpolateColor(color1: string, color2: string, factor = 0.5): string 
 }
 
 const colors = [
-  "#261c3d",
-  "#4a3572",
-  "#3d448b",
-  "#235aa6",
-  "#2a7cbe",
-  "#0ca5cf",
-  "#0ed1df",
-  "#26d6a7",
-  "#34ea74",
+  "#2f38c0",
+  "#5f64cf",
+  "#8c91dc",
+  "#d2d3f0",
+  "#ffffff",
+  "#f4d2cf",
+  "#e38b87",
+  "#d65c5a",
+  "#d65c5a",
 ];
 
 export function getColorByFactor(array: number[], factor: number): string {

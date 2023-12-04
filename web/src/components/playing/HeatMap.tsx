@@ -23,7 +23,6 @@ const HeatMap = ({
   const generateCell = (index: number) => (
     <Box
       key={index}
-      p={"2px"}
       border={"1px solid #aaa"}
       borderLeftStyle={leftBorder.includes(index) && showStrikeZone ? "solid" : "none"}
       borderRightStyle={rightBorder.includes(index) && showStrikeZone ? "solid" : "none"}
@@ -38,7 +37,6 @@ const HeatMap = ({
         justifyContent="center"
         cursor={"pointer"}
         bg={getColorByFactor(rates, rates[index] ?? "#111111")}
-        borderRadius={"3px"}
         onClick={() => setShowMode(showMode === 2 ? 0 : showMode + 1)}
       >
         {showMode !== 0 && (
