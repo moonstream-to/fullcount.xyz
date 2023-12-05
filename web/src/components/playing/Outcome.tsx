@@ -7,8 +7,17 @@ import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import BallAnimation from "./BallAnimation";
 import { progressMessage } from "../utils";
 import { Session } from "../../types";
+import BatAnimation from "./BatAnimation";
 const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
 const assets = FULLCOUNT_ASSETS_PATH;
+
+const playSound = (sound: string) => {
+  const soundElement = document.getElementById(sound) as HTMLAudioElement;
+  if (!soundElement) {
+    return;
+  }
+  soundElement.play();
+};
 
 interface Swing {
   kind: 0 | 1 | 2;
@@ -65,18 +74,50 @@ const Outcome = ({
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
 
   useEffect(() => {
-    let timer1: NodeJS.Timeout;
-    let timer2: NodeJS.Timeout;
-    let timer3: NodeJS.Timeout;
-    let timer4: NodeJS.Timeout;
+    const start = 3000;
+
+    const timers: NodeJS.Timeout[] = [];
 
     if (isVisible) {
-      setIsPitchSpeedVisible(true);
-      timer1 = setTimeout(() => setIsSwingKindVisible(true), 1500);
-      timer2 = setTimeout(() => setIsPitchVisible(true), 1500);
-      timer3 = setTimeout(() => setIsSwingVisible(true), 3350);
-      timer4 = setTimeout(() => setIsOutcomeVisible(true), 4000);
-      timer4 = setTimeout(() => setIsDescriptionVisible(true), 5000);
+      playSound("heartbeat");
+
+      timers.push(setTimeout(() => setIsPitchSpeedVisible(true), 1000 + start));
+
+      timers.push(setTimeout(() => playSound("whoosh"), 1000 + start));
+
+      timers.push(
+        setTimeout(() => {
+          setIsSwingKindVisible(true);
+          playSound("whoosh");
+        }, 3500 + start),
+      );
+
+      timers.push(
+        setTimeout(() => {
+          setIsPitchVisible(true);
+          playSound("swoosh");
+        }, 4500 + start),
+      );
+      if (swing.kind !== 2) {
+        timers.push(setTimeout(() => playSound("swing"), 6000 + start));
+      }
+      if (outcome > 1 && outcome < 6) {
+        timers.push(setTimeout(() => playSound("hit"), 6500 + start));
+      } else {
+        timers.push(setTimeout(() => playSound("catch"), 6500 + start));
+      }
+      timers.push(
+        setTimeout(() => {
+          setIsSwingVisible(true);
+        }, 6000 + start),
+      );
+      timers.push(
+        setTimeout(() => {
+          setIsOutcomeVisible(true);
+        }, 7500 + start),
+      );
+      timers.push(setTimeout(() => playSound("clapping"), 7500 + start));
+      timers.push(setTimeout(() => setIsDescriptionVisible(true), 8500 + start));
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -85,10 +126,7 @@ const Outcome = ({
       setIsPitchVisible(false);
     }
     return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
+      timers.forEach((t) => clearTimeout(t));
     };
   }, []);
   return (
@@ -113,14 +151,14 @@ const Outcome = ({
           <Image src={`${assets}/ball2.png`} h={"40px"} w={"40px"} alt={"o"} />
         </BallAnimation>
         {swing.kind !== 2 && (
-          <GrowingText
+          <BatAnimation
             isVisible={isSwingVisible}
-            left={`${(Number(swing.horizontal) + 1) * 50 - 25 - 20}px`}
-            top={`${(Number(swing.vertical) + 1) * 50 - 25 - 20}px`}
-            duration={"0s"}
+            endLeft={(Number(swing.horizontal) + 1) * 50 - 25 - 20}
+            endTop={(Number(swing.vertical) + 1) * 50 - 25 - 20}
+            duration={"0.5s"}
           >
             <Image src={`${assets}/bat2.png`} h={"40px"} w={"40px"} alt={"x"} />
-          </GrowingText>
+          </BatAnimation>
         )}
         <GrowingText
           isVisible={isOutcomeVisible}
