@@ -1,15 +1,16 @@
 import React, { ReactNode } from "react";
 import Navbar from "./Navbar";
 import { Flex } from "@chakra-ui/react";
+import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 const sounds = {
-  whoosh: "sounds/whoosh.wav",
-  heartbeat: "sounds/heartbeat.wav",
-  swoosh: "sounds/windy-swoosh.wav",
-  swing: "sounds/fast-swoosh.wav",
-  clapping: "sounds/clapping-male-crowd.wav",
-  hit: "sounds/hard-hit.wav",
-  catch: "sounds/ball-hit.wav",
+  whoosh: `${FULLCOUNT_ASSETS_PATH}/sounds/whoosh.wav`,
+  heartbeat: `${FULLCOUNT_ASSETS_PATH}/sounds/heartbeat.wav`,
+  swoosh: `${FULLCOUNT_ASSETS_PATH}/sounds/windy-swoosh.wav`,
+  swing: `${FULLCOUNT_ASSETS_PATH}/sounds/fast-swoosh.wav`,
+  clapping: `${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`,
+  hit: `${FULLCOUNT_ASSETS_PATH}/sounds/hard-hit.wav`,
+  catch: `${FULLCOUNT_ASSETS_PATH}/sounds/ball-hit.wav`,
 };
 
 const PlayingLayout = ({ children }: { children: ReactNode }) => {
