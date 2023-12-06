@@ -15,8 +15,8 @@ import { OwnedToken, Session, Token } from "../../types";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { sendTransactionWithEstimate } from "../utils";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
+import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];

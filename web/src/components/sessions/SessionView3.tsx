@@ -7,8 +7,9 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
-import { progressMessage, sendTransactionWithEstimate } from "../utils";
+import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
+import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 

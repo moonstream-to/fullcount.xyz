@@ -1,21 +1,18 @@
-import styles from "./ConnectingView.module.css";
-import globalStyles from "./tokens/OwnedTokens.module.css";
+import { useContext, useState } from "react";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
-import { useContext, useEffect, useState } from "react";
+
 import Web3Context from "../contexts/Web3Context/context";
 import { useGameContext } from "../contexts/GameContext";
 import { chainByChainId } from "../contexts/Web3Context";
 
-const ConnectingView = ({ nextStep }: { nextStep: () => void }) => {
+import { EthereumError } from "../types";
+import globalStyles from "./tokens/OwnedTokens.module.css";
+import styles from "./ConnectingView.module.css";
+
+const ConnectingView = () => {
   const web3Provider = useContext(Web3Context);
   const [isSwitching, setIsSwitching] = useState(false);
   const { chainId } = useGameContext();
-  useEffect(() => {
-    if (web3Provider.buttonText === "Connected" && web3Provider.chainId === chainId) {
-      nextStep();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [web3Provider.buttonText, web3Provider.chainId]);
 
   const switchToWyrm = async () => {
     const wyrmID = 322;
@@ -26,8 +23,8 @@ const ConnectingView = ({ nextStep }: { nextStep: () => void }) => {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: hexString }],
       });
-    } catch (switchError: any) {
-      if (switchError.code === 4902) {
+    } catch (switchError: unknown) {
+      if ((switchError as EthereumError).code === 4902) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
@@ -44,6 +41,8 @@ const ConnectingView = ({ nextStep }: { nextStep: () => void }) => {
         } catch (addError) {
           console.log(addError);
         }
+      } else {
+        console.log(switchError);
       }
     }
     setIsSwitching(false);

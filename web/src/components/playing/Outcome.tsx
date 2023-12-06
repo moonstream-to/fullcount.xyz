@@ -5,7 +5,7 @@ import GrowingText from "./GrowingText";
 import { pitchSpeed, swingKind } from "./PlayView";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import BallAnimation from "./BallAnimation";
-import { progressMessage } from "../utils";
+import { progressMessage } from "../../utils/messages";
 import { Session } from "../../types";
 import BatAnimation from "./BatAnimation";
 const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];

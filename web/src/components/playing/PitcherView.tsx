@@ -4,7 +4,7 @@ import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
 import { useCallback, useContext, useEffect, useState } from "react";
 import { getPitchDescription, getRowCol } from "./PlayView";
-import { signPitch } from "../Signing";
+import { signPitch } from "../../utils/signing";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
 import { useMutation, useQueryClient } from "react-query";
@@ -12,7 +12,8 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { sendTransactionWithEstimate } from "../utils";
+
+import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
