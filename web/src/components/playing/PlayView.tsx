@@ -117,10 +117,10 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     ["session", selectedSession],
     async () => {
       if (!selectedSession) return undefined;
-      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
       const progress = Number(
         await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
       );
+      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
       if (progress < 2 || progress > 4) {
         setGameOver(true);
       }
@@ -372,20 +372,23 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               )}
             </>
           )}
-        {sessionStatus.data && sessionStatus.data.progress === 5 && (
-          <Outcome
-            outcome={sessionStatus.data?.outcome}
-            isExpired={!!sessionStatus.data?.isExpired}
-            pitch={sessionStatus.data.pitcherReveal}
-            swing={sessionStatus.data.batterReveal}
-            session={{
-              ...sessionStatus.data,
-              pair: isPitcher(selectedToken)
-                ? { pitcher: selectedToken, batter: opponent }
-                : { pitcher: opponent, batter: selectedToken },
-            }}
-          />
-        )}
+        {sessionStatus.data &&
+          sessionStatus.data.progress === 5 &&
+          sessionStatus.data.didBatterReveal &&
+          sessionStatus.data.didPitcherReveal && (
+            <Outcome
+              outcome={sessionStatus.data?.outcome}
+              isExpired={!!sessionStatus.data?.isExpired}
+              pitch={sessionStatus.data.pitcherReveal}
+              swing={sessionStatus.data.batterReveal}
+              session={{
+                ...sessionStatus.data,
+                pair: isPitcher(selectedToken)
+                  ? { pitcher: selectedToken, batter: opponent }
+                  : { pitcher: opponent, batter: selectedToken },
+              }}
+            />
+          )}
         <Flex direction={"column"} gap={"20px"}>
           {!isPitcher(selectedToken) ? (
             <>
