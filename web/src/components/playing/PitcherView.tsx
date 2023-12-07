@@ -1,8 +1,8 @@
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import GridComponent from "./GridComponent";
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getPitchDescription, getRowCol } from "./PlayView";
 import { signPitch } from "../../utils/signing";
 import Web3Context from "../../contexts/Web3Context/context";
@@ -70,9 +70,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     });
   };
 
-  // const [movements, setMovements] = useState<number[]>([]);
-  // const [seed, setSeed] = useState("");
-
   useEffect(() => {
     // setMovements([]);
     const item =
@@ -85,29 +82,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
   }, [selectedSession]);
-
-  // useEffect(() => {
-  //   if (movements.length > 499) {
-  //     window.removeEventListener("mousemove", handleMouseMove);
-  //     setSeed(generateSeed(movements));
-  //     setMovements([]);
-  //   }
-  // }, [movements.length]);
-
-  // const generateSeed = (movements: number[]): string => {
-  //   const dataString = movements.join("");
-  //   const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
-  //   const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-  //   setNonce(uint256Seed);
-  //   return uint256Seed;
-  // };
-  // const handleMouseMove = useCallback((event: MouseEvent) => {
-  //   setMovements((prevMovements) => [...prevMovements, event.clientX, event.clientY]);
-  // }, []);
-  // const handleGenerate = () => {
-  //   window.addEventListener("mousemove", handleMouseMove);
-  //   setMovements((prevMovements) => [...prevMovements, 0, 0]);
-  // };
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -218,33 +192,10 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
       </Text>
-      <Text className={styles.text}>
-        Click on the button below and move mouse until the button is filled in
-      </Text>
       <RandomGenerator
         isActive={!nonce && !sessionStatus.didPitcherCommit}
-        // isGenerated={nonce}
-        onChange={(value) => setNonce(value)}
+        onChange={(value: string) => setNonce(value)}
       />
-      {/*{!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (*/}
-      {/*  <button className={globalStyles.commitButton} onClick={handleGenerate}>*/}
-      {/*    Generate*/}
-      {/*  </button>*/}
-      {/*)}*/}
-      {/*{seed && <Flex className={styles.completedAction}>Generated</Flex>}*/}
-      {/*{movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (*/}
-      {/*  <Flex*/}
-      {/*    onClick={() => window.removeEventListener("mousemove", handleMouseMove)}*/}
-      {/*    w={"180px"}*/}
-      {/*    h={"31px"}*/}
-      {/*    border={"1px solid white"}*/}
-      {/*    position={"relative"}*/}
-      {/*  >*/}
-      {/*    <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />*/}
-      {/*    <Box bg={"gray"} />*/}
-      {/*    <Text className={styles.moveMouseTip}>move mouse</Text>*/}
-      {/*  </Flex>*/}
-      {/*)}*/}
       {!sessionStatus.didPitcherCommit ? (
         <button
           className={globalStyles.commitButton}

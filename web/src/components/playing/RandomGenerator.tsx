@@ -1,8 +1,11 @@
-import styles from "./PlayView.module.css";
-import globalStyles from "../GlobalStyles.module.css";
-import { Box, Flex, Text } from "@chakra-ui/react";
-import Web3 from "web3";
 import { useCallback, useEffect, useState } from "react";
+import { Box, Flex, Text } from "@chakra-ui/react";
+
+import Web3 from "web3";
+
+import globalStyles from "../GlobalStyles.module.css";
+import styles from "./PlayView.module.css";
+
 const MOVEMENTS_NUMBER = 500;
 
 const RandomGenerator = ({

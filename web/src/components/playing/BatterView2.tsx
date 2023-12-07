@@ -1,26 +1,28 @@
-import { Box, Flex, Spinner, Text } from "@chakra-ui/react";
-import globalStyles from "../GlobalStyles.module.css";
-import styles from "./PlayView.module.css";
-import GridComponent from "./GridComponent";
-import { useCallback, useContext, useEffect, useState } from "react";
-import { getRowCol, getSwingDescription, swingKind } from "./PlayView";
-import { signSwing } from "../../utils/signing";
-import Web3Context from "../../contexts/Web3Context/context";
-import { useGameContext } from "../../contexts/GameContext";
+import { useContext, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
+
+import { useGameContext } from "../../contexts/GameContext";
+import Web3Context from "../../contexts/Web3Context/context";
+import GridComponent from "./GridComponent";
+import RandomGenerator from "./RandomGenerator";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import { getRowCol, getSwingDescription, swingKind } from "./PlayView";
 import { AbiItem } from "web3-utils";
-
+import { signSwing } from "../../utils/signing";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
+import globalStyles from "../GlobalStyles.module.css";
+import styles from "./PlayView.module.css";
+
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [kind, setKind] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [nonce, setNonce] = useState("0");
+  const [nonce, setNonce] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
@@ -73,11 +75,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     });
   };
 
-  const [movements, setMovements] = useState<number[]>([]);
-  const [seed, setSeed] = useState("");
-
   useEffect(() => {
-    setMovements([]);
     const item =
       localStorage.getItem(
         `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
@@ -88,29 +86,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
   }, [selectedSession]);
-
-  useEffect(() => {
-    if (movements.length > 499) {
-      window.removeEventListener("mousemove", handleMouseMove);
-      setSeed(generateSeed(movements));
-      setMovements([]);
-    }
-  }, [movements.length]);
-
-  const generateSeed = (movements: number[]): string => {
-    const dataString = movements.join("");
-    const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
-    const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-    setNonce(uint256Seed);
-    return uint256Seed;
-  };
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    setMovements((prevMovements) => [...prevMovements, event.clientX, event.clientY]);
-  }, []);
-  const handleGenerate = () => {
-    window.addEventListener("mousemove", handleMouseMove);
-    setMovements((prevMovements) => [...prevMovements, 0, 0]);
-  };
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -234,33 +209,15 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text fontSize={"18px"} fontWeight={"500"}>
         3. Generate randomness
       </Text>
-      <Text className={styles.text}>
-        Click on the button below and move mouse until the button is filled in
-      </Text>
-      {!seed && movements.length === 0 && !sessionStatus.didBatterCommit && (
-        <button className={globalStyles.commitButton} onClick={handleGenerate}>
-          Generate
-        </button>
-      )}
-      {seed && <Flex className={styles.completedAction}>Generated</Flex>}
-      {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didBatterCommit && (
-        <Flex
-          onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
-          w={"180px"}
-          h={"31px"}
-          border={"1px solid white"}
-          position={"relative"}
-        >
-          <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
-          <Box bg={"gray"} />
-          <Text className={styles.moveMouseTip}>move mouse</Text>
-        </Flex>
-      )}
+      <RandomGenerator
+        isActive={!nonce && !sessionStatus.didBatterCommit}
+        onChange={(value: string) => setNonce(value)}
+      />
       {!sessionStatus.didBatterCommit ? (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}
-          disabled={!seed || sessionStatus.didBatterCommit}
+          disabled={!nonce || sessionStatus.didBatterCommit}
         >
           {commitSwing.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
