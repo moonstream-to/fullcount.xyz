@@ -14,13 +14,14 @@ import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
+import RandomGenerator from "./RandomGenerator";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [nonce, setNonce] = useState("0");
+  const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const [showTooltip, setShowTooltip] = useState(false);
@@ -69,11 +70,11 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     });
   };
 
-  const [movements, setMovements] = useState<number[]>([]);
-  const [seed, setSeed] = useState("");
+  // const [movements, setMovements] = useState<number[]>([]);
+  // const [seed, setSeed] = useState("");
 
   useEffect(() => {
-    setMovements([]);
+    // setMovements([]);
     const item =
       localStorage.getItem(
         `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
@@ -85,28 +86,28 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     }
   }, [selectedSession]);
 
-  useEffect(() => {
-    if (movements.length > 499) {
-      window.removeEventListener("mousemove", handleMouseMove);
-      setSeed(generateSeed(movements));
-      setMovements([]);
-    }
-  }, [movements.length]);
+  // useEffect(() => {
+  //   if (movements.length > 499) {
+  //     window.removeEventListener("mousemove", handleMouseMove);
+  //     setSeed(generateSeed(movements));
+  //     setMovements([]);
+  //   }
+  // }, [movements.length]);
 
-  const generateSeed = (movements: number[]): string => {
-    const dataString = movements.join("");
-    const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
-    const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
-    setNonce(uint256Seed);
-    return uint256Seed;
-  };
-  const handleMouseMove = useCallback((event: MouseEvent) => {
-    setMovements((prevMovements) => [...prevMovements, event.clientX, event.clientY]);
-  }, []);
-  const handleGenerate = () => {
-    window.addEventListener("mousemove", handleMouseMove);
-    setMovements((prevMovements) => [...prevMovements, 0, 0]);
-  };
+  // const generateSeed = (movements: number[]): string => {
+  //   const dataString = movements.join("");
+  //   const hash = web3ctx.web3.utils.sha3(dataString) || ""; // Use Web3 to hash the data string
+  //   const uint256Seed = "0x" + hash.substring(2, 66); // Adjust the substring to get 64 hex characters
+  //   setNonce(uint256Seed);
+  //   return uint256Seed;
+  // };
+  // const handleMouseMove = useCallback((event: MouseEvent) => {
+  //   setMovements((prevMovements) => [...prevMovements, event.clientX, event.clientY]);
+  // }, []);
+  // const handleGenerate = () => {
+  //   window.addEventListener("mousemove", handleMouseMove);
+  //   setMovements((prevMovements) => [...prevMovements, 0, 0]);
+  // };
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -220,30 +221,35 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text className={styles.text}>
         Click on the button below and move mouse until the button is filled in
       </Text>
-      {!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (
-        <button className={globalStyles.commitButton} onClick={handleGenerate}>
-          Generate
-        </button>
-      )}
-      {seed && <Flex className={styles.completedAction}>Generated</Flex>}
-      {movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (
-        <Flex
-          onClick={() => window.removeEventListener("mousemove", handleMouseMove)}
-          w={"180px"}
-          h={"31px"}
-          border={"1px solid white"}
-          position={"relative"}
-        >
-          <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
-          <Box bg={"gray"} />
-          <Text className={styles.moveMouseTip}>move mouse</Text>
-        </Flex>
-      )}
+      <RandomGenerator
+        isActive={!nonce && !sessionStatus.didPitcherCommit}
+        // isGenerated={nonce}
+        onChange={(value) => setNonce(value)}
+      />
+      {/*{!seed && movements.length === 0 && !sessionStatus.didPitcherCommit && (*/}
+      {/*  <button className={globalStyles.commitButton} onClick={handleGenerate}>*/}
+      {/*    Generate*/}
+      {/*  </button>*/}
+      {/*)}*/}
+      {/*{seed && <Flex className={styles.completedAction}>Generated</Flex>}*/}
+      {/*{movements.length > 0 && sessionStatus.progress === 3 && !sessionStatus.didPitcherCommit && (*/}
+      {/*  <Flex*/}
+      {/*    onClick={() => window.removeEventListener("mousemove", handleMouseMove)}*/}
+      {/*    w={"180px"}*/}
+      {/*    h={"31px"}*/}
+      {/*    border={"1px solid white"}*/}
+      {/*    position={"relative"}*/}
+      {/*  >*/}
+      {/*    <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />*/}
+      {/*    <Box bg={"gray"} />*/}
+      {/*    <Text className={styles.moveMouseTip}>move mouse</Text>*/}
+      {/*  </Flex>*/}
+      {/*)}*/}
       {!sessionStatus.didPitcherCommit ? (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}
-          disabled={!seed || sessionStatus.didPitcherCommit}
+          disabled={!nonce || sessionStatus.didPitcherCommit}
         >
           {commitPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to pitch first</div>}
