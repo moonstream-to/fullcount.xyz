@@ -1,20 +1,22 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
-import globalStyles from "../GlobalStyles.module.css";
-import styles from "./PlayView.module.css";
-import GridComponent from "./GridComponent";
 import { useContext, useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "react-query";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
+
+import GridComponent from "./GridComponent";
 import { getPitchDescription, getRowCol } from "./PlayView";
 import { signPitch } from "../../utils/signing";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
-import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
+import globalStyles from "../GlobalStyles.module.css";
+import styles from "./PlayView.module.css";
 
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import RandomGenerator from "./RandomGenerator";
+import ActionTypeSelector from "./ActionTypeSelector";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
@@ -27,6 +29,8 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [showTooltip, setShowTooltip] = useState(false);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
+
+  const pitchSpeeds = ["Fast", "Slow"];
 
   const handleCommit = async () => {
     if (gridIndex === -1) {
@@ -159,22 +163,12 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text fontSize={"18px"} fontWeight={"500"}>
         1. Select the type of pitch
       </Text>
-      <Flex justifyContent={"center"} gap={"20px"}>
-        <Flex
-          className={speed === 0 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(0)}
-          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
-        >
-          Fast
-        </Flex>
-        <Flex
-          className={speed === 1 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didPitcherCommit ? undefined : () => setSpeed(1)}
-          cursor={sessionStatus.didPitcherCommit ? "default" : "pointer"}
-        >
-          Slow
-        </Flex>
-      </Flex>
+      <ActionTypeSelector
+        types={pitchSpeeds}
+        isDisabled={sessionStatus.didPitcherCommit}
+        selected={speed}
+        setSelected={(value: number) => setSpeed(value)}
+      />
       <Text fontSize={"18px"} fontWeight={"500"}>
         2. Choose where to pitch
       </Text>

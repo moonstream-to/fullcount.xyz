@@ -9,12 +9,13 @@ import RandomGenerator from "./RandomGenerator";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
-import { getRowCol, getSwingDescription, swingKind } from "./PlayView";
+import { getRowCol, getSwingDescription } from "./PlayView";
 import { AbiItem } from "web3-utils";
 import { signSwing } from "../../utils/signing";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
+import ActionTypeSelector from "./ActionTypeSelector";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -28,6 +29,8 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
+
+  const swingKinds = ["Contact", "Power", "Take"];
 
   const handleCommit = async () => {
     if (gridIndex === -1 && kind !== 2) {
@@ -154,6 +157,13 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
   );
 
+  const typeChangeHandle = (value: number) => {
+    setKind(value);
+    if (value === 2) {
+      setGridIndex(-1);
+    }
+  };
+
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
       <Text fontSize={"24px"} fontWeight={"700"}>
@@ -162,36 +172,12 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text fontSize={"18px"} fontWeight={"500"}>
         1. Select the type of swing
       </Text>
-      <Flex justifyContent={"center"} gap={"20px"}>
-        <Flex
-          className={kind === 0 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(0)}
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
-        >
-          {swingKind[0]}
-        </Flex>
-        <Flex
-          className={kind === 1 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={sessionStatus.didBatterCommit ? undefined : () => setKind(1)}
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
-        >
-          {swingKind[1]}
-        </Flex>
-        <Flex
-          className={kind === 2 ? styles.activeChoice : styles.inactiveChoice}
-          onClick={
-            sessionStatus.didBatterCommit
-              ? undefined
-              : () => {
-                  setKind(2);
-                  setGridIndex(-1);
-                }
-          }
-          cursor={sessionStatus.didBatterCommit ? "default" : "pointer"}
-        >
-          {swingKind[2]}
-        </Flex>
-      </Flex>
+      <ActionTypeSelector
+        types={swingKinds}
+        isDisabled={sessionStatus.didBatterCommit}
+        selected={kind}
+        setSelected={typeChangeHandle}
+      />
       <Text fontSize={"18px"} fontWeight={"500"}>
         2. Choose where to swing
       </Text>
