@@ -1,9 +1,10 @@
 import cors from "cors";
 import express, { Application, Request, Response } from 'express';
-import { 
-    getAllStats, 
-    getPlayerStats, 
-    getAllPitcherDistributions, 
+import { narrateThrowBySessionID } from "./narrate";
+import {
+    getAllStats,
+    getPlayerStats,
+    getAllPitcherDistributions,
     getPitcherDistribution,
     getAllBatterDistributions,
     getBatterDistribution,
@@ -73,6 +74,12 @@ app.get("/swing_distribution/:nftAddress/:nftTokenId", async (req: Request, res:
         return res.status(200).json(stats);
     }
 });
+
+app.get("/throws/:sessionId/narrate", async (req: Request, res: Response) => {
+    console.log("narrateThrowBySessionID", req.params.sessionId);
+    const narration = await narrateThrowBySessionID(req.params.sessionId);
+    return res.status(200).json({ narration })
+})
 
 app.listen(PORT, (): void => {
     console.log('SERVER IS UP ON PORT:', PORT);
