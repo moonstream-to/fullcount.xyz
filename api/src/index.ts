@@ -76,7 +76,6 @@ app.get("/swing_distribution/:nftAddress/:nftTokenId", async (req: Request, res:
 });
 
 app.get("/throws/:sessionId/narrate", async (req: Request, res: Response) => {
-    console.log("narrateThrowBySessionID", req.params.sessionId);
     const narration = await narrateThrowBySessionID(req.params.sessionId);
     return res.status(200).json({ narration })
 })
