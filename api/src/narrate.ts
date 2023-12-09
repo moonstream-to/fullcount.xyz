@@ -1,6 +1,8 @@
 import axios from "axios";
 import { createPublicClient, defineChain, http } from "viem";
-import { constants } from "zlib";
+
+// Constants
+const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
 // In-process cache of narrations
 export type NarrationCache = { [k: string]: string }
@@ -548,36 +550,44 @@ export async function narrateThrowBySessionID(sessionID: string): Promise<string
   const batterNFTAddress = throwState.batterNFT.nftAddress;
   const batterTokenID = throwState.batterNFT.tokenID;
 
-  const pitcherNFTURI: string = await web3Client.readContract({
-    address: pitcherNFTAddress,
-    abi: ERC721TokenInfoABI,
-    functionName: "tokenURI",
-    args: [pitcherTokenID],
-  }) as string;
-
   const dataURIPrefix = "data:application/json;base64,"
 
   let pitcherNFTMetadata = { name: "", description: "" };
-  if (pitcherNFTURI.startsWith(dataURIPrefix)) {
-    pitcherNFTMetadata = JSON.parse(atob(pitcherNFTURI.slice(dataURIPrefix.length)))
-  } else {
-    const pitcherNFTResponse = await axios.get(pitcherNFTURI)
-    pitcherNFTMetadata = pitcherNFTResponse.data
+
+  if (pitcherNFTAddress !== ZeroAddress) {
+    const pitcherNFTURI: string = await web3Client.readContract({
+      address: pitcherNFTAddress,
+      abi: ERC721TokenInfoABI,
+      functionName: "tokenURI",
+      args: [pitcherTokenID],
+    }) as string;
+
+    if (pitcherNFTURI.startsWith(dataURIPrefix)) {
+      pitcherNFTMetadata = JSON.parse(atob(pitcherNFTURI.slice(dataURIPrefix.length)))
+    } else {
+      const pitcherNFTResponse = await axios.get(pitcherNFTURI)
+      pitcherNFTMetadata = pitcherNFTResponse.data
+    }
   }
 
-  const batterNFTURI: string = await web3Client.readContract({
-    address: batterNFTAddress,
-    abi: ERC721TokenInfoABI,
-    functionName: "tokenURI",
-    args: [batterTokenID],
-  }) as string;
 
   let batterNFTMetadata = { name: "", description: "" }
-  if (batterNFTURI.startsWith(dataURIPrefix)) {
-    batterNFTMetadata = JSON.parse(atob(batterNFTURI.slice(dataURIPrefix.length)))
-  } else {
-    const batterNFTResponse = await axios.get(batterNFTURI)
-    batterNFTMetadata = batterNFTResponse.data
+
+
+  if (batterNFTAddress !== ZeroAddress) {
+    const batterNFTURI: string = await web3Client.readContract({
+      address: batterNFTAddress,
+      abi: ERC721TokenInfoABI,
+      functionName: "tokenURI",
+      args: [batterTokenID],
+    }) as string;
+
+    if (batterNFTURI.startsWith(dataURIPrefix)) {
+      batterNFTMetadata = JSON.parse(atob(batterNFTURI.slice(dataURIPrefix.length)))
+    } else {
+      const batterNFTResponse = await axios.get(batterNFTURI)
+      batterNFTMetadata = batterNFTResponse.data
+    }
   }
 
   const pitcherName = pitcherNFTMetadata.name || "";
