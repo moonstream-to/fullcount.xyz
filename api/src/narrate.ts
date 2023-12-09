@@ -2,6 +2,19 @@ import axios from "axios";
 import { createPublicClient, defineChain, http } from "viem";
 import { constants } from "zlib";
 
+// In-process cache of narrations
+export type NarrationCache = { [k: string]: string }
+
+export const cache: NarrationCache = {}
+
+function cacheKey(sessionID: string, throwOutcome?: ThrowOutcome): string {
+  if (!throwOutcome) {
+    return `${sessionID}-0`
+  }
+
+  return `${sessionID}-1`
+}
+
 // Blockchain
 const wyrm = defineChain({
   id: 322,
@@ -511,6 +524,26 @@ export async function narrateThrowBySessionID(sessionID: string): Promise<string
     args: [sessionID],
   });
 
+  let throwOutcome: ThrowOutcome | undefined = undefined;
+  if (throwState.didPitcherReveal && throwState.didBatterReveal) {
+    throwOutcome = {
+      pitchSpeed: throwState.pitcherReveal.speed,
+      pitchVertical: throwState.pitcherReveal.vertical,
+      pitchHorizontal: throwState.pitcherReveal.horizontal,
+      swingType: throwState.batterReveal.kind,
+      swingVertical: throwState.batterReveal.vertical,
+      swingHorizontal: throwState.batterReveal.horizontal,
+      outcome: throwState.outcome,
+    }
+  }
+
+  const key = cacheKey(sessionID, throwOutcome)
+  console.log("Cache lookupe:", key)
+  if (cache[key]) {
+    console.log("Cache HIT!")
+    return cache[key]
+  }
+
   const pitcherNFTAddress = throwState.pitcherNFT.nftAddress;
   const pitcherTokenID = throwState.pitcherNFT.tokenID;
 
@@ -555,18 +588,8 @@ export async function narrateThrowBySessionID(sessionID: string): Promise<string
   const batterName = batterNFTMetadata.name || "";
   const batterDescription = batterNFTMetadata.description || "";
 
-  let throwOutcome: ThrowOutcome | undefined = undefined;
-  if (throwState.didPitcherReveal && throwState.didBatterReveal) {
-    throwOutcome = {
-      pitchSpeed: throwState.pitcherReveal.speed,
-      pitchVertical: throwState.pitcherReveal.vertical,
-      pitchHorizontal: throwState.pitcherReveal.horizontal,
-      swingType: throwState.batterReveal.kind,
-      swingVertical: throwState.batterReveal.vertical,
-      swingHorizontal: throwState.batterReveal.horizontal,
-      outcome: throwState.outcome,
-    }
-  }
+  const narration = await narrateThrow(pitcherName, pitcherDescription, batterName, batterDescription, throwOutcome)
 
-  return narrateThrow(pitcherName, pitcherDescription, batterName, batterDescription, throwOutcome)
+  cache[key] = narration
+  return narration
 }
