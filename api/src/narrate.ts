@@ -538,9 +538,7 @@ export async function narrateThrowBySessionID(sessionID: string): Promise<string
   }
 
   const key = cacheKey(sessionID, throwOutcome)
-  console.log("Cache lookupe:", key)
   if (cache[key]) {
-    console.log("Cache HIT!")
     return cache[key]
   }
 
