@@ -12,7 +12,7 @@ import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { ZERO_ADDRESS } from "../../constants";
+import { FULLCOUNT_ASSETS_PATH, ZERO_ADDRESS } from "../../constants";
 import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
@@ -20,6 +20,8 @@ import styles from "./PlayView.module.css";
 import axios from "axios";
 import MainStat from "./MainStat";
 import HeatMap from "./HeatMap";
+import Narrate from "./Narrate";
+import { IoExitOutline } from "react-icons/all";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -289,24 +291,43 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
-        <Text w={"150px"}>{`Session ${selectedSession?.sessionID}`}</Text>
+        <Flex w={"150px"} h={"10px"} />
 
         {(sessionStatus.data?.progress === 3 ||
           sessionStatus.data?.progress === 4 ||
-          sessionStatus.data?.progress === 2) && (
+          sessionStatus.data?.progress === 2 ||
+          sessionStatus.data?.progress === 5) && (
           <Timer
             start={Number(sessionStatus.data?.phaseStartTimestamp)}
-            delay={sessionStatus.data?.secondsPerPhase}
-            isActive={sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4}
+            delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}
+            isActive={
+              sessionStatus.data?.progress === 3 ||
+              sessionStatus.data?.progress === 4 ||
+              sessionStatus.data?.progress === 5
+            }
           />
         )}
         <Flex w={"150px"} justifyContent={"end"}>
-          <CloseIcon
-            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
+          <Image
+            alt="exit"
+            src={`${FULLCOUNT_ASSETS_PATH}/icons/exit.svg`}
+            h={"20px"}
+            w={"20px"}
             cursor={"pointer"}
+            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
           />
         </Flex>
       </Flex>
+      {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
+        <Flex w={"1000px"} placeSelf={"center"} minH={"108px"}>
+          <Narrate
+            sessionID={selectedSession?.sessionID ?? 0}
+            speed={1}
+            isComplete={sessionStatus.data.progress === 5}
+          />
+        </Flex>
+      )}
+
       <Flex alignItems={"center"} justifyContent={"space-between"}>
         <Flex direction={"column"} gap={"10px"}>
           {isPitcher(selectedToken) ? (
@@ -347,14 +368,20 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               )}
             </>
           )}
-          {pitcherStats.data && <MainStat stats={pitcherStats.data} isPitcher={true} />}
+          {pitcherStats.data ? (
+            <MainStat stats={pitcherStats.data} isPitcher={true} />
+          ) : (
+            <Flex h={"35px"} />
+          )}
 
-          {pitchDistributions.data && (
+          {pitchDistributions.data ? (
             <HeatMap
               rates={pitchDistributions.data.rates}
               counts={pitchDistributions.data.counts}
               isPitcher
             />
+          ) : (
+            <Flex h={"150px"} />
           )}
         </Flex>
 
@@ -428,14 +455,20 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               )}
             </>
           )}
-          {batterStats.data && <MainStat stats={batterStats.data} isPitcher={false} />}
+          {batterStats.data ? (
+            <MainStat stats={batterStats.data} isPitcher={false} />
+          ) : (
+            <Flex h={"35px"} />
+          )}
 
-          {swingDistributions.data && (
+          {swingDistributions.data ? (
             <HeatMap
               rates={swingDistributions.data.rates}
               counts={swingDistributions.data.counts}
               isPitcher={false}
             />
+          ) : (
+            <Flex h={"150px"} />
           )}
         </Flex>
       </Flex>
