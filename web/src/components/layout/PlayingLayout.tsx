@@ -9,8 +9,8 @@ const sounds = {
   swoosh: `${FULLCOUNT_ASSETS_PATH}/sounds/windy-swoosh.wav`,
   swing: `${FULLCOUNT_ASSETS_PATH}/sounds/fast-swoosh.wav`,
   clapping: `${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`,
-  hit: `${FULLCOUNT_ASSETS_PATH}/sounds/hard-hit.wav`,
-  catch: `${FULLCOUNT_ASSETS_PATH}/sounds/ball-hit.wav`,
+  hit: `${FULLCOUNT_ASSETS_PATH}/sounds/eelke-hit-01.wav`,
+  catch: `${FULLCOUNT_ASSETS_PATH}/sounds/martinimeniscus-glove-catch-6-ff009.wav`,
 };
 
 const PlayingLayout = ({ children }: { children: ReactNode }) => {
