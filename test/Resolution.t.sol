@@ -43,7 +43,7 @@ contract ResolutionTest is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
         vm.stopPrank();
 
@@ -51,7 +51,7 @@ contract ResolutionTest is FullcountTestBase {
 
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();
 

@@ -208,11 +208,12 @@ class Fullcount:
         session_id: int,
         nft_address: ChecksumAddress,
         token_id: int,
+        signature: bytes,
         transaction_config,
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.joinSession(
-            session_id, nft_address, token_id, transaction_config
+            session_id, nft_address, token_id, signature, transaction_config
         )
 
     def pitch_hash(
@@ -289,6 +290,12 @@ class Fullcount:
             nonce0, nonce1, distribution, block_identifier=block_number
         )
 
+    def session_hash(
+        self, session_id: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.sessionHash.call(session_id, block_identifier=block_number)
+
     def session_progress(
         self, session_id: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -298,11 +305,16 @@ class Fullcount:
         )
 
     def start_session(
-        self, nft_address: ChecksumAddress, token_id: int, role: int, transaction_config
+        self,
+        nft_address: ChecksumAddress,
+        token_id: int,
+        role: int,
+        require_signature: bool,
+        transaction_config,
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.startSession(
-            nft_address, token_id, role, transaction_config
+            nft_address, token_id, role, require_signature, transaction_config
         )
 
     def swing_hash(
@@ -548,6 +560,7 @@ def handle_join_session(args: argparse.Namespace) -> None:
         session_id=args.session_id,
         nft_address=args.nft_address,
         token_id=args.token_id,
+        signature=args.signature,
         transaction_config=transaction_config,
     )
     print(result)
@@ -635,6 +648,15 @@ def handle_sample_outcome_from_distribution(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_session_hash(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.session_hash(
+        session_id=args.session_id, block_number=args.block_number
+    )
+    print(result)
+
+
 def handle_session_progress(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -652,6 +674,7 @@ def handle_start_session(args: argparse.Namespace) -> None:
         nft_address=args.nft_address,
         token_id=args.token_id,
         role=args.role,
+        require_signature=args.require_signature,
         transaction_config=transaction_config,
     )
     print(result)
@@ -808,6 +831,9 @@ def generate_cli() -> argparse.ArgumentParser:
     join_session_parser.add_argument(
         "--token-id", required=True, help="Type: uint256", type=int
     )
+    join_session_parser.add_argument(
+        "--signature", required=True, help="Type: bytes", type=bytes_argument_type
+    )
     join_session_parser.set_defaults(func=handle_join_session)
 
     pitch_hash_parser = subcommands.add_parser("pitch-hash")
@@ -900,6 +926,13 @@ def generate_cli() -> argparse.ArgumentParser:
         func=handle_sample_outcome_from_distribution
     )
 
+    session_hash_parser = subcommands.add_parser("session-hash")
+    add_default_arguments(session_hash_parser, False)
+    session_hash_parser.add_argument(
+        "--session-id", required=True, help="Type: uint256", type=int
+    )
+    session_hash_parser.set_defaults(func=handle_session_hash)
+
     session_progress_parser = subcommands.add_parser("session-progress")
     add_default_arguments(session_progress_parser, False)
     session_progress_parser.add_argument(
@@ -917,6 +950,12 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     start_session_parser.add_argument(
         "--role", required=True, help="Type: uint8", type=int
+    )
+    start_session_parser.add_argument(
+        "--require-signature",
+        required=True,
+        help="Type: bool",
+        type=boolean_argument_type,
     )
     start_session_parser.set_defaults(func=handle_start_session)
 

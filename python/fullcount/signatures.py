@@ -22,6 +22,18 @@ def sign_message(message_hash, signer) -> str:
     )
     return signed_message_bytes.hex()
 
+def sign_session(
+    contract: Fullcount,
+    signer: Any,
+    sessionID: int
+) -> Tuple[str, str]:
+    """
+    Generates a session signature suitable for joining a session requiring a signature
+    """
+    message_hash = contract.session_hash(
+        sessionID
+    )
+    return message_hash, sign_message(message_hash, signer)
 
 def commit_pitch(
     contract: Fullcount,
@@ -39,7 +51,6 @@ def commit_pitch(
     )
     return message_hash, sign_message(message_hash, signer)
 
-
 def commit_swing(
     contract: Fullcount,
     signer: Any,
@@ -56,6 +67,15 @@ def commit_swing(
     )
     return message_hash, sign_message(message_hash, signer)
 
+def handle_sign_session(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    signer = network.accounts.load(args.sender, args.password)
+    contract = Fullcount(args.address)
+    session_id = args.session_id
+    message_hash, signature = sign_session(
+        contract, signer, session_id
+    )
+    print(f"Message hash: {message_hash}\nSignature: {signature}")
 
 def handle_commit_pitch(args: argparse.Namespace) -> None:
     network.connect(args.network)
@@ -98,10 +118,15 @@ def handle_commit_swing(args: argparse.Namespace) -> None:
 
 
 def generate_cli() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Generate pitch and swing commitments")
+    parser = argparse.ArgumentParser(description="Generates session, commit-pitch, and commit-swing signatures.")
     parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
+
+    session_parser = subparsers.add_parser("sign-session")
+    add_default_arguments(session_parser, transact=True)
+    session_parser.add_argument("--session-id", type=int, required=True, help="Session ID")
+    session_parser.set_defaults(func=handle_sign_session)
 
     pitch_type_help = (
         f"Pitch type. If not specified, generates a random pitch type. Inputs: "
@@ -124,7 +149,7 @@ def generate_cli() -> argparse.ArgumentParser:
         + ", ".join(f"{hor.value} - {hor.name}" for hor in list(HorizontalLocation))
     )
 
-    pitch_parser = subparsers.add_parser("pitch")
+    pitch_parser = subparsers.add_parser("commit-pitch")
     add_default_arguments(pitch_parser, transact=True)
     pitch_parser.add_argument("--commit-nonce", type=int, required=True, help="Nonce")
     pitch_parser.add_argument("--commit-type", type=int, help=pitch_type_help)
@@ -144,7 +169,7 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     pitch_parser.set_defaults(func=handle_commit_pitch)
 
-    swing_parser = subparsers.add_parser("swing")
+    swing_parser = subparsers.add_parser("commit-swing")
     add_default_arguments(swing_parser, transact=True)
     swing_parser.add_argument("--commit-nonce", type=int, required=True, help="Nonce")
     swing_parser.add_argument("--commit-type", type=int, help=swing_type_help)
