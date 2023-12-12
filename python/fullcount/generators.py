@@ -70,10 +70,10 @@ function test_{pitch_nonce}_{pitch_type.name}_{pitch_vert.name}_{pitch_hor.name}
     vm.stopPrank();
 
     Session memory session = game.getSession(SessionID);
-    assertTrue(session.didBatterReveal);
+    assertTrue(session.batter.didReveal);
     assertEq(uint256(session.outcome), uint256(Outcome.{outcome.name}));
 
-    Swing memory sessionSwing = session.batterReveal;
+    Swing memory sessionSwing = session.batter.didReveal;
     assertEq(sessionSwing.nonce, swing.nonce);
     assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
     assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));

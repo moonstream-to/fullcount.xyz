@@ -119,22 +119,24 @@ struct NFT {
     uint256 tokenID;
 }
 
+struct PlayerInfo {
+    NFT nft;
+    bool didCommit;
+    bytes commitment;
+    bool didReveal;
+    bool leftSession;
+}
+
 /*
 Session represents the state of a Fullcount session.
 */
 struct Session {
     uint256 phaseStartTimestamp;
-    NFT pitcherNFT;
-    bool didPitcherCommit;
-    bool didPitcherReveal;
-    bytes pitcherCommit;
+    PlayerInfo pitcher;
+    PlayerInfo batter;
     Pitch pitcherReveal;
-    NFT batterNFT;
-    bool didBatterCommit;
-    bool didBatterReveal;
-    bytes batterCommit;
     Swing batterReveal;
     Outcome outcome;
-    bool pitcherLeftSession;
-    bool batterLeftSession;
+    bool requireSignature;
+    address sessionStarter;
 }

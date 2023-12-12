@@ -43,7 +43,7 @@ contract ResolutionTest is FullcountTestBase {
 
         characterNFTs.approve(address(game), tokenID);
 
-        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher);
+        uint256 sessionID = game.startSession(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
         vm.stopPrank();
 
@@ -51,7 +51,7 @@ contract ResolutionTest is FullcountTestBase {
 
         otherCharacterNFTs.approve(address(game), otherTokenID);
 
-        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID);
+        game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();
 
@@ -108,7 +108,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Single));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -166,7 +166,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Single));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -224,7 +224,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Single));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -283,7 +283,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -342,7 +342,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -401,7 +401,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -460,7 +460,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -518,7 +518,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -576,7 +576,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -634,7 +634,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Triple));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -692,7 +692,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Triple));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -750,7 +750,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Triple));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -808,7 +808,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Double));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -866,7 +866,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Double));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -924,7 +924,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.Double));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -982,7 +982,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.InPlayOut));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -1040,7 +1040,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.InPlayOut));
 
         Swing memory sessionSwing = session.batterReveal;
@@ -1098,7 +1098,7 @@ contract ResolutionTest is FullcountTestBase {
         vm.stopPrank();
 
         Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
+        assertTrue(session.batter.didReveal);
         assertEq(uint256(session.outcome), uint256(Outcome.InPlayOut));
 
         Swing memory sessionSwing = session.batterReveal;
