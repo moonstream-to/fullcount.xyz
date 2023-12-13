@@ -1776,7 +1776,7 @@ contract FullcountTest_inviteOnly is FullcountTestBase {
         assertEq(session.batterNFT.tokenID, 0);
     }
 
-    function testRevert_if_invalid_siganture() public {
+    function testRevert_if_invalid_signature() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
