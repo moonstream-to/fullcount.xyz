@@ -3,7 +3,7 @@ with  dedup_events as (
         DISTINCT ON(transaction_hash, log_index) *
     FROM wyrm_labels
     WHERE label='moonworm-alpha'
-        AND address='0x391FFCcea2BC1a615e2d4923fFd9373278707504'
+        AND address='0x47E45451Af901E227901fa3F6e51c24145F70AF4'
         AND log_index IS NOT NULL
 ), SessionResolved as (
     SELECT
