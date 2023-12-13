@@ -17,6 +17,11 @@ import styles from "./PlayView.module.css";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import RandomGenerator from "./RandomGenerator";
 import ActionTypeSelector from "./ActionTypeSelector";
+import {
+  getLocalStorageItem,
+  getLocalStorageKey,
+  setLocalStorageItem,
+} from "../../utils/localStorage";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
@@ -48,40 +53,26 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
-    localStorage.setItem(
-      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
-      JSON.stringify({
-        nonce,
-        speed,
-        vertical: getRowCol(gridIndex)[0],
-        horizontal: getRowCol(gridIndex)[1],
-      }),
-    );
+    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    setLocalStorageItem(localStorageKey, {
+      nonce,
+      speed,
+      vertical: getRowCol(gridIndex)[0],
+      horizontal: getRowCol(gridIndex)[1],
+    });
     commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {
-    const item =
-      localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
-      ) ?? "";
-    const reveal = JSON.parse(item);
-    revealPitch.mutate({
-      nonce: reveal.nonce,
-      speed: reveal.speed,
-      vertical: reveal.vertical,
-      horizontal: reveal.horizontal,
-    });
+    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const reveal = getLocalStorageItem(localStorageKey);
+    revealPitch.mutate(reveal);
   };
 
   useEffect(() => {
-    // setMovements([]);
-    const item =
-      localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
-      ) ?? "";
-    if (item) {
-      const reveal = JSON.parse(item);
+    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const reveal = getLocalStorageItem(localStorageKey);
+    if (reveal) {
       setSpeed(reveal.speed);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
