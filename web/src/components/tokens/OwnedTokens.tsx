@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import styles from "./OwnedTokens.module.css";
 import globalStyles from "./OwnedTokens.module.css";
-import { Flex, Image, Spinner, Text, useDisclosure } from "@chakra-ui/react";
+import {
+  Flex,
+  Image,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  SlideFade,
+  Spinner,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
 import React, { useContext, useEffect } from "react";
 import { useGameContext } from "../../contexts/GameContext";
@@ -18,6 +28,7 @@ import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { sendTransactionWithEstimate } from "../utils";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
 import { signSession } from "../../utils/signSession";
+import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
@@ -34,6 +45,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     selectedToken,
     updateContext,
     invitedTo,
+    inviteCode,
   } = useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
@@ -115,13 +127,20 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const startSession = useMutation(
-    async ({ role, token }: { role: number; token: Token }) => {
+    async ({
+      role,
+      token,
+      requireSignature,
+    }: {
+      role: number;
+      token: Token;
+      requireSignature: boolean;
+    }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
         });
       }
-      const requireSignature = true;
       return sendTransactionWithEstimate(
         web3ctx.account,
         gameContract.methods.startSession(tokenAddress, token.id, role, requireSignature),
@@ -129,15 +148,21 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       onSuccess: async (data, variables) => {
-        console.log(
-          await signSession(
+        if (variables.requireSignature) {
+          const sign = await signSession(
             web3ctx.account,
             window.ethereum,
             Number(data.events.SessionStarted.returnValues.sessionID),
-          ),
-        );
+          );
+          const inviteCodeKey = getLocalStorageInviteCodeKey(
+            contractAddress,
+            data.events.SessionStarted.returnValues.sessionID,
+          );
+          setLocalStorageItem(inviteCodeKey, sign);
+        }
         queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           const newSession: Session = {
+            requiresSignature: variables.requireSignature,
             batterLeftSession: false,
             pitcherLeftSession: false,
             progress: 2,
@@ -184,7 +209,15 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const joinSession = useMutation(
-    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
+    async ({
+      sessionID,
+      token,
+      inviteCode,
+    }: {
+      sessionID: number;
+      token: Token;
+      inviteCode: string;
+    }) => {
       if (!web3ctx.account) {
         return new Promise((_, reject) => {
           reject(new Error(`Account address isn't set`));
@@ -192,7 +225,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, inviteCode),
       );
     },
     {
@@ -338,51 +371,130 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         {selectedToken && !selectedToken?.isStaked && !forJoin && (
           <Flex direction={"column"} minH={"229px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            {forJoin && invitedTo ? (
-              <button
-                className={globalStyles.button}
-                style={{ width: "139px" }}
-                onClick={() => joinSession.mutate({ sessionID: invitedTo, token: selectedToken })}
-              >
-                {joinSession.isLoading ? (
-                  <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-                ) : (
-                  <Image
-                    src={`${assets}/${isPitcherInvited() ? "ball2.png" : "bat2.png"}`}
-                    h={"24px"}
-                    w={"24px"}
-                    alt={"o"}
-                  />
-                )}
-              </button>
-            ) : (
-              <>
-                <Flex minW={"139px"}>
-                  <button
-                    className={globalStyles.button}
-                    style={{ width: "70px" }}
-                    onClick={() => startSession.mutate({ role: 0, token: selectedToken })}
-                  >
-                    {startSession.isLoading && startSession.variables?.role === 0 ? (
-                      <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-                    ) : (
-                      <Image src={`${assets}/ball2.png`} h={"24px"} w={"24px"} alt={"o"} />
-                    )}
+
+            <Flex minW={"139px"}>
+              <Popover placement="top">
+                <PopoverTrigger>
+                  <button className={globalStyles.button} style={{ width: "70px" }}>
+                    <Image src={`${assets}/ball2.png`} h={"24px"} w={"24px"} alt={"o"} />
                   </button>
-                  <button
-                    className={globalStyles.button}
-                    onClick={() => startSession.mutate({ role: 1, token: selectedToken })}
-                    style={{ width: "69px" }}
-                  >
-                    {startSession.isLoading && startSession.variables?.role === 1 ? (
-                      <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-                    ) : (
-                      <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"x"} />
-                    )}
+                </PopoverTrigger>
+                <SlideFade in={true} offsetY="200px">
+                  <PopoverContent bg={"#252525"} border={"1px solid #4d4d4d"}>
+                    <Flex bg={"#GGG"} p={"30px"} direction={"column"} gap={"10px"}>
+                      <button
+                        className={globalStyles.createSessionButton}
+                        onClick={() =>
+                          startSession.mutate({
+                            role: 0,
+                            token: selectedToken,
+                            requireSignature: false,
+                          })
+                        }
+                      >
+                        {startSession.isLoading &&
+                        startSession.variables?.role === 0 &&
+                        !startSession.variables?.requireSignature ? (
+                          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                        ) : (
+                          "Open challenge"
+                        )}
+                      </button>
+                      <button
+                        className={globalStyles.createSessionButton}
+                        onClick={() =>
+                          startSession.mutate({
+                            role: 0,
+                            token: selectedToken,
+                            requireSignature: true,
+                          })
+                        }
+                      >
+                        {startSession.isLoading &&
+                        startSession.variables?.role === 0 &&
+                        startSession.variables?.requireSignature ? (
+                          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                        ) : (
+                          "By invite link only"
+                        )}
+                      </button>
+                    </Flex>
+                  </PopoverContent>
+                </SlideFade>
+              </Popover>
+              <Popover placement="top">
+                <PopoverTrigger>
+                  <button className={globalStyles.button} style={{ width: "70px" }}>
+                    <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"o"} />
                   </button>
-                </Flex>
-              </>
-            )}
+                </PopoverTrigger>
+                <SlideFade in={true} offsetY="200px">
+                  <PopoverContent bg={"#252525"} border={"1px solid #4d4d4d"}>
+                    <Flex bg={"#GGG"} p={"30px"} direction={"column"} gap={"10px"}>
+                      <button
+                        className={globalStyles.createSessionButton}
+                        onClick={() =>
+                          startSession.mutate({
+                            role: 1,
+                            token: selectedToken,
+                            requireSignature: false,
+                          })
+                        }
+                      >
+                        {startSession.isLoading &&
+                        startSession.variables?.role === 1 &&
+                        !startSession.variables?.requireSignature ? (
+                          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                        ) : (
+                          "Open challenge"
+                        )}
+                      </button>
+                      <button
+                        className={globalStyles.createSessionButton}
+                        onClick={() =>
+                          startSession.mutate({
+                            role: 1,
+                            token: selectedToken,
+                            requireSignature: true,
+                          })
+                        }
+                      >
+                        {startSession.isLoading &&
+                        startSession.variables?.role === 1 &&
+                        startSession.variables?.requireSignature ? (
+                          <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                        ) : (
+                          "By invite link only"
+                        )}
+                      </button>
+                    </Flex>
+                  </PopoverContent>
+                </SlideFade>
+              </Popover>
+
+              {/*<button*/}
+              {/*  className={globalStyles.button}*/}
+              {/*  style={{ width: "70px" }}*/}
+              {/*  onClick={() => startSession.mutate({ role: 0, token: selectedToken })}*/}
+              {/*>*/}
+              {/*  {startSession.isLoading && startSession.variables?.role === 0 ? (*/}
+              {/*    <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
+              {/*  ) : (*/}
+              {/*    <Image src={`${assets}/ball2.png`} h={"24px"} w={"24px"} alt={"o"} />*/}
+              {/*  )}*/}
+              {/*</button>*/}
+              {/*<button*/}
+              {/*  className={globalStyles.button}*/}
+              {/*  onClick={() => startSession.mutate({ role: 1, token: selectedToken })}*/}
+              {/*  style={{ width: "69px" }}*/}
+              {/*>*/}
+              {/*  {startSession.isLoading && startSession.variables?.role === 1 ? (*/}
+              {/*    <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
+              {/*  ) : (*/}
+              {/*    <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"x"} />*/}
+              {/*  )}*/}
+              {/*</button>*/}
+            </Flex>
           </Flex>
         )}
         {selectedToken && selectedToken.isStaked && (
@@ -424,7 +536,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                       className={globalStyles.inviteButton}
                       style={{ width: "70px" }}
                       onClick={() =>
-                        joinSession.mutate({ sessionID: invitedTo, token: selectedToken })
+                        joinSession.mutate({
+                          sessionID: invitedTo,
+                          token: selectedToken,
+                          inviteCode,
+                        })
                       }
                     >
                       {joinSession.isLoading ? (

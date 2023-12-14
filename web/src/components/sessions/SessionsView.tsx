@@ -58,10 +58,13 @@ const SessionsView = () => {
       const invitedBy = Array.isArray(router.query.invitedBy)
         ? router.query.invitedBy[0]
         : router.query.invitedBy;
+      const inviteCode = Array.isArray(router.query.inviteCode)
+        ? router.query.inviteCode[0]
+        : router.query.inviteCode;
       const invitedTo = Number(
         Array.isArray(router.query.session) ? router.query.session[0] : router.query.session,
       );
-      updateContext({ invitedBy, invitedTo });
+      updateContext({ invitedBy, invitedTo, inviteCode });
       router.push("/", undefined, { shallow: true });
       onOpen();
     }
