@@ -872,6 +872,11 @@
         "internalType": "uint256",
         "name": "tokenID",
         "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
       }
     ],
     "name": "joinSession",
@@ -1113,6 +1118,25 @@
         "type": "uint256"
       }
     ],
+    "name": "sessionHash",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "sessionID",
+        "type": "uint256"
+      }
+    ],
     "name": "sessionProgress",
     "outputs": [
       {
@@ -1140,6 +1164,11 @@
         "internalType": "enum PlayerType",
         "name": "role",
         "type": "uint8"
+      },
+      {
+        "internalType": "bool",
+        "name": "requireSignature",
+        "type": "bool"
       }
     ],
     "name": "startSession",

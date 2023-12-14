@@ -17,6 +17,7 @@ import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { sendTransactionWithEstimate } from "../utils";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
+import { signSession } from "../../utils/signSession";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
@@ -120,13 +121,21 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
+      const requireSignature = true;
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.startSession(tokenAddress, token.id, role),
+        gameContract.methods.startSession(tokenAddress, token.id, role, requireSignature),
       );
     },
     {
       onSuccess: async (data, variables) => {
+        console.log(
+          await signSession(
+            web3ctx.account,
+            window.ethereum,
+            Number(data.events.SessionStarted.returnValues.sessionID),
+          ),
+        );
         queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           const newSession: Session = {
             batterLeftSession: false,

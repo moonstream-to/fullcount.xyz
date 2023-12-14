@@ -43,9 +43,11 @@ const SessionView3 = ({ session }: { session: Session }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
+      const signature =
+        "0xebcd962ed57b5ce36d9d7829772646d13541fa9a83936a37ea36060407ac398172227e979b581980e970ec330597b772e5888759f1fec74ff90dda51bc9ec2801b";
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, signature),
       );
     },
     {
