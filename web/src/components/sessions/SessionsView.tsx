@@ -84,6 +84,7 @@ const SessionsView = () => {
       for (let i = oldestSessionNumber; i <= numSessions; i += 1) {
         callData.push(gameContract.methods.sessionProgress(i).encodeABI());
         callData.push(gameContract.methods.getSession(i).encodeABI());
+        callData.push(gameContract.methods.SessionRequiresSignature(i).encodeABI());
       }
       const queries = callData.map((callData) => {
         return {
@@ -93,10 +94,14 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
-
-      const res: { progress: string; session: string }[] = [];
-      for (let i = 0; i < multicallRes.length; i += 2) {
-        res.push({ progress: multicallRes[i][1], session: multicallRes[i + 1][1] });
+      console.log(multicallRes);
+      const res: { progress: string; session: string; requiresSignature: boolean }[] = [];
+      for (let i = 0; i < multicallRes.length; i += 3) {
+        res.push({
+          progress: multicallRes[i][1],
+          session: multicallRes[i + 1][1],
+          requiresSignature: !!Number(multicallRes[i + 2][1]),
+        });
       }
       const decodedRes = res.map((data) => {
         const sessionRaw = web3ctx.web3.eth.abi.decodeParameters(
@@ -109,6 +114,7 @@ const SessionsView = () => {
           pitcherTokenID: sessionRaw.pitcherNFT.tokenID,
           batterAddress: sessionRaw.batterNFT.nftAddress,
           batterTokenID: sessionRaw.batterNFT.tokenID,
+          requiresSignature: data.requiresSignature,
         };
         return {
           progress: Number(data.progress),
@@ -202,6 +208,7 @@ const SessionsView = () => {
           didBatterCommit: session.session.didBatterCommit,
           didBatterReveal: session.session.didBatterReveal,
           outcome: Number(session.session.outcome),
+          requiresSignature: session.session.requiresSignature,
         };
       });
 
