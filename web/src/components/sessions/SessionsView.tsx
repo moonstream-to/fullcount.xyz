@@ -94,7 +94,6 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
-      console.log(multicallRes);
       const res: { progress: string; session: string; requiresSignature: boolean }[] = [];
       for (let i = 0; i < multicallRes.length; i += 3) {
         res.push({

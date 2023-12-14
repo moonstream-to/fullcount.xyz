@@ -471,29 +471,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   </PopoverContent>
                 </SlideFade>
               </Popover>
-
-              {/*<button*/}
-              {/*  className={globalStyles.button}*/}
-              {/*  style={{ width: "70px" }}*/}
-              {/*  onClick={() => startSession.mutate({ role: 0, token: selectedToken })}*/}
-              {/*>*/}
-              {/*  {startSession.isLoading && startSession.variables?.role === 0 ? (*/}
-              {/*    <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
-              {/*  ) : (*/}
-              {/*    <Image src={`${assets}/ball2.png`} h={"24px"} w={"24px"} alt={"o"} />*/}
-              {/*  )}*/}
-              {/*</button>*/}
-              {/*<button*/}
-              {/*  className={globalStyles.button}*/}
-              {/*  onClick={() => startSession.mutate({ role: 1, token: selectedToken })}*/}
-              {/*  style={{ width: "69px" }}*/}
-              {/*>*/}
-              {/*  {startSession.isLoading && startSession.variables?.role === 1 ? (*/}
-              {/*    <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />*/}
-              {/*  ) : (*/}
-              {/*    <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"x"} />*/}
-              {/*  )}*/}
-              {/*</button>*/}
             </Flex>
           </Flex>
         )}
