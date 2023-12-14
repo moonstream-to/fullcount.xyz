@@ -156,3 +156,27 @@
     height: 26px;
     min-width: 144px;
 }
+
+.createSessionButton {
+    display: flex;
+    width: 100%;
+    height: 40px;
+    padding: 6px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #00A341;
+    background: #1B1B1B;
+    color: #00A341;
+    text-align: center;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.createSessionButton:hover {
+    font-weight: 700;
+}
+
