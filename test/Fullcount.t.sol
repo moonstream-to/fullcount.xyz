@@ -309,7 +309,7 @@ contract FullcountTest_startSession is FullcountTestBase {
         emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
         game.startSession(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
-        vm.expectRevert("Fullcount.startSession: NFT is already staked to a session.");
+        vm.expectRevert("Fullcount._startSession: NFT is already staked to a session.");
         game.startSession(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
         vm.stopPrank();
@@ -466,7 +466,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.startPrank(randomPerson);
 
-        vm.expectRevert("Fullcount.joinSession: session is already full");
+        vm.expectRevert("Fullcount._joinSession: session is already full");
         game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID, "");
 
         vm.stopPrank();
@@ -519,7 +519,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.startPrank(player2);
 
-        vm.expectRevert("Fullcount.joinSession: opponent left session");
+        vm.expectRevert("Fullcount._joinSession: opponent left session");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();

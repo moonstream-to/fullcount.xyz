@@ -13,6 +13,7 @@ import {
     VerticalLocation,
     HorizontalLocation,
     Session,
+    AtBat,
     Pitch,
     Swing,
     Outcome
@@ -74,6 +75,10 @@ contract Fullcount is EIP712 {
     // NOTE: Sessions are 1-indexed
     mapping(address => mapping(uint256 => uint256)) public StakedSession;
 
+    uint256 public NumAtBats;
+    mapping(uint256 => AtBat) public AtBatState;
+    mapping(uint256 => uint256[]) AtBatSessions;
+
     event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
@@ -104,6 +109,10 @@ contract Fullcount is EIP712 {
     // This is useful because of how return values from the public mapping get serialized.
     function getSession(uint256 sessionID) external view returns (Session memory) {
         return SessionState[sessionID];
+    }
+
+    function getAtBat(uint256 atBatID) external view returns (AtBat memory) {
+        return AtBatState[atBatID];
     }
 
     /**
@@ -153,21 +162,14 @@ contract Fullcount is EIP712 {
         return _hashTypedDataV4(structHash);
     }
 
+    function _isTokenOwner(address nftAddress, uint256 tokenID) internal view returns (bool) {
+        return msg.sender == IERC721(nftAddress).ownerOf(tokenID);
+    }
+
     // Emits:
     // - SessionStarted
-    function startSession(
-        address nftAddress,
-        uint256 tokenID,
-        PlayerType role,
-        bool requireSignature
-    )
-        external
-        virtual
-        returns (uint256)
-    {
-        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
-
-        require(StakedSession[nftAddress][tokenID] == 0, "Fullcount.startSession: NFT is already staked to a session.");
+    function _startSession(address nftAddress, uint256 tokenID, PlayerType role) internal returns (uint256) {
+        require(StakedSession[nftAddress][tokenID] == 0, "Fullcount._startSession: NFT is already staked to a session.");
 
         // Increment NumSessions. The new value is the ID of the session that was just started.
         // This is what makes sessions 1-indexed.
@@ -183,8 +185,6 @@ contract Fullcount is EIP712 {
 
         StakedSession[nftAddress][tokenID] = NumSessions;
 
-        SessionRequiresSignature[NumSessions] = requireSignature;
-
         SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
 
         emit SessionStarted(NumSessions, nftAddress, tokenID, role);
@@ -192,46 +192,36 @@ contract Fullcount is EIP712 {
         return NumSessions;
     }
 
-    // Emits:
-    // - SessionJoined
-    function joinSession(
-        uint256 sessionID,
+    function startSession(
         address nftAddress,
         uint256 tokenID,
-        bytes memory signature
+        PlayerType role,
+        bool requireSignature
     )
         external
         virtual
+        returns (uint256)
     {
-        require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
+        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
 
-        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.joinSession: msg.sender is not NFT owner");
+        uint256 sessionID = _startSession(nftAddress, tokenID, role);
+
+        SessionRequiresSignature[sessionID] = requireSignature;
+
+        return sessionID;
+    }
+
+    function _joinSession(uint256 sessionID, address nftAddress, uint256 tokenID) internal {
+        require(sessionID <= NumSessions, "Fullcount._joinSession: session does not exist");
 
         require(StakedSession[nftAddress][tokenID] == 0, "Fullcount.joinSession: NFT is already staked to a session.");
 
         Session storage session = SessionState[sessionID];
 
         if (session.pitcherNFT.nftAddress != address(0) && session.batterNFT.nftAddress != address(0)) {
-            revert("Fullcount.joinSession: session is already full");
+            revert("Fullcount._joinSession: session is already full");
         } else if (session.pitcherLeftSession || session.batterLeftSession) {
-            revert("Fullcount.joinSession: opponent left session");
-        }
-
-        if (SessionRequiresSignature[sessionID]) {
-            address sessionStarter;
-            if (session.pitcherNFT.nftAddress != address(0)) {
-                sessionStarter = IERC721(session.pitcherNFT.nftAddress).ownerOf(session.pitcherNFT.tokenID);
-            } else if (session.batterNFT.nftAddress != address(0)) {
-                sessionStarter = IERC721(session.batterNFT.nftAddress).ownerOf(session.batterNFT.tokenID);
-            } else {
-                revert("Fullcount.joinSession: idiot programmer");
-            }
-
-            bytes32 sessionMessageHash = sessionHash(sessionID);
-            require(
-                SignatureChecker.isValidSignatureNow(sessionStarter, sessionMessageHash, signature),
-                "Fullcount.joinSession: invalid signature in session requiring signature to join."
-            );
+            revert("Fullcount._joinSession: opponent left session");
         }
 
         PlayerType role = PlayerType.Pitcher;
@@ -251,8 +241,96 @@ contract Fullcount is EIP712 {
         emit SessionJoined(sessionID, nftAddress, tokenID, role);
     }
 
-    function _isTokenOwner(address nftAddress, uint256 tokenID) internal view returns (bool) {
-        return msg.sender == IERC721(nftAddress).ownerOf(tokenID);
+    // Emits:
+    // - SessionJoined
+    function joinSession(
+        uint256 sessionID,
+        address nftAddress,
+        uint256 tokenID,
+        bytes memory signature
+    )
+        external
+        virtual
+    {
+        require(sessionID <= NumSessions, "Fullcount.joinSession: session does not exist");
+
+        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.joinSession: msg.sender is not NFT owner");
+
+        Session storage session = SessionState[sessionID];
+
+        if (SessionRequiresSignature[sessionID]) {
+            address sessionStarter;
+            if (session.pitcherNFT.nftAddress != address(0)) {
+                sessionStarter = IERC721(session.pitcherNFT.nftAddress).ownerOf(session.pitcherNFT.tokenID);
+            } else if (session.batterNFT.nftAddress != address(0)) {
+                sessionStarter = IERC721(session.batterNFT.nftAddress).ownerOf(session.batterNFT.tokenID);
+            } else {
+                revert("Fullcount.joinSession: idiot programmer");
+            }
+
+            bytes32 sessionMessageHash = sessionHash(sessionID);
+            require(
+                SignatureChecker.isValidSignatureNow(sessionStarter, sessionMessageHash, signature),
+                "Fullcount.joinSession: invalid signature in session requiring signature to join."
+            );
+        }
+
+        _joinSession(sessionID, nftAddress, tokenID);
+    }
+
+    function startAtBat(
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role,
+        bool requireSignature
+    )
+        external
+        virtual
+        returns (uint256)
+    {
+        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
+
+        NumAtBats++;
+
+        if (role == PlayerType.Pitcher) {
+            AtBatState[NumAtBats].pitcherNFT.nftAddress = nftAddress;
+            AtBatState[NumAtBats].pitcherNFT.tokenID = tokenID;
+        } else {
+            AtBatState[NumAtBats].batterNFT.nftAddress = nftAddress;
+            AtBatState[NumAtBats].batterNFT.tokenID = tokenID;
+        }
+
+        uint256 firstSession = _startSession(nftAddress, tokenID, role);
+        AtBatSessions[NumAtBats] = [firstSession];
+
+        // Emit start at-bat event.
+
+        return NumAtBats;
+    }
+
+    function joinAtBat(uint256 atBatID, address nftAddress, uint256 tokenID, bytes memory signature) external virtual {
+        require(atBatID <= NumAtBats, "Fullcount.joinAtBat: atBat does not exist");
+
+        require(_isTokenOwner(nftAddress, tokenID), "Fullcount.joinAtBat: msg.sender is not NFT owner");
+
+        uint256 firstSession = AtBatSessions[NumAtBats][0];
+        require(firstSession > 0, "Fullcount.joinAtBat: AtBat doesn't have a session");
+
+        AtBat storage atBat = AtBatState[atBatID];
+
+        PlayerType role = PlayerType.Pitcher;
+        if (atBat.batterNFT.nftAddress == address(0)) {
+            role = PlayerType.Batter;
+            atBat.batterNFT.nftAddress = nftAddress;
+            atBat.batterNFT.tokenID = tokenID;
+        } else {
+            atBat.pitcherNFT.nftAddress = nftAddress;
+            atBat.pitcherNFT.tokenID = tokenID;
+        }
+
+        _joinSession(firstSession, nftAddress, tokenID);
+
+        // Emit join at-bat event.
     }
 
     // TODO Change name of function as tokens are no longer staked?

@@ -138,3 +138,8 @@ struct Session {
     bool pitcherLeftSession;
     bool batterLeftSession;
 }
+
+struct AtBat {
+    NFT pitcherNFT;
+    NFT batterNFT;
+}
