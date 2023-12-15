@@ -225,7 +225,12 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, inviteCode),
+        gameContract.methods.joinSession(
+          sessionID,
+          tokenAddress,
+          token.id,
+          inviteCode ? inviteCode : "0x",
+        ),
       );
     },
     {
