@@ -160,6 +160,14 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.SecondsPerPhase.call(block_identifier=block_number)
 
+    def session_requires_signature(
+        self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.SessionRequiresSignature.call(
+            arg1, block_identifier=block_number
+        )
+
     def session_state(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -480,6 +488,15 @@ def handle_seconds_per_phase(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_session_requires_signature(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.session_requires_signature(
+        arg1=args.arg1, block_number=args.block_number
+    )
+    print(result)
+
+
 def handle_session_state(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -766,6 +783,17 @@ def generate_cli() -> argparse.ArgumentParser:
     seconds_per_phase_parser = subcommands.add_parser("seconds-per-phase")
     add_default_arguments(seconds_per_phase_parser, False)
     seconds_per_phase_parser.set_defaults(func=handle_seconds_per_phase)
+
+    session_requires_signature_parser = subcommands.add_parser(
+        "session-requires-signature"
+    )
+    add_default_arguments(session_requires_signature_parser, False)
+    session_requires_signature_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    session_requires_signature_parser.set_defaults(
+        func=handle_session_requires_signature
+    )
 
     session_state_parser = subcommands.add_parser("session-state")
     add_default_arguments(session_state_parser, False)

@@ -69,7 +69,7 @@ contract Fullcount is EIP712 {
     // Session ID => session state
     // NOTE: Sessions are 1-indexed
     mapping(uint256 => Session) public SessionState;
-    mapping(uint256 => bool) SessionRequiresSignature;
+    mapping(uint256 => bool) public SessionRequiresSignature;
 
     // ERC721 address => ERC721 token ID => session that that character is staked into
     // NOTE: Sessions are 1-indexed

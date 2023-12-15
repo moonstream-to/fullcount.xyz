@@ -410,6 +410,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               swing={sessionStatus.data.batterReveal}
               session={{
                 ...sessionStatus.data,
+                requiresSignature: false,
                 pair: isPitcher(selectedToken)
                   ? { pitcher: selectedToken, batter: opponent }
                   : { pitcher: opponent, batter: selectedToken },

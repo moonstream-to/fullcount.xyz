@@ -17,6 +17,7 @@ interface GameContextProps {
   sessions: Session[] | undefined;
   invitedBy: string;
   invitedTo: number | undefined;
+  inviteCode: string;
   watchingToken: Token | undefined;
   isTokenSelected: boolean;
   tokensCache: Token[];
@@ -51,6 +52,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     sessions: undefined,
     invitedBy: "",
     invitedTo: undefined,
+    inviteCode: "",
     watchingToken: undefined,
     isTokenSelected: false,
     tokensCache: [],

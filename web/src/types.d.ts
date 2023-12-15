@@ -81,6 +81,7 @@ interface Session {
   didBatterCommit: boolean;
   didBatterReveal: boolean;
   outcome: number;
+  requiresSignature: boolean;
 }
 
 interface FullcountContractSession {

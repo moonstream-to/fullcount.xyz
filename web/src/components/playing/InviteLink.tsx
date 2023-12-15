@@ -1,11 +1,16 @@
 import { Flex, Text, useClipboard } from "@chakra-ui/react";
 import { Session, Token } from "../../types";
 import { LinkIcon } from "@chakra-ui/icons";
+import { useGameContext } from "../../contexts/GameContext";
+import { getLocalStorageInviteCodeKey, getLocalStorageItem } from "../../utils/localStorage";
 
 const InviteLink = ({ session, token }: { session: Session; token: Token }) => {
+  const { contractAddress } = useGameContext();
+  const inviteCodeKey = getLocalStorageInviteCodeKey(contractAddress, String(session.sessionID));
+  const inviteCode = getLocalStorageItem(inviteCodeKey);
   const path = `${window.location.href}?session=${session.sessionID}&invitedBy=${encodeURIComponent(
     token.name,
-  )}`;
+  )}${inviteCode ? "&inviteCode=" : ""}${inviteCode ? inviteCode : ""}`;
   const { onCopy, hasCopied } = useClipboard(path);
   return (
     <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"10px"}>
