@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { Flex, Spinner, Text } from "@chakra-ui/react";
 
 import GridComponent from "./GridComponent";
-import { getPitchDescription, getRowCol } from "./PlayView";
+import { getRowCol } from "./PlayView";
 import { signPitch } from "../../utils/signing";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
@@ -22,6 +22,7 @@ import {
   getLocalStorageKey,
   setLocalStorageItem,
 } from "../../utils/localStorage";
+import { getPitchDescription } from "../../utils/messages";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {

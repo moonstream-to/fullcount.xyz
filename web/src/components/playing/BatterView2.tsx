@@ -9,13 +9,14 @@ import RandomGenerator from "./RandomGenerator";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
-import { getRowCol, getSwingDescription } from "./PlayView";
+import { getRowCol } from "./PlayView";
 import { AbiItem } from "web3-utils";
 import { signSwing } from "../../utils/signing";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import ActionTypeSelector from "./ActionTypeSelector";
+import { getSwingDescription } from "../../utils/messages";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
