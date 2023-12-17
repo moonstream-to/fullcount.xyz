@@ -1,12 +1,12 @@
-import styles from "./Playing.module.css";
-import { Flex, Text } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
+
 import { useGameContext } from "../contexts/GameContext";
 import SessionsView from "./sessions/SessionsView";
-import { useEffect } from "react";
 import PlayView from "./playing/PlayView";
+import styles from "./Playing.module.css";
 
 const Playing = () => {
-  const { selectedSession, updateContext, selectedToken, watchingToken } = useGameContext();
+  const { selectedSession, selectedToken, watchingToken } = useGameContext();
 
   return (
     <Flex className={styles.container}>

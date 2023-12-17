@@ -7,8 +7,9 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
-import { progressMessage, sendTransactionWithEstimate } from "../utils";
+import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
+import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -97,18 +98,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
     },
   );
 
-  const isTokenStaked = (token: Token) => {
-    return sessions?.find(
-      (s) =>
-        (s.pair.pitcher?.id === token.id &&
-          s.pair.pitcher?.address === token.address &&
-          !s.pitcherLeftSession) ||
-        (s.pair.batter?.id === token.id &&
-          s.pair.batter?.address === token.address &&
-          !s.batterLeftSession),
-    );
-  };
-
   const handleClick = () => {
     if (!selectedToken) {
       updateContext({ invitedTo: session.sessionID });
@@ -138,7 +127,13 @@ const SessionView3 = ({ session }: { session: Session }) => {
   ];
 
   return (
-    <Flex justifyContent={"space-between"} w={"100%"} alignItems={"center"} py={"15px"}>
+    <Flex
+      justifyContent={"space-between"}
+      w={"100%"}
+      alignItems={{ base: "start", lg: "center" }}
+      py={"15px"}
+      direction={{ base: "column", lg: "row" }}
+    >
       <Text
         color={progressMessageColors[session.progress]}
         title={`Session ${session.sessionID}. Progress - ${session.progress}`}
@@ -146,7 +141,13 @@ const SessionView3 = ({ session }: { session: Session }) => {
         {progressMessage(session)}
       </Text>
 
-      <Flex gap={"50px"} alignItems={"center"} justifyContent={"space-between"} minW={"480px"}>
+      <Flex
+        alignItems={{ base: "start", lg: "center" }}
+        justifyContent={"space-between"}
+        minW={{ base: "", lg: "480px" }}
+        direction={{ base: "column", lg: "row" }}
+        gap={{ base: "10px", lg: "50px" }}
+      >
         <SelectToken isOpen={isSelectTokenOpen} onClose={onSelectTokenClose} />
         {session.pair.pitcher ? (
           <Flex gap={4}>
@@ -189,7 +190,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
           </>
         )}
       </Flex>
-      {/*<button className={globalStyles.spectateButton}>Spectate</button>*/}
     </Flex>
   );
 };

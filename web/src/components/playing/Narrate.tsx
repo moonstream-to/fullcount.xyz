@@ -59,7 +59,7 @@ const Narrate = ({
   return (
     <>
       {narrate.data && (
-        <Text fontSize={"18px"} fontWeight={700}>
+        <Text fontSize={{ base: "12px", lg: "18px" }} fontWeight={700} p={1}>
           {narrate.data.slice(0, length)}
         </Text>
       )}

@@ -41,29 +41,61 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
   }, [start, delay]);
 
   return (
-    <Flex gap={"10px"}>
+    <Flex gap={"10px"} mx={"auto"}>
       <Flex className={styles.countLeft}>
         <Flex direction={"column"} alignItems={"center"} gap={"4px"}>
-          <Text fontSize={"14px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "9px", lg: "14px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             HOME
           </Text>
-          <Text fontSize={"17px"} fontWeight={"700"} color={"#FFF"} lineHeight={"1"} py={"4px"}>
+          <Text
+            fontSize={{ base: "12px", lg: "17px" }}
+            fontWeight={"700"}
+            color={"#FFF"}
+            lineHeight={"1"}
+            py={"4px"}
+          >
             0
           </Text>
         </Flex>
         <Flex direction={"column"} alignItems={"center"} gap={"4px"} justifyContent={"end"}>
-          <Text fontSize={"13px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "8px", lg: "13px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             INN
           </Text>
-          <Text fontSize={"15px"} fontWeight={"700"} color={"#FFF"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "10px", lg: "15px" }}
+            fontWeight={"700"}
+            color={"#FFF"}
+            lineHeight={"1"}
+          >
             BOT&nbsp;9
           </Text>
         </Flex>
         <Flex direction={"column"} alignItems={"center"} gap={"4px"}>
-          <Text fontSize={"14px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "9px", lg: "14px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             AWAY
           </Text>
-          <Text fontSize={"17px"} fontWeight={"700"} color={"#FFF"} lineHeight={"1"} py={"4px"}>
+          <Text
+            fontSize={{ base: "12px", lg: "17px" }}
+            fontWeight={"700"}
+            color={"#FFF"}
+            lineHeight={"1"}
+            py={"4px"}
+          >
             1
           </Text>
         </Flex>
@@ -74,7 +106,12 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           <Text className={styles.time} fontFamily="Segment7Standard">
             {minutesLeft}
           </Text>
-          <Text h={"25px"} fontSize={"20px"} lineHeight={"1"} color={"#FF8D8D"}>
+          <Text
+            h={"25px"}
+            fontSize={{ base: "10px", lg: "20px" }}
+            lineHeight={"1"}
+            color={"#FF8D8D"}
+          >
             :
           </Text>
           <Text className={styles.time} fontFamily="Segment7Standard">
@@ -83,9 +120,14 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
         </Flex>
       </Flex>
 
-      <Flex className={styles.countLeft} w={"186px"}>
+      <Flex className={styles.countLeft} minW={{ base: "100px", lg: "186px" }}>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
-          <Text fontSize={"14px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "9px", lg: "14px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             BALL
           </Text>
           <Flex gap={1}>
@@ -95,7 +137,12 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           </Flex>
         </Flex>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
-          <Text fontSize={"14px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "9px", lg: "14px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             STRIKE
           </Text>
           <Flex gap={1}>
@@ -104,7 +151,12 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           </Flex>
         </Flex>{" "}
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
-          <Text fontSize={"14px"} fontWeight={"700"} color={"#1B1B1B"} lineHeight={"1"}>
+          <Text
+            fontSize={{ base: "9px", lg: "14px" }}
+            fontWeight={"700"}
+            color={"#1B1B1B"}
+            lineHeight={"1"}
+          >
             OUT
           </Text>
           <Flex gap={1}>

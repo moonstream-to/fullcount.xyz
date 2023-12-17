@@ -23,11 +23,12 @@ import {
   setLocalStorageItem,
 } from "../../utils/localStorage";
 import { getPitchDescription } from "../../utils/messages";
+import RandomGeneratorMobile from "./RandomGeneratorMobile";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
-  const [gridIndex, setGridIndex] = useState(-1);
+  const [gridIndex, setGridIndex] = useState(11);
   const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
@@ -148,22 +149,13 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   );
 
   return (
-    <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      <Text fontSize={"24px"} fontWeight={"700"}>
-        One pitch to win the game
-      </Text>
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        1. Select the type of pitch
-      </Text>
+    <Flex direction={"column"} gap={"15px"} alignItems={"center"} mx={"auto"}>
       <ActionTypeSelector
         types={pitchSpeeds}
         isDisabled={sessionStatus.didPitcherCommit}
         selected={speed}
         setSelected={(value: number) => setSpeed(value)}
       />
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        2. Choose where to pitch
-      </Text>
       <GridComponent
         selectedIndex={gridIndex}
         isPitcher={true}
@@ -175,14 +167,13 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text className={styles.actionText}>
         {getPitchDescription(speed, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
       </Text>
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        3. Generate randomness
-      </Text>
-      <RandomGenerator
-        isActive={!nonce && !sessionStatus.didPitcherCommit}
-        onChange={(value: string) => setNonce(value)}
-      />
-      {!sessionStatus.didPitcherCommit ? (
+      {!nonce && !sessionStatus.didPitcherCommit && (
+        <RandomGeneratorMobile
+          isActive={!nonce && !sessionStatus.didPitcherCommit}
+          onChange={(value: string) => setNonce(value)}
+        />
+      )}
+      {!!nonce && !sessionStatus.didPitcherCommit && (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}
@@ -191,26 +182,20 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           {commitPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to pitch first</div>}
         </button>
-      ) : (
-        <Flex className={styles.completedAction}>Committed</Flex>
       )}
-      {sessionStatus.didPitcherReveal || isRevealed ? (
-        <Flex className={styles.completedAction}>Revealed</Flex>
-      ) : (
-        <button
-          className={globalStyles.commitButton}
-          onClick={handleReveal}
-          disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
-        >
-          {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
-        </button>
-      )}
-      <Text className={styles.text}>
-        Once both players have committed their moves, press{" "}
-        <span className={styles.textBold}> Reveal</span> to see the outcome
-      </Text>
+      {sessionStatus.didPitcherCommit &&
+        sessionStatus.didBatterCommit &&
+        !sessionStatus.didPitcherReveal && (
+          <button
+            className={globalStyles.mobileButton}
+            onClick={handleReveal}
+            disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
+          >
+            {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+          </button>
+        )}
     </Flex>
   );
 };
 
-export default PitcherView;
+export default PitcherViewMobile;
