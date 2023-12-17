@@ -7,6 +7,16 @@
     background: #232323;
     align-items: baseline;
 }
+
+.divider {
+    width: 0.5px;
+    height: 9px;
+    background: #4D4D4D;
+}
+
+
+
+
 .data {
     color: #FFF;
     text-align: center;
@@ -35,8 +45,19 @@
 
 }
 
-.divider {
-    width: 0.5px;
-    height: 9px;
-    background: #4D4D4D;
+@media (max-width: 375px) {
+    /*.container {*/
+    /*    !*flex-direction: column;*!*/
+    /*    !*max-width: 100px;*!*/
+    /*    padding: 5px;*/
+    /*    flex-wrap: wrap;*/
+    /*}*/
+    .data {
+        font-size: 8px;
+    }
+    .label {
+        font-size: 6px;
+        margin-left: 0px;
+
+    }
 }
