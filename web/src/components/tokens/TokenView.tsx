@@ -91,7 +91,14 @@ const TokenView = ({
   const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
   if (!token) {
-    return <></>;
+    return (
+      <Flex
+        h={{ base: "150px", lg: "300px" }}
+        w={{ base: "150px", lg: "300px" }}
+        border={"1px solid #4d4d4d"}
+        alignSelf={"start"}
+      />
+    );
   }
 
   return (

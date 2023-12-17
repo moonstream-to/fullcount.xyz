@@ -14,7 +14,7 @@ const InviteLink = ({ session, token }: { session: Session; token: Token }) => {
   const { onCopy, hasCopied } = useClipboard(path);
   return (
     <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"10px"}>
-      <Text fontSize={"24px"} fontWeight={"700"}>
+      <Text fontSize={{ base: "12px", lg: "24px" }} fontWeight={"700"}>
         Waiting for Opponent. Invite Friend?
       </Text>
       <Flex gap={"0px"} alignItems={"center"} p={"0px"}>
@@ -27,7 +27,7 @@ const InviteLink = ({ session, token }: { session: Session; token: Token }) => {
           overflowX={"hidden"}
           textOverflow={"ellipsis"}
           whiteSpace={"nowrap"}
-          maxW={"500px"}
+          maxW={{ base: "295px", lg: "500px" }}
         >
           {path}
         </Text>
