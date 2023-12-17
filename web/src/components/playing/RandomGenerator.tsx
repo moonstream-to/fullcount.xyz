@@ -45,19 +45,16 @@ const RandomGenerator = ({
     <>
       {isActive && (
         <>
-          <Text className={styles.text}>
-            Click on the button below and move mouse until the button is filled in
-          </Text>
           {movements.length === 0 && (
             <button className={globalStyles.commitButton} onClick={handleGenerate}>
-              Generate
+              Tap
             </button>
           )}
           {movements.length > 0 && (
             <Flex w={"180px"} h={"31px"} border={"1px solid white"} position={"relative"}>
               <Box w={`${(movements.length / 500) * 100}%`} bg={"green"} />
               <Box bg={"gray"} />
-              <Text className={styles.moveMouseTip}>move mouse</Text>
+              <Text className={styles.moveMouseTip}>move and rotate</Text>
             </Flex>
           )}
         </>

@@ -32,6 +32,26 @@
     position: relative;
 }
 
+.mobileButton {
+    display: flex;
+    padding: 4px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 180px;
+    /*align-self: stretch;*/
+    border: 0.5px solid #f1e3bf;
+    /*border-radius: 50%;*/
+    background: #00a341;
+    color: #fff;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+    height: 31px;
+    position: relative;
+}
+
 .commitButton:disabled {
     border: 1px solid #F1E3BF;
     opacity: 0.3;
