@@ -30,8 +30,8 @@ const HeatMap = ({
       borderBottomStyle={bottomBorder.includes(index) && showStrikeZone ? "solid" : "none"}
     >
       <Box
-        height="20px"
-        width="20px"
+        height={{ base: "10px", lg: "20px" }}
+        width={{ base: "10px", lg: "20px" }}
         display="flex"
         alignItems="center"
         justifyContent="center"
