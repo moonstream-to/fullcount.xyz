@@ -16,7 +16,8 @@ import {
     AtBat,
     Pitch,
     Swing,
-    Outcome
+    Outcome,
+    AtBatOutcome
 } from "./data.sol";
 
 /*
@@ -61,10 +62,12 @@ contract Fullcount is EIP712 {
 
     uint256 public NumSessions;
 
-    uint256[7] public Distance0Distribution = [0, 0, 4458, 1408, 126, 1008, 3000];
-    uint256[7] public Distance1Distribution = [500, 0, 3185, 1005, 90, 720, 4500];
-    uint256[7] public Distance2Distribution = [2000, 0, 1910, 603, 55, 432, 5000];
-    uint256[7] public DistanceGT2Distribution = [6000, 0, 636, 201, 19, 144, 3000];
+    uint256[8] public Distance0Distribution = [0, 0, 0, 4458, 1408, 126, 1008, 3000];
+    uint256[8] public Distance1Distribution = [500, 0, 500, 3185, 1005, 90, 720, 4000];
+    uint256[8] public Distance2Distribution = [1500, 0, 1500, 1910, 603, 55, 432, 4000];
+    uint256[8] public Distance3Distribution = [4500, 0, 1500, 736, 241, 23, 0, 3000];
+    uint256[8] public Distance4Distribution = [6000, 0, 1000, 0, 0, 0, 0, 3000];
+    uint256[8] public DistanceGT4Distribution = [10_000, 0, 0, 0, 0, 0, 0, 0];
 
     // Session ID => session state
     // NOTE: Sessions are 1-indexed
@@ -77,7 +80,8 @@ contract Fullcount is EIP712 {
 
     uint256 public NumAtBats;
     mapping(uint256 => AtBat) public AtBatState;
-    mapping(uint256 => uint256[]) AtBatSessions;
+    mapping(uint256 => uint256[]) public AtBatSessions;
+    mapping(uint256 => uint256) public SessionAtBat;
 
     event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event SessionStarted(
@@ -113,6 +117,10 @@ contract Fullcount is EIP712 {
 
     function getAtBat(uint256 atBatID) external view returns (AtBat memory) {
         return AtBatState[atBatID];
+    }
+
+    function getNumberOfSessionsInAtBat(uint256 atBatID) external view returns (uint256) {
+        return AtBatSessions[atBatID].length;
     }
 
     /**
@@ -302,6 +310,7 @@ contract Fullcount is EIP712 {
 
         uint256 firstSession = _startSession(nftAddress, tokenID, role);
         AtBatSessions[NumAtBats] = [firstSession];
+        SessionAtBat[firstSession] = NumAtBats;
 
         // Emit start at-bat event.
 
@@ -331,6 +340,58 @@ contract Fullcount is EIP712 {
         _joinSession(firstSession, nftAddress, tokenID);
 
         // Emit join at-bat event.
+    }
+
+    function _progressAtBat(uint256 finishedSessionID) internal {
+        uint256 atBatID = SessionAtBat[finishedSessionID];
+        if (atBatID == 0) return;
+
+        Session memory finishedSession = SessionState[finishedSessionID];
+
+        // TODO Update AtBatState
+        AtBat storage atBat = AtBatState[atBatID];
+
+        uint256 sessionOutcome = uint256(finishedSession.outcome);
+        if (sessionOutcome == uint256(Outcome.Strike)) {
+            if (atBat.strikes >= 2) {
+                atBat.outcome = AtBatOutcome.Strikeout;
+            } else {
+                atBat.strikes++;
+                _startNextAtBatSession(atBatID, finishedSession);
+            }
+        } else if (sessionOutcome == uint256(Outcome.Ball)) {
+            if (atBat.balls >= 3) {
+                atBat.outcome = AtBatOutcome.Walk;
+            } else {
+                atBat.balls++;
+                _startNextAtBatSession(atBatID, finishedSession);
+            }
+        } else if (sessionOutcome == uint256(Outcome.Foul)) {
+            if (atBat.strikes < 2) {
+                atBat.strikes++;
+            }
+            _startNextAtBatSession(atBatID, finishedSession);
+        } else if (sessionOutcome == uint256(Outcome.Single)) {
+            atBat.outcome = AtBatOutcome.Single;
+        } else if (sessionOutcome == uint256(Outcome.Double)) {
+            atBat.outcome = AtBatOutcome.Double;
+        } else if (sessionOutcome == uint256(Outcome.Triple)) {
+            atBat.outcome = AtBatOutcome.Triple;
+        } else if (sessionOutcome == uint256(Outcome.HomeRun)) {
+            atBat.outcome = AtBatOutcome.HomeRun;
+        } else if (sessionOutcome == uint256(Outcome.InPlayOut)) {
+            atBat.outcome = AtBatOutcome.InPlayOut;
+        }
+    }
+
+    function _startNextAtBatSession(uint256 atBatID, Session memory previousSession) internal {
+        uint256 nextSessionID =
+            _startSession(previousSession.pitcherNFT.nftAddress, previousSession.pitcherNFT.tokenID, PlayerType.Pitcher);
+        _joinSession(nextSessionID, previousSession.batterNFT.nftAddress, previousSession.batterNFT.tokenID);
+
+        uint256[] storage sessionList = AtBatSessions[atBatID];
+        sessionList.push(nextSessionID);
+        SessionAtBat[nextSessionID] = atBatID;
     }
 
     // TODO Change name of function as tokens are no longer staked?
@@ -519,43 +580,48 @@ contract Fullcount is EIP712 {
     function sampleOutcomeFromDistribution(
         uint256 nonce0,
         uint256 nonce1,
-        uint256[7] memory distribution
+        uint256[8] memory distribution
     )
         public
         pure
         returns (Outcome)
     {
         uint256 totalMass = distribution[0] + distribution[1] + distribution[2] + distribution[3] + distribution[4]
-            + distribution[5] + distribution[6];
+            + distribution[5] + distribution[6] + distribution[7];
 
         uint256 sample = _randomSample(nonce0, nonce1, totalMass);
 
         uint256 cumulativeMass = distribution[0];
         if (sample < cumulativeMass) {
-            return Outcome.Strikeout;
+            return Outcome.Strike;
         }
 
         cumulativeMass += distribution[1];
         if (sample < cumulativeMass) {
-            return Outcome.Walk;
+            return Outcome.Ball;
         }
 
         cumulativeMass += distribution[2];
         if (sample < cumulativeMass) {
-            return Outcome.Single;
+            return Outcome.Foul;
         }
 
         cumulativeMass += distribution[3];
         if (sample < cumulativeMass) {
-            return Outcome.Double;
+            return Outcome.Single;
         }
 
         cumulativeMass += distribution[4];
         if (sample < cumulativeMass) {
-            return Outcome.Triple;
+            return Outcome.Double;
         }
 
         cumulativeMass += distribution[5];
+        if (sample < cumulativeMass) {
+            return Outcome.Triple;
+        }
+
+        cumulativeMass += distribution[6];
         if (sample < cumulativeMass) {
             return Outcome.HomeRun;
         }
@@ -603,9 +669,9 @@ contract Fullcount is EIP712 {
                     || pitch.horizontal == HorizontalLocation.InsideBall
                     || pitch.horizontal == HorizontalLocation.OutsideBall
             ) {
-                return Outcome.Walk;
+                return Outcome.Ball;
             } else {
-                return Outcome.Strikeout;
+                return Outcome.Strike;
             }
         }
 
@@ -616,9 +682,13 @@ contract Fullcount is EIP712 {
             return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance1Distribution);
         } else if (dist == 2) {
             return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance2Distribution);
+        } else if (dist == 3) {
+            return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance3Distribution);
+        } else if (dist == 4) {
+            return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, Distance4Distribution);
         }
 
-        return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, DistanceGT2Distribution);
+        return sampleOutcomeFromDistribution(pitch.nonce, swing.nonce, DistanceGT4Distribution);
     }
 
     function revealPitch(
@@ -673,6 +743,8 @@ contract Fullcount is EIP712 {
             session.batterLeftSession = true;
             StakedSession[session.pitcherNFT.nftAddress][session.pitcherNFT.tokenID] = 0;
             session.pitcherLeftSession = true;
+
+            _progressAtBat(sessionID);
         }
     }
 
@@ -729,5 +801,7 @@ contract Fullcount is EIP712 {
             StakedSession[session.pitcherNFT.nftAddress][session.pitcherNFT.tokenID] = 0;
             session.pitcherLeftSession = true;
         }
+
+        _progressAtBat(sessionID);
     }
 }

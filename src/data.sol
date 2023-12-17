@@ -85,6 +85,17 @@ enum HorizontalLocation {
  * InPlayOut represents a GroundOut or FlyOut. In the future, we may split this into two outcomes.
  */
 enum Outcome {
+    Strike,
+    Ball,
+    Foul,
+    Single,
+    Double,
+    Triple,
+    HomeRun,
+    InPlayOut
+}
+
+enum AtBatOutcome {
     Strikeout,
     Walk,
     Single,
@@ -142,4 +153,7 @@ struct Session {
 struct AtBat {
     NFT pitcherNFT;
     NFT batterNFT;
+    uint256 balls;
+    uint256 strikes;
+    AtBatOutcome outcome;
 }
