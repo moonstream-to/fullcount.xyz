@@ -70,7 +70,7 @@ export const swingKind = {
 };
 
 const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
-  const [isSmallView] = useMediaQuery("(max-width: 375px)");
+  const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
   const { selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
@@ -259,8 +259,20 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
 
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
+      {isSmallView && (
+        <Flex w={"100%"} justifyContent={"end"}>
+          <Image
+            alt="exit"
+            src={`${FULLCOUNT_ASSETS_PATH}/icons/exit.svg`}
+            h={"20px"}
+            w={"20px"}
+            cursor={"pointer"}
+            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
+          />
+        </Flex>
+      )}
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
-        <Flex w={"150px"} h={"10px"} />
+        {!isSmallView && <Flex w={"20px"} h={"10px"} />}
 
         {(sessionStatus.data?.progress === 3 ||
           sessionStatus.data?.progress === 4 ||
@@ -276,26 +288,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             }
           />
         )}
-        <Flex w={"150px"} justifyContent={"end"}>
-          <Image
-            alt="exit"
-            src={`${FULLCOUNT_ASSETS_PATH}/icons/exit.svg`}
-            h={"20px"}
-            w={"20px"}
-            cursor={"pointer"}
-            onClick={() => updateContext({ selectedSession: undefined, watchingToken: undefined })}
-          />
-        </Flex>
+        {!isSmallView && (
+          <Flex w={"20px"} justifyContent={"end"}>
+            <Image
+              alt="exit"
+              src={`${FULLCOUNT_ASSETS_PATH}/icons/exit.svg`}
+              h={"20px"}
+              w={"20px"}
+              cursor={"pointer"}
+              onClick={() =>
+                updateContext({ selectedSession: undefined, watchingToken: undefined })
+              }
+            />
+          </Flex>
+        )}
       </Flex>
-      {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
-        <Flex w={"1000px"} placeSelf={"center"} minH={"108px"}>
-          <Narrate
-            sessionID={selectedSession?.sessionID ?? 0}
-            speed={1}
-            isComplete={sessionStatus.data.progress === 5}
-          />
-        </Flex>
-      )}
+
       {isSmallView && (
         <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"}>
           <TokenView
@@ -309,9 +317,18 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             width={!isPitcher(selectedToken) ? "300px" : "100px"}
             isPitcher={false}
           />
-            </Flex>
+        </Flex>
       )}
-      <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"}>
+      {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
+        <Flex w={{ base: "320px", lg: "1000px" }} placeSelf={"center"} minH={"108px"}>
+          <Narrate
+            sessionID={selectedSession?.sessionID ?? 0}
+            speed={1}
+            isComplete={sessionStatus.data.progress === 5}
+          />
+        </Flex>
+      )}
+      <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"} w={"100%"}>
         {!isSmallView && (
           <TokenView
             token={pitcher}
@@ -351,61 +368,13 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               }}
             />
           )}
-        <Flex direction={"column"} gap={"20px"}>
-          {!isPitcher(selectedToken) ? (
-            <>
-              {selectedToken && (
-                <Flex direction={"column"} gap="10px" alignItems={"center"}>
-                  <Image
-                    src={selectedToken?.image}
-                    h={"300px"}
-                    w={"300px"}
-                    alt={selectedToken?.name}
-                  />
-                  <Text fontSize={"14px"} fontWeight={"700"}>
-                    {selectedToken.name}
-                  </Text>
-                </Flex>
-              )}
-            </>
-          ) : (
-            <>
-              {opponent ? (
-                <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                  <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
-                  <Text fontSize={"14px"} fontWeight={"700"}>
-                    {opponent?.name}
-                  </Text>
-                </Flex>
-              ) : (
-                <Flex
-                  direction={"column"}
-                  gap="10px"
-                  alignItems={"center"}
-                  className={styles.pitcherGrid}
-                >
-                  <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-                  <Box h={"21px"} w="300px" bg={"transparent"} />
-                </Flex>
-              )}
-            </>
-          )}
-          {batterStats.data ? (
-            <MainStat stats={batterStats.data} isPitcher={false} />
-          ) : (
-            <Flex h={"35px"} />
-          )}
-
-          {swingDistributions.data ? (
-            <HeatMap
-              rates={swingDistributions.data.rates}
-              counts={swingDistributions.data.counts}
-              isPitcher={false}
-            />
-          ) : (
-            <Flex h={"150px"} />
-          )}
-        </Flex>
+        {!isSmallView && (
+          <TokenView
+            token={batter}
+            width={!isPitcher(selectedToken) ? "300px" : "150px"}
+            isPitcher={false}
+          />
+        )}
       </Flex>
     </Flex>
   );

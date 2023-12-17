@@ -88,7 +88,7 @@ const TokenView = ({
     },
   );
 
-  const [isSmallView] = useMediaQuery("(max-width: 375px)");
+  const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
   if (!token) {
     return <></>;

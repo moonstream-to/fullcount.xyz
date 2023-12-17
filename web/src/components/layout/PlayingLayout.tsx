@@ -19,7 +19,7 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       direction="column"
       minH={"100vh"}
       gap={"40px"}
-      p={"0 7% 60px 7%"}
+      p={{ lg: "0 7% 60px 7%", base: "0 10px 80px 10px" }}
       maxW={"1440px"}
       placeSelf={"center"}
       w={"100%"}

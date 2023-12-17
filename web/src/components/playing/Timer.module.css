@@ -26,14 +26,34 @@
     border: 1px solid #FFF;
     background: #1B1B1B;
     flex-direction: column;
+    justify-content: center;
 }
 
 .countLeft {
     display: flex;
     padding: 10px 12px;
     align-items: center;
+    justify-content: space-between;
     gap: 15px;
-    flex: 1 0 0;
+    flex: 0 0 0;
     border: 1px solid #F1E3BF;
     background: #00B94A;
+}
+
+@media (max-width: 1023px) {
+    .countLeft {
+        padding: 2px 4px;
+        gap: 3px;
+    }
+    .timerContainer {
+        padding: 2px 4px;
+    }
+
+    .title {
+        font-size: 10px;
+    }
+
+    .time {
+        font-size: 12px;
+    }
 }

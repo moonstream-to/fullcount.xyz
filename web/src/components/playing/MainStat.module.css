@@ -45,7 +45,7 @@
 
 }
 
-@media (max-width: 375px) {
+@media (max-width: 1023px) {
     /*.container {*/
     /*    !*flex-direction: column;*!*/
     /*    !*max-width: 100px;*!*/
