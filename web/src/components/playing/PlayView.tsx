@@ -1,6 +1,6 @@
 import { useGameContext } from "../../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Box, Flex, Image, Text } from "@chakra-ui/react";
+import { Box, Flex, Image, Text, useMediaQuery } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
@@ -20,6 +20,7 @@ import styles from "./PlayView.module.css";
 import axios from "axios";
 import MainStat from "./MainStat";
 import HeatMap from "./HeatMap";
+import TokenView from "../tokens/TokenView";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -67,6 +68,8 @@ export const swingKind = {
 };
 
 const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
+  const [isSmallView] = useMediaQuery("(max-width: 375px)");
+
   const { selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -273,57 +276,29 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           />
         </Flex>
       </Flex>
-      <Flex alignItems={"center"} justifyContent={"space-between"}>
-        <Flex direction={"column"} gap={"10px"}>
-          {isPitcher(selectedToken) ? (
-            <>
-              {selectedToken && (
-                <Flex direction={"column"} gap="10px" alignItems={"center"}>
-                  <Image
-                    src={selectedToken?.image}
-                    h={"300px"}
-                    w={"300px"}
-                    alt={selectedToken?.name}
-                  />
-                  <Text fontSize={"14px"} fontWeight={"700"}>
-                    {selectedToken.name}
-                  </Text>
-                </Flex>
-              )}
-            </>
-          ) : (
-            <>
-              {opponent ? (
-                <Flex direction={"column"} gap="10px" alignItems={"center"} w={"300px"}>
-                  <Image src={opponent?.image} h={"150px"} w={"150px"} alt={opponent?.name} />
-                  <Text fontSize={"14px"} fontWeight={"700"}>
-                    {opponent?.name}
-                  </Text>
-                </Flex>
-              ) : (
-                <Flex
-                  direction={"column"}
-                  gap="10px"
-                  alignItems={"center"}
-                  className={styles.pitcherGrid}
-                >
-                  <Box w={"300px"} h={"300px"} bg={"#4D4D4D"} border={"1px solid #F1E3BF"} />
-                  <Box h={"21px"} w="300px" bg={"transparent"} />
-                </Flex>
-              )}
-            </>
-          )}
-          {pitcherStats.data && <MainStat stats={pitcherStats.data} isPitcher={true} />}
-
-          {pitchDistributions.data && (
-            <HeatMap
-              rates={pitchDistributions.data.rates}
-              counts={pitchDistributions.data.counts}
-              isPitcher
-            />
-          )}
+      {isSmallView && (
+        <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"}>
+          <TokenView
+            token={pitcher}
+            width={isPitcher(selectedToken) ? "300px" : "100px"}
+            isPitcher={true}
+          />
+          vs
+          <TokenView
+            token={batter}
+            width={!isPitcher(selectedToken) ? "300px" : "100px"}
+            isPitcher={false}
+          />
         </Flex>
-
+      )}
+      <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"}>
+        {!isSmallView && (
+          <TokenView
+            token={pitcher}
+            width={isPitcher(selectedToken) ? "300px" : "100px"}
+            isPitcher={true}
+          />
+        )}
         {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
           <InviteLink session={selectedSession} token={selectedToken} />
         )}
