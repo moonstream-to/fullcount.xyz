@@ -9,9 +9,9 @@ interface TimerProps {
 }
 
 const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
-  const [timeLeft, setTimeLeft] = useState("88:88");
-  const [minutesLeft, setMinutesLeft] = useState("8");
-  const [secondsLeft, setSecondsLeft] = useState("88");
+  const [timeLeft, setTimeLeft] = useState("00:00");
+  const [minutesLeft, setMinutesLeft] = useState("0");
+  const [secondsLeft, setSecondsLeft] = useState("00");
 
   useEffect(() => {
     const updateTimer = () => {
@@ -30,18 +30,13 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
       }
 
       const minutes = Math.floor(remainingTime / 60).toString();
-      // .padStart(2, "0");
       const seconds = (remainingTime % 60).toString().padStart(2, "0");
       setMinutesLeft(minutes);
       setSecondsLeft(seconds);
 
       setTimeLeft(`${minutes}:${seconds}`);
     };
-
-    // Update timer every second
     const intervalId = setInterval(updateTimer, 1000);
-
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, [start, delay]);
 

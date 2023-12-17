@@ -7,6 +7,10 @@ export const getLocalStorageKey = (
 ) =>
   `${LOCAL_STORAGE_NAMESPACE}-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`;
 
+export const getLocalStorageInviteCodeKey = (contractAddress: string, sessionID: string) =>
+  `${LOCAL_STORAGE_NAMESPACE}-invites-${contractAddress}-${sessionID}`;
+
+
 export const getLocalStorageItem = (key: string) => {
   const item = localStorage.getItem(key) ?? "";
   return item ? JSON.parse(item) : null;

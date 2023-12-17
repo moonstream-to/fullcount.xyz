@@ -44,9 +44,10 @@ const SessionView3 = ({ session }: { session: Session }) => {
           reject(new Error(`Account address isn't set`));
         });
       }
+      const signature = "0x";
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id),
+        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, signature),
       );
     },
     {
@@ -162,7 +163,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           </Flex>
         ) : (
           <>
-            {session.progress === 2 && (
+            {session.progress === 2 && !session.requiresSignature && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
                 {joinSession.isLoading ? <Spinner /> : "join as pitcher"}
               </button>
@@ -181,7 +182,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           </Flex>
         ) : (
           <>
-            {session.progress === 2 && (
+            {session.progress === 2 && !session.requiresSignature && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
                 {joinSession.isLoading ? <Spinner /> : "join as batter"}
               </button>

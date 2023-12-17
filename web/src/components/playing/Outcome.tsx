@@ -1,23 +1,15 @@
 import styles from "./Outcome.module.css";
 import { Box, Flex, Grid, Image, Text } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import GrowingText from "./GrowingText";
 import { pitchSpeed, swingKind } from "./PlayView";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import BallAnimation from "./BallAnimation";
-import { progressMessage } from "../../utils/messages";
 import { Session } from "../../types";
 import BatAnimation from "./BatAnimation";
+import { useGameContext } from "../../contexts/GameContext";
 const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
 const assets = FULLCOUNT_ASSETS_PATH;
-
-const playSound = (sound: string) => {
-  const soundElement = document.getElementById(sound) as HTMLAudioElement;
-  if (!soundElement) {
-    return;
-  }
-  soundElement.play();
-};
 
 interface Swing {
   kind: 0 | 1 | 2;
@@ -71,7 +63,33 @@ const Outcome = ({
   const [isPitchVisible, setIsPitchVisible] = useState(false);
   const [isSwingVisible, setIsSwingVisible] = useState(false);
   const [isOutcomeVisible, setIsOutcomeVisible] = useState(false);
-  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+
+  const { soundVolume } = useGameContext();
+  const soundVolumeRef = useRef(soundVolume);
+  const playingSounds = useRef<{ [key: string]: HTMLAudioElement | undefined }>({}).current;
+
+  const updateVolume = (volume: number) => {
+    Object.values(playingSounds).forEach((soundElement) => {
+      if (soundElement) {
+        soundElement.volume = volume / 100;
+      }
+    });
+  };
+
+  useEffect(() => {
+    soundVolumeRef.current = soundVolume;
+    updateVolume(soundVolume);
+  }, [soundVolume]);
+
+  const playSound = (sound: string) => {
+    const soundElement = document.getElementById(sound) as HTMLAudioElement;
+    if (!soundElement) {
+      return;
+    }
+    soundElement.volume = soundVolumeRef.current / 100;
+    soundElement.play();
+    playingSounds[sound] = soundElement;
+  };
 
   useEffect(() => {
     const start = 3000;
@@ -117,7 +135,6 @@ const Outcome = ({
         }, 7500 + start),
       );
       timers.push(setTimeout(() => playSound("clapping"), 7500 + start));
-      timers.push(setTimeout(() => setIsDescriptionVisible(true), 8500 + start));
     } else {
       setIsSwingKindVisible(false);
       setIsPitchSpeedVisible(false);
@@ -130,7 +147,12 @@ const Outcome = ({
     };
   }, []);
   return (
-    <Flex direction={"column"} h={"700px"} justifyContent={"center"} position={"relative"}>
+    <Flex
+      direction={"column"}
+      justifyContent={"center"}
+      position={"relative"}
+      alignItems={"center"}
+    >
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
         <GrowingText isVisible={isPitchSpeedVisible} right={"110%"} top="-75px" duration={"0.5s"}>
           <Text>{pitchSpeed[pitch.speed]}</Text>
@@ -170,17 +192,6 @@ const Outcome = ({
           w={"300px"}
         >
           {outcomes[outcome].toUpperCase()}!
-        </GrowingText>
-        <GrowingText
-          isVisible={isDescriptionVisible}
-          left={"50%"}
-          top={"130%"}
-          className={styles.result}
-          css={{ transform: "translateX(-50%)" }}
-          textAlign={"center"}
-          w={"300px"}
-        >
-          {progressMessage(session)}
         </GrowingText>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>

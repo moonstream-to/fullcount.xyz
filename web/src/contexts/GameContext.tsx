@@ -17,10 +17,12 @@ interface GameContextProps {
   sessions: Session[] | undefined;
   invitedBy: string;
   invitedTo: number | undefined;
+  inviteCode: string;
   watchingToken: Token | undefined;
   isTokenSelected: boolean;
   tokensCache: Token[];
   sessionOffset: number;
+  soundVolume: number;
 }
 
 interface GameContextType extends GameContextProps {
@@ -28,6 +30,7 @@ interface GameContextType extends GameContextProps {
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
+const SOUND_VOLUME_KEY = "soundVolume";
 
 interface ProviderProps {
   children: ReactNode;
@@ -49,16 +52,31 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     sessions: undefined,
     invitedBy: "",
     invitedTo: undefined,
+    inviteCode: "",
     watchingToken: undefined,
     isTokenSelected: false,
     tokensCache: [],
     sessionOffset: 20,
+    soundVolume: 20,
   });
+
+  useEffect(() => {
+    const storedVolume = localStorage.getItem(SOUND_VOLUME_KEY);
+    if (storedVolume) {
+      setContextState((prevState) => ({
+        ...prevState,
+        soundVolume: Number(storedVolume),
+      }));
+    }
+  }, []);
 
   const updateContext = (newState: Partial<GameContextProps>) => {
     setContextState((prevState) => {
       const isTokenSelected =
         prevState.isTokenSelected || !!newState.selectedToken || !!prevState.selectedToken;
+      if (newState.soundVolume !== undefined && newState.soundVolume !== prevState.soundVolume) {
+        localStorage.setItem(SOUND_VOLUME_KEY, newState.soundVolume.toString());
+      }
       return { ...prevState, ...newState, isTokenSelected };
     });
   };
