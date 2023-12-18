@@ -24,6 +24,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
   const [kind, setKind] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isCommitted, setIsCommitted] = useState(false);
   const [nonce, setNonce] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
@@ -109,6 +110,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
     },
     {
       onSuccess: () => {
+        setIsCommitted(true);
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
       },
@@ -198,7 +200,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
           />
         </>
       )}
-      {!!nonce && !sessionStatus.didBatterCommit && (
+      {!!nonce && !sessionStatus.didBatterCommit && !isCommitted && (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}

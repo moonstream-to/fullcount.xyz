@@ -30,6 +30,8 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
   const [speed, setSpeed] = useState(0);
   const [gridIndex, setGridIndex] = useState(12);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isCommitted, setIsCommitted] = useState(false);
+
   const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
   const { selectedSession, contractAddress, selectedToken } = useGameContext();
@@ -100,6 +102,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
       onSuccess: () => {
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
+        setIsCommitted(true);
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -178,7 +181,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
           />
         </>
       )}
-      {!!nonce && !sessionStatus.didPitcherCommit && (
+      {!!nonce && !sessionStatus.didPitcherCommit && !isCommitted && (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}
