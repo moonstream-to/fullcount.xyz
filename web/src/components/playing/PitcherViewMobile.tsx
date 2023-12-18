@@ -28,7 +28,7 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [speed, setSpeed] = useState(0);
-  const [gridIndex, setGridIndex] = useState(11);
+  const [gridIndex, setGridIndex] = useState(12);
   const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
@@ -194,6 +194,12 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
             {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
           </button>
         )}
+      {sessionStatus.didPitcherCommit && !sessionStatus.didBatterCommit && (
+        <Text>Waiting batter to commit</Text>
+      )}
+      {sessionStatus.didPitcherReveal && !sessionStatus.didBatterReveal && (
+        <Text>Waiting batter to reveal</Text>
+      )}
     </Flex>
   );
 };

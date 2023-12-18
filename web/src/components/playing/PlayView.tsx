@@ -344,7 +344,13 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           !sessionStatus.data?.isExpired && (
             <>
               {isPitcher(selectedToken) && sessionStatus.data && (
-                <PitcherViewMobile sessionStatus={sessionStatus.data} />
+                <>
+                  {isSmallView ? (
+                    <PitcherViewMobile sessionStatus={sessionStatus.data} />
+                  ) : (
+                    <PitcherView sessionStatus={sessionStatus.data} />
+                  )}
+                </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
                 <BatterView2 sessionStatus={sessionStatus.data} />
