@@ -429,7 +429,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               </Popover>
               <Popover placement="top">
                 <PopoverTrigger>
-                  <button className={globalStyles.button} style={{ width: "70px" }}>
+                  <button className={globalStyles.button} style={{ width: "69px" }}>
                     <Image src={`${assets}/bat2.png`} h={"24px"} w={"24px"} alt={"o"} />
                   </button>
                 </PopoverTrigger>
@@ -480,7 +480,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           </Flex>
         )}
         {selectedToken && selectedToken.isStaked && (
-          <Flex direction={"column"} minH={"229px"} mr={"-5px"}>
+          <Flex direction={"column"} minH={"229px"} minW={"139px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
             {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
               <button
@@ -505,8 +505,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   <CharacterCard
                     token={token}
                     isActive={false}
-                    w={"70px"}
-                    h={"85px"}
+                    w={"75px"}
+                    h={"75px"}
                     showName={false}
                     isClickable={true}
                     border={
@@ -541,8 +541,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
               ))}
           {ownedTokens.data && ownedTokens.data.length > 0 && (
             <Flex
-              w={"70px"}
-              h={"85px"}
+              w={"75px"}
+              h={"75px"}
               className={styles.mintCard}
               onClick={onOpen}
               cursor={"pointer"}
