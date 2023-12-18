@@ -13,7 +13,7 @@ When a player joins a session, they make two strategic decisions:
 ⠀
 The 25 pitch and swing placement options are  represented on a 5x5 grid. The central nine squares represent the strike zone. 
 
-![strike zone grid]([strike_zone_grid.png]([https://drive.google.com/file/d/1IoDfo6XelVJZcOnZOUF8XFJdRn6Obgbe/view?usp=drive_link](https://static.greatwyrm.xyz/test/strikezone_grid.png)))
+![A five by five grid; the nine center squares are green](https://static.greatwyrm.xyz/test/strikezone_grid.png "strike zone grid")
 
 Each player also generates a random number by moving their mouse for a required amount of time.
 
