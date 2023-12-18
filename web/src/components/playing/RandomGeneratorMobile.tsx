@@ -100,7 +100,9 @@ const RandomGeneratorMobile = ({
     <>
       {isActive && (
         <>
-          {moved}
+          <Text fontSize={"12px"} mb={"-5px"} color={"#bdbdbd"}>
+            Tap and rotate to generate pitch
+          </Text>
           {movements.length === 0 && (
             <button className={globalStyles.commitButton} onClick={handleGenerate}>
               Tap
@@ -110,7 +112,7 @@ const RandomGeneratorMobile = ({
             <Flex w={"180px"} h={"31px"} border={"1px solid white"} position={"relative"}>
               <Box w={`${(movements.length / MOVEMENTS_NUMBER) * 100}%`} bg={"green"} />
               <Box bg={"gray"} />
-              <Text className={styles.moveMouseTip}>Move and rotate your device</Text>
+              <Text className={styles.moveMouseTip}>rotate your device</Text>
             </Flex>
           )}
         </>
