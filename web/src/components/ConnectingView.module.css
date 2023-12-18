@@ -29,6 +29,7 @@
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  text-align: center;
 }
 
 .text {
@@ -39,4 +40,13 @@
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+}
+
+@media (max-width: 1023px) {
+  .container {
+    width: 90%;
+  }
+  .text {
+    width: 100%;
+  }
 }

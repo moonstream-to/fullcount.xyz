@@ -57,11 +57,15 @@ const CharacterCard = ({
       }}
       cursor={isClickable ? "pointer" : "default"}
     >
-      <audio id="selectSound" src={soundSrc} preload={"auto"}></audio>
-      <Image h={"137px"} w={"137px"} alt={""} src={token.image} />
+      <Image
+        h={{ base: "137px", lg: "137px" }}
+        w={{ base: "137px", lg: "137px" }}
+        alt={""}
+        src={token.image}
+      />
       {(showName || isActive || children) && (
         <Flex className={styles.bottom}>
-          {showName && <Text maxW={"137px"}>{token.name}</Text>}
+          {showName && <Text maxW={{ base: "137px", lg: "137px" }}>{token.name}</Text>}
           {isActive && (
             <button className={globalStyles.button} onClick={handleClick}>
               Play

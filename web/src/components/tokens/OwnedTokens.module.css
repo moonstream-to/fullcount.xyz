@@ -29,6 +29,9 @@
   gap: 15px;
   row-gap: 15px;
   flex-wrap: wrap;
+    justify-content: center;
+
+
 }
 
 .button {
