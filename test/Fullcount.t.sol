@@ -207,9 +207,9 @@ contract FullcountTestBase is Test {
 contract FullcountTestDeployment is FullcountTestBase {
     function test_Deployment() public {
         vm.expectEmit();
-        emit FullcountDeployed("0.0.4", secondsPerPhase);
+        emit FullcountDeployed("0.1.0", secondsPerPhase);
         Fullcount newGame = new Fullcount(secondsPerPhase);
-        assertEq(newGame.FullcountVersion(), "0.0.4");
+        assertEq(newGame.FullcountVersion(), "0.1.0");
         assertEq(newGame.SecondsPerPhase(), secondsPerPhase);
         assertEq(newGame.NumSessions(), 0);
     }

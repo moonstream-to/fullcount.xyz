@@ -56,7 +56,7 @@ Functionality:
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract Fullcount is EIP712 {
-    string public constant FullcountVersion = "0.0.4";
+    string public constant FullcountVersion = "0.1.0";
 
     uint256 public SecondsPerPhase;
 
@@ -298,6 +298,8 @@ contract Fullcount is EIP712 {
     {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
 
+        // TODO Signature stuff
+
         NumAtBats++;
 
         if (role == PlayerType.Pitcher) {
@@ -312,7 +314,7 @@ contract Fullcount is EIP712 {
         AtBatSessions[NumAtBats] = [firstSession];
         SessionAtBat[firstSession] = NumAtBats;
 
-        // Emit start at-bat event.
+        // TODO Emit start at-bat event.
 
         return NumAtBats;
     }
@@ -339,55 +341,84 @@ contract Fullcount is EIP712 {
 
         _joinSession(firstSession, nftAddress, tokenID);
 
-        // Emit join at-bat event.
+        // TODO Emit join at-bat event.
     }
 
     function _progressAtBat(uint256 finishedSessionID) internal {
         uint256 atBatID = SessionAtBat[finishedSessionID];
         if (atBatID == 0) return;
 
-        Session memory finishedSession = SessionState[finishedSessionID];
+        Session storage finishedSession = SessionState[finishedSessionID];
 
         // TODO Update AtBatState
         AtBat storage atBat = AtBatState[atBatID];
 
-        uint256 sessionOutcome = uint256(finishedSession.outcome);
-        if (sessionOutcome == uint256(Outcome.Strike)) {
+        if (finishedSession.outcome == Outcome.Strike) {
             if (atBat.strikes >= 2) {
                 atBat.outcome = AtBatOutcome.Strikeout;
             } else {
                 atBat.strikes++;
-                _startNextAtBatSession(atBatID, finishedSession);
+                _startNextAtBatSession(
+                    atBatID,
+                    finishedSession.pitcherNFT.nftAddress,
+                    finishedSession.pitcherNFT.tokenID,
+                    finishedSession.batterNFT.nftAddress,
+                    finishedSession.batterNFT.tokenID
+                );
             }
-        } else if (sessionOutcome == uint256(Outcome.Ball)) {
+        } else if (finishedSession.outcome == Outcome.Ball) {
             if (atBat.balls >= 3) {
                 atBat.outcome = AtBatOutcome.Walk;
             } else {
                 atBat.balls++;
-                _startNextAtBatSession(atBatID, finishedSession);
+                _startNextAtBatSession(
+                    atBatID,
+                    finishedSession.pitcherNFT.nftAddress,
+                    finishedSession.pitcherNFT.tokenID,
+                    finishedSession.batterNFT.nftAddress,
+                    finishedSession.batterNFT.tokenID
+                );
             }
-        } else if (sessionOutcome == uint256(Outcome.Foul)) {
+        } else if (finishedSession.outcome == Outcome.Foul) {
             if (atBat.strikes < 2) {
                 atBat.strikes++;
             }
-            _startNextAtBatSession(atBatID, finishedSession);
-        } else if (sessionOutcome == uint256(Outcome.Single)) {
+            _startNextAtBatSession(
+                atBatID,
+                finishedSession.pitcherNFT.nftAddress,
+                finishedSession.pitcherNFT.tokenID,
+                finishedSession.batterNFT.nftAddress,
+                finishedSession.batterNFT.tokenID
+            );
+        } else if (finishedSession.outcome == Outcome.Single) {
             atBat.outcome = AtBatOutcome.Single;
-        } else if (sessionOutcome == uint256(Outcome.Double)) {
+        } else if (finishedSession.outcome == Outcome.Double) {
             atBat.outcome = AtBatOutcome.Double;
-        } else if (sessionOutcome == uint256(Outcome.Triple)) {
+        } else if (finishedSession.outcome == Outcome.Triple) {
             atBat.outcome = AtBatOutcome.Triple;
-        } else if (sessionOutcome == uint256(Outcome.HomeRun)) {
+        } else if (finishedSession.outcome == Outcome.HomeRun) {
             atBat.outcome = AtBatOutcome.HomeRun;
-        } else if (sessionOutcome == uint256(Outcome.InPlayOut)) {
+        } else if (finishedSession.outcome == Outcome.InPlayOut) {
             atBat.outcome = AtBatOutcome.InPlayOut;
         }
+
+        // TODO Fire an at-bat progress event so that we don't need to rebuild the at-bat from sessions. AtBatID should
+        // be indexed in the event.
+
+        // TODO Fire an event for the at-bat outcome
     }
 
-    function _startNextAtBatSession(uint256 atBatID, Session memory previousSession) internal {
-        uint256 nextSessionID =
-            _startSession(previousSession.pitcherNFT.nftAddress, previousSession.pitcherNFT.tokenID, PlayerType.Pitcher);
-        _joinSession(nextSessionID, previousSession.batterNFT.nftAddress, previousSession.batterNFT.tokenID);
+    function _startNextAtBatSession(
+        uint256 atBatID,
+        address pitcherNFTAddress,
+        uint256 pitcherTokenID,
+        address batterNFTAddress,
+        uint256 batterTokenID
+    )
+        internal
+    {
+        uint256 nextSessionID = _startSession(pitcherNFTAddress, pitcherTokenID, PlayerType.Pitcher);
+        _joinSession(nextSessionID, batterNFTAddress, batterTokenID);
 
         uint256[] storage sessionList = AtBatSessions[atBatID];
         sessionList.push(nextSessionID);
@@ -800,8 +831,8 @@ contract Fullcount is EIP712 {
             session.batterLeftSession = true;
             StakedSession[session.pitcherNFT.nftAddress][session.pitcherNFT.tokenID] = 0;
             session.pitcherLeftSession = true;
-        }
 
-        _progressAtBat(sessionID);
+            _progressAtBat(sessionID);
+        }
     }
 }
