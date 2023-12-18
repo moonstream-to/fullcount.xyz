@@ -83,6 +83,8 @@ contract Fullcount is EIP712 {
     mapping(uint256 => uint256[]) public AtBatSessions;
     mapping(uint256 => uint256) public SessionAtBat;
 
+    mapping(uint256 => bool) public AtBatRequiresSignature;
+
     event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
@@ -166,7 +168,12 @@ contract Fullcount is EIP712 {
     }
 
     function sessionHash(uint256 sessionID) public view returns (bytes32) {
-        bytes32 structHash = keccak256(abi.encode(keccak256("SessionMessage(uint256 session)"), uint256(sessionID)));
+        bytes32 structHash = keccak256(abi.encode(keccak256("SessionMessage(uint256 sessionID)"), uint256(sessionID)));
+        return _hashTypedDataV4(structHash);
+    }
+
+    function atBatHash(uint256 atBatID) public view returns (bytes32) {
+        bytes32 structHash = keccak256(abi.encode(keccak256("AtBatMessage(uint256 atBatID)"), uint256(atBatID)));
         return _hashTypedDataV4(structHash);
     }
 
@@ -314,13 +321,15 @@ contract Fullcount is EIP712 {
         AtBatSessions[NumAtBats] = [firstSession];
         SessionAtBat[firstSession] = NumAtBats;
 
+        AtBatRequiresSignature[NumAtBats] = requireSignature;
+
         // TODO Emit start at-bat event.
 
         return NumAtBats;
     }
 
     function joinAtBat(uint256 atBatID, address nftAddress, uint256 tokenID, bytes memory signature) external virtual {
-        require(atBatID <= NumAtBats, "Fullcount.joinAtBat: atBat does not exist");
+        require(atBatID <= NumAtBats, "Fullcount.joinAtBat: AtBat does not exist");
 
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount.joinAtBat: msg.sender is not NFT owner");
 
@@ -328,6 +337,23 @@ contract Fullcount is EIP712 {
         require(firstSession > 0, "Fullcount.joinAtBat: AtBat doesn't have a session");
 
         AtBat storage atBat = AtBatState[atBatID];
+
+        if (AtBatRequiresSignature[atBatID]) {
+            address atBatStarter;
+            if (atBat.pitcherNFT.nftAddress != address(0)) {
+                atBatStarter = IERC721(atBat.pitcherNFT.nftAddress).ownerOf(atBat.pitcherNFT.tokenID);
+            } else if (atBat.batterNFT.nftAddress != address(0)) {
+                atBatStarter = IERC721(atBat.batterNFT.nftAddress).ownerOf(atBat.batterNFT.tokenID);
+            } else {
+                revert("Fullcount.joinAtBat: idiot programmer");
+            }
+
+            bytes32 atBatMessageHash = atBatHash(atBatID);
+            require(
+                SignatureChecker.isValidSignatureNow(atBatStarter, atBatMessageHash, signature),
+                "Fullcount.joinAtBat: invalid signature in AtBat requiring signature to join."
+            );
+        }
 
         PlayerType role = PlayerType.Pitcher;
         if (atBat.batterNFT.nftAddress == address(0)) {

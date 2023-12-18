@@ -1637,12 +1637,6 @@ contract FullcountTest_unstake is FullcountTestBase {
 }
 
 contract FullcountTest_inviteOnly is FullcountTestBase {
-    uint256 SessionID;
-    address PitcherNFTAddress;
-    uint256 PitcherTokenID;
-    address BatterNFTAddress;
-    uint256 BatterTokenID;
-
     function test_as_batter() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;

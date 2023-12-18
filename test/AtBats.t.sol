@@ -168,7 +168,7 @@ contract FullcountTest_joinAtBat is FullcountTestBase {
     }
 }
 
-contract FullcountTest_nextSession is FullcountTestBase {
+contract FullcountTest_ballsAndStrikes is FullcountTestBase {
     uint256 AtBatID;
     address PitcherNFTAddress;
     uint256 PitcherTokenID;
@@ -804,5 +804,171 @@ contract FullcountTest_nextSession is FullcountTestBase {
         atBat = game.getAtBat(AtBatID);
         assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 0);
+    }
+}
+
+contract FullcountTest_atBatInviteOnly is FullcountTestBase {
+    function test_as_batter() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+        uint256 initialNumAtBats = game.NumAtBats();
+
+        vm.startPrank(player1);
+
+        uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, true);
+
+        vm.stopPrank();
+
+        bytes32 atBatMessageHash = game.atBatHash(atBatID);
+        bytes memory signature = signMessageHash(player1PrivateKey, atBatMessageHash);
+
+        vm.startPrank(player2);
+
+        game.joinAtBat(atBatID, address(otherCharacterNFTs), otherTokenID, signature);
+
+        vm.stopPrank();
+
+        uint256 terminalNumSessions = game.NumSessions();
+        uint256 terminalNumAtBats = game.NumAtBats();
+
+        assertEq(terminalNumSessions, initialNumSessions + 1);
+        assertEq(terminalNumAtBats, initialNumAtBats + 1);
+
+        AtBat memory atBat = game.getAtBat(atBatID);
+        assertEq(atBat.batterNFT.nftAddress, address(characterNFTs));
+        assertEq(atBat.batterNFT.tokenID, tokenID);
+        assertEq(atBat.pitcherNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(atBat.pitcherNFT.tokenID, otherTokenID);
+    }
+
+    function test_as_pitcher() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+        uint256 initialNumAtBats = game.NumAtBats();
+
+        vm.startPrank(player1);
+
+        uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, true);
+
+        vm.stopPrank();
+
+        bytes32 atBatMessageHash = game.atBatHash(atBatID);
+        bytes memory signature = signMessageHash(player1PrivateKey, atBatMessageHash);
+
+        vm.startPrank(player2);
+
+        game.joinAtBat(atBatID, address(otherCharacterNFTs), otherTokenID, signature);
+
+        vm.stopPrank();
+
+        uint256 terminalNumSessions = game.NumSessions();
+        uint256 terminalNumAtBats = game.NumAtBats();
+
+        assertEq(terminalNumSessions, initialNumSessions + 1);
+        assertEq(terminalNumAtBats, initialNumAtBats + 1);
+
+        AtBat memory atBat = game.getAtBat(atBatID);
+        assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(atBat.pitcherNFT.tokenID, tokenID);
+        assertEq(atBat.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(atBat.batterNFT.tokenID, otherTokenID);
+    }
+
+    function testRevert_if_wrong_signer() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+        uint256 initialNumAtBats = game.NumAtBats();
+
+        vm.startPrank(player1);
+
+        uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, true);
+
+        vm.stopPrank();
+
+        bytes32 atBatMessageHash = game.atBatHash(atBatID);
+        bytes memory signature = signMessageHash(player2PrivateKey, atBatMessageHash);
+
+        vm.startPrank(player2);
+
+        vm.expectRevert("Fullcount.joinAtBat: invalid signature in AtBat requiring signature to join.");
+        game.joinAtBat(atBatID, address(otherCharacterNFTs), otherTokenID, signature);
+
+        vm.stopPrank();
+
+        uint256 terminalNumSessions = game.NumSessions();
+        uint256 terminalNumAtBats = game.NumAtBats();
+
+        assertEq(terminalNumSessions, initialNumSessions + 1);
+        assertEq(terminalNumAtBats, initialNumAtBats + 1);
+
+        AtBat memory atBat = game.getAtBat(atBatID);
+        assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(atBat.pitcherNFT.tokenID, tokenID);
+        assertEq(atBat.batterNFT.nftAddress, address(0));
+        assertEq(atBat.batterNFT.tokenID, 0);
+    }
+
+    function testRevert_if_invalid_signature() public {
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        uint256 initialNumSessions = game.NumSessions();
+        uint256 initialNumAtBats = game.NumAtBats();
+
+        uint256 startJoinOffsetSeconds = 5;
+
+        vm.startPrank(player1);
+
+        uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, true);
+
+        vm.stopPrank();
+
+        bytes32 atBatMessageHash = game.atBatHash(12_345);
+        bytes memory signature = signMessageHash(player1PrivateKey, atBatMessageHash);
+
+        vm.startPrank(player2);
+
+        vm.expectRevert("Fullcount.joinAtBat: invalid signature in AtBat requiring signature to join.");
+        game.joinAtBat(atBatID, address(otherCharacterNFTs), otherTokenID, signature);
+
+        vm.stopPrank();
+
+        assertEq(game.NumSessions(), initialNumSessions + 1);
+
+        AtBat memory atBat = game.getAtBat(atBatID);
+        assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(atBat.pitcherNFT.tokenID, tokenID);
+        assertEq(atBat.batterNFT.nftAddress, address(0));
+        assertEq(atBat.batterNFT.tokenID, 0);
     }
 }
