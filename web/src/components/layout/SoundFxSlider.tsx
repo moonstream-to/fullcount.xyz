@@ -6,7 +6,7 @@ const SoundFxSlider = () => {
 
   return (
     <Flex gap={"10px"} p={"10px"} border={"1px solid #4D4D4D"}>
-      <Text>Sound FX</Text>
+      <Text whiteSpace={"nowrap"}>Sound FX</Text>
       <Slider
         aria-label="slider-ex-4"
         value={soundVolume}
