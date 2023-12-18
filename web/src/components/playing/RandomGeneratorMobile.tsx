@@ -4,7 +4,7 @@ import Web3 from "web3";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 
-const MOVEMENTS_NUMBER = 500;
+const MOVEMENTS_NUMBER = 1500;
 
 const RandomGeneratorMobile = ({
   isActive,
@@ -28,23 +28,25 @@ const RandomGeneratorMobile = ({
       DeviceMotionEvent.requestPermission();
     }
     window.addEventListener("devicemotion", handleDeviceMotion);
-    window.addEventListener("deviceorientation", handleOrientation);
+    // window.addEventListener("deviceorientation", handleOrientation);
     setMovements((prevMovements) => [...prevMovements, 0, 0]);
   };
 
   const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
     const { acceleration, rotationRate } = event;
     setMoved("Moved");
-    if (acceleration && rotationRate) {
-      setMovements((prevMovements) => [
-        ...prevMovements,
-        acceleration.x || 0,
-        acceleration.y || 0,
-        acceleration.z || 0,
-        rotationRate.alpha || 0,
-        rotationRate.beta || 0,
-        rotationRate.gamma || 0,
-      ]);
+    if (Math.random() < 0.1) {
+      if (acceleration && rotationRate) {
+        setMovements((prevMovements) => [
+          ...prevMovements,
+          acceleration.x || 0,
+          acceleration.y || 0,
+          acceleration.z || 0,
+          rotationRate.alpha || 0,
+          rotationRate.beta || 0,
+          rotationRate.gamma || 0,
+        ]);
+      }
     }
   }, []);
 
@@ -89,7 +91,7 @@ const RandomGeneratorMobile = ({
   useEffect(() => {
     if (movements.length >= MOVEMENTS_NUMBER) {
       window.removeEventListener("devicemotion", handleDeviceMotion);
-      window.removeEventListener("deviceorientation", handleOrientation);
+      // window.removeEventListener("deviceorientation", handleOrientation);
 
       generateSeed(movements);
       setMovements([]);
