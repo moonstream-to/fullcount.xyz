@@ -24,6 +24,7 @@ import TokenView from "../tokens/TokenView";
 import Narrate from "./Narrate";
 import { IoExitOutline } from "react-icons/all";
 import PitcherViewMobile from "./PitcherViewMobile";
+import BatterViewMobile from "./BatterViewMobile";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -353,7 +354,13 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
-                <BatterView2 sessionStatus={sessionStatus.data} />
+                <>
+                  {isSmallView ? (
+                    <BatterViewMobile sessionStatus={sessionStatus.data} />
+                  ) : (
+                    <BatterView2 sessionStatus={sessionStatus.data} />
+                  )}
+                </>
               )}
             </>
           )}
