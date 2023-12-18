@@ -35,7 +35,7 @@ const RandomGeneratorMobile = ({
   const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
     const { acceleration, rotationRate } = event;
     setMoved("Moved");
-    if (Math.random() < 0.2) {
+    if (Math.random() < 0.8) {
       if (acceleration && rotationRate) {
         const moves = [acceleration.x, acceleration.y, acceleration.z]
           .map((m) => m ?? 0)
