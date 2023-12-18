@@ -168,10 +168,15 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
         {getPitchDescription(speed, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
       </Text>
       {!nonce && !sessionStatus.didPitcherCommit && (
-        <RandomGeneratorMobile
-          isActive={!nonce && !sessionStatus.didPitcherCommit}
-          onChange={(value: string) => setNonce(value)}
-        />
+        <>
+          <Text fontSize={"12px"} mb={"-5px"} color={"#bdbdbd"}>
+            Tap and rotate to generate swing
+          </Text>
+          <RandomGeneratorMobile
+            isActive={!nonce && !sessionStatus.didPitcherCommit}
+            onChange={(value: string) => setNonce(value)}
+          />
+        </>
       )}
       {!!nonce && !sessionStatus.didPitcherCommit && (
         <button
@@ -185,12 +190,9 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
       )}
       {sessionStatus.didPitcherCommit &&
         sessionStatus.didBatterCommit &&
-        !sessionStatus.didPitcherReveal && (
-          <button
-            className={globalStyles.mobileButton}
-            onClick={handleReveal}
-            disabled={sessionStatus.progress !== 4 || sessionStatus.didPitcherReveal}
-          >
+        !sessionStatus.didPitcherReveal &&
+        !isRevealed && (
+          <button className={globalStyles.mobileButton} onClick={handleReveal}>
             {revealPitch.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
           </button>
         )}

@@ -100,9 +100,6 @@ const RandomGeneratorMobile = ({
     <>
       {isActive && (
         <>
-          <Text fontSize={"12px"} mb={"-5px"} color={"#bdbdbd"}>
-            Tap and rotate to generate pitch
-          </Text>
           {movements.length === 0 && (
             <button className={globalStyles.commitButton} onClick={handleGenerate}>
               Tap
