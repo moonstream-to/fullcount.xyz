@@ -8,7 +8,12 @@ const SelectToken = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
   return (
     <>
       <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalContent className={styles.container} bg="#1A" minW={"662px"} my={"auto"}>
+        <ModalContent
+          className={styles.container}
+          bg="#1A"
+          minW={{ base: "", lg: "662px" }}
+          my={"auto"}
+        >
           <Text className={styles.message}>
             Bottom of the ninth. <br />
             Bases loaded. Full count.
