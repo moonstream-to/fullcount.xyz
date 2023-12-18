@@ -35,18 +35,16 @@ const RandomGeneratorMobile = ({
   const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
     const { acceleration, rotationRate } = event;
     setMoved("Moved");
-    if (Math.random() < 0.1) {
-      if (acceleration && rotationRate) {
-        setMovements((prevMovements) => [
-          ...prevMovements,
-          acceleration.x || 0,
-          acceleration.y || 0,
-          acceleration.z || 0,
-          rotationRate.alpha || 0,
-          rotationRate.beta || 0,
-          rotationRate.gamma || 0,
-        ]);
-      }
+    if (acceleration && rotationRate) {
+      setMovements((prevMovements) => [
+        ...prevMovements,
+        acceleration.x || 0,
+        acceleration.y || 0,
+        acceleration.z || 0,
+        rotationRate.alpha || 0,
+        rotationRate.beta || 0,
+        rotationRate.gamma || 0,
+      ]);
     }
   }, []);
 
