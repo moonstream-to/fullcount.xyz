@@ -28,6 +28,7 @@ const RandomGeneratorMobile = ({
       DeviceMotionEvent.requestPermission();
     }
     window.addEventListener("devicemotion", handleDeviceMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
     setMovements((prevMovements) => [...prevMovements, 0, 0]);
   };
 
@@ -46,6 +47,17 @@ const RandomGeneratorMobile = ({
       ]);
     }
   }, []);
+
+  function handleOrientation(event: DeviceOrientationEvent) {
+    setMoved("orientation");
+
+    setMovements((prevMovements) => [
+      ...prevMovements,
+      event.alpha || 0,
+      event.beta || 0,
+      event.gamma || 0,
+    ]);
+  }
 
   const generateSeed = (movements: number[]) => {
     const dataString = movements.join("");
@@ -77,6 +89,8 @@ const RandomGeneratorMobile = ({
   useEffect(() => {
     if (movements.length >= MOVEMENTS_NUMBER) {
       window.removeEventListener("devicemotion", handleDeviceMotion);
+      window.removeEventListener("deviceorientation", handleOrientation);
+
       generateSeed(movements);
       setMovements([]);
     }
