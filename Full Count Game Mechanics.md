@@ -28,11 +28,11 @@ To resolve the at bat, the game starts with the distance between the pitch (the 
 
 The vertical and horizontal pitch location are assigned numbers, as follows:
 
-HighBall - 0		InsideBall - 0
-HighStrike - 1		InsideStrike - 1
-Middle - 2		Middle - 2
-LowStrike - 3		OutsideStrike - 3
-LowBall - 4		Outside Ball - 4
+HighBall - 0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;InsideBall - 0 <br />
+HighStrike - 1&nbsp;&nbsp;&nbsp;InsideStrike - 1 <br />
+Middle - 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Middle - 2 <br />
+LowStrike - 3&nbsp;&nbsp;&nbsp;OutsideStrike - 3 <br />
+LowBall - 4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Outside Ball - 4 <br />
 
 The game compares the positions by adding the absolute values of the vertical and horizontal distances between the pitch and the swing.
 
@@ -50,7 +50,7 @@ If the batter chose a swing that does not suit the speed of the pitch, add +1 to
 ### Probabilities and outcomes
 There are eight possible outcomes for an at bat: strikeout, homerun, walk, single, double, triple, foul, and in-play out (fly out, or ground out)
 
-Each distance (~[L1 distance](https://en.wikipedia.org/wiki/Taxicab_geometry)~ + pitch type penalty) comes with a probability distribution that specifies how likely each of those outcomes are for the given scenario. The larger the distance between the pitch and the swing, for example, the higher the chance of a strikeout, and the lower the odds of hitting a home run. 
+Each distance ([L1 distance](https://en.wikipedia.org/wiki/Taxicab_geometry) + pitch type penalty) comes with a probability distribution that specifies how likely each of those outcomes are for the given scenario. The larger the distance between the pitch and the swing, for example, the higher the chance of a strikeout, and the lower the odds of hitting a home run. 
 
 The player-generated randomness determines which outcome actually happens. 
 
