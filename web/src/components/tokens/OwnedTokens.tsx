@@ -39,7 +39,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
   const {
     tokensCache,
-    sessions,
     tokenAddress,
     contractAddress,
     selectedToken,
@@ -339,9 +338,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
   );
 
-  const isPitcherInvited = () =>
-    !sessions?.find((s) => s.sessionID === invitedTo)?.pair.pitcher?.id;
-
   useEffect(() => {
     if (!selectedToken || !ownedTokens.data) return;
     const newSelectedToken = ownedTokens.data.find(
@@ -501,43 +497,32 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             ownedTokens.data
               .filter((t) => !forJoin || !t.isStaked)
               .map((token: OwnedToken, idx: number) => (
-                <Flex direction={"column"} key={idx}>
-                  <CharacterCard
-                    token={token}
-                    isActive={false}
-                    w={"75px"}
-                    h={"75px"}
-                    showName={false}
-                    isClickable={true}
-                    border={
-                      selectedToken?.id === token.id ? "1px solid white" : "1px solid #4D4D4D"
-                    }
-                  />
-                  {forJoin && invitedTo && selectedToken?.id === token.id && (
-                    <button
-                      className={globalStyles.inviteButton}
-                      style={{ width: "70px" }}
-                      onClick={() =>
-                        joinSession.mutate({
-                          sessionID: invitedTo,
-                          token: selectedToken,
-                          inviteCode,
-                        })
-                      }
-                    >
-                      {joinSession.isLoading ? (
-                        <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-                      ) : (
-                        <Image
-                          src={`${assets}/${isPitcherInvited() ? "ball2.png" : "bat2.png"}`}
-                          h={"24px"}
-                          w={"24px"}
-                          alt={"o"}
-                        />
-                      )}
-                    </button>
+                <>
+                  {joinSession.isLoading && joinSession.variables?.token.id === token.id ? (
+                    <Flex h={"75px"} w={"75px"} alignItems={"center"} justifyContent={"center"}>
+                      <Spinner />
+                    </Flex>
+                  ) : (
+                    <Image
+                      src={token.image}
+                      alt={""}
+                      key={idx}
+                      cursor={"pointer"}
+                      h={"75px"}
+                      w={"75px"}
+                      onClick={() => {
+                        updateContext({ selectedToken: token });
+                        if (forJoin && invitedTo) {
+                          joinSession.mutate({
+                            sessionID: invitedTo,
+                            token,
+                            inviteCode,
+                          });
+                        }
+                      }}
+                    />
                   )}
-                </Flex>
+                </>
               ))}
           {ownedTokens.data && ownedTokens.data.length > 0 && (
             <Flex
