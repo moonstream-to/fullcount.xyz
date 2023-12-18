@@ -11,6 +11,7 @@ const sounds = {
   clapping: `${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`,
   hit: `${FULLCOUNT_ASSETS_PATH}/sounds/hard-hit.wav`,
   catch: `${FULLCOUNT_ASSETS_PATH}/sounds/ball-hit.wav`,
+  select: `${FULLCOUNT_ASSETS_PATH}/sounds/select.wav`,
 };
 
 const PlayingLayout = ({ children }: { children: ReactNode }) => {
@@ -33,6 +34,7 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       <audio id="hit" src={sounds.hit} preload={"auto"} />
       <audio id="clapping" src={sounds.clapping} preload={"auto"} />
       <audio id="catch" src={sounds.catch} preload={"auto"} />
+      <audio id="selectSound" src={sounds.select} preload={"auto"}></audio>
 
       {children}
     </Flex>
