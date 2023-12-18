@@ -37,15 +37,10 @@ const RandomGeneratorMobile = ({
     setMoved("Moved");
     if (Math.random() < 0.5) {
       if (acceleration && rotationRate) {
-        setMovements((prevMovements) => [
-          ...prevMovements,
-          acceleration.x || 0,
-          acceleration.y || 0,
-          acceleration.z || 0,
-          rotationRate.alpha || 0,
-          rotationRate.beta || 0,
-          rotationRate.gamma || 0,
-        ]);
+        const moves = [acceleration.x, acceleration.y, acceleration.z]
+          .map((m) => m ?? 0)
+          .filter((m) => m !== 0);
+        setMovements((prevMovements) => [...prevMovements, ...moves]);
       }
     }
   }, []);
