@@ -4,7 +4,7 @@ import Web3 from "web3";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 
-const MOVEMENTS_NUMBER = 1500;
+const MOVEMENTS_NUMBER = 1000;
 
 const RandomGeneratorMobile = ({
   isActive,
@@ -15,7 +15,7 @@ const RandomGeneratorMobile = ({
 }) => {
   const web3 = new Web3();
 
-  const [movements, setMovements] = useState<number[]>([]);
+  const [movements, setMovements] = useState<{ alpha: number; beta: number; gamma: number }[]>([]);
   const [moved, setMoved] = useState("Not moved");
 
   const handleGenerate = () => {
@@ -27,37 +27,55 @@ const RandomGeneratorMobile = ({
       // @ts-ignore
       DeviceMotionEvent.requestPermission();
     }
-    window.addEventListener("devicemotion", handleDeviceMotion);
-    // window.addEventListener("deviceorientation", handleOrientation);
-    setMovements((prevMovements) => [...prevMovements, 0, 0]);
+    // window.addEventListener("devicemotion", handleDeviceMotion);
+    window.addEventListener("deviceorientation", handleOrientation);
   };
 
-  const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
-    const { acceleration, rotationRate } = event;
-    setMoved("Moved");
-    if (Math.random() < 0.8) {
-      if (acceleration && rotationRate) {
-        const moves = [acceleration.x, acceleration.y, acceleration.z]
-          .map((m) => m ?? 0)
-          .filter((m) => m !== 0);
-        setMovements((prevMovements) => [...prevMovements, ...moves]);
-      }
-    }
-  }, []);
+  // const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
+  //   const { acceleration, rotationRate } = event;
+  //   if (acceleration && rotationRate) {
+  //     const moves = [acceleration.x, acceleration.y, acceleration.z]
+  //       .map((m) => m ?? 0)
+  //       .filter((m) => m !== 0);
+  //     setMovements((prevMovements) => [...prevMovements, ...moves]);
+  //   }
+  // }, []);
 
   function handleOrientation(event: DeviceOrientationEvent) {
     setMoved("orientation");
 
-    setMovements((prevMovements) => [
-      ...prevMovements,
-      event.alpha || 0,
-      event.beta || 0,
-      event.gamma || 0,
-    ]);
+    setMovements((prevMovements) => {
+      const round = (value: number | null) => Number(value?.toFixed(2)) ?? 0;
+      const newMove = {
+        alpha: round(event.alpha),
+        beta: round(event.beta),
+        gamma: round(event.gamma),
+      };
+      if (!prevMovements.length) {
+        return [newMove];
+      }
+      const { alpha, beta, gamma } = prevMovements.slice(-1)[0];
+
+      if (alpha !== newMove.alpha || beta !== newMove.beta || gamma !== newMove.gamma) {
+        return [...prevMovements, newMove];
+      }
+      return prevMovements;
+    });
   }
 
-  const generateSeed = (movements: number[]) => {
-    const dataString = movements.join("");
+  const generateSeed = (points: { alpha: number; beta: number; gamma: number }[]) => {
+    function cantorPair(x: number, y: number): number {
+      return 0.5 * (x + y) * (x + y + 1) + y;
+    }
+
+    function uniqNumber(x: number, y: number, z: number): number {
+      const pairedXY = cantorPair(x, y);
+      return cantorPair(pairedXY, z);
+    }
+
+    const dataString = points
+      .map(({ alpha, beta, gamma }) => uniqNumber(alpha, beta, gamma))
+      .join("");
     const hash = web3.utils.sha3(dataString) || "";
     const uint256Seed = "0x" + hash.substring(2, 66);
     onChange(uint256Seed);
@@ -85,8 +103,8 @@ const RandomGeneratorMobile = ({
 
   useEffect(() => {
     if (movements.length >= MOVEMENTS_NUMBER) {
-      window.removeEventListener("devicemotion", handleDeviceMotion);
-      // window.removeEventListener("deviceorientation", handleOrientation);
+      // window.removeEventListener("devicemotion", handleDeviceMotion);
+      window.removeEventListener("deviceorientation", handleOrientation);
 
       generateSeed(movements);
       setMovements([]);
