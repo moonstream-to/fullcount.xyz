@@ -21,11 +21,21 @@ const SoundCredits: React.FC<SoundCreditsProps> = ({ soundCredits }) => {
     <Flex gap={"10px"} direction={"column"}>
       {soundCredits.map((credit, index) => (
         <Box key={index} className={styles.text}>
-          <a href={credit.soundRef} target="_blank" rel="noopener noreferrer">
+          <a
+            className={styles.link}
+            href={credit.soundRef}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {credit.sound}
           </a>{" "}
           by{" "}
-          <a href={credit.authorRef} target="_blank" rel="noopener noreferrer">
+          <a
+            className={styles.link}
+            href={credit.authorRef}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {credit.author}
           </a>{" "}
           licensed under {credit.licence}

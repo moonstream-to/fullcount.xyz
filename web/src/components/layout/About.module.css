@@ -46,3 +46,20 @@
     border: 1px solid #FFF;
 }
 
+.link {
+    color: #00b749;
+    text-decoration: underline;
+}
+
+.link:hover {
+    font-weight: 400;
+    text-decoration: underline;
+}
+
+.button:hover {
+    border: 1px solid #CCC;
+    color: #CCC;
+}
+
+
+
