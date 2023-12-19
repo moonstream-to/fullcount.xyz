@@ -45,7 +45,7 @@ const RandomGeneratorMobile = ({
     setMoved("orientation");
 
     setMovements((prevMovements) => {
-      const round = (value: number | null) => Number(value?.toFixed(1)) ?? 0;
+      const round = (value: number | null) => (value ? Number((value / 10).toFixed(1)) : 0);
       const newMove = {
         alpha: round(event.alpha),
         beta: round(event.beta),
@@ -56,7 +56,7 @@ const RandomGeneratorMobile = ({
       }
       const { alpha, beta, gamma } = prevMovements.slice(-1)[0];
 
-      if (alpha !== newMove.alpha || beta !== newMove.beta || gamma !== newMove.gamma) {
+      if (alpha !== newMove.alpha && beta !== newMove.beta && gamma !== newMove.gamma) {
         return [...prevMovements, newMove];
       }
       return prevMovements;
