@@ -127,6 +127,12 @@ const RandomGeneratorMobile = ({
               <Text className={styles.moveMouseTip}>rotate your device</Text>
             </Flex>
           )}
+          {movements.length > 0 && (
+            <Text>{`alpha: ${movements.slice(-1)[0].alpha}; beta: ${
+              movements.slice(-1)[0].beta
+            }; gamma: ${movements.slice(-1)[0].gamma};`}</Text>
+          )}
+          <Text>{`length: ${movements.length}`}</Text>
         </>
       )}
       {!isActive && <Flex className={styles.completedAction}>Generated</Flex>}
