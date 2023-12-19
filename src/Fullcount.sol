@@ -360,8 +360,6 @@ contract Fullcount is EIP712 {
     {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount.startSession: msg.sender is not NFT owner");
 
-        // TODO Signature stuff
-
         NumAtBats++;
 
         if (role == PlayerType.Pitcher) {
@@ -387,7 +385,6 @@ contract Fullcount is EIP712 {
 
         Session storage finishedSession = SessionState[finishedSessionID];
 
-        // TODO Update AtBatState
         AtBat storage atBat = AtBatState[atBatID];
 
         if (finishedSession.outcome == Outcome.Strike) {
