@@ -5,7 +5,6 @@ import { Flex, Spinner, Text } from "@chakra-ui/react";
 import { useGameContext } from "../../contexts/GameContext";
 import Web3Context from "../../contexts/Web3Context/context";
 import GridComponent from "./GridComponent";
-import RandomGenerator from "./RandomGenerator";
 import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
@@ -17,13 +16,15 @@ import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import ActionTypeSelector from "./ActionTypeSelector";
 import { getSwingDescription } from "../../utils/messages";
+import RandomGeneratorMobile from "./RandomGeneratorMobile";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [kind, setKind] = useState(0);
-  const [gridIndex, setGridIndex] = useState(-1);
+  const [gridIndex, setGridIndex] = useState(12);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isCommitted, setIsCommitted] = useState(false);
   const [nonce, setNonce] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
@@ -109,6 +110,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     },
     {
       onSuccess: () => {
+        setIsCommitted(true);
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
       },
@@ -159,6 +161,9 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   );
 
   const typeChangeHandle = (value: number) => {
+    if (value !== 2 && gridIndex === -1) {
+      setGridIndex(12);
+    }
     setKind(value);
     if (value === 2) {
       setGridIndex(-1);
@@ -166,22 +171,13 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   };
 
   return (
-    <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      <Text fontSize={"24px"} fontWeight={"700"}>
-        One pitch to win the game
-      </Text>
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        1. Select the type of swing
-      </Text>
+    <Flex direction={"column"} gap={"15px"} alignItems={"center"} mx={"auto"}>
       <ActionTypeSelector
         types={swingKinds}
         isDisabled={sessionStatus.didBatterCommit}
         selected={kind}
         setSelected={typeChangeHandle}
       />
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        2. Choose where to swing
-      </Text>
       <GridComponent
         selectedIndex={gridIndex}
         isPitcher={false}
@@ -193,14 +189,18 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       <Text className={styles.actionText}>
         {getSwingDescription(kind, getRowCol(gridIndex)[1], getRowCol(gridIndex)[0])}
       </Text>
-      <Text fontSize={"18px"} fontWeight={"500"}>
-        3. Generate randomness
-      </Text>
-      <RandomGenerator
-        isActive={!nonce && !sessionStatus.didBatterCommit}
-        onChange={(value: string) => setNonce(value)}
-      />
-      {!sessionStatus.didBatterCommit ? (
+      {!nonce && !sessionStatus.didBatterCommit && (
+        <>
+          <Text fontSize={"12px"} mb={"-5px"} color={"#bdbdbd"}>
+            Tap and rotate to generate swing
+          </Text>
+          <RandomGeneratorMobile
+            isActive={!nonce && !sessionStatus.didBatterCommit}
+            onChange={(value: string) => setNonce(value)}
+          />
+        </>
+      )}
+      {!!nonce && !sessionStatus.didBatterCommit && !isCommitted && (
         <button
           className={globalStyles.commitButton}
           onClick={handleCommit}
@@ -209,27 +209,23 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
           {commitSwing.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
-      ) : (
-        <Flex className={styles.completedAction}>Committed</Flex>
       )}
-
-      {sessionStatus.didBatterReveal || isRevealed ? (
-        <Flex className={styles.completedAction}>Revealed</Flex>
-      ) : (
-        <button
-          className={globalStyles.commitButton}
-          onClick={handleReveal}
-          disabled={sessionStatus.progress !== 4 || sessionStatus.didBatterReveal}
-        >
-          {revealSwing.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
-        </button>
+      {sessionStatus.didBatterCommit &&
+        sessionStatus.didPitcherCommit &&
+        !sessionStatus.didBatterReveal &&
+        !isRevealed && (
+          <button className={globalStyles.mobileButton} onClick={handleReveal}>
+            {revealSwing.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+          </button>
+        )}
+      {sessionStatus.didBatterCommit && !sessionStatus.didPitcherCommit && (
+        <Text>Waiting pitcher to commit</Text>
       )}
-      <Text className={styles.text}>
-        Once both players have committed their moves, press{" "}
-        <span className={styles.textBold}> Reveal</span> to see the outcome
-      </Text>
+      {sessionStatus.didBatterReveal && !sessionStatus.didPitcherReveal && (
+        <Text>Waiting pitcher to reveal</Text>
+      )}
     </Flex>
   );
 };
 
-export default BatterView2;
+export default BatterViewMobile;

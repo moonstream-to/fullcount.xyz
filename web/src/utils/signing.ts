@@ -55,13 +55,11 @@ export async function signPitch(
     },
   });
 
-  const result = await provider.request({
+  return await provider.request({
     method: "eth_signTypedData_v4",
     params: [account, msgParams],
     from: account,
   });
-
-  return result;
 }
 
 export async function signSwing(
@@ -112,11 +110,9 @@ export async function signSwing(
     },
   });
 
-  const result = await provider.request({
+  return await provider.request({
     method: "eth_signTypedData_v4",
     params: [account, msgParams],
     from: account,
   });
-
-  return result;
 }

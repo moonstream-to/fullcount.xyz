@@ -19,7 +19,7 @@ const Navbar = () => {
       justifyContent={"space-between"}
       pt={{ base: "15px", sm: "5px" }}
       gap={"15px"}
-      fontSize={{ sm: "16px", base: "14px" }}
+      fontSize={{ sm: "16px", base: "10px" }}
     >
       <Text className={styles.gradientText} fontSize={"14px"}>
         Fullcount

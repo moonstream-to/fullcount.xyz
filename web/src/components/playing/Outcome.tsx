@@ -152,12 +152,23 @@ const Outcome = ({
       justifyContent={"center"}
       position={"relative"}
       alignItems={"center"}
+      mx={"auto"}
     >
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"} position={"relative"}>
-        <GrowingText isVisible={isPitchSpeedVisible} right={"110%"} top="-75px" duration={"0.5s"}>
+        <GrowingText
+          isVisible={isPitchSpeedVisible}
+          right={"100%"}
+          top={{ base: "-10px", lg: "-75px" }}
+          duration={"0.5s"}
+        >
           <Text>{pitchSpeed[pitch.speed]}</Text>
         </GrowingText>
-        <GrowingText isVisible={isSwingKindVisible} left={"110%"} top="-75px" duration={"0.5s"}>
+        <GrowingText
+          isVisible={isSwingKindVisible}
+          left={"100%"}
+          top={{ base: "-10px", lg: "-75px" }}
+          duration={"0.5s"}
+        >
           <Text>{swingKind[swing.kind]}</Text>
         </GrowingText>
         <BallAnimation

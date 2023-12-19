@@ -154,3 +154,8 @@ interface SwingLocation {
   count: number;
   swing_type: number;
 }
+
+interface EthereumError {
+  code: number;
+  message: string;
+}
