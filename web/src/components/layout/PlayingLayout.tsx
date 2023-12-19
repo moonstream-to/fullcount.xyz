@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
-import Navbar from "./Navbar";
 import { Flex } from "@chakra-ui/react";
+
+import Navbar from "./Navbar";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 const sounds = {
@@ -9,8 +10,8 @@ const sounds = {
   swoosh: `${FULLCOUNT_ASSETS_PATH}/sounds/windy-swoosh.wav`,
   swing: `${FULLCOUNT_ASSETS_PATH}/sounds/fast-swoosh.wav`,
   clapping: `${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`,
-  hit: `${FULLCOUNT_ASSETS_PATH}/sounds/hard-hit.wav`,
-  catch: `${FULLCOUNT_ASSETS_PATH}/sounds/ball-hit.wav`,
+  hit: `${FULLCOUNT_ASSETS_PATH}/sounds/eelke-hit-01.wav`,
+  catch: `${FULLCOUNT_ASSETS_PATH}/sounds/martinimeniscus-glove-catch-6-ff009.wav`,
   select: `${FULLCOUNT_ASSETS_PATH}/sounds/select.wav`,
 };
 
@@ -24,7 +25,6 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       maxW={"1440px"}
       placeSelf={"center"}
       w={"100%"}
-      // bg={"#111133"}
     >
       <Navbar />
       <audio id="heartbeat" src={sounds.heartbeat} preload={"auto"} />
@@ -35,7 +35,6 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       <audio id="clapping" src={sounds.clapping} preload={"auto"} />
       <audio id="catch" src={sounds.catch} preload={"auto"} />
       <audio id="selectSound" src={sounds.select} preload={"auto"}></audio>
-
       {children}
     </Flex>
   );

@@ -1,8 +1,10 @@
-import { Flex, useMediaQuery, Text } from "@chakra-ui/react";
+import { Flex, useMediaQuery, Text, Link, useDisclosure } from "@chakra-ui/react";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useContext } from "react";
 import styles from "../GlobalStyles.module.css";
 import SoundFxSlider from "./SoundFxSlider";
+import { FEEDBACK_FORM_URL } from "../../constants";
+import About from "./About";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -12,6 +14,7 @@ const Navbar = () => {
   const { account } = useContext(Web3Context);
 
   const address = !isMediumScreen ? `${account.slice(0, 6)}...${account.slice(-4)}` : account;
+  const { onOpen, isOpen, onClose } = useDisclosure();
   return (
     <Flex
       direction={{ base: "column", sm: "row" }}
@@ -21,9 +24,18 @@ const Navbar = () => {
       gap={"15px"}
       fontSize={{ sm: "16px", base: "10px" }}
     >
-      <Text className={styles.gradientText} fontSize={"14px"}>
-        Fullcount
-      </Text>
+      <Flex gap={"20px"} alignItems={"center"}>
+        <Text className={styles.gradientText} fontSize={"14px"}>
+          Fullcount
+        </Text>
+        <Link isExternal href={FEEDBACK_FORM_URL} _hover={{ textDecoration: "none" }}>
+          <Text className={styles.navbarButton}>Give feedback</Text>
+        </Link>
+        <Text className={styles.navbarButton} onClick={onOpen}>
+          About
+        </Text>
+        <About isOpen={isOpen} onClose={onClose} />
+      </Flex>
       <Flex gap={"10px"}>
         <SoundFxSlider />
         <Flex
