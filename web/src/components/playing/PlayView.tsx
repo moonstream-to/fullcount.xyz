@@ -1,12 +1,11 @@
 import { useGameContext } from "../../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Box, Flex, Image, Text, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Image, useMediaQuery } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { PitchLocation, SwingLocation, Token } from "../../types";
-import { CloseIcon } from "@chakra-ui/icons";
+import { Token } from "../../types";
 import Outcome from "./Outcome";
 import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
@@ -16,13 +15,8 @@ import { FULLCOUNT_ASSETS_PATH, ZERO_ADDRESS } from "../../constants";
 import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
-import styles from "./PlayView.module.css";
-import axios from "axios";
-import MainStat from "./MainStat";
-import HeatMap from "./HeatMap";
 import TokenView from "../tokens/TokenView";
 import Narrate from "./Narrate";
-import { IoExitOutline } from "react-icons/all";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
 
@@ -178,82 +172,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
-  const pitcherStats = useQuery(
-    ["pitcher_stat", pitcher],
-    async () => {
-      if (!pitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!pitcher,
-    },
-  );
-
-  const batterStats = useQuery(
-    ["batter_stat", batter],
-    async () => {
-      if (!batter) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!batter,
-    },
-  );
-
-  const mockLocations = [
-    19, 11, 5, 1, 2, 45, 29, 13, 8, 6, 70, 59, 47, 23, 12, 40, 35, 40, 32, 31, 11, 12, 23, 24, 34,
-  ];
-
-  const pitchDistributions = useQuery(
-    ["pitch_distribution", pitcher],
-    async () => {
-      if (!pitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/pitch_distribution";
-      const res = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
-      const counts = new Array(25).fill(0);
-      res.data.pitch_distribution.forEach(
-        (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
-      );
-      const total = counts.reduce((acc, value) => acc + value);
-      const rates = counts.map((value) => value / total);
-      return { rates, counts };
-    },
-    {
-      enabled: !!pitcher,
-    },
-  );
-
-  const swingDistributions = useQuery(
-    ["swing_distribution", batter],
-    async () => {
-      if (!batter) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/swing_distribution";
-      const res = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
-      const counts = new Array(25).fill(0);
-      res.data.swing_distribution.forEach(
-        (l: SwingLocation) => (counts[l.swing_vertical * 5 + l.swing_horizontal] = l.count),
-      );
-      const total = counts.reduce((acc, value) => acc + value);
-      const rates = counts.map((value) => value / total);
-      return { rates, counts };
-    },
-    {
-      enabled: !!batter,
-    },
-  );
-
   useEffect(() => {
     setPitcher(isPitcher(selectedToken) ? selectedToken : opponent);
     setBatter(isPitcher(selectedToken) ? opponent : selectedToken);
@@ -334,7 +252,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         {!isSmallView && (
           <TokenView
             token={pitcher}
-            width={isPitcher(selectedToken) ? "300px" : "100px"}
+            width={isPitcher(selectedToken) ? "300px" : "150px"}
             isPitcher={true}
           />
         )}
