@@ -22,7 +22,7 @@ from .data import (
     HorizontalLocation,
     MAX_UINT256,
 )
-from .generation_1 import Distance0, Distance1, Distance2, DistanceGT2
+from .generation_1 import Distance0, Distance1, Distance2, Distance3, Distance4, DistanceGT4
 from .randomness import grind
 
 OUTCOME_TEST_TEMPLATE = """
@@ -124,13 +124,18 @@ def outcome_tests(
         pitch_type, pitch_vert, pitch_hor, swing_type, swing_vert, swing_hor
     )
 
-    outcome_distribution = DistanceGT2
+    outcome_distribution = DistanceGT4
     if distance == 0:
         outcome_distribution = Distance0
     elif distance == 1:
         outcome_distribution = Distance1
     elif distance == 2:
         outcome_distribution = Distance2
+    elif distance == 3:
+        outcome_distribution = Distance3    
+    elif distance == 4:
+        outcome_distribution = Distance4
+    
 
     boundary_0 = sum(outcome_distribution[: desired_outcome.value])
     boundary_1 = sum(outcome_distribution[: desired_outcome.value + 1]) - 1
