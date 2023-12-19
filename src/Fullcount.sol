@@ -92,6 +92,23 @@ contract Fullcount is EIP712 {
     );
     event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+
+    event AtBatStarted(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role
+    );
+
+    event AtBatJoined(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role
+    );
+
     event PitchCommitted(uint256 indexed sessionID);
     event SwingCommitted(uint256 indexed sessionID);
     event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
@@ -105,7 +122,16 @@ contract Fullcount is EIP712 {
         uint256 batterTokenID
     );
 
-    event AtBatProgress(uint256 indexed atBatID);
+    event AtBatProgress(
+        uint256 indexed atBatID,
+        AtBatOutcome indexed outcome,
+        uint256 balls,
+        uint256 strikes,
+        address pitcherAddress,
+        uint256 pitcherTokenID,
+        address batterAddress,
+        uint256 batterTokenID
+    );
 
     constructor(uint256 secondsPerPhase) EIP712("Fullcount", FullcountVersion) {
         SecondsPerPhase = secondsPerPhase;
@@ -264,9 +290,12 @@ contract Fullcount is EIP712 {
         emit SessionJoined(sessionID, nftAddress, tokenID, role);
     }
 
-    function _joinAtBat(uint256 atBatID, address nftAddress, uint256 tokenID) internal {
+    function _joinAtBat(uint256 atBatID, address nftAddress, uint256 tokenID, uint256 firstSessionID) internal {
         AtBat storage atBat = AtBatState[atBatID];
+
+        PlayerType role = PlayerType.Pitcher;
         if (atBat.batterNFT.nftAddress == address(0)) {
+            role = PlayerType.Batter;
             atBat.batterNFT.nftAddress = nftAddress;
             atBat.batterNFT.tokenID = tokenID;
         } else {
@@ -274,7 +303,7 @@ contract Fullcount is EIP712 {
             atBat.pitcherNFT.tokenID = tokenID;
         }
 
-        // TODO Emit join AtBat event.
+        emit AtBatJoined(atBatID, nftAddress, tokenID, firstSessionID, role);
     }
 
     // Emits:
@@ -315,7 +344,7 @@ contract Fullcount is EIP712 {
 
         uint256 atBatID = SessionAtBat[sessionID];
         if (atBatID > 0) {
-            _joinAtBat(atBatID, nftAddress, tokenID);
+            _joinAtBat(atBatID, nftAddress, tokenID, sessionID);
         }
     }
 
@@ -343,11 +372,11 @@ contract Fullcount is EIP712 {
             AtBatState[NumAtBats].batterNFT.tokenID = tokenID;
         }
 
-        uint256 firstSession = _startSession(nftAddress, tokenID, role, requireSignature);
-        AtBatSessions[NumAtBats] = [firstSession];
-        SessionAtBat[firstSession] = NumAtBats;
+        uint256 firstSessionID = _startSession(nftAddress, tokenID, role, requireSignature);
+        AtBatSessions[NumAtBats] = [firstSessionID];
+        SessionAtBat[firstSessionID] = NumAtBats;
 
-        // TODO Emit start at-bat event.
+        emit AtBatStarted(NumAtBats, nftAddress, tokenID, firstSessionID, role);
 
         return NumAtBats;
     }
@@ -410,10 +439,16 @@ contract Fullcount is EIP712 {
             atBat.outcome = AtBatOutcome.InPlayOut;
         }
 
-        // TODO Fire an at-bat progress event so that we don't need to rebuild the at-bat from sessions. AtBatID should
-        // be indexed in the event.
-
-        // TODO Fire an event for the at-bat outcome
+        emit AtBatProgress(
+            atBatID,
+            atBat.outcome,
+            atBat.balls,
+            atBat.strikes,
+            atBat.pitcherNFT.nftAddress,
+            atBat.pitcherNFT.tokenID,
+            atBat.batterNFT.nftAddress,
+            atBat.batterNFT.tokenID
+        );
     }
 
     function _startNextAtBatSession(

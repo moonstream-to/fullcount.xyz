@@ -18,7 +18,34 @@ import {
     AtBatOutcome
 } from "../src/data.sol";
 
-contract FullcountTest_startAtBat is FullcountTestBase {
+contract FullcountAtBatTest is FullcountTestBase {
+    event AtBatStarted(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role
+    );
+    event AtBatJoined(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role
+    );
+    event AtBatProgress(
+        uint256 indexed atBatID,
+        AtBatOutcome indexed outcome,
+        uint256 balls,
+        uint256 strikes,
+        address pitcherAddress,
+        uint256 pitcherTokenID,
+        address batterAddress,
+        uint256 batterTokenID
+    );
+}
+
+contract FullcountTest_startAtBat is FullcountAtBatTest {
     function test_as_pitcher() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
@@ -29,9 +56,11 @@ contract FullcountTest_startAtBat is FullcountTestBase {
 
         vm.startPrank(player1);
 
-        // Check for startAtBat event
-        // vm.expectEmit(address(game));
-        // emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        vm.expectEmit(address(game));
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
         vm.stopPrank();
@@ -47,6 +76,9 @@ contract FullcountTest_startAtBat is FullcountTestBase {
         assertEq(atBat.pitcherNFT.tokenID, tokenID);
         assertEq(atBat.batterNFT.nftAddress, address(0));
         assertEq(atBat.batterNFT.tokenID, 0);
+        assertEq(atBat.strikes, 0);
+        assertEq(atBat.balls, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 
     function test_as_batter() public {
@@ -59,9 +91,11 @@ contract FullcountTest_startAtBat is FullcountTestBase {
 
         vm.startPrank(player1);
 
-        // Check for startAtBat event
-        // vm.expectEmit(address(game));
-        // emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        vm.expectEmit(address(game));
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
         vm.stopPrank();
@@ -77,11 +111,14 @@ contract FullcountTest_startAtBat is FullcountTestBase {
         assertEq(atBat.batterNFT.tokenID, tokenID);
         assertEq(atBat.pitcherNFT.nftAddress, address(0));
         assertEq(atBat.pitcherNFT.tokenID, 0);
+        assertEq(atBat.strikes, 0);
+        assertEq(atBat.balls, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 }
 
-contract FullcountTest_joinAtBatSession is FullcountTestBase {
-    function test_as_batter() public {
+contract FullcountTest_joinAtBatSession is FullcountAtBatTest {
+    function test_join_as_batter() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
@@ -96,9 +133,11 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
 
         vm.startPrank(player1);
 
-        // Check for startAtBat event
-        // vm.expectEmit(address(game));
-        // emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        vm.expectEmit(address(game));
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
         vm.stopPrank();
@@ -112,8 +151,9 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
 
         vm.startPrank(player2);
 
-        // vm.expectEmit(address(game));
-        // emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        vm.expectEmit(address(game));
+        emit SessionJoined(firstSessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        emit AtBatJoined(atBatID, address(otherCharacterNFTs), otherTokenID, firstSessionID, PlayerType.Batter);
         game.joinSession(firstSessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();
@@ -123,9 +163,12 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
         assertEq(atBat.pitcherNFT.tokenID, tokenID);
         assertEq(atBat.batterNFT.nftAddress, address(otherCharacterNFTs));
         assertEq(atBat.batterNFT.tokenID, otherTokenID);
+        assertEq(atBat.strikes, 0);
+        assertEq(atBat.balls, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 
-    function test_as_pitcher() public {
+    function test_join_as_pitcher() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
 
@@ -140,9 +183,11 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
 
         vm.startPrank(player1);
 
-        // Check for startAtBat event
-        // vm.expectEmit(address(game));
-        // emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
+        vm.expectEmit(address(game));
+        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
         vm.stopPrank();
@@ -156,8 +201,9 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
 
         vm.startPrank(player2);
 
-        // vm.expectEmit(address(game));
-        // emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
+        vm.expectEmit(address(game));
+        emit SessionJoined(firstSessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Pitcher);
+        emit AtBatJoined(atBatID, address(otherCharacterNFTs), otherTokenID, firstSessionID, PlayerType.Pitcher);
         game.joinSession(firstSessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();
@@ -167,56 +213,13 @@ contract FullcountTest_joinAtBatSession is FullcountTestBase {
         assertEq(atBat.batterNFT.tokenID, tokenID);
         assertEq(atBat.pitcherNFT.nftAddress, address(otherCharacterNFTs));
         assertEq(atBat.pitcherNFT.tokenID, otherTokenID);
+        assertEq(atBat.strikes, 0);
+        assertEq(atBat.balls, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
-
-    // function testRevert_if_joining_session_that_is_part_of_an_at_bat() public {
-    //     charactersMinted++;
-    //     uint256 tokenID = charactersMinted;
-
-    //     otherCharactersMinted++;
-    //     uint256 otherTokenID = otherCharactersMinted;
-
-    //     characterNFTs.mint(player1, tokenID);
-    //     otherCharacterNFTs.mint(player2, otherTokenID);
-
-    //     uint256 initialNumSessions = game.NumSessions();
-    //     uint256 initialNumAtBats = game.NumAtBats();
-
-    //     vm.startPrank(player1);
-
-    //     // Check for startAtBat event
-    //     // vm.expectEmit(address(game));
-    //     // emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
-    //     uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
-
-    //     vm.stopPrank();
-
-    //     uint256 firstSessionID = game.AtBatSessions(atBatID, 0);
-
-    //     vm.startPrank(player2);
-
-    //     // vm.expectEmit(address(game));
-    //     // emit SessionJoined(sessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
-    //     vm.expectRevert("Fullcount.joinSession: cannot directly join session that is part of an AtBat");
-    //     game.joinSession(firstSessionID, address(otherCharacterNFTs), otherTokenID, "");
-
-    //     vm.stopPrank();
-
-    //     uint256 terminalNumSessions = game.NumSessions();
-    //     uint256 terminalNumAtBats = game.NumAtBats();
-
-    //     assertEq(terminalNumSessions, initialNumSessions + 1);
-    //     assertEq(terminalNumAtBats, initialNumAtBats + 1);
-
-    //     AtBat memory atBat = game.getAtBat(atBatID);
-    //     assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
-    //     assertEq(atBat.pitcherNFT.tokenID, tokenID);
-    //     assertEq(atBat.batterNFT.nftAddress, address(0));
-    //     assertEq(atBat.batterNFT.tokenID, 0);
-    // }
 }
 
-contract FullcountTest_ballsAndStrikes is FullcountTestBase {
+contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
     uint256 AtBatID;
     address PitcherNFTAddress;
     uint256 PitcherTokenID;
@@ -311,8 +314,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(firstSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(firstSessionID);
         Session memory firstSession = game.getSession(firstSessionID);
@@ -323,8 +327,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 2);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 
     function test_new_session_begins_after_one_ball() public {
@@ -339,8 +344,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(firstSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(firstSessionID);
 
@@ -352,8 +358,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 2);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 
     function test_three_strikes_is_a_strikeout() public {
@@ -379,8 +386,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(secondSessionID);
 
@@ -394,8 +402,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(thirdSessionID);
 
@@ -407,8 +416,8 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 3);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 2);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.Strikeout));
     }
 
@@ -435,8 +444,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(secondSessionID);
 
@@ -450,8 +460,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(thirdSessionID);
 
@@ -465,8 +476,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fourthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(fourthSessionID);
 
@@ -478,8 +490,8 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 4);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 0);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.Walk));
     }
 
@@ -506,8 +518,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(secondSessionID);
 
@@ -521,8 +534,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(thirdSessionID);
 
@@ -536,8 +550,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fourthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(fourthSessionID);
 
@@ -551,8 +566,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fifthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(fifthSessionID);
 
@@ -566,8 +582,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(sixthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(sixthSessionID);
 
@@ -579,8 +596,8 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 6);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.Strikeout));
     }
 
@@ -607,8 +624,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(secondSessionID);
 
@@ -622,8 +640,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(thirdSessionID);
 
@@ -637,8 +656,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fourthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(fourthSessionID);
 
@@ -652,8 +672,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fifthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(fifthSessionID);
 
@@ -667,8 +688,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(sixthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(sixthSessionID);
 
@@ -680,8 +702,8 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 6);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.Walk));
     }
 
@@ -708,8 +730,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 0);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 0);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(secondSessionID);
 
@@ -723,8 +746,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(thirdSessionID);
 
@@ -738,8 +762,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fourthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _strikeSession(fourthSessionID);
 
@@ -753,8 +778,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fifthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _ballSession(fifthSessionID);
 
@@ -768,8 +794,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(sixthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         // Generates a double
         Pitch memory pitch = Pitch(
@@ -794,8 +821,8 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 6);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.Double));
     }
 
@@ -822,8 +849,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(secondSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 1);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _foulSession(secondSessionID);
 
@@ -837,8 +865,9 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(thirdSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
         _foulSession(thirdSessionID);
 
@@ -852,8 +881,189 @@ contract FullcountTest_ballsAndStrikes is FullcountTestBase {
         assertEq(game.SessionAtBat(fourthSessionID), AtBatID);
 
         atBat = game.getAtBat(AtBatID);
-        assertEq(atBat.strikes, 2);
         assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+    }
+
+    function test_atBatProgress_events() public {
+        AtBat memory atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
+        assertEq(atBat.pitcherNFT.tokenID, PitcherTokenID);
+        assertEq(atBat.batterNFT.nftAddress, address(otherCharacterNFTs));
+        assertEq(atBat.batterNFT.tokenID, BatterTokenID);
+
+        assertEq(game.getNumberOfSessionsInAtBat(AtBatID), 1);
+        uint256 nextSessionID = game.AtBatSessions(AtBatID, 0);
+        assertEq(game.SessionAtBat(nextSessionID), AtBatID);
+
+        Pitch memory strikePitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideStrike);
+        Pitch memory ballPitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideBall);
+        Swing memory takeSwing = Swing(1, SwingType.Take, VerticalLocation.Middle, HorizontalLocation.Middle);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, strikePitch);
+        _commitSwing(nextSessionID, player2, player2PrivateKey, takeSwing);
+
+        _revealPitch(nextSessionID, player1, strikePitch);
+
+        vm.prank(player2);
+        vm.expectEmit(address(game));
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.InProgress,
+            0,
+            1,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, takeSwing.nonce, takeSwing.kind, takeSwing.vertical, takeSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 1);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+
+        nextSessionID = game.AtBatSessions(AtBatID, 1);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, strikePitch);
+        _commitSwing(nextSessionID, player2, player2PrivateKey, takeSwing);
+
+        _revealPitch(nextSessionID, player1, strikePitch);
+
+        vm.prank(player2);
+        vm.expectEmit(address(game));
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.InProgress,
+            0,
+            2,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, takeSwing.nonce, takeSwing.kind, takeSwing.vertical, takeSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 0);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+
+        nextSessionID = game.AtBatSessions(AtBatID, 2);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, ballPitch);
+        _commitSwing(nextSessionID, player2, player2PrivateKey, takeSwing);
+
+        _revealPitch(nextSessionID, player1, ballPitch);
+
+        vm.prank(player2);
+        vm.expectEmit(address(game));
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.InProgress,
+            1,
+            2,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, takeSwing.nonce, takeSwing.kind, takeSwing.vertical, takeSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 1);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+
+        nextSessionID = game.AtBatSessions(AtBatID, 3);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, ballPitch);
+        _commitSwing(nextSessionID, player2, player2PrivateKey, takeSwing);
+
+        _revealPitch(nextSessionID, player1, ballPitch);
+
+        vm.prank(player2);
+        vm.expectEmit(address(game));
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.InProgress,
+            2,
+            2,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, takeSwing.nonce, takeSwing.kind, takeSwing.vertical, takeSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 2);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+
+        nextSessionID = game.AtBatSessions(AtBatID, 4);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, ballPitch);
+        _commitSwing(nextSessionID, player2, player2PrivateKey, takeSwing);
+
+        _revealPitch(nextSessionID, player1, ballPitch);
+
+        vm.prank(player2);
+        vm.expectEmit(address(game));
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.InProgress,
+            3,
+            2,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, takeSwing.nonce, takeSwing.kind, takeSwing.vertical, takeSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
+
+        nextSessionID = game.AtBatSessions(AtBatID, 5);
+
+        Pitch memory hrPitch = Pitch(
+            63_640_271_245_765_366_210_780_587_460_610_203_501_690_580_269_930_603_495_014_854_898_867_107_880_639,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, hrPitch);
+
+        Swing memory hrSwing =
+            Swing(1982, SwingType.Contact, VerticalLocation.HighStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(nextSessionID, player2, player2PrivateKey, hrSwing);
+
+        _revealPitch(nextSessionID, player1, hrPitch);
+
+        vm.prank(player2);
+        emit AtBatProgress(
+            AtBatID,
+            AtBatOutcome.HomeRun,
+            3,
+            2,
+            address(characterNFTs),
+            PitcherTokenID,
+            address(otherCharacterNFTs),
+            BatterTokenID
+        );
+        game.revealSwing(nextSessionID, hrSwing.nonce, hrSwing.kind, hrSwing.vertical, hrSwing.horizontal);
+
+        atBat = game.getAtBat(AtBatID);
+        assertEq(atBat.balls, 3);
+        assertEq(atBat.strikes, 2);
+        assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.HomeRun));
     }
 }
 
@@ -997,8 +1207,6 @@ contract FullcountTest_atBatInviteOnly is FullcountTestBase {
 
         uint256 initialNumSessions = game.NumSessions();
         uint256 initialNumAtBats = game.NumAtBats();
-
-        uint256 startJoinOffsetSeconds = 5;
 
         vm.startPrank(player1);
 
