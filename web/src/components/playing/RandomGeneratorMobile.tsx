@@ -4,7 +4,7 @@ import Web3 from "web3";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 
-const MOVEMENTS_NUMBER = 1000;
+const MOVEMENTS_NUMBER = 300;
 
 const RandomGeneratorMobile = ({
   isActive,
@@ -45,7 +45,7 @@ const RandomGeneratorMobile = ({
     setMoved("orientation");
 
     setMovements((prevMovements) => {
-      const round = (value: number | null) => Number(value?.toFixed(2)) ?? 0;
+      const round = (value: number | null) => Number(value?.toFixed(1)) ?? 0;
       const newMove = {
         alpha: round(event.alpha),
         beta: round(event.beta),
@@ -73,9 +73,21 @@ const RandomGeneratorMobile = ({
       return cantorPair(pairedXY, z);
     }
 
-    const dataString = points
-      .map(({ alpha, beta, gamma }) => uniqNumber(alpha, beta, gamma))
-      .join("");
+    interface Coordinates {
+      alpha: number;
+      beta: number;
+      gamma: number;
+    }
+
+    function separateCoordinates(coords: Coordinates[]): [number[], number[], number[]] {
+      const alphas = coords.map((coord) => coord.alpha);
+      const betas = coords.map((coord) => coord.beta);
+      const gammas = coords.map((coord) => coord.gamma);
+
+      return [alphas, betas, gammas];
+    }
+
+    const dataString = separateCoordinates(points).join("");
     const hash = web3.utils.sha3(dataString) || "";
     const uint256Seed = "0x" + hash.substring(2, 66);
     onChange(uint256Seed);
