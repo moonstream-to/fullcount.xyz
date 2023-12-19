@@ -38,7 +38,7 @@ const wyrm = defineChain({
 });
 
 // Contract address
-const FullcountContractAddress = "0xde191e8c352BA59F95cf19f0931cCbBcc7B60934";
+const FullcountContractAddress = "0x9270df8d907A99E5024dc3532657a5cF9C7A4889";
 
 // ABIs
 const FullcountSessionABI = [
