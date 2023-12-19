@@ -16,7 +16,6 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-family: Inter;
   font-size: 20px;
   font-style: normal;
   font-weight: 700;
@@ -26,20 +25,28 @@
 
 .prompt {
   color: #fff;
-  font-family: Inter;
   font-size: 30px;
   font-style: normal;
   font-weight: 700;
   line-height: normal;
+  text-align: center;
 }
 
 .text {
   width: 402px;
   color: #bfbfbf;
   text-align: center;
-  font-family: Inter;
   font-size: 14px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+}
+
+@media (max-width: 1023px) {
+  .container {
+    width: 90%;
+  }
+  .text {
+    width: 100%;
+  }
 }

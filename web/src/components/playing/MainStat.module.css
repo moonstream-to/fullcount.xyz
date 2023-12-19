@@ -7,11 +7,17 @@
     background: #232323;
     align-items: baseline;
 }
+
+.divider {
+    width: 0.5px;
+    height: 9px;
+    background: #4D4D4D;
+}
+
+
 .data {
     color: #FFF;
     text-align: center;
-    leading-trim: both;
-    text-edge: cap;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -24,8 +30,6 @@
     margin-left: -7px;
     color: #BFBFBF;
     text-align: center;
-    leading-trim: both;
-    text-edge: cap;
     font-size: 8px;
     font-style: normal;
     font-weight: 300;
@@ -35,8 +39,13 @@
 
 }
 
-.divider {
-    width: 0.5px;
-    height: 9px;
-    background: #4D4D4D;
+@media (max-width: 1023px) {
+    .data {
+        font-size: 8px;
+    }
+    .label {
+        font-size: 6px;
+        margin-left: 0px;
+
+    }
 }

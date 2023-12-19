@@ -32,14 +32,14 @@ const CreateNewCharacter = ({
   };
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <ModalContent className={styles.container} bg="#1A1D22" minW={"782px"}>
+      <ModalContent className={styles.container} bg="#1A1D22" minW={{ base: "", lg: "782px" }}>
         <Text className={styles.message}>Create character</Text>
         <Flex wrap={"wrap"} gap={"20px"} maxW={"800px"} placeSelf={"center"}>
           {images.map((_, idx: number) => (
             <Image
               key={idx}
-              h="100px"
-              w="100px"
+              h={{ base: "40px", lg: "100px" }}
+              w={{ base: "40px", lg: "100px" }}
               alt={`img${idx}`}
               src={`https://badges.moonstream.to/blb/p${idx}.png`}
               cursor={"pointer"}

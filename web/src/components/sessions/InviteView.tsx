@@ -10,7 +10,12 @@ const InviteView = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   return (
     <>
       <Modal isOpen={isOpen || !!selectedSession} onClose={onClose}>
-        <ModalContent className={styles.container} bg="#1A" minW={"662px"} my={"auto"}>
+        <ModalContent
+          className={styles.container}
+          bg="#1A"
+          minW={{ base: "", lg: "662px" }}
+          my={"auto"}
+        >
           {sessions &&
             sessions?.length !== 0 &&
             !sessions?.find((s) => s.sessionID === invitedTo) && (

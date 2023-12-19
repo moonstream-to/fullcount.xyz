@@ -81,6 +81,7 @@ interface Session {
   didBatterCommit: boolean;
   didBatterReveal: boolean;
   outcome: number;
+  requiresSignature: boolean;
 }
 
 interface FullcountContractSession {
@@ -152,4 +153,9 @@ interface SwingLocation {
   swing_horizontal: number;
   count: number;
   swing_type: number;
+}
+
+interface EthereumError {
+  code: number;
+  message: string;
 }

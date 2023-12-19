@@ -22,7 +22,7 @@ const Navbar = () => {
       justifyContent={"space-between"}
       pt={{ base: "15px", sm: "5px" }}
       gap={"15px"}
-      fontSize={{ sm: "16px", base: "14px" }}
+      fontSize={{ sm: "16px", base: "10px" }}
     >
       <Flex gap={"20px"} alignItems={"center"}>
         <Text className={styles.gradientText} fontSize={"14px"}>
