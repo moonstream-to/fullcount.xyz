@@ -4,7 +4,7 @@ import Web3 from "web3";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 
-const MOVEMENTS_NUMBER = 200;
+const MOVEMENTS_NUMBER = 100;
 
 const RandomGeneratorMobile = ({
   isActive,
