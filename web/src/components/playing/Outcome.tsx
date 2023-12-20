@@ -8,7 +8,16 @@ import BallAnimation from "./BallAnimation";
 import { Session } from "../../types";
 import BatAnimation from "./BatAnimation";
 import { useGameContext } from "../../contexts/GameContext";
-const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
+const outcomes = [
+  "Strike",
+  "Ball",
+  "Foul",
+  "Single",
+  "Double",
+  "Triple",
+  "Home Run",
+  "In Play Out",
+];
 const assets = FULLCOUNT_ASSETS_PATH;
 
 interface Swing {
