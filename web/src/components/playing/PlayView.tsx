@@ -1,6 +1,6 @@
 import { useGameContext } from "../../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Flex, Image, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
@@ -36,6 +36,7 @@ export interface SessionStatus {
   didPitcherReveal: boolean;
   didBatterReveal: boolean;
   outcome: number;
+  sessionID: number;
 }
 
 export const horizontalLocations = {
@@ -68,7 +69,7 @@ export const swingKind = {
 const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
-  const { selectedSession, updateContext, contractAddress } = useGameContext();
+  const { selectedAtBat, selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -80,14 +81,51 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [pitcher, setPitcher] = useState<Token | undefined>(undefined);
   const [batter, setBatter] = useState<Token | undefined>(undefined);
 
+  const atBat = useQuery(
+    ["sessionAtBatID", selectedSession],
+    () => {
+      if (!selectedSession) return undefined;
+      return gameContract.methods.SessionAtBat(selectedSession.sessionID).call();
+    },
+    {
+      refetchInterval: 100000000,
+    },
+  );
+
+  const atBatStatus = useQuery(["atBatStatus", atBat.data], async () => {
+    if (!atBat.data) {
+      return;
+    }
+    console.log("At bat data");
+    const atBatID = atBat.data;
+    const status = await gameContract.methods.getAtBat(atBatID).call();
+    const numSessions = Number(
+      await gameContract.methods.getNumberOfSessionsInAtBat(atBatID).call(),
+    );
+    const currentSessionID = await gameContract.methods
+      .AtBatSessions(atBatID, numSessions - 1)
+      .call();
+    console.log({
+      atBat: {
+        ...status,
+        currentSessionID,
+        numSessions,
+      },
+    });
+    return {
+      ...status,
+      currentSessionID,
+      numSessions,
+    };
+  });
+
   const sessionStatus = useQuery(
-    ["session", selectedSession],
+    ["session", selectedSession, atBatStatus.data],
     async () => {
       if (!selectedSession) return undefined;
-      const progress = Number(
-        await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
-      );
-      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
+      const sessionID = Number(atBatStatus.data?.currentSessionID ?? selectedSession.sessionID);
+      const progress = Number(await gameContract.methods.sessionProgress(sessionID).call());
+      const session = await gameContract.methods.getSession(sessionID).call();
       if (progress < 2 || progress > 4) {
         setGameOver(true);
       }
@@ -143,7 +181,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         Number(batterReveal[1]) === 0 ? 0 : Number(batterReveal[1]) === 1 ? 1 : 2;
 
       return {
-        sessionID: selectedSession?.sessionID,
+        sessionID,
         progress,
         didPitcherCommit,
         didBatterCommit,
@@ -177,6 +215,18 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     setBatter(isPitcher(selectedToken) ? opponent : selectedToken);
   }, [selectedToken, opponent]);
 
+  useEffect(() => {
+    atBatStatus.refetch();
+  }, [sessionStatus.data]);
+
+  const numberToOrdinal = (n: number): string => {
+    if (n > 10) return "";
+    if (n === 1) return "1st";
+    if (n === 2) return "2nd";
+    if (n === 3) return "3rd";
+    return `${n}th`;
+  };
+
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
       {isSmallView && (
@@ -199,6 +249,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           sessionStatus.data?.progress === 2 ||
           sessionStatus.data?.progress === 5) && (
           <Timer
+            balls={atBatStatus.data?.balls ?? 3}
+            strikes={atBatStatus.data?.strikes ?? 2}
             start={Number(sessionStatus.data?.phaseStartTimestamp)}
             delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}
             isActive={
@@ -242,11 +294,16 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
         <Flex w={{ base: "320px", lg: "1000px" }} placeSelf={"center"} minH={"108px"}>
           <Narrate
-            sessionID={selectedSession?.sessionID ?? 0}
+            sessionID={sessionStatus.data?.sessionID ?? 0}
             speed={1}
             isComplete={sessionStatus.data.progress === 5}
           />
         </Flex>
+      )}
+      {atBatStatus.data && (
+        <Text fontSize={"20px"} mx={"auto"}>{`${numberToOrdinal(
+          atBatStatus.data.numSessions,
+        )} pitch`}</Text>
       )}
       <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"} w={"100%"}>
         {!isSmallView && (
