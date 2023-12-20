@@ -15,13 +15,9 @@
 }
 
 
-
-
 .data {
     color: #FFF;
     text-align: center;
-    leading-trim: both;
-    text-edge: cap;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
@@ -34,8 +30,6 @@
     margin-left: -7px;
     color: #BFBFBF;
     text-align: center;
-    leading-trim: both;
-    text-edge: cap;
     font-size: 8px;
     font-style: normal;
     font-weight: 300;
@@ -46,12 +40,6 @@
 }
 
 @media (max-width: 1023px) {
-    /*.container {*/
-    /*    !*flex-direction: column;*!*/
-    /*    !*max-width: 100px;*!*/
-    /*    padding: 5px;*/
-    /*    flex-wrap: wrap;*/
-    /*}*/
     .data {
         font-size: 8px;
     }

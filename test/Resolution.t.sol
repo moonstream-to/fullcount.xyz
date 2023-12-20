@@ -64,22 +64,22 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 0 --pitch-hor 3 --swing-type 1
+     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
      * --swing-vert 0 --swing-hor 0
      */
-    function test_1049021687222126610802454284509212319382457272717699306926378180865829833280_Fast_HighBall_OutsideStrike_14846_Power_HighBall_InsideBall_Single(
+    function test_81893017823874769801906908035192746668162095865890101500053572628606081271057_Slow_HighStrike_OutsideStrike_4070_Contact_HighBall_InsideBall_Strike(
     )
         public
     {
-        //  Nonces 1049021687222126610802454284509212319382457272717699306926378180865829833280 and 14846 generate
-        // random number 6000 which maps to Outcome.Single.
+        //  Nonces 81893017823874769801906908035192746668162095865890101500053572628606081271057 and 4070 generate
+        // random number 0 which maps to Outcome.Strike.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            1_049_021_687_222_126_610_802_454_284_509_212_319_382_457_272_717_699_306_926_378_180_865_829_833_280,
-            PitchSpeed.Fast,
-            VerticalLocation.HighBall,
+            81_893_017_823_874_769_801_906_908_035_192_746_668_162_095_865_890_101_500_053_572_628_606_081_271_057,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
             HorizontalLocation.OutsideStrike
         );
 
@@ -87,7 +87,355 @@ contract ResolutionTest is FullcountTestBase {
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(14_846, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+        Swing memory swing = Swing(4070, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Strike, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Strike));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
+     * --swing-vert 0 --swing-hor 0
+     */
+    function test_81893017823874769801906908035192746668162095865890101500053572628606081271057_Slow_HighStrike_OutsideStrike_4167_Contact_HighBall_InsideBall_Strike(
+    )
+        public
+    {
+        //  Nonces 81893017823874769801906908035192746668162095865890101500053572628606081271057 and 4167 generate
+        // random number 4999 which maps to Outcome.Strike.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            81_893_017_823_874_769_801_906_908_035_192_746_668_162_095_865_890_101_500_053_572_628_606_081_271_057,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(4167, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Strike, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Strike));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
+     * --swing-vert 0 --swing-hor 0
+     */
+    function test_81893017823874769801906908035192746668162095865890101500053572628606081271057_Slow_HighStrike_OutsideStrike_15216_Contact_HighBall_InsideBall_Strike(
+    )
+        public
+    {
+        //  Nonces 81893017823874769801906908035192746668162095865890101500053572628606081271057 and 15216 generate
+        // random number 9999 which maps to Outcome.Strike.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            81_893_017_823_874_769_801_906_908_035_192_746_668_162_095_865_890_101_500_053_572_628_606_081_271_057,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(15_216, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Strike, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Strike));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
+     * --swing-vert 1 --swing-hor 2
+     */
+    function test_8896391875205613932298229962938938694841002446457628837939997515662919318336_Fast_Middle_OutsideStrike_4043_Power_HighStrike_Middle_Foul(
+    )
+        public
+    {
+        //  Nonces 8896391875205613932298229962938938694841002446457628837939997515662919318336 and 4043 generate random
+        // number 5249 which maps to Outcome.Foul.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            8_896_391_875_205_613_932_298_229_962_938_938_694_841_002_446_457_628_837_939_997_515_662_919_318_336,
+            PitchSpeed.Fast,
+            VerticalLocation.Middle,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(4043, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.Middle);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Foul, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Foul));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
+     * --swing-vert 1 --swing-hor 2
+     */
+    function test_8896391875205613932298229962938938694841002446457628837939997515662919318336_Fast_Middle_OutsideStrike_19734_Power_HighStrike_Middle_Foul(
+    )
+        public
+    {
+        //  Nonces 8896391875205613932298229962938938694841002446457628837939997515662919318336 and 19734 generate
+        // random number 4500 which maps to Outcome.Foul.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            8_896_391_875_205_613_932_298_229_962_938_938_694_841_002_446_457_628_837_939_997_515_662_919_318_336,
+            PitchSpeed.Fast,
+            VerticalLocation.Middle,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(19_734, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.Middle);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Foul, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Foul));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
+     * --swing-vert 1 --swing-hor 2
+     */
+    function test_8896391875205613932298229962938938694841002446457628837939997515662919318336_Fast_Middle_OutsideStrike_5875_Power_HighStrike_Middle_Foul(
+    )
+        public
+    {
+        //  Nonces 8896391875205613932298229962938938694841002446457628837939997515662919318336 and 5875 generate random
+        // number 5999 which maps to Outcome.Foul.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            8_896_391_875_205_613_932_298_229_962_938_938_694_841_002_446_457_628_837_939_997_515_662_919_318_336,
+            PitchSpeed.Fast,
+            VerticalLocation.Middle,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(5875, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.Middle);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Foul, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Foul));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 4 --pitch-hor 0 --swing-type 0
+     * --swing-vert 4 --swing-hor 2
+     */
+    function test_73880998331054308679733447677928138855511350019791931962590171442024355864647_Fast_LowBall_InsideBall_11419_Contact_LowBall_Middle_Single(
+    )
+        public
+    {
+        //  Nonces 73880998331054308679733447677928138855511350019791931962590171442024355864647 and 11419 generate
+        // random number 3000 which maps to Outcome.Single.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            73_880_998_331_054_308_679_733_447_677_928_138_855_511_350_019_791_931_962_590_171_442_024_355_864_647,
+            PitchSpeed.Fast,
+            VerticalLocation.LowBall,
+            HorizontalLocation.InsideBall
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(11_419, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -122,30 +470,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 0 --pitch-hor 3 --swing-type 1
-     * --swing-vert 0 --swing-hor 0
+     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 4 --pitch-hor 0 --swing-type 0
+     * --swing-vert 4 --swing-hor 2
      */
-    function test_1049021687222126610802454284509212319382457272717699306926378180865829833280_Fast_HighBall_OutsideStrike_5672_Power_HighBall_InsideBall_Single(
+    function test_73880998331054308679733447677928138855511350019791931962590171442024355864647_Fast_LowBall_InsideBall_3389_Contact_LowBall_Middle_Single(
     )
         public
     {
-        //  Nonces 1049021687222126610802454284509212319382457272717699306926378180865829833280 and 5672 generate random
-        // number 6635 which maps to Outcome.Single.
+        //  Nonces 73880998331054308679733447677928138855511350019791931962590171442024355864647 and 3389 generate
+        // random number 3954 which maps to Outcome.Single.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            1_049_021_687_222_126_610_802_454_284_509_212_319_382_457_272_717_699_306_926_378_180_865_829_833_280,
+            73_880_998_331_054_308_679_733_447_677_928_138_855_511_350_019_791_931_962_590_171_442_024_355_864_647,
             PitchSpeed.Fast,
-            VerticalLocation.HighBall,
-            HorizontalLocation.OutsideStrike
+            VerticalLocation.LowBall,
+            HorizontalLocation.InsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(5672, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+        Swing memory swing = Swing(3389, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -180,30 +528,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 2 --pitch-type 0 --pitch-vert 0 --pitch-hor 3 --swing-type 1
-     * --swing-vert 0 --swing-hor 0
+     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 4 --pitch-hor 0 --swing-type 0
+     * --swing-vert 4 --swing-hor 2
      */
-    function test_1049021687222126610802454284509212319382457272717699306926378180865829833280_Fast_HighBall_OutsideStrike_3623_Power_HighBall_InsideBall_Single(
+    function test_73880998331054308679733447677928138855511350019791931962590171442024355864647_Fast_LowBall_InsideBall_11698_Contact_LowBall_Middle_Single(
     )
         public
     {
-        //  Nonces 1049021687222126610802454284509212319382457272717699306926378180865829833280 and 3623 generate random
-        // number 6317 which maps to Outcome.Single.
+        //  Nonces 73880998331054308679733447677928138855511350019791931962590171442024355864647 and 11698 generate
+        // random number 4909 which maps to Outcome.Single.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            1_049_021_687_222_126_610_802_454_284_509_212_319_382_457_272_717_699_306_926_378_180_865_829_833_280,
+            73_880_998_331_054_308_679_733_447_677_928_138_855_511_350_019_791_931_962_590_171_442_024_355_864_647,
             PitchSpeed.Fast,
-            VerticalLocation.HighBall,
-            HorizontalLocation.OutsideStrike
+            VerticalLocation.LowBall,
+            HorizontalLocation.InsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(3623, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.InsideBall);
+        Swing memory swing = Swing(11_698, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.Middle);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -238,556 +586,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 1 --pitch-hor 3 --swing-type 0
-     * --swing-vert 3 --swing-hor 3
-     */
-    function test_13878950540724399130699174649043457636982143338026946178985896842721427747167_Fast_HighStrike_OutsideStrike_27426_Contact_LowStrike_OutsideStrike_HomeRun(
-    )
-        public
-    {
-        //  Nonces 13878950540724399130699174649043457636982143338026946178985896842721427747167 and 27426 generate
-        // random number 4568 which maps to Outcome.HomeRun.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            13_878_950_540_724_399_130_699_174_649_043_457_636_982_143_338_026_946_178_985_896_842_721_427_747_167,
-            PitchSpeed.Fast,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideStrike
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing =
-            Swing(27_426, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 1 --pitch-hor 3 --swing-type 0
-     * --swing-vert 3 --swing-hor 3
-     */
-    function test_13878950540724399130699174649043457636982143338026946178985896842721427747167_Fast_HighStrike_OutsideStrike_24391_Contact_LowStrike_OutsideStrike_HomeRun(
-    )
-        public
-    {
-        //  Nonces 13878950540724399130699174649043457636982143338026946178985896842721427747167 and 24391 generate
-        // random number 4783 which maps to Outcome.HomeRun.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            13_878_950_540_724_399_130_699_174_649_043_457_636_982_143_338_026_946_178_985_896_842_721_427_747_167,
-            PitchSpeed.Fast,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideStrike
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing =
-            Swing(24_391, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 1 --pitch-hor 3 --swing-type 0
-     * --swing-vert 3 --swing-hor 3
-     */
-    function test_13878950540724399130699174649043457636982143338026946178985896842721427747167_Fast_HighStrike_OutsideStrike_2785_Contact_LowStrike_OutsideStrike_HomeRun(
-    )
-        public
-    {
-        //  Nonces 13878950540724399130699174649043457636982143338026946178985896842721427747167 and 2785 generate
-        // random number 4999 which maps to Outcome.HomeRun.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            13_878_950_540_724_399_130_699_174_649_043_457_636_982_143_338_026_946_178_985_896_842_721_427_747_167,
-            PitchSpeed.Fast,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideStrike
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing =
-            Swing(2785, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 0 --pitch-vert 2 --pitch-hor 0 --swing-type 1
-     * --swing-vert 1 --swing-hor 1
-     */
-    function test_89945021098686570139325674050881369998229748902165957706437741571902570180120_Fast_Middle_InsideBall_11382_Power_HighStrike_InsideStrike_Strikeout(
-    )
-        public
-    {
-        //  Nonces 89945021098686570139325674050881369998229748902165957706437741571902570180120 and 11382 generate
-        // random number 0 which maps to Outcome.Strikeout.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            89_945_021_098_686_570_139_325_674_050_881_369_998_229_748_902_165_957_706_437_741_571_902_570_180_120,
-            PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.InsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing =
-            Swing(11_382, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.InsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Strikeout, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 0 --pitch-vert 2 --pitch-hor 0 --swing-type 1
-     * --swing-vert 1 --swing-hor 1
-     */
-    function test_89945021098686570139325674050881369998229748902165957706437741571902570180120_Fast_Middle_InsideBall_8307_Power_HighStrike_InsideStrike_Strikeout(
-    )
-        public
-    {
-        //  Nonces 89945021098686570139325674050881369998229748902165957706437741571902570180120 and 8307 generate
-        // random number 2999 which maps to Outcome.Strikeout.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            89_945_021_098_686_570_139_325_674_050_881_369_998_229_748_902_165_957_706_437_741_571_902_570_180_120,
-            PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.InsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing = Swing(8307, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.InsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Strikeout, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 0 --pitch-type 0 --pitch-vert 2 --pitch-hor 0 --swing-type 1
-     * --swing-vert 1 --swing-hor 1
-     */
-    function test_89945021098686570139325674050881369998229748902165957706437741571902570180120_Fast_Middle_InsideBall_5872_Power_HighStrike_InsideStrike_Strikeout(
-    )
-        public
-    {
-        //  Nonces 89945021098686570139325674050881369998229748902165957706437741571902570180120 and 5872 generate
-        // random number 5999 which maps to Outcome.Strikeout.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            89_945_021_098_686_570_139_325_674_050_881_369_998_229_748_902_165_957_706_437_741_571_902_570_180_120,
-            PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.InsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing = Swing(5872, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.InsideStrike);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Strikeout, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Strikeout));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 1 --pitch-vert 1 --pitch-hor 4 --swing-type 1
+     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 0 --pitch-vert 1 --pitch-hor 4 --swing-type 0
      * --swing-vert 4 --swing-hor 4
      */
-    function test_100481080998296392191365173002285024694107022523030749537901599408673377815667_Slow_HighStrike_OutsideBall_13874_Power_LowBall_OutsideBall_Triple(
+    function test_91570361361086801704628331303643350164779775915959877737366882739133169692606_Fast_HighStrike_OutsideBall_5661_Contact_LowBall_OutsideBall_Double(
     )
         public
     {
-        //  Nonces 100481080998296392191365173002285024694107022523030749537901599408673377815667 and 13874 generate
-        // random number 6837 which maps to Outcome.Triple.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            100_481_080_998_296_392_191_365_173_002_285_024_694_107_022_523_030_749_537_901_599_408_673_377_815_667,
-            PitchSpeed.Slow,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing = Swing(13_874, SwingType.Power, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 1 --pitch-vert 1 --pitch-hor 4 --swing-type 1
-     * --swing-vert 4 --swing-hor 4
-     */
-    function test_100481080998296392191365173002285024694107022523030749537901599408673377815667_Slow_HighStrike_OutsideBall_1859_Power_LowBall_OutsideBall_Triple(
-    )
-        public
-    {
-        //  Nonces 100481080998296392191365173002285024694107022523030749537901599408673377815667 and 1859 generate
-        // random number 6846 which maps to Outcome.Triple.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            100_481_080_998_296_392_191_365_173_002_285_024_694_107_022_523_030_749_537_901_599_408_673_377_815_667,
-            PitchSpeed.Slow,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing = Swing(1859, SwingType.Power, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 1 --pitch-vert 1 --pitch-hor 4 --swing-type 1
-     * --swing-vert 4 --swing-hor 4
-     */
-    function test_100481080998296392191365173002285024694107022523030749537901599408673377815667_Slow_HighStrike_OutsideBall_14754_Power_LowBall_OutsideBall_Triple(
-    )
-        public
-    {
-        //  Nonces 100481080998296392191365173002285024694107022523030749537901599408673377815667 and 14754 generate
-        // random number 6855 which maps to Outcome.Triple.
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Pitch memory pitch = Pitch(
-            100_481_080_998_296_392_191_365_173_002_285_024_694_107_022_523_030_749_537_901_599_408_673_377_815_667,
-            PitchSpeed.Slow,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideBall
-        );
-
-        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
-
-        assertEq(game.sessionProgress(SessionID), 3);
-
-        Swing memory swing = Swing(14_754, SwingType.Power, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
-
-        _commitSwing(SessionID, player2, player2PrivateKey, swing);
-
-        assertEq(game.sessionProgress(SessionID), 4);
-
-        // Pitcher reveals first.
-        _revealPitch(SessionID, player1, pitch);
-
-        vm.startPrank(player2);
-
-        vm.expectEmit(address(game));
-        emit SessionResolved(
-            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
-        );
-
-        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
-
-        vm.stopPrank();
-
-        Session memory session = game.getSession(SessionID);
-        assertTrue(session.didBatterReveal);
-        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
-
-        Swing memory sessionSwing = session.batterReveal;
-        assertEq(sessionSwing.nonce, swing.nonce);
-        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
-        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
-        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
-
-        assertEq(game.sessionProgress(SessionID), 5);
-    }
-
-    /**
-     * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
-     * --swing-vert 3 --swing-hor 1
-     */
-    function test_27396150803863136439008615961271347825519983904573989306967321670860879085882_Fast_Middle_OutsideStrike_5335_Power_LowStrike_InsideStrike_Double(
-    )
-        public
-    {
-        //  Nonces 27396150803863136439008615961271347825519983904573989306967321670860879085882 and 5335 generate
+        //  Nonces 91570361361086801704628331303643350164779775915959877737366882739133169692606 and 5661 generate
         // random number 6736 which maps to Outcome.Double.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            27_396_150_803_863_136_439_008_615_961_271_347_825_519_983_904_573_989_306_967_321_670_860_879_085_882,
+            91_570_361_361_086_801_704_628_331_303_643_350_164_779_775_915_959_877_737_366_882_739_133_169_692_606,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.OutsideStrike
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(5335, SwingType.Power, VerticalLocation.LowStrike, HorizontalLocation.InsideStrike);
+        Swing memory swing = Swing(5661, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -822,30 +644,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
-     * --swing-vert 3 --swing-hor 1
+     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 0 --pitch-vert 1 --pitch-hor 4 --swing-type 0
+     * --swing-vert 4 --swing-hor 4
      */
-    function test_27396150803863136439008615961271347825519983904573989306967321670860879085882_Fast_Middle_OutsideStrike_4531_Power_LowStrike_InsideStrike_Double(
+    function test_91570361361086801704628331303643350164779775915959877737366882739133169692606_Fast_HighStrike_OutsideBall_195_Contact_LowBall_OutsideBall_Double(
     )
         public
     {
-        //  Nonces 27396150803863136439008615961271347825519983904573989306967321670860879085882 and 4531 generate
-        // random number 6836 which maps to Outcome.Double.
+        //  Nonces 91570361361086801704628331303643350164779775915959877737366882739133169692606 and 195 generate random
+        // number 6976 which maps to Outcome.Double.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            27_396_150_803_863_136_439_008_615_961_271_347_825_519_983_904_573_989_306_967_321_670_860_879_085_882,
+            91_570_361_361_086_801_704_628_331_303_643_350_164_779_775_915_959_877_737_366_882_739_133_169_692_606,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.OutsideStrike
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(4531, SwingType.Power, VerticalLocation.LowStrike, HorizontalLocation.InsideStrike);
+        Swing memory swing = Swing(195, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -880,30 +702,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 3 --pitch-type 0 --pitch-vert 2 --pitch-hor 3 --swing-type 1
-     * --swing-vert 3 --swing-hor 1
+     * $ fullcount codegen outcome-tests --desired-outcome 4 --pitch-type 0 --pitch-vert 1 --pitch-hor 4 --swing-type 0
+     * --swing-vert 4 --swing-hor 4
      */
-    function test_27396150803863136439008615961271347825519983904573989306967321670860879085882_Fast_Middle_OutsideStrike_9787_Power_LowStrike_InsideStrike_Double(
+    function test_91570361361086801704628331303643350164779775915959877737366882739133169692606_Fast_HighStrike_OutsideBall_20124_Contact_LowBall_OutsideBall_Double(
     )
         public
     {
-        //  Nonces 27396150803863136439008615961271347825519983904573989306967321670860879085882 and 9787 generate
-        // random number 6636 which maps to Outcome.Double.
+        //  Nonces 91570361361086801704628331303643350164779775915959877737366882739133169692606 and 20124 generate
+        // random number 6856 which maps to Outcome.Double.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            27_396_150_803_863_136_439_008_615_961_271_347_825_519_983_904_573_989_306_967_321_670_860_879_085_882,
+            91_570_361_361_086_801_704_628_331_303_643_350_164_779_775_915_959_877_737_366_882_739_133_169_692_606,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.OutsideStrike
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(9787, SwingType.Power, VerticalLocation.LowStrike, HorizontalLocation.InsideStrike);
+        Swing memory swing = Swing(20_124, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -938,22 +760,22 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 0 --pitch-vert 2 --pitch-hor 2 --swing-type 1
-     * --swing-vert 2 --swing-hor 2
+     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 4 --pitch-hor 2 --swing-type 0
+     * --swing-vert 3 --swing-hor 3
      */
-    function test_111500307696102841260223026743650025952726101597964309549886540063107304466468_Fast_Middle_Middle_2841_Power_Middle_Middle_InPlayOut(
+    function test_12368273458357240996887706903519576562044643416501980488897206542627568072921_Fast_LowBall_Middle_28771_Contact_LowStrike_OutsideStrike_Triple(
     )
         public
     {
-        //  Nonces 111500307696102841260223026743650025952726101597964309549886540063107304466468 and 2841 generate
-        // random number 5500 which maps to Outcome.InPlayOut.
+        //  Nonces 12368273458357240996887706903519576562044643416501980488897206542627568072921 and 28771 generate
+        // random number 5513 which maps to Outcome.Triple.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            111_500_307_696_102_841_260_223_026_743_650_025_952_726_101_597_964_309_549_886_540_063_107_304_466_468,
+            12_368_273_458_357_240_996_887_706_903_519_576_562_044_643_416_501_980_488_897_206_542_627_568_072_921,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
+            VerticalLocation.LowBall,
             HorizontalLocation.Middle
         );
 
@@ -961,7 +783,361 @@ contract ResolutionTest is FullcountTestBase {
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(2841, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Swing memory swing =
+            Swing(28_771, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 4 --pitch-hor 2 --swing-type 0
+     * --swing-vert 3 --swing-hor 3
+     */
+    function test_12368273458357240996887706903519576562044643416501980488897206542627568072921_Fast_LowBall_Middle_2759_Contact_LowStrike_OutsideStrike_Triple(
+    )
+        public
+    {
+        //  Nonces 12368273458357240996887706903519576562044643416501980488897206542627568072921 and 2759 generate
+        // random number 5540 which maps to Outcome.Triple.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            12_368_273_458_357_240_996_887_706_903_519_576_562_044_643_416_501_980_488_897_206_542_627_568_072_921,
+            PitchSpeed.Fast,
+            VerticalLocation.LowBall,
+            HorizontalLocation.Middle
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing =
+            Swing(2759, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 5 --pitch-type 0 --pitch-vert 4 --pitch-hor 2 --swing-type 0
+     * --swing-vert 3 --swing-hor 3
+     */
+    function test_12368273458357240996887706903519576562044643416501980488897206542627568072921_Fast_LowBall_Middle_5156_Contact_LowStrike_OutsideStrike_Triple(
+    )
+        public
+    {
+        //  Nonces 12368273458357240996887706903519576562044643416501980488897206542627568072921 and 5156 generate
+        // random number 5567 which maps to Outcome.Triple.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            12_368_273_458_357_240_996_887_706_903_519_576_562_044_643_416_501_980_488_897_206_542_627_568_072_921,
+            PitchSpeed.Fast,
+            VerticalLocation.LowBall,
+            HorizontalLocation.Middle
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing =
+            Swing(5156, SwingType.Contact, VerticalLocation.LowStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
+     * --swing-vert 1 --swing-hor 3
+     */
+    function test_63640271245765366210780587460610203501690580269930603495014854898867107880639_Slow_HighStrike_OutsideStrike_1982_Contact_HighStrike_OutsideStrike_HomeRun(
+    )
+        public
+    {
+        //  Nonces 63640271245765366210780587460610203501690580269930603495014854898867107880639 and 1982 generate
+        // random number 5280 which maps to Outcome.HomeRun.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            63_640_271_245_765_366_210_780_587_460_610_203_501_690_580_269_930_603_495_014_854_898_867_107_880_639,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing =
+            Swing(1982, SwingType.Contact, VerticalLocation.HighStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
+     * --swing-vert 1 --swing-hor 3
+     */
+    function test_63640271245765366210780587460610203501690580269930603495014854898867107880639_Slow_HighStrike_OutsideStrike_2893_Contact_HighStrike_OutsideStrike_HomeRun(
+    )
+        public
+    {
+        //  Nonces 63640271245765366210780587460610203501690580269930603495014854898867107880639 and 2893 generate
+        // random number 5639 which maps to Outcome.HomeRun.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            63_640_271_245_765_366_210_780_587_460_610_203_501_690_580_269_930_603_495_014_854_898_867_107_880_639,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing =
+            Swing(2893, SwingType.Contact, VerticalLocation.HighStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 1 --pitch-vert 1 --pitch-hor 3 --swing-type 0
+     * --swing-vert 1 --swing-hor 3
+     */
+    function test_63640271245765366210780587460610203501690580269930603495014854898867107880639_Slow_HighStrike_OutsideStrike_666_Contact_HighStrike_OutsideStrike_HomeRun(
+    )
+        public
+    {
+        //  Nonces 63640271245765366210780587460610203501690580269930603495014854898867107880639 and 666 generate random
+        // number 5999 which maps to Outcome.HomeRun.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            63_640_271_245_765_366_210_780_587_460_610_203_501_690_580_269_930_603_495_014_854_898_867_107_880_639,
+            PitchSpeed.Slow,
+            VerticalLocation.HighStrike,
+            HorizontalLocation.OutsideStrike
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing =
+            Swing(666, SwingType.Contact, VerticalLocation.HighStrike, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.HomeRun, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.HomeRun));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
+
+    /**
+     * To generate boundary and interior condition tests for this test case:
+     * $ fullcount codegen outcome-tests --desired-outcome 7 --pitch-type 0 --pitch-vert 0 --pitch-hor 4 --swing-type 0
+     * --swing-vert 4 --swing-hor 4
+     */
+    function test_49731744772638454924760285687313284121695085924285688079658751756900959447272_Fast_HighBall_OutsideBall_27400_Contact_LowBall_OutsideBall_InPlayOut(
+    )
+        public
+    {
+        //  Nonces 49731744772638454924760285687313284121695085924285688079658751756900959447272 and 27400 generate
+        // random number 7000 which maps to Outcome.InPlayOut.
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(
+            49_731_744_772_638_454_924_760_285_687_313_284_121_695_085_924_285_688_079_658_751_756_900_959_447_272,
+            PitchSpeed.Fast,
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideBall
+        );
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(27_400, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -996,30 +1172,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 0 --pitch-vert 2 --pitch-hor 2 --swing-type 1
-     * --swing-vert 2 --swing-hor 2
+     * $ fullcount codegen outcome-tests --desired-outcome 7 --pitch-type 0 --pitch-vert 0 --pitch-hor 4 --swing-type 0
+     * --swing-vert 4 --swing-hor 4
      */
-    function test_111500307696102841260223026743650025952726101597964309549886540063107304466468_Fast_Middle_Middle_26696_Power_Middle_Middle_InPlayOut(
+    function test_49731744772638454924760285687313284121695085924285688079658751756900959447272_Fast_HighBall_OutsideBall_625_Contact_LowBall_OutsideBall_InPlayOut(
     )
         public
     {
-        //  Nonces 111500307696102841260223026743650025952726101597964309549886540063107304466468 and 26696 generate
-        // random number 7749 which maps to Outcome.InPlayOut.
+        //  Nonces 49731744772638454924760285687313284121695085924285688079658751756900959447272 and 625 generate random
+        // number 8499 which maps to Outcome.InPlayOut.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            111_500_307_696_102_841_260_223_026_743_650_025_952_726_101_597_964_309_549_886_540_063_107_304_466_468,
+            49_731_744_772_638_454_924_760_285_687_313_284_121_695_085_924_285_688_079_658_751_756_900_959_447_272,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.Middle
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(26_696, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Swing memory swing = Swing(625, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 
@@ -1054,30 +1230,30 @@ contract ResolutionTest is FullcountTestBase {
 
     /**
      * To generate boundary and interior condition tests for this test case:
-     * $ fullcount codegen outcome-tests --desired-outcome 6 --pitch-type 0 --pitch-vert 2 --pitch-hor 2 --swing-type 1
-     * --swing-vert 2 --swing-hor 2
+     * $ fullcount codegen outcome-tests --desired-outcome 7 --pitch-type 0 --pitch-vert 0 --pitch-hor 4 --swing-type 0
+     * --swing-vert 4 --swing-hor 4
      */
-    function test_111500307696102841260223026743650025952726101597964309549886540063107304466468_Fast_Middle_Middle_1966_Power_Middle_Middle_InPlayOut(
+    function test_49731744772638454924760285687313284121695085924285688079658751756900959447272_Fast_HighBall_OutsideBall_2165_Contact_LowBall_OutsideBall_InPlayOut(
     )
         public
     {
-        //  Nonces 111500307696102841260223026743650025952726101597964309549886540063107304466468 and 1966 generate
+        //  Nonces 49731744772638454924760285687313284121695085924285688079658751756900959447272 and 2165 generate
         // random number 9999 which maps to Outcome.InPlayOut.
 
         assertEq(game.sessionProgress(SessionID), 3);
 
         Pitch memory pitch = Pitch(
-            111_500_307_696_102_841_260_223_026_743_650_025_952_726_101_597_964_309_549_886_540_063_107_304_466_468,
+            49_731_744_772_638_454_924_760_285_687_313_284_121_695_085_924_285_688_079_658_751_756_900_959_447_272,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.Middle
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideBall
         );
 
         _commitPitch(SessionID, player1, player1PrivateKey, pitch);
 
         assertEq(game.sessionProgress(SessionID), 3);
 
-        Swing memory swing = Swing(1966, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.Middle);
+        Swing memory swing = Swing(2165, SwingType.Contact, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
 
         _commitSwing(SessionID, player2, player2PrivateKey, swing);
 

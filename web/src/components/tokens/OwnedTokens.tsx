@@ -142,7 +142,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.startSession(tokenAddress, token.id, role, requireSignature),
+        gameContract.methods.startAtBat(tokenAddress, token.id, role, requireSignature),
       );
     },
     {
@@ -497,7 +497,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             ownedTokens.data
               .filter((t) => !forJoin || !t.isStaked)
               .map((token: OwnedToken, idx: number) => (
-                <>
+                <React.Fragment key={idx}>
                   {joinSession.isLoading && joinSession.variables?.token.id === token.id ? (
                     <Flex h={"75px"} w={"75px"} alignItems={"center"} justifyContent={"center"}>
                       <Spinner />
@@ -506,7 +506,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                     <Image
                       src={token.image}
                       alt={""}
-                      key={idx}
                       cursor={"pointer"}
                       h={"75px"}
                       w={"75px"}
@@ -522,7 +521,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                       }}
                     />
                   )}
-                </>
+                </React.Fragment>
               ))}
           {ownedTokens.data && ownedTokens.data.length > 0 && (
             <Flex

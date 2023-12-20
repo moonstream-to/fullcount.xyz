@@ -4,45 +4,17 @@ from typing import Optional, List, Tuple
 
 from . import data
 
-Distance0: data.OutcomeDistribution = (
-    0,
-    0,
-    4458,
-    1408,
-    126,
-    1008,
-    3000,
-)
+Distance0: data.OutcomeDistribution = (0, 0, 0, 4458, 1408, 126, 1008, 3000)
 
-Distance1: data.OutcomeDistribution = (
-    500,
-    0,
-    3185,
-    1005,
-    90,
-    720,
-    4500,
-)
+Distance1: data.OutcomeDistribution = (500, 0, 500, 3185, 1005, 90, 720, 4000)
 
-Distance2: data.OutcomeDistribution = (
-    2000,
-    0,
-    1910,
-    603,
-    55,
-    432,
-    5000,
-)
+Distance2: data.OutcomeDistribution = (1500, 0, 1500, 1910, 603, 55, 432, 4000)
 
-DistanceGT2: data.OutcomeDistribution = (
-    6000,
-    0,
-    636,
-    201,
-    19,
-    144,
-    3000,
-)
+Distance3: data.OutcomeDistribution = (4500, 0, 1500, 736, 241, 23, 0, 3000)
+
+Distance4: data.OutcomeDistribution = (6000, 0, 1000, 0, 0, 0, 0, 3000)
+
+DistanceGT4: data.OutcomeDistribution = (10000, 0, 0, 0, 0, 0, 0, 0)
 
 
 def result(
@@ -78,8 +50,12 @@ def result(
         distribution = Distance1
     elif distance == 2:
         distribution = Distance2
-    elif distance > 2:
-        distribution = DistanceGT2
+    elif distance == 3:
+        distribution = Distance3   
+    elif distance == 4:
+        distribution = Distance4
+    elif distance > 4:
+        distribution = DistanceGT4
 
     return data.sample(distribution)
 

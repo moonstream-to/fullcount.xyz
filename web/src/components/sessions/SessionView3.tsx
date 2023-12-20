@@ -2,10 +2,10 @@ import { Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
 import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
@@ -112,6 +112,56 @@ const SessionView3 = ({ session }: { session: Session }) => {
     joinSession.mutate({ sessionID: session.sessionID, token: selectedToken });
   };
 
+  const atBat = useQuery(
+    ["sessionAtBatID", session],
+    () => {
+      if (!session) return undefined;
+      return gameContract.methods.SessionAtBat(session.sessionID).call();
+    },
+    {
+      refetchInterval: 100000000,
+      onSuccess: () => {
+        atBatStatus.refetch();
+      },
+    },
+  );
+
+  const atBatStatus = useQuery(
+    ["atBatStatus", atBat.data],
+    async () => {
+      if (!atBat.data) {
+        return;
+      }
+      const atBatID = atBat.data;
+      const status = await gameContract.methods.getAtBat(atBatID).call();
+      const numSessions = Number(
+        await gameContract.methods.getNumberOfSessionsInAtBat(atBatID).call(),
+      );
+      const currentSessionID = await gameContract.methods
+        .AtBatSessions(atBatID, numSessions - 1)
+        .call();
+      console.log({
+        atBat: {
+          ...status,
+          currentSessionID,
+          numSessions,
+        },
+      });
+      return {
+        ...status,
+        currentSessionID,
+        numSessions,
+      };
+    },
+    {
+      enabled: false,
+    },
+  );
+
+  useEffect(() => {
+    atBat.refetch();
+  }, [session]);
+
   if (!progressFilter[session.progress]) {
     return <></>;
   }
@@ -126,6 +176,17 @@ const SessionView3 = ({ session }: { session: Session }) => {
     "#FF8D8D",
   ];
 
+  const outcomes = [
+    "InProgress",
+    "Strikeout",
+    "Walk",
+    "Single",
+    "Double",
+    "Triple",
+    "HomeRun",
+    "InPlayOut",
+  ];
+
   return (
     <Flex
       justifyContent={"space-between"}
@@ -134,12 +195,17 @@ const SessionView3 = ({ session }: { session: Session }) => {
       py={"15px"}
       direction={{ base: "column", lg: "row" }}
     >
-      <Text
-        color={progressMessageColors[session.progress]}
-        title={`Session ${session.sessionID}. Progress - ${session.progress}`}
-      >
-        {progressMessage(session)}
-      </Text>
+      {/*<Text*/}
+      {/*  color={progressMessageColors[session.progress]}*/}
+      {/*  title={`Session ${session.sessionID}. Progress - ${session.progress}`}*/}
+      {/*>*/}
+      {/*  {progressMessage(session)}*/}
+      {/*</Text>*/}
+      {atBatStatus.data && (
+        <Text>{`Strike: ${atBatStatus.data.strikes}; Ball: ${atBatStatus.data.balls}; ${
+          outcomes[Number(atBatStatus.data.outcome)]
+        }`}</Text>
+      )}
 
       <Flex
         alignItems={{ base: "start", lg: "center" }}

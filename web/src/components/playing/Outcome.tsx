@@ -8,7 +8,16 @@ import BallAnimation from "./BallAnimation";
 import { Session } from "../../types";
 import BatAnimation from "./BatAnimation";
 import { useGameContext } from "../../contexts/GameContext";
-const outcomes = ["Strikeout", "Walk", "Single", "Double", "Triple", "Home Run", "In Play Out"];
+const outcomes = [
+  "Strike",
+  "Ball",
+  "Foul",
+  "Single",
+  "Double",
+  "Triple",
+  "Home Run",
+  "In Play Out",
+];
 const assets = FULLCOUNT_ASSETS_PATH;
 
 interface Swing {
@@ -46,16 +55,14 @@ const generateCell = (index: number) => (
 
 const Outcome = ({
   outcome,
-  isExpired,
   pitch,
   swing,
-  session,
+  onDone,
 }: {
   outcome: number;
-  isExpired: boolean;
   pitch: Pitch;
   swing: Swing;
-  session: Session;
+  onDone: () => void;
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isPitchSpeedVisible, setIsPitchSpeedVisible] = useState(false);
@@ -133,6 +140,11 @@ const Outcome = ({
         setTimeout(() => {
           setIsOutcomeVisible(true);
         }, 7500 + start),
+      );
+      timers.push(
+        setTimeout(() => {
+          onDone();
+        }, 9500 + start),
       );
       timers.push(setTimeout(() => playSound("clapping"), 7500 + start));
     } else {

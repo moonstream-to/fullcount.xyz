@@ -207,9 +207,9 @@ contract FullcountTestBase is Test {
 contract FullcountTestDeployment is FullcountTestBase {
     function test_Deployment() public {
         vm.expectEmit();
-        emit FullcountDeployed("0.0.4", secondsPerPhase);
+        emit FullcountDeployed("0.1.0", secondsPerPhase);
         Fullcount newGame = new Fullcount(secondsPerPhase);
-        assertEq(newGame.FullcountVersion(), "0.0.4");
+        assertEq(newGame.FullcountVersion(), "0.1.0");
         assertEq(newGame.SecondsPerPhase(), secondsPerPhase);
         assertEq(newGame.NumSessions(), 0);
     }
@@ -309,7 +309,7 @@ contract FullcountTest_startSession is FullcountTestBase {
         emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
         game.startSession(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
-        vm.expectRevert("Fullcount.startSession: NFT is already staked to a session.");
+        vm.expectRevert("Fullcount._startSession: NFT is already staked to a session.");
         game.startSession(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
         vm.stopPrank();
@@ -466,7 +466,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.startPrank(randomPerson);
 
-        vm.expectRevert("Fullcount.joinSession: session is already full");
+        vm.expectRevert("Fullcount._joinSession: session is already full");
         game.joinSession(sessionID, address(otherCharacterNFTs), nextOtherTokenID, "");
 
         vm.stopPrank();
@@ -519,7 +519,7 @@ contract FullcountTest_joinSession is FullcountTestBase {
 
         vm.startPrank(player2);
 
-        vm.expectRevert("Fullcount.joinSession: opponent left session");
+        vm.expectRevert("Fullcount._joinSession: opponent left session");
         game.joinSession(sessionID, address(otherCharacterNFTs), otherTokenID, "");
 
         vm.stopPrank();
@@ -1637,12 +1637,6 @@ contract FullcountTest_unstake is FullcountTestBase {
 }
 
 contract FullcountTest_inviteOnly is FullcountTestBase {
-    uint256 SessionID;
-    address PitcherNFTAddress;
-    uint256 PitcherTokenID;
-    address BatterNFTAddress;
-    uint256 BatterTokenID;
-
     function test_as_batter() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;

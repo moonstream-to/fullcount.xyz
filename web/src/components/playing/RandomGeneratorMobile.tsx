@@ -4,7 +4,7 @@ import Web3 from "web3";
 import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 
-const MOVEMENTS_NUMBER = 100;
+const MOVEMENTS_NUMBER = 30;
 
 const RandomGeneratorMobile = ({
   isActive,
@@ -16,10 +16,8 @@ const RandomGeneratorMobile = ({
   const web3 = new Web3();
 
   const [movements, setMovements] = useState<{ alpha: number; beta: number; gamma: number }[]>([]);
-  const [moved, setMoved] = useState("Not moved");
 
   const handleGenerate = () => {
-    setMoved("trying to");
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
@@ -27,23 +25,11 @@ const RandomGeneratorMobile = ({
       // @ts-ignore
       DeviceMotionEvent.requestPermission();
     }
-    // window.addEventListener("devicemotion", handleDeviceMotion);
     window.addEventListener("deviceorientation", handleOrientation);
+    setMovements([{ alpha: 0, beta: 0, gamma: 0 }]);
   };
 
-  // const handleDeviceMotion = useCallback((event: DeviceMotionEvent) => {
-  //   const { acceleration, rotationRate } = event;
-  //   if (acceleration && rotationRate) {
-  //     const moves = [acceleration.x, acceleration.y, acceleration.z]
-  //       .map((m) => m ?? 0)
-  //       .filter((m) => m !== 0);
-  //     setMovements((prevMovements) => [...prevMovements, ...moves]);
-  //   }
-  // }, []);
-
   function handleOrientation(event: DeviceOrientationEvent) {
-    setMoved("orientation");
-
     setMovements((prevMovements) => {
       const round = (value: number | null) => (value ? Number((value / 10).toFixed(1)) : 0);
       const newMove = {
@@ -64,15 +50,6 @@ const RandomGeneratorMobile = ({
   }
 
   const generateSeed = (points: { alpha: number; beta: number; gamma: number }[]) => {
-    function cantorPair(x: number, y: number): number {
-      return 0.5 * (x + y) * (x + y + 1) + y;
-    }
-
-    function uniqNumber(x: number, y: number, z: number): number {
-      const pairedXY = cantorPair(x, y);
-      return cantorPair(pairedXY, z);
-    }
-
     interface Coordinates {
       alpha: number;
       beta: number;
@@ -93,31 +70,15 @@ const RandomGeneratorMobile = ({
     onChange(uint256Seed);
   };
 
-  // useEffect(() => {
-  //   if (isActive && movements.length === 0) {
-  //     setMoved("trying to");
-  //     if (DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") {
-  //       DeviceMotionEvent.requestPermission();
-  //     }
-  //     window.addEventListener("devicemotion", handleDeviceMotion);
-  //   }
-  //
-  //   if (movements.length >= MOVEMENTS_NUMBER) {
-  //     window.removeEventListener("devicemotion", handleDeviceMotion);
-  //     generateSeed(movements);
-  //     setMovements([]);
-  //   }
-  //
-  //   return () => {
-  //     window.removeEventListener("devicemotion", handleDeviceMotion);
-  //   };
-  // }, [isActive, movements.length]);
+  useEffect(() => {
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation);
+    };
+  }, []);
 
   useEffect(() => {
     if (movements.length >= MOVEMENTS_NUMBER) {
-      // window.removeEventListener("devicemotion", handleDeviceMotion);
       window.removeEventListener("deviceorientation", handleOrientation);
-
       generateSeed(movements);
       setMovements([]);
     }
@@ -139,12 +100,6 @@ const RandomGeneratorMobile = ({
               <Text className={styles.moveMouseTip}>rotate your device</Text>
             </Flex>
           )}
-          {movements.length > 0 && (
-            <Text>{`alpha: ${movements.slice(-1)[0].alpha}; beta: ${
-              movements.slice(-1)[0].beta
-            }; gamma: ${movements.slice(-1)[0].gamma};`}</Text>
-          )}
-          <Text>{`length: ${movements.length}`}</Text>
         </>
       )}
       {!isActive && <Flex className={styles.completedAction}>Generated</Flex>}
