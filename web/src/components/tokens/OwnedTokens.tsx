@@ -142,7 +142,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       }
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.startSession(tokenAddress, token.id, role, requireSignature),
+        gameContract.methods.startAtBat(tokenAddress, token.id, role, requireSignature),
       );
     },
     {
