@@ -112,6 +112,20 @@ class Fullcount:
         contract_class = contract_from_build(self.contract_name)
         contract_class.publish_source(self.contract)
 
+    def at_bat_sessions(
+        self, arg1: int, arg2: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.AtBatSessions.call(
+            arg1, arg2, block_identifier=block_number
+        )
+
+    def at_bat_state(
+        self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.AtBatState.call(arg1, block_identifier=block_number)
+
     def distance0_distribution(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -136,11 +150,27 @@ class Fullcount:
             arg1, block_identifier=block_number
         )
 
-    def distance_gt2_distribution(
+    def distance3_distribution(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
         self.assert_contract_is_instantiated()
-        return self.contract.DistanceGT2Distribution.call(
+        return self.contract.Distance3Distribution.call(
+            arg1, block_identifier=block_number
+        )
+
+    def distance4_distribution(
+        self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.Distance4Distribution.call(
+            arg1, block_identifier=block_number
+        )
+
+    def distance_gt4_distribution(
+        self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.DistanceGT4Distribution.call(
             arg1, block_identifier=block_number
         )
 
@@ -149,6 +179,10 @@ class Fullcount:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.FullcountVersion.call(block_identifier=block_number)
+
+    def num_at_bats(self, block_number: Optional[Union[str, int]] = "latest") -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.NumAtBats.call(block_identifier=block_number)
 
     def num_sessions(self, block_number: Optional[Union[str, int]] = "latest") -> Any:
         self.assert_contract_is_instantiated()
@@ -159,6 +193,12 @@ class Fullcount:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.SecondsPerPhase.call(block_identifier=block_number)
+
+    def session_at_bat(
+        self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.SessionAtBat.call(arg1, block_identifier=block_number)
 
     def session_requires_signature(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
@@ -189,6 +229,12 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.abortSession(session_id, transaction_config)
 
+    def at_bat_hash(
+        self, at_bat_id: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.atBatHash.call(at_bat_id, block_identifier=block_number)
+
     def commit_pitch(
         self, session_id: int, signature: bytes, transaction_config
     ) -> Any:
@@ -204,6 +250,20 @@ class Fullcount:
     def eip712_domain(self, block_number: Optional[Union[str, int]] = "latest") -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.eip712Domain.call(block_identifier=block_number)
+
+    def get_at_bat(
+        self, at_bat_id: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.getAtBat.call(at_bat_id, block_identifier=block_number)
+
+    def get_number_of_sessions_in_at_bat(
+        self, at_bat_id: int, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.getNumberOfSessionsInAtBat.call(
+            at_bat_id, block_identifier=block_number
+        )
 
     def get_session(
         self, session_id: int, block_number: Optional[Union[str, int]] = "latest"
@@ -310,6 +370,19 @@ class Fullcount:
         self.assert_contract_is_instantiated()
         return self.contract.sessionProgress.call(
             session_id, block_identifier=block_number
+        )
+
+    def start_at_bat(
+        self,
+        nft_address: ChecksumAddress,
+        token_id: int,
+        role: int,
+        require_signature: bool,
+        transaction_config,
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.startAtBat(
+            nft_address, token_id, role, require_signature, transaction_config
         )
 
     def start_session(
@@ -431,6 +504,22 @@ def handle_verify_contract(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_at_bat_sessions(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.at_bat_sessions(
+        arg1=args.arg1, arg2=args.arg2, block_number=args.block_number
+    )
+    print(result)
+
+
+def handle_at_bat_state(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.at_bat_state(arg1=args.arg1, block_number=args.block_number)
+    print(result)
+
+
 def handle_distance0_distribution(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -458,10 +547,28 @@ def handle_distance2_distribution(args: argparse.Namespace) -> None:
     print(result)
 
 
-def handle_distance_gt2_distribution(args: argparse.Namespace) -> None:
+def handle_distance3_distribution(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
-    result = contract.distance_gt2_distribution(
+    result = contract.distance3_distribution(
+        arg1=args.arg1, block_number=args.block_number
+    )
+    print(result)
+
+
+def handle_distance4_distribution(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.distance4_distribution(
+        arg1=args.arg1, block_number=args.block_number
+    )
+    print(result)
+
+
+def handle_distance_gt4_distribution(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.distance_gt4_distribution(
         arg1=args.arg1, block_number=args.block_number
     )
     print(result)
@@ -471,6 +578,13 @@ def handle_fullcount_version(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
     result = contract.fullcount_version(block_number=args.block_number)
+    print(result)
+
+
+def handle_num_at_bats(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.num_at_bats(block_number=args.block_number)
     print(result)
 
 
@@ -485,6 +599,13 @@ def handle_seconds_per_phase(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
     result = contract.seconds_per_phase(block_number=args.block_number)
+    print(result)
+
+
+def handle_session_at_bat(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.session_at_bat(arg1=args.arg1, block_number=args.block_number)
     print(result)
 
 
@@ -525,6 +646,15 @@ def handle_abort_session(args: argparse.Namespace) -> None:
         print(result.info())
 
 
+def handle_at_bat_hash(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.at_bat_hash(
+        at_bat_id=args.at_bat_id, block_number=args.block_number
+    )
+    print(result)
+
+
 def handle_commit_pitch(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -557,6 +687,24 @@ def handle_eip712_domain(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
     result = contract.eip712_domain(block_number=args.block_number)
+    print(result)
+
+
+def handle_get_at_bat(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.get_at_bat(
+        at_bat_id=args.at_bat_id, block_number=args.block_number
+    )
+    print(result)
+
+
+def handle_get_number_of_sessions_in_at_bat(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.get_number_of_sessions_in_at_bat(
+        at_bat_id=args.at_bat_id, block_number=args.block_number
+    )
     print(result)
 
 
@@ -683,6 +831,22 @@ def handle_session_progress(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_start_at_bat(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.start_at_bat(
+        nft_address=args.nft_address,
+        token_id=args.token_id,
+        role=args.role,
+        require_signature=args.require_signature,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def handle_start_session(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -742,6 +906,23 @@ def generate_cli() -> argparse.ArgumentParser:
     add_default_arguments(verify_contract_parser, False)
     verify_contract_parser.set_defaults(func=handle_verify_contract)
 
+    at_bat_sessions_parser = subcommands.add_parser("at-bat-sessions")
+    add_default_arguments(at_bat_sessions_parser, False)
+    at_bat_sessions_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    at_bat_sessions_parser.add_argument(
+        "--arg2", required=True, help="Type: uint256", type=int
+    )
+    at_bat_sessions_parser.set_defaults(func=handle_at_bat_sessions)
+
+    at_bat_state_parser = subcommands.add_parser("at-bat-state")
+    add_default_arguments(at_bat_state_parser, False)
+    at_bat_state_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    at_bat_state_parser.set_defaults(func=handle_at_bat_state)
+
     distance0_distribution_parser = subcommands.add_parser("distance0-distribution")
     add_default_arguments(distance0_distribution_parser, False)
     distance0_distribution_parser.add_argument(
@@ -763,18 +944,36 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     distance2_distribution_parser.set_defaults(func=handle_distance2_distribution)
 
-    distance_gt2_distribution_parser = subcommands.add_parser(
-        "distance-gt2-distribution"
-    )
-    add_default_arguments(distance_gt2_distribution_parser, False)
-    distance_gt2_distribution_parser.add_argument(
+    distance3_distribution_parser = subcommands.add_parser("distance3-distribution")
+    add_default_arguments(distance3_distribution_parser, False)
+    distance3_distribution_parser.add_argument(
         "--arg1", required=True, help="Type: uint256", type=int
     )
-    distance_gt2_distribution_parser.set_defaults(func=handle_distance_gt2_distribution)
+    distance3_distribution_parser.set_defaults(func=handle_distance3_distribution)
+
+    distance4_distribution_parser = subcommands.add_parser("distance4-distribution")
+    add_default_arguments(distance4_distribution_parser, False)
+    distance4_distribution_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    distance4_distribution_parser.set_defaults(func=handle_distance4_distribution)
+
+    distance_gt4_distribution_parser = subcommands.add_parser(
+        "distance-gt4-distribution"
+    )
+    add_default_arguments(distance_gt4_distribution_parser, False)
+    distance_gt4_distribution_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    distance_gt4_distribution_parser.set_defaults(func=handle_distance_gt4_distribution)
 
     fullcount_version_parser = subcommands.add_parser("fullcount-version")
     add_default_arguments(fullcount_version_parser, False)
     fullcount_version_parser.set_defaults(func=handle_fullcount_version)
+
+    num_at_bats_parser = subcommands.add_parser("num-at-bats")
+    add_default_arguments(num_at_bats_parser, False)
+    num_at_bats_parser.set_defaults(func=handle_num_at_bats)
 
     num_sessions_parser = subcommands.add_parser("num-sessions")
     add_default_arguments(num_sessions_parser, False)
@@ -783,6 +982,13 @@ def generate_cli() -> argparse.ArgumentParser:
     seconds_per_phase_parser = subcommands.add_parser("seconds-per-phase")
     add_default_arguments(seconds_per_phase_parser, False)
     seconds_per_phase_parser.set_defaults(func=handle_seconds_per_phase)
+
+    session_at_bat_parser = subcommands.add_parser("session-at-bat")
+    add_default_arguments(session_at_bat_parser, False)
+    session_at_bat_parser.add_argument(
+        "--arg1", required=True, help="Type: uint256", type=int
+    )
+    session_at_bat_parser.set_defaults(func=handle_session_at_bat)
 
     session_requires_signature_parser = subcommands.add_parser(
         "session-requires-signature"
@@ -817,6 +1023,13 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     abort_session_parser.set_defaults(func=handle_abort_session)
 
+    at_bat_hash_parser = subcommands.add_parser("at-bat-hash")
+    add_default_arguments(at_bat_hash_parser, False)
+    at_bat_hash_parser.add_argument(
+        "--at-bat-id", required=True, help="Type: uint256", type=int
+    )
+    at_bat_hash_parser.set_defaults(func=handle_at_bat_hash)
+
     commit_pitch_parser = subcommands.add_parser("commit-pitch")
     add_default_arguments(commit_pitch_parser, True)
     commit_pitch_parser.add_argument(
@@ -840,6 +1053,24 @@ def generate_cli() -> argparse.ArgumentParser:
     eip712_domain_parser = subcommands.add_parser("eip712-domain")
     add_default_arguments(eip712_domain_parser, False)
     eip712_domain_parser.set_defaults(func=handle_eip712_domain)
+
+    get_at_bat_parser = subcommands.add_parser("get-at-bat")
+    add_default_arguments(get_at_bat_parser, False)
+    get_at_bat_parser.add_argument(
+        "--at-bat-id", required=True, help="Type: uint256", type=int
+    )
+    get_at_bat_parser.set_defaults(func=handle_get_at_bat)
+
+    get_number_of_sessions_in_at_bat_parser = subcommands.add_parser(
+        "get-number-of-sessions-in-at-bat"
+    )
+    add_default_arguments(get_number_of_sessions_in_at_bat_parser, False)
+    get_number_of_sessions_in_at_bat_parser.add_argument(
+        "--at-bat-id", required=True, help="Type: uint256", type=int
+    )
+    get_number_of_sessions_in_at_bat_parser.set_defaults(
+        func=handle_get_number_of_sessions_in_at_bat
+    )
 
     get_session_parser = subcommands.add_parser("get-session")
     add_default_arguments(get_session_parser, False)
@@ -948,7 +1179,7 @@ def generate_cli() -> argparse.ArgumentParser:
         "--nonce1", required=True, help="Type: uint256", type=int
     )
     sample_outcome_from_distribution_parser.add_argument(
-        "--distribution", required=True, help="Type: uint256[7]", nargs="+"
+        "--distribution", required=True, help="Type: uint256[8]", nargs="+"
     )
     sample_outcome_from_distribution_parser.set_defaults(
         func=handle_sample_outcome_from_distribution
@@ -967,6 +1198,25 @@ def generate_cli() -> argparse.ArgumentParser:
         "--session-id", required=True, help="Type: uint256", type=int
     )
     session_progress_parser.set_defaults(func=handle_session_progress)
+
+    start_at_bat_parser = subcommands.add_parser("start-at-bat")
+    add_default_arguments(start_at_bat_parser, True)
+    start_at_bat_parser.add_argument(
+        "--nft-address", required=True, help="Type: address"
+    )
+    start_at_bat_parser.add_argument(
+        "--token-id", required=True, help="Type: uint256", type=int
+    )
+    start_at_bat_parser.add_argument(
+        "--role", required=True, help="Type: uint8", type=int
+    )
+    start_at_bat_parser.add_argument(
+        "--require-signature",
+        required=True,
+        help="Type: bool",
+        type=boolean_argument_type,
+    )
+    start_at_bat_parser.set_defaults(func=handle_start_at_bat)
 
     start_session_parser = subcommands.add_parser("start-session")
     add_default_arguments(start_session_parser, True)
