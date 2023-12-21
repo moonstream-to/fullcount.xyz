@@ -3,10 +3,11 @@ with  dedup_events as (
         DISTINCT ON(transaction_hash, log_index) *
     FROM wyrm_labels
     WHERE label='moonworm-alpha'
-        AND address='0x9270df8d907A99E5024dc3532657a5cF9C7A4889'
+        AND (address='0xde191e8c352BA59F95cf19f0931cCbBcc7B60934' OR address='0x9270df8d907A99E5024dc3532657a5cF9C7A4889')
         AND log_index IS NOT NULL
 ), SessionResolved as (
     SELECT
+        address as contract_address,
         label_data->'args'->>'sessionID' as session_id,
         label_data->'args'->>'outcome' as outcome,
         label_data->'args'->>'batterAddress' as batter_address,
@@ -18,6 +19,7 @@ with  dedup_events as (
     WHERE label_data->>'name'='SessionResolved'
 ), SwingRevealed as (
     SELECT
+        address as contract_address,
         label_data->'args'->>'sessionID' as session_id,
         label_data->'args'->'swing'-> 1 as swing_type,
         label_data->'args'->'swing'-> 2 as swing_vertical,
@@ -32,7 +34,7 @@ with  dedup_events as (
         swing_vertical,
         swing_horizontal,
         count(*) as swing_count
-    FROM SessionResolved LEFT JOIN SwingRevealed ON SessionResolved.session_id = SwingRevealed.session_id
+    FROM SessionResolved LEFT JOIN SwingRevealed ON (SessionResolved.contract_address=SwingRevealed.contract_address AND SessionResolved.session_id = SwingRevealed.session_id)
     GROUP BY batter_address, batter_token_id, swing_type, swing_vertical, swing_horizontal
     ORDER BY swing_type, swing_vertical, swing_horizontal
 )
