@@ -15,7 +15,7 @@ with  dedup_events as (
         label_data->'args'->>'pitcherTokenID' as pitcher_token_id,
         log_index
     FROM dedup_events
-    WHERE label_data->>'name'='AtBatProgress' AND label_data->'args'->>'outcome'!=0
+    WHERE label_data->>'name'='AtBatProgress' AND label_data->'args'->>'outcome'!='0'
 ), batter_stats as ( 
     SELECT
         SUM(CASE
@@ -67,7 +67,7 @@ with  dedup_events as (
         SUM(CASE
             WHEN outcome = '7' THEN 1 ELSE 0 
         END) as in_play_outs,
-        count(*) as total_pitscher_events,
+        count(*) as total_pitcher_events,
         pitcher_address,
         pitcher_token_id
     FROM AtBats

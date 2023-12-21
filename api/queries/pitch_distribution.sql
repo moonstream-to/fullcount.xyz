@@ -3,10 +3,11 @@ with  dedup_events as (
         DISTINCT ON(transaction_hash, log_index) *
     FROM wyrm_labels
     WHERE label='moonworm-alpha'
-        AND address='0xde191e8c352BA59F95cf19f0931cCbBcc7B60934'
+        AND (address='0xde191e8c352BA59F95cf19f0931cCbBcc7B60934' OR address='0x9270df8d907A99E5024dc3532657a5cF9C7A4889')
         AND log_index IS NOT NULL
 ), SessionResolved as (
     SELECT
+        address as contract_address,
         label_data->'args'->>'sessionID' as session_id,
         label_data->'args'->>'outcome' as outcome,
         label_data->'args'->>'batterAddress' as batter_address,
@@ -18,6 +19,7 @@ with  dedup_events as (
     WHERE label_data->>'name'='SessionResolved'
 ), PitchRevealed as (
     SELECT
+        address as contract_address,
         label_data->'args'->>'sessionID' as session_id,
         label_data->'args'->'pitch'-> 1 as pitch_speed,
         label_data->'args'->'pitch'-> 2 as pitch_vertical,
@@ -32,7 +34,7 @@ with  dedup_events as (
         pitch_vertical,
         pitch_horizontal,
         count(*) as pitch_count
-    FROM SessionResolved LEFT JOIN PitchRevealed ON SessionResolved.session_id = PitchRevealed.session_id
+    FROM SessionResolved LEFT JOIN PitchRevealed ON (SessionResolved.contract_address=PitchRevealed.contract_address AND SessionResolved.session_id = PitchRevealed.session_id)
     GROUP BY pitcher_address, pitcher_token_id, pitch_speed, pitch_vertical, pitch_horizontal
     ORDER BY pitch_speed, pitch_vertical, pitch_horizontal
 )
