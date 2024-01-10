@@ -17,6 +17,7 @@ import styles from "./PlayView.module.css";
 import ActionTypeSelector from "./ActionTypeSelector";
 import { getSwingDescription } from "../../utils/messages";
 import RandomGeneratorMobile from "./RandomGeneratorMobile";
+import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStorage";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -28,7 +29,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
   const [nonce, setNonce] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
-  const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const { contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
@@ -54,43 +55,30 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
       vertical,
       horizontal,
     );
-    localStorage.setItem(
-      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
-      JSON.stringify({
-        nonce,
-        kind,
-        vertical,
-        horizontal,
-      }),
-    );
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    setLocalStorageItem(localStorageKey, {
+      nonce,
+      kind,
+      vertical: getRowCol(gridIndex)[0],
+      horizontal: getRowCol(gridIndex)[1],
+    });
     commitSwing.mutate({ sign });
   };
 
   const handleReveal = async () => {
-    const item =
-      localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
-      ) ?? "";
-    const reveal = JSON.parse(item);
-    revealSwing.mutate({
-      nonce: reveal.nonce,
-      kind: reveal.kind,
-      vertical: reveal.vertical,
-      horizontal: reveal.horizontal,
-    });
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    const reveal = getLocalStorageItem(localStorageKey);
+    revealSwing.mutate(reveal);
   };
 
   useEffect(() => {
-    const item =
-      localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
-      ) ?? "";
-    if (item) {
-      const reveal = JSON.parse(item);
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    const reveal = getLocalStorageItem(localStorageKey);
+    if (reveal) {
       setKind(reveal.kind);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
-  }, [selectedSession]);
+  }, [sessionStatus.sessionID]);
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -105,7 +93,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
 
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.commitSwing(selectedSession?.sessionID, sign),
+        gameContract.methods.commitSwing(sessionStatus.sessionID, sign),
       );
     },
     {
@@ -140,7 +128,7 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
       return sendTransactionWithEstimate(
         web3ctx.account,
         gameContract.methods.revealSwing(
-          selectedSession?.sessionID,
+          sessionStatus.sessionID,
           nonce,
           kind,
           vertical,

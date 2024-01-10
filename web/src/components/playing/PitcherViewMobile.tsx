@@ -34,7 +34,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
 
   const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
-  const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const { contractAddress, selectedToken } = useGameContext();
   const [showTooltip, setShowTooltip] = useState(false);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -57,7 +57,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     setLocalStorageItem(localStorageKey, {
       nonce,
       speed,
@@ -68,19 +68,19 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
   };
 
   const handleReveal = async () => {
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getLocalStorageItem(localStorageKey);
     revealPitch.mutate(reveal);
   };
 
   useEffect(() => {
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getLocalStorageItem(localStorageKey);
     if (reveal) {
       setSpeed(reveal.speed);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
-  }, [selectedSession]);
+  }, [sessionStatus.sessionID]);
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -95,7 +95,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
 
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.commitPitch(selectedSession?.sessionID, sign),
+        gameContract.methods.commitPitch(sessionStatus.sessionID, sign),
       );
     },
     {
@@ -131,7 +131,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
       return sendTransactionWithEstimate(
         web3ctx.account,
         gameContract.methods.revealPitch(
-          selectedSession?.sessionID,
+          sessionStatus.sessionID,
           nonce,
           speed,
           vertical,
