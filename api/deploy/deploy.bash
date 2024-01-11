@@ -79,7 +79,7 @@ if [ ! -d "$MONITORING_SECRETS_DIR" ]; then
   echo -e "${PREFIX_WARN} There are no ${MONITORING_SECRETS_DIR}, creating new one.."
   mkdir -p "${MONITORING_SECRETS_DIR}"
 fi
-cp "${SCRIPT_DIR}/files/config-monitoring-fullcount.json" "${MONITORING_SECRETS_DIR}/config-monitoring-fullcount.json"
+cp "${SCRIPT_DIR}/config-monitoring-fullcount.json" "${MONITORING_SECRETS_DIR}/config-monitoring-fullcount.json"
 
 echo
 echo
