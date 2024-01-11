@@ -14,7 +14,7 @@ PREFIX_WARN="${C_YELLOW}[WARN]${C_RESET} [$(date +%d-%m\ %T)]"
 PREFIX_CRIT="${C_RED}[CRIT]${C_RESET} [$(date +%d-%m\ %T)]"
 
 # Main
-APP_DIR="${APP_DIR:-/home/ubuntu/fullcount.xyz}"
+APP_DIR="${APP_DIR:-/home/ubuntu/fullcount}"
 AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 SCRIPT_DIR="$(realpath $(dirname $0))"
 SECRETS_DIR="${SECRETS_DIR:-/home/ubuntu/fullcount-secrets}"
