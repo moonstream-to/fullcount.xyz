@@ -19,10 +19,14 @@ AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 SCRIPT_DIR="$(realpath $(dirname $0))"
 SECRETS_DIR="${SECRETS_DIR:-/home/ubuntu/fullcount-secrets}"
 PARAMETERS_ENV_PATH="${SECRETS_DIR}/app.env"
+MONITORING_SECRETS_DIR="${MONITORING_SECRETS_DIR:-/home/ubuntu/monitoring-secrets}"
+MONITORING_ENV_PATH="${MONITORING_SECRETS_DIR}/app.env"
 USER_SYSTEMD_DIR="${USER_SYSTEMD_DIR:-/home/ubuntu/.config/systemd/user}"
 
 # API server service file
 FULLCOUNT_API_SERVICE_FILE="fullcount-api.service"
+
+FULLCOUNT_MONITORING_SERVICE_FILE="monitoring-fullcount.service"
 
 set -eu
 
@@ -64,6 +68,39 @@ chmod 0640 "${PARAMETERS_ENV_PATH}"
 
 echo
 echo
+echo -e "${PREFIX_INFO} Copy monitoring binary from AWS S3"
+aws s3 cp s3://bugout-binaries/prod/monitoring/monitoring "/home/ubuntu/monitoring"
+chmod +x "/home/ubuntu/monitoring"
+
+echo
+echo
+echo -e "${PREFIX_INFO} Copy monitoring configuration"
+if [ ! -d "$MONITORING_SECRETS_DIR" ]; then
+  echo -e "${PREFIX_WARN} There are no ${MONITORING_SECRETS_DIR}, creating new one.."
+  mkdir -p "${MONITORING_SECRETS_DIR}"
+fi
+cp "${SCRIPT_DIR}/files/config-monitoring-fullcount.json" "${MONITORING_SECRETS_DIR}/config-monitoring-fullcount.json"
+
+echo
+echo
+echo -e "${PREFIX_INFO} Retrieving monitoring deployment parameters"
+AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}" /home/ubuntu/go/bin/checkenv show aws_ssm+monitoring:true,service:true > "${MONITORING_ENV_PATH}"
+chown ubuntu:ubuntu "${MONITORING_ENV_PATH}"
+chmod 0640 "${MONITORING_ENV_PATH}"
+
+echo
+echo
+echo -e "${PREFIX_INFO} Fetch local IP of instance and save to monitoring secrets"
+AWS_LOCAL_IPV4=$(ec2metadata --local-ipv4)
+echo "AWS_LOCAL_IPV4=$AWS_LOCAL_IPV4" >> "${MONITORING_ENV_PATH}"
+
+echo
+echo
+echo -e "${PREFIX_INFO} Add AWS default region to monitoring parameters"
+echo "AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}" >> "${MONITORING_ENV_PATH}"
+
+echo
+echo
 echo -e "${PREFIX_INFO} Prepare user systemd directory"
 if [ ! -d "${USER_SYSTEMD_DIR}" ]; then
   mkdir -p "${USER_SYSTEMD_DIR}"
@@ -77,3 +114,11 @@ chmod 644 "${SCRIPT_DIR}/${FULLCOUNT_API_SERVICE_FILE}"
 cp "${SCRIPT_DIR}/${FULLCOUNT_API_SERVICE_FILE}" "${USER_SYSTEMD_DIR}/${FULLCOUNT_API_SERVICE_FILE}"
 XDG_RUNTIME_DIR="/run/user/1000" systemctl --user daemon-reload
 XDG_RUNTIME_DIR="/run/user/1000" systemctl --user restart "${FULLCOUNT_API_SERVICE_FILE}"
+
+echo
+echo
+echo -e "${PREFIX_INFO} Replacing existing Fullcount monitoring service definition with ${FULLCOUNT_MONITORING_SERVICE_FILE}"
+chmod 644 "${SCRIPT_DIR}/${FULLCOUNT_MONITORING_SERVICE_FILE}"
+cp "${SCRIPT_DIR}/${FULLCOUNT_MONITORING_SERVICE_FILE}" "${USER_SYSTEMD_DIR}/${FULLCOUNT_MONITORING_SERVICE_FILE}"
+XDG_RUNTIME_DIR="/run/user/1000" systemctl --user daemon-reload
+XDG_RUNTIME_DIR="/run/user/1000" systemctl --user restart "${FULLCOUNT_MONITORING_SERVICE_FILE}"
