@@ -49,11 +49,18 @@ cd "${EXEC_DIR}"
 
 echo
 echo
+echo -e "${PREFIX_INFO} Install checkenv"
+HOME=/home/ubuntu /usr/local/go/bin/go install github.com/bugout-dev/checkenv@latest
+
+echo
+echo
 echo -e "${PREFIX_INFO} Retrieving deployment parameters"
 if [ ! -d "${SECRETS_DIR}" ]; then
   mkdir "${SECRETS_DIR}"
   echo -e "${PREFIX_WARN} Created new secrets directory"
 fi
+AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION}" /home/ubuntu/go/bin/checkenv show aws_ssm+fullcount:true > "${PARAMETERS_ENV_PATH}"
+chmod 0640 "${PARAMETERS_ENV_PATH}"
 
 echo
 echo
