@@ -5,7 +5,7 @@ StartLimitIntervalSec=300
 StartLimitBurst=3
 
 [Service]
-WorkingDirectory=/home/ubuntu/fullcount.xyz/api
+WorkingDirectory=/home/ubuntu/fullcount/api
 EnvironmentFile=/home/ubuntu/fullcount-secrets/app.env
 Environment=NODE_VERSION=19.9.0 NODE_ENV=production
 Restart=on-failure
