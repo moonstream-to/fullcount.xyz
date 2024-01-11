@@ -16,9 +16,9 @@ app.use(cors());
 // Number of hits in Pete Rose's career
 const PORT: number = 4256;
 
-app.get("/status", (_: Request, res: Response) => {
-  const status = { status: "ok" };
-  return res.status(200).json(status);
+app.get("/ping", (_: Request, res: Response) => {
+  const ping = { status: "ok" };
+  return res.status(200).json(ping);
 });
 
 app.get("/stats/", async (req: Request, res: Response) => {
