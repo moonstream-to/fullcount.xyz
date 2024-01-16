@@ -10,7 +10,7 @@ const domain = {
 export async function signSession(
   account: string,
   provider: any,
-  session: number,
+  sessionID: number,
 ): Promise<string> {
   if (!provider) throw new Error("signAccessToken: provider must be defined");
   if (!account) throw new Error("signAccessToken: account must be defined");
@@ -18,7 +18,7 @@ export async function signSession(
   const msgParams = JSON.stringify({
     domain,
     message: {
-      session,
+      sessionID,
     },
     primaryType: "SessionMessage",
     types: {
@@ -31,7 +31,7 @@ export async function signSession(
       SessionMessage: [
         {
           type: "uint256",
-          name: "session",
+          name: "sessionID",
         },
       ],
     },

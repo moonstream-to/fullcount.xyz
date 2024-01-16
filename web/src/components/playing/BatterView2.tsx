@@ -27,7 +27,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [nonce, setNonce] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
   const web3ctx = useContext(Web3Context);
-  const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const { contractAddress, selectedToken } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
 
@@ -54,7 +54,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       horizontal,
     );
     localStorage.setItem(
-      `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}`,
+      `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`,
       JSON.stringify({
         nonce,
         kind,
@@ -68,7 +68,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const handleReveal = async () => {
     const item =
       localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+        `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}` ?? "",
       ) ?? "";
     const reveal = JSON.parse(item);
     revealSwing.mutate({
@@ -82,14 +82,14 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   useEffect(() => {
     const item =
       localStorage.getItem(
-        `fullcount.xyz-${contractAddress}-${selectedSession?.sessionID}-${selectedToken?.id}` ?? "",
+        `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}` ?? "",
       ) ?? "";
     if (item) {
       const reveal = JSON.parse(item);
       setKind(reveal.kind);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
-  }, [selectedSession]);
+  }, [sessionStatus.sessionID]);
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -104,7 +104,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.commitSwing(selectedSession?.sessionID, sign),
+        gameContract.methods.commitSwing(sessionStatus.sessionID, sign),
       );
     },
     {
@@ -138,7 +138,7 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       return sendTransactionWithEstimate(
         web3ctx.account,
         gameContract.methods.revealSwing(
-          selectedSession?.sessionID,
+          sessionStatus.sessionID,
           nonce,
           kind,
           vertical,
@@ -167,9 +167,6 @@ const BatterView2 = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      <Text fontSize={"24px"} fontWeight={"700"}>
-        One pitch to win the game
-      </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
         1. Select the type of swing
       </Text>

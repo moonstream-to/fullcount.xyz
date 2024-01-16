@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
-import { OwnedToken, Session, Token } from "../types";
+import { AtBat, OwnedToken, Session, Token } from "../types";
 import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
 
 interface GameContextProps {
@@ -14,6 +14,7 @@ interface GameContextProps {
   chainId: number;
   selectedToken: OwnedToken | undefined;
   selectedSession: Session | undefined;
+  selectedAtBat: AtBat | undefined;
   sessions: Session[] | undefined;
   invitedBy: string;
   invitedTo: number | undefined;
@@ -49,6 +50,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     tokenAddress: process.env.NEXT_PUBLIC_TOKEN_ADDRESS ?? TOKEN_CONTRACT,
     selectedToken: undefined,
     selectedSession: undefined,
+    selectedAtBat: undefined,
     sessions: undefined,
     invitedBy: "",
     invitedTo: undefined,

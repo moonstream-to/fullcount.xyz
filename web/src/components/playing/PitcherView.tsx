@@ -31,7 +31,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   const [isRevealed, setIsRevealed] = useState(false);
   const [nonce, setNonce] = useState("");
   const web3ctx = useContext(Web3Context);
-  const { selectedSession, contractAddress, selectedToken } = useGameContext();
+  const { contractAddress, selectedToken } = useGameContext();
   const [showTooltip, setShowTooltip] = useState(false);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -54,7 +54,8 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       getRowCol(gridIndex)[0],
       getRowCol(gridIndex)[1],
     );
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     setLocalStorageItem(localStorageKey, {
       nonce,
       speed,
@@ -65,19 +66,21 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
   };
 
   const handleReveal = async () => {
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
-    const reveal = getLocalStorageItem(localStorageKey);
+    const reveal = getLocalStorageItem(
+      `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`,
+    );
+    console.log(reveal);
     revealPitch.mutate(reveal);
   };
 
   useEffect(() => {
-    const localStorageKey = getLocalStorageKey(contractAddress, selectedSession, selectedToken);
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getLocalStorageItem(localStorageKey);
     if (reveal) {
       setSpeed(reveal.speed);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
-  }, [selectedSession]);
+  }, [sessionStatus.sessionID]);
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -92,7 +95,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
       return sendTransactionWithEstimate(
         web3ctx.account,
-        gameContract.methods.commitPitch(selectedSession?.sessionID, sign),
+        gameContract.methods.commitPitch(sessionStatus.sessionID, sign),
       );
     },
     {
@@ -127,7 +130,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
       return sendTransactionWithEstimate(
         web3ctx.account,
         gameContract.methods.revealPitch(
-          selectedSession?.sessionID,
+          sessionStatus.sessionID,
           nonce,
           speed,
           vertical,
@@ -149,9 +152,6 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   return (
     <Flex direction={"column"} gap={"15px"} alignItems={"center"}>
-      <Text fontSize={"24px"} fontWeight={"700"}>
-        One pitch to win the game
-      </Text>
       <Text fontSize={"18px"} fontWeight={"500"}>
         1. Select the type of pitch
       </Text>

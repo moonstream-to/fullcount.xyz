@@ -1,12 +1,11 @@
 import { useGameContext } from "../../contexts/GameContext";
 import PitcherView from "./PitcherView";
-import { Box, Flex, Image, Text, useMediaQuery } from "@chakra-ui/react";
+import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { PitchLocation, SwingLocation, Token } from "../../types";
-import { CloseIcon } from "@chakra-ui/icons";
+import { Token } from "../../types";
 import Outcome from "./Outcome";
 import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
@@ -16,13 +15,8 @@ import { FULLCOUNT_ASSETS_PATH, ZERO_ADDRESS } from "../../constants";
 import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
-import styles from "./PlayView.module.css";
-import axios from "axios";
-import MainStat from "./MainStat";
-import HeatMap from "./HeatMap";
 import TokenView from "../tokens/TokenView";
 import Narrate from "./Narrate";
-import { IoExitOutline } from "react-icons/all";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
 
@@ -42,6 +36,7 @@ export interface SessionStatus {
   didPitcherReveal: boolean;
   didBatterReveal: boolean;
   outcome: number;
+  sessionID: number;
 }
 
 export const horizontalLocations = {
@@ -72,9 +67,11 @@ export const swingKind = {
 };
 
 const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
+  const [sessionID, setSessionID] = useState(undefined);
+  const [outcomeDone, setOutcomeDone] = useState(false);
   const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
-  const { selectedSession, updateContext, contractAddress } = useGameContext();
+  const { selectedAtBat, selectedSession, updateContext, contractAddress } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -86,14 +83,69 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [pitcher, setPitcher] = useState<Token | undefined>(undefined);
   const [batter, setBatter] = useState<Token | undefined>(undefined);
 
+  const atBat = useQuery(
+    ["sessionAtBatID", selectedSession],
+    () => {
+      if (!selectedSession) return undefined;
+      return gameContract.methods.SessionAtBat(selectedSession.sessionID).call();
+    },
+    {
+      refetchInterval: 100000000,
+      onSuccess: () => {
+        atBatStatus.refetch();
+      },
+    },
+  );
+
+  const atBatStatus = useQuery(
+    ["atBatStatus", atBat.data],
+    async () => {
+      if (!atBat.data) {
+        return;
+      }
+      const atBatID = atBat.data;
+      const status = await gameContract.methods.getAtBat(atBatID).call();
+      const numSessions = Number(
+        await gameContract.methods.getNumberOfSessionsInAtBat(atBatID).call(),
+      );
+      const currentSessionID = await gameContract.methods
+        .AtBatSessions(atBatID, numSessions - 1)
+        .call();
+      console.log({
+        atBat: {
+          ...status,
+          currentSessionID,
+          numSessions,
+        },
+      });
+      return {
+        ...status,
+        currentSessionID,
+        numSessions,
+      };
+    },
+    {
+      enabled: false,
+    },
+  );
+
+  useEffect(() => {
+    console.log(atBatStatus.data, outcomeDone, sessionID);
+    if (outcomeDone && atBatStatus.data?.currentSessionID) {
+      if (Number(atBatStatus.data.currentSessionID) !== sessionStatus.data?.sessionID) {
+        setSessionID(atBatStatus.data.currentSessionID);
+        setOutcomeDone(false);
+      }
+    }
+  }, [atBatStatus.data, outcomeDone]);
+
   const sessionStatus = useQuery(
-    ["session", selectedSession],
+    ["session", selectedSession, atBatStatus.data, sessionID],
     async () => {
       if (!selectedSession) return undefined;
-      const progress = Number(
-        await gameContract.methods.sessionProgress(selectedSession.sessionID).call(),
-      );
-      const session = await gameContract.methods.getSession(selectedSession.sessionID).call();
+      const id = sessionID ?? selectedSession.sessionID;
+      const progress = Number(await gameContract.methods.sessionProgress(id).call());
+      const session = await gameContract.methods.getSession(id).call();
       if (progress < 2 || progress > 4) {
         setGameOver(true);
       }
@@ -149,7 +201,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         Number(batterReveal[1]) === 0 ? 0 : Number(batterReveal[1]) === 1 ? 1 : 2;
 
       return {
-        sessionID: selectedSession?.sessionID,
+        sessionID: Number(id),
         progress,
         didPitcherCommit,
         didBatterCommit,
@@ -178,86 +230,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
-  const pitcherStats = useQuery(
-    ["pitcher_stat", pitcher],
-    async () => {
-      if (!pitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!pitcher,
-    },
-  );
-
-  const batterStats = useQuery(
-    ["batter_stat", batter],
-    async () => {
-      if (!batter) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!batter,
-    },
-  );
-
-  const mockLocations = [
-    19, 11, 5, 1, 2, 45, 29, 13, 8, 6, 70, 59, 47, 23, 12, 40, 35, 40, 32, 31, 11, 12, 23, 24, 34,
-  ];
-
-  const pitchDistributions = useQuery(
-    ["pitch_distribution", pitcher],
-    async () => {
-      if (!pitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/pitch_distribution";
-      const res = await axios.get(`${API_URL}/${pitcher.address}/${pitcher.id}`);
-      const counts = new Array(25).fill(0);
-      res.data.pitch_distribution.forEach(
-        (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
-      );
-      const total = counts.reduce((acc, value) => acc + value);
-      const rates = counts.map((value) => value / total);
-      return { rates, counts };
-    },
-    {
-      enabled: !!pitcher,
-    },
-  );
-
-  const swingDistributions = useQuery(
-    ["swing_distribution", batter],
-    async () => {
-      if (!batter) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/swing_distribution";
-      const res = await axios.get(`${API_URL}/${batter.address}/${batter.id}`);
-      const counts = new Array(25).fill(0);
-      res.data.swing_distribution.forEach(
-        (l: SwingLocation) => (counts[l.swing_vertical * 5 + l.swing_horizontal] = l.count),
-      );
-      const total = counts.reduce((acc, value) => acc + value);
-      const rates = counts.map((value) => value / total);
-      return { rates, counts };
-    },
-    {
-      enabled: !!batter,
-    },
-  );
-
   useEffect(() => {
     setPitcher(isPitcher(selectedToken) ? selectedToken : opponent);
     setBatter(isPitcher(selectedToken) ? opponent : selectedToken);
   }, [selectedToken, opponent]);
+
+  useEffect(() => {
+    atBatStatus.refetch();
+  }, [sessionStatus.data]);
+
+  const numberToOrdinal = (n: number): string => {
+    if (n > 10) return "";
+    if (n === 1) return "1st";
+    if (n === 2) return "2nd";
+    if (n === 3) return "3rd";
+    return `${n}th`;
+  };
 
   return (
     <Flex direction={"column"} gap={"20px"} minW={"100%"}>
@@ -281,6 +269,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           sessionStatus.data?.progress === 2 ||
           sessionStatus.data?.progress === 5) && (
           <Timer
+            balls={atBatStatus.data?.balls ?? 3}
+            strikes={atBatStatus.data?.strikes ?? 2}
             start={Number(sessionStatus.data?.phaseStartTimestamp)}
             delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}
             isActive={
@@ -324,17 +314,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
         <Flex w={{ base: "320px", lg: "1000px" }} placeSelf={"center"} minH={"108px"}>
           <Narrate
-            sessionID={selectedSession?.sessionID ?? 0}
+            sessionID={sessionID ?? 0}
             speed={1}
             isComplete={sessionStatus.data.progress === 5}
           />
         </Flex>
       )}
+      {/*{atBatStatus.data && (*/}
+      {/*  <Text fontSize={"20px"} mx={"auto"}>{`${numberToOrdinal(*/}
+      {/*    atBatStatus.data.numSessions,*/}
+      {/*  )} pitch`}</Text>*/}
+      {/*)}*/}
       <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"} w={"100%"}>
         {!isSmallView && (
           <TokenView
             token={pitcher}
-            width={isPitcher(selectedToken) ? "300px" : "100px"}
+            width={isPitcher(selectedToken) ? "300px" : "150px"}
             isPitcher={true}
           />
         )}
@@ -370,16 +365,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           sessionStatus.data.didPitcherReveal && (
             <Outcome
               outcome={sessionStatus.data?.outcome}
-              isExpired={!!sessionStatus.data?.isExpired}
               pitch={sessionStatus.data.pitcherReveal}
               swing={sessionStatus.data.batterReveal}
-              session={{
-                ...sessionStatus.data,
-                requiresSignature: false,
-                pair: isPitcher(selectedToken)
-                  ? { pitcher: selectedToken, batter: opponent }
-                  : { pitcher: opponent, batter: selectedToken },
-              }}
+              onDone={() => setOutcomeDone(true)}
             />
           )}
         {!isSmallView && (

@@ -14,23 +14,27 @@ class Outcome(Enum):
     """
     /**
     * Possible outcomes of a Fullcount session:
-    * - Strikeout - 0
-    * - Walk - 1
-    * - Single - 2
-    * - Double - 3
-    * - Triple - 4
-    * - HomeRun - 5
-    * - InPlayOut - 6
+    * - Strike - 0
+    * - Ball - 1
+    * - Foul - 2
+    * - Single - 3
+    * - Double - 4
+    * - Triple - 5
+    * - HomeRun - 6
+    * - InPlayOut - 7
+    *
+    * InPlayOut represents a GroundOut or FlyOut. In the future, we may split this into two outcomes.
     */
     """
 
-    Strikeout = 0
-    Walk = 1
-    Single = 2
-    Double = 3
-    Triple = 4
-    HomeRun = 5
-    InPlayOut = 6
+    Strike = 0
+    Ball = 1
+    Foul = 2
+    Single = 3
+    Double = 4
+    Triple = 5
+    HomeRun = 6
+    InPlayOut = 7
 
 
 class PitchType(Enum):
