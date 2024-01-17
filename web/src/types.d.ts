@@ -90,6 +90,8 @@ interface Session {
   didBatterReveal: boolean;
   outcome: number;
   requiresSignature: boolean;
+  atBat: any | undefined;
+  atBatID: number | undefined;
 }
 
 interface FullcountContractSession {

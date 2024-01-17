@@ -112,56 +112,6 @@ const SessionView3 = ({ session }: { session: Session }) => {
     joinSession.mutate({ sessionID: session.sessionID, token: selectedToken });
   };
 
-  const atBat = useQuery(
-    ["sessionAtBatID", session],
-    () => {
-      if (!session) return undefined;
-      return gameContract.methods.SessionAtBat(session.sessionID).call();
-    },
-    {
-      refetchInterval: 100000000,
-      onSuccess: () => {
-        atBatStatus.refetch();
-      },
-    },
-  );
-
-  const atBatStatus = useQuery(
-    ["atBatStatus", atBat.data],
-    async () => {
-      if (!atBat.data) {
-        return;
-      }
-      const atBatID = atBat.data;
-      const status = await gameContract.methods.getAtBat(atBatID).call();
-      const numSessions = Number(
-        await gameContract.methods.getNumberOfSessionsInAtBat(atBatID).call(),
-      );
-      const currentSessionID = await gameContract.methods
-        .AtBatSessions(atBatID, numSessions - 1)
-        .call();
-      console.log({
-        atBat: {
-          ...status,
-          currentSessionID,
-          numSessions,
-        },
-      });
-      return {
-        ...status,
-        currentSessionID,
-        numSessions,
-      };
-    },
-    {
-      enabled: false,
-    },
-  );
-
-  useEffect(() => {
-    atBat.refetch();
-  }, [session]);
-
   if (!progressFilter[session.progress]) {
     return <></>;
   }
@@ -201,10 +151,10 @@ const SessionView3 = ({ session }: { session: Session }) => {
       {/*>*/}
       {/*  {progressMessage(session)}*/}
       {/*</Text>*/}
-      {atBatStatus.data && (
-        <Text>{`Strike: ${atBatStatus.data.strikes}; Ball: ${atBatStatus.data.balls}; ${
-          outcomes[Number(atBatStatus.data.outcome)]
-        }`}</Text>
+      {session.atBat && session.atBatID && (
+        <Text>{`AtBat #${session.atBatID} - Strike: ${session.atBat.strikes}; Ball: ${
+          session.atBat.balls
+        }; ${outcomes[Number(session.atBat.outcome)]}`}</Text>
       )}
 
       <Flex
