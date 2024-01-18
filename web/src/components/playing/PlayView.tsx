@@ -226,7 +226,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       };
     },
     {
-      refetchInterval: () => (gameOver ? false : 3000),
+      refetchInterval: 3000,
     },
   );
 
