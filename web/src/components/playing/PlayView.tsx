@@ -19,6 +19,7 @@ import TokenView from "../tokens/TokenView";
 import Narrate from "./Narrate";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
+import styles from "./PlayView.module.css";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -281,22 +282,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
         {!isSmallView && <Flex w={"20px"} h={"10px"} />}
 
-        {(sessionStatus.data?.progress === 3 ||
-          sessionStatus.data?.progress === 4 ||
-          sessionStatus.data?.progress === 2 ||
-          sessionStatus.data?.progress === 5) && (
-          <Timer
-            balls={atBatStatus.data?.balls ?? 3}
-            strikes={atBatStatus.data?.strikes ?? 2}
-            start={Number(sessionStatus.data?.phaseStartTimestamp)}
-            delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}
-            isActive={
-              sessionStatus.data?.progress === 3 ||
-              sessionStatus.data?.progress === 4 ||
-              sessionStatus.data?.progress === 5
-            }
-          />
-        )}
+        {/*{(sessionStatus.data?.progress === 3 ||*/}
+        {/*  sessionStatus.data?.progress === 4 ||*/}
+        {/*  sessionStatus.data?.progress === 2 ||*/}
+        {/*  sessionStatus.data?.progress === 5) && (*/}
+        {/*  <Timer*/}
+        {/*    balls={atBatStatus.data?.balls ?? 3}*/}
+        {/*    strikes={atBatStatus.data?.strikes ?? 2}*/}
+        {/*    start={Number(sessionStatus.data?.phaseStartTimestamp)}*/}
+        {/*    delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}*/}
+        {/*    isActive={*/}
+        {/*      sessionStatus.data?.progress === 3 ||*/}
+        {/*      sessionStatus.data?.progress === 4 ||*/}
+        {/*      sessionStatus.data?.progress === 5*/}
+        {/*    }*/}
+        {/*  />*/}
+        {/*)}*/}
         {!isSmallView && (
           <Flex w={"20px"} justifyContent={"end"}>
             <Image
@@ -328,15 +329,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           />
         </Flex>
       )}
-      {sessionStatus.data && sessionStatus.data.progress > 2 && sessionStatus.data.progress < 6 && (
-        <Flex w={{ base: "320px", lg: "1000px" }} placeSelf={"center"} minH={"108px"}>
-          <Narrate
-            sessionID={sessionID ?? 0}
-            speed={1}
-            isComplete={sessionStatus.data.progress === 5}
-          />
-        </Flex>
-      )}
+
       {/*{atBatStatus.data && (*/}
       {/*  <Text fontSize={"20px"} mx={"auto"}>{`${numberToOrdinal(*/}
       {/*    atBatStatus.data.numSessions,*/}
@@ -355,7 +348,21 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
-            <>
+            <Flex direction={"column"} gap={"30px"} alignItems={"center"}>
+              {atBatStatus.data && (
+                <Text className={styles.pitchTitle}>Pitch {atBatStatus.data.numSessions}</Text>
+              )}
+              <Timer
+                balls={atBatStatus.data?.balls ?? 3}
+                strikes={atBatStatus.data?.strikes ?? 2}
+                start={Number(sessionStatus.data?.phaseStartTimestamp)}
+                delay={sessionStatus.data?.secondsPerPhase}
+                isActive={
+                  sessionStatus.data?.progress === 3 ||
+                  sessionStatus.data?.progress === 4 ||
+                  sessionStatus.data?.progress === 5
+                }
+              />
               {isPitcher(selectedToken) && sessionStatus.data && (
                 <>
                   <PitcherViewMobile sessionStatus={sessionStatus.data} />
@@ -364,7 +371,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               {!isPitcher(selectedToken) && sessionStatus.data && (
                 <BatterViewMobile sessionStatus={sessionStatus.data} />
               )}
-            </>
+            </Flex>
           )}
         {sessionStatus.data &&
           sessionStatus.data.progress === 5 &&
@@ -375,6 +382,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               pitch={sessionStatus.data.pitcherReveal}
               swing={sessionStatus.data.batterReveal}
               onDone={() => setIsShowOutcomeDone(true)}
+              atBatOutcome={atBatStatus.data?.outcome ?? 0}
             />
           )}
         {!isSmallView && (

@@ -102,3 +102,22 @@
     background: #4D4D4D;
     line-height: normal;
 }
+
+.waitingMessage {
+    color: #BFBFBF;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.pitchTitle {
+    color: #FFF;
+    font-family: Inter, sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}

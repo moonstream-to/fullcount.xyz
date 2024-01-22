@@ -28,7 +28,7 @@ const PlayerView = ({
   const [actionChoice, setActionChoice] = useState(0);
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
-  const [gridIndex, setGridIndex] = useState(12);
+  const [gridIndex, setGridIndex] = useState(-1);
   const [showTooltip, setShowTooltip] = useState(false);
   const { contractAddress, selectedToken } = useGameContext();
   const web3ctx = useContext(Web3Context);
@@ -85,8 +85,8 @@ const PlayerView = ({
     setLocalStorageItem(localStorageKey, {
       nonce,
       actionChoice,
-      vertical: getRowCol(gridIndex)[0],
-      horizontal: getRowCol(gridIndex)[1],
+      vertical,
+      horizontal,
     });
     commitMutation.mutate({ sign });
   };
@@ -131,7 +131,7 @@ const PlayerView = ({
   }, [sessionStatus.sessionID]);
 
   return (
-    <Flex direction={"column"} gap={"15px"} alignItems={"center"} mx={"auto"}>
+    <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
       <ActionTypeSelector
         types={isPitcher ? pitchSpeeds : swingKinds}
         isDisabled={isCommitted}
@@ -146,7 +146,7 @@ const PlayerView = ({
         }
       />
       <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
-        {`You&apos;re ${isPitcher ? "throwing" : "swinging"}`}
+        {`You're ${isPitcher ? "throwing" : "swinging"}`}
       </Text>
       <Text className={styles.actionText}>{getActionDescription()}</Text>
       {!isCommitted && (
@@ -160,18 +160,16 @@ const PlayerView = ({
           {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
         </button>
       )}
-      {sessionStatus.didBatterCommit && !sessionStatus.didPitcherCommit && (
-        <Text>Waiting pitcher to commit</Text>
-      )}
-      {sessionStatus.didBatterReveal && !sessionStatus.didPitcherReveal && (
-        <Text>Waiting pitcher to reveal</Text>
-      )}
-      {!sessionStatus.didBatterCommit && sessionStatus.didPitcherCommit && (
-        <Text>Waiting batter to commit</Text>
-      )}
-      {!sessionStatus.didBatterReveal && sessionStatus.didPitcherReveal && (
-        <Text>Waiting batter to reveal</Text>
-      )}
+      {isCommitted &&
+        ((!isPitcher && !sessionStatus.didPitcherCommit) ||
+          (isPitcher && !sessionStatus.didBatterCommit)) && (
+          <Text className={styles.waitingMessage}>Waiting for opponent to commit...</Text>
+        )}
+      {isRevealed &&
+        ((!isPitcher && !sessionStatus.didPitcherReveal) ||
+          (isPitcher && !sessionStatus.didBatterReveal)) && (
+          <Text className={styles.waitingMessage}>Waiting for opponent to reveal...</Text>
+        )}
     </Flex>
   );
 };

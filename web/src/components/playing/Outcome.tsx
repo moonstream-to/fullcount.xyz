@@ -58,11 +58,13 @@ const Outcome = ({
   pitch,
   swing,
   onDone,
+  atBatOutcome,
 }: {
   outcome: number;
   pitch: Pitch;
   swing: Swing;
   onDone: () => void;
+  atBatOutcome: number;
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isPitchSpeedVisible, setIsPitchSpeedVisible] = useState(false);
@@ -82,6 +84,17 @@ const Outcome = ({
       }
     });
   };
+
+  const atBatOutcomes = [
+    "In Progress",
+    "Strikeout",
+    "Walk",
+    "Single",
+    "Double",
+    "Triple",
+    "Home Run",
+    "In Play Out",
+  ];
 
   useEffect(() => {
     soundVolumeRef.current = soundVolume;
@@ -214,7 +227,10 @@ const Outcome = ({
           textAlign={"center"}
           w={"300px"}
         >
-          {outcomes[outcome].toUpperCase()}!
+          {!!Number(atBatOutcome)
+            ? atBatOutcomes[Number(atBatOutcome)].toUpperCase()
+            : outcomes[outcome].toUpperCase()}
+          !
         </GrowingText>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>
