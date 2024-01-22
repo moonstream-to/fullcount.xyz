@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
@@ -10,17 +10,19 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
+import DotsCounter from "./DotsCounter";
+import styles from "./SessionView.module.css";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
 export const sessionStates = [
   "session does not exist",
-  "session aborted",
+  "aborted",
   "session started, but second player has not yet joined",
   "session started, both players joined, ready for commitments",
   "both players committed, ready for reveals",
   "session complete",
-  "session expired",
+  "expired",
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
@@ -127,14 +129,14 @@ const SessionView3 = ({ session }: { session: Session }) => {
   ];
 
   const outcomes = [
-    "InProgress",
+    "In Progress",
     "Strikeout",
     "Walk",
     "Single",
     "Double",
     "Triple",
-    "HomeRun",
-    "InPlayOut",
+    "Home Run",
+    "In Play Out",
   ];
 
   return (
@@ -152,9 +154,25 @@ const SessionView3 = ({ session }: { session: Session }) => {
       {/*  {progressMessage(session)}*/}
       {/*</Text>*/}
       {session.atBat && session.atBatID && (
-        <Text>{`AtBat #${session.atBatID} - Strike: ${session.atBat.strikes}; Ball: ${
-          session.atBat.balls
-        }; ${outcomes[Number(session.atBat.outcome)]}`}</Text>
+        <Flex gap={"15px"} p={"5px 0px"}>
+          <DotsCounter label={"ball"} count={session.atBat.balls} capacity={4} />
+          <DotsCounter label={"strike"} count={session.atBat.strikes} capacity={3} />
+          <Box h={"23px"} bg={"#4d4d4d"} w={"0.5px"} />
+          <Text
+            className={
+              session.progress === 6 || session.progress === 1
+                ? styles.expired
+                : Number(session.atBat.outcome) === 0
+                ? styles.inProcess
+                : styles.finished
+            }
+          >
+            {session.progress === 6 || session.progress === 1
+              ? sessionStates[session.progress]
+              : outcomes[Number(session.atBat.outcome)]}
+          </Text>
+          {/*<Text>{`AtBat #${session.atBatID}/${session.sessionID}`}</Text>*/}
+        </Flex>
       )}
 
       <Flex

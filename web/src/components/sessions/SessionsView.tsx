@@ -235,21 +235,18 @@ const SessionsView = () => {
           requiresSignature: session.session.requiresSignature,
         };
       });
-
-      return sessionsWithTokens
-        .filter(
-          (s) =>
-            (s.progress !== 6 && s.progress !== 1) ||
-            s.pair.batter?.staker === web3ctx.account ||
-            s.pair.pitcher?.staker === web3ctx.account,
-        )
-        .reverse();
+      return getAtBats(sessionsWithTokens.reverse()).filter(
+        (s) =>
+          (s.progress !== 6 && s.progress !== 1) ||
+          s.pair.batter?.staker === web3ctx.account ||
+          s.pair.pitcher?.staker === web3ctx.account,
+      );
     },
     {
       onSuccess: (data) => {
         updateContext({ sessions: data });
       },
-      refetchInterval: 5 * 1000,
+      refetchInterval: 55 * 1000,
     },
   );
 
@@ -275,7 +272,7 @@ const SessionsView = () => {
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
-          {getAtBats(sessions.data).map((session, idx) => (
+          {sessions.data.map((session, idx) => (
             <Fragment key={idx}>
               {progressFilter[session.progress] && (
                 <>
