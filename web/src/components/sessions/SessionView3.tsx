@@ -154,7 +154,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
       {/*  {progressMessage(session)}*/}
       {/*</Text>*/}
       {session.atBat && session.atBatID && (
-        <Flex gap={"15px"} p={"5px 0px"}>
+        <Flex gap={"15px"} p={"5px 0px"} alignItems={"center"}>
           <DotsCounter label={"ball"} count={session.atBat.balls} capacity={4} />
           <DotsCounter label={"strike"} count={session.atBat.strikes} capacity={3} />
           <Box h={"23px"} bg={"#4d4d4d"} w={"0.5px"} />
