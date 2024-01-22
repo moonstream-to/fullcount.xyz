@@ -12,7 +12,7 @@ const DotsCounter = ({
 }) => {
   return (
     <Flex alignItems={"center"} justifyContent={"space-between"} gap={"5px"}>
-      <div className={styles.label}>{label}</div>
+      {label && <div className={styles.label}>{label}</div>}
       <Flex gap={"4px"}>
         {Array.from({ length: capacity }, () => 0).map((_, idx) => (
           <div key={idx} className={idx < count ? styles.filledDot : styles.emptyDot} />

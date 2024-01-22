@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Text, Flex } from "@chakra-ui/react";
 import styles from "./Timer.module.css";
+import DotsCounter from "../sessions/DotsCounter";
 
 interface TimerProps {
   start: number; // Start time in Unix timestamp format
@@ -26,7 +27,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
 
       if (remainingTime <= 0) {
         setMinutesLeft("0");
-        setSecondsLeft("0");
+        setSecondsLeft("00");
         setTimeLeft("00:00");
         return;
       }
@@ -43,10 +44,10 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
   }, [start, delay]);
 
   return (
-    <Flex gap={"10px"} mx={"auto"}>
-      <Flex className={styles.timerContainer} opacity={isActive ? "1" : "0.3"}>
-        <Text className={styles.title}>TIME LEFT</Text>
-        <Flex gap={"7px"} alignItems={"start"}>
+    <Flex gap={"0px"} mx={"auto"} direction={"row-reverse"} w={"100%"}>
+      <Flex className={styles.timerContainer}>
+        {/*<Text className={styles.title}>TIME LEFT</Text>*/}
+        <Flex gap={"7px"} alignItems={"start"} opacity={isActive ? "1" : "0.3"}>
           <Text className={styles.time} fontFamily="Segment7Standard">
             {minutesLeft}
           </Text>
@@ -64,7 +65,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
         </Flex>
       </Flex>
 
-      <Flex className={styles.countLeft} minW={{ base: "100px", lg: "186px" }}>
+      <Flex className={styles.countLeft} gap={"15px"} flex={"1"}>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
           <Text
             fontSize={{ base: "9px", lg: "14px" }}
@@ -74,14 +75,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
           >
             BALL
           </Text>
-          <Flex gap={1} minH={"6px"}>
-            {Array.from({ length: balls }).map((_, idx) => (
-              <div
-                key={idx}
-                style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }}
-              />
-            ))}
-          </Flex>
+          <DotsCounter label={""} count={balls} capacity={4} />
         </Flex>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
           <Text
@@ -92,14 +86,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
           >
             STRIKE
           </Text>
-          <Flex gap={1} minH={"6px"}>
-            {Array.from({ length: strikes }).map((_, idx) => (
-              <div
-                key={idx}
-                style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }}
-              />
-            ))}
-          </Flex>
+          <DotsCounter label={""} count={strikes} capacity={3} />
         </Flex>
       </Flex>
     </Flex>
