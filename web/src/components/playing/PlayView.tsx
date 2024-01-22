@@ -68,7 +68,7 @@ export const swingKind = {
 
 const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [sessionID, setSessionID] = useState(undefined);
-  const [outcomeDone, setOutcomeDone] = useState(false);
+  const [isShowOutcomeDone, setIsShowOutcomeDone] = useState(false);
   const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
   const { selectedAtBat, selectedSession, updateContext, contractAddress } = useGameContext();
@@ -86,12 +86,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const atBat = useQuery(
     ["sessionAtBatID", selectedSession],
     () => {
+      console.log("sessionAtBatID");
       if (!selectedSession) return undefined;
       return gameContract.methods.SessionAtBat(selectedSession.sessionID).call();
     },
     {
       refetchInterval: 100000000,
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log("sessionAtBatID success: ", data);
         atBatStatus.refetch();
       },
     },
@@ -103,6 +105,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       if (!atBat.data) {
         return;
       }
+      console.log("atBatStatus");
+
       const atBatID = atBat.data;
       const status = await gameContract.methods.getAtBat(atBatID).call();
       const numSessions = Number(
@@ -126,28 +130,40 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
     {
       enabled: false,
+      onSuccess: (data) => {
+        console.log("atBatStatus success: ", data);
+      },
     },
   );
 
   useEffect(() => {
-    console.log(atBatStatus.data, outcomeDone, sessionID);
-    if (outcomeDone && atBatStatus.data?.currentSessionID) {
+    console.log(
+      "atBatStatus.data, isShowOutcomeDone useEffect: ",
+      atBatStatus.data,
+      isShowOutcomeDone,
+      "sessionID: ",
+      sessionID,
+    );
+    if (isShowOutcomeDone && atBatStatus.data?.currentSessionID) {
       if (Number(atBatStatus.data.currentSessionID) !== sessionStatus.data?.sessionID) {
         setSessionID(atBatStatus.data.currentSessionID);
-        setOutcomeDone(false);
+        setIsShowOutcomeDone(false);
       }
     }
-  }, [atBatStatus.data, outcomeDone]);
+  }, [atBatStatus.data, isShowOutcomeDone]);
 
   const sessionStatus = useQuery(
     ["session", selectedSession, atBatStatus.data, sessionID],
     async () => {
+      console.log("sessionStatus");
       if (!selectedSession) return undefined;
       const id = sessionID ?? selectedSession.sessionID;
       const progress = Number(await gameContract.methods.sessionProgress(id).call());
       const session = await gameContract.methods.getSession(id).call();
       if (progress < 2 || progress > 4) {
         setGameOver(true);
+      } else {
+        setGameOver(false);
       }
       const pitcherAddress = session.pitcherNFT.nftAddress;
       const pitcherTokenID = session.pitcherNFT.tokenID;
@@ -236,6 +252,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   }, [selectedToken, opponent]);
 
   useEffect(() => {
+    console.log("sessionStatus.data useEffect:", sessionStatus.data);
     atBatStatus.refetch();
   }, [sessionStatus.data]);
 
@@ -341,21 +358,11 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             <>
               {isPitcher(selectedToken) && sessionStatus.data && (
                 <>
-                  {isSmallView ? (
-                    <PitcherViewMobile sessionStatus={sessionStatus.data} />
-                  ) : (
-                    <PitcherView sessionStatus={sessionStatus.data} />
-                  )}
+                  <PitcherViewMobile sessionStatus={sessionStatus.data} />
                 </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
-                <>
-                  {isSmallView ? (
-                    <BatterViewMobile sessionStatus={sessionStatus.data} />
-                  ) : (
-                    <BatterView2 sessionStatus={sessionStatus.data} />
-                  )}
-                </>
+                <BatterViewMobile sessionStatus={sessionStatus.data} />
               )}
             </>
           )}
@@ -367,7 +374,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               outcome={sessionStatus.data?.outcome}
               pitch={sessionStatus.data.pitcherReveal}
               swing={sessionStatus.data.batterReveal}
-              onDone={() => setOutcomeDone(true)}
+              onDone={() => setIsShowOutcomeDone(true)}
             />
           )}
         {!isSmallView && (
