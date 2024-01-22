@@ -253,6 +253,16 @@ const SessionsView = () => {
     },
   );
 
+  const getAtBats = (sessions: Session[]) => {
+    const uniqueAtBatIDArray = sessions.reduce((accumulator, current) => {
+      if (!accumulator.has(current.atBatID)) {
+        accumulator.set(current.atBatID, current);
+      }
+      return accumulator;
+    }, new Map());
+    return Array.from(uniqueAtBatIDArray.values());
+  };
+
   return (
     <Flex className={styles.container}>
       <Flex gap={"20px"} alignItems={"start"}>
@@ -265,7 +275,7 @@ const SessionsView = () => {
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
-          {sessions.data.map((session, idx) => (
+          {getAtBats(sessions.data).map((session, idx) => (
             <Fragment key={idx}>
               {progressFilter[session.progress] && (
                 <>
