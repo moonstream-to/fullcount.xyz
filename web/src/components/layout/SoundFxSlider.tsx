@@ -1,8 +1,17 @@
-import { Flex, Slider, SliderFilledTrack, SliderThumb, SliderTrack, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  Slider,
+  SliderFilledTrack,
+  SliderThumb,
+  SliderTrack,
+  Text,
+  useMediaQuery,
+} from "@chakra-ui/react";
 import { useGameContext } from "../../contexts/GameContext";
 
 const SoundFxSlider = () => {
   const { soundVolume, updateContext } = useGameContext();
+  const [isMobile] = useMediaQuery(["(max-width: 767px)"]);
 
   return (
     <Flex gap={"10px"} p={"10px"} border={"1px solid #4D4D4D"}>
