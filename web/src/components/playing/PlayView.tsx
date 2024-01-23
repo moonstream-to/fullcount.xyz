@@ -348,7 +348,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
-            <Flex direction={"column"} gap={"30px"} alignItems={"center"}>
+            <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
               {atBatStatus.data && (
                 <Text className={styles.pitchTitle}>Pitch {atBatStatus.data.numSessions}</Text>
               )}

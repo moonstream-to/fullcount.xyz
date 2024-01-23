@@ -47,16 +47,11 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
     <Flex gap={"0px"} mx={"auto"} direction={"row-reverse"} w={"100%"}>
       <Flex className={styles.timerContainer}>
         {/*<Text className={styles.title}>TIME LEFT</Text>*/}
-        <Flex gap={"7px"} alignItems={"start"} opacity={isActive ? "1" : "0.3"}>
+        <Flex gap={"7px"} my="auto" alignItems={"center"} opacity={isActive ? "1" : "0.3"}>
           <Text className={styles.time} fontFamily="Segment7Standard">
             {minutesLeft}
           </Text>
-          <Text
-            h={"25px"}
-            fontSize={{ base: "10px", lg: "20px" }}
-            lineHeight={"1"}
-            color={"#FF8D8D"}
-          >
+          <Text h={"25px"} fontSize={"20px"} lineHeight={"1"} color={"#FF8D8D"}>
             :
           </Text>
           <Text className={styles.time} fontFamily="Segment7Standard">
