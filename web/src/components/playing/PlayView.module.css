@@ -5,9 +5,9 @@
     align-items: center;
     gap: 10px;
     border-radius: 30px;
-    border: 1px solid #00A341;
-    background: #00A341;
-    color: #FFF;
+    border: 1px solid #FFF;
+    background: #FFF;
+    color: #000;
     leading-trim: both;
     text-edge: cap;
     font-family: Inter;

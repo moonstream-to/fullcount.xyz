@@ -1,11 +1,11 @@
 .time {
     color: #FF8D8D;
     /*font-family: Segment7;*/
-    font-size: 27.027px;
+    font-size: 25px;
     font-style: normal;
     font-weight: 600;
-    line-height: normal;
-    height: 25px;
+    line-height: 1;
+    /*height: 25px;*/
 }
 
 .title {

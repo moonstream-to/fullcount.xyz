@@ -51,7 +51,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes })
           <Text className={styles.time} fontFamily="Segment7Standard">
             {minutesLeft}
           </Text>
-          <Text h={"25px"} fontSize={"20px"} lineHeight={"1"} color={"#FF8D8D"}>
+          <Text fontSize={"20px"} lineHeight={"1"} color={"#FF8D8D"}>
             :
           </Text>
           <Text className={styles.time} fontFamily="Segment7Standard">
