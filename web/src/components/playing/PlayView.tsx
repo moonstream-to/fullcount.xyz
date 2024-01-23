@@ -1,5 +1,4 @@
 import { useGameContext } from "../../contexts/GameContext";
-import PitcherView from "./PitcherView";
 import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
@@ -7,19 +6,24 @@ import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import { Token } from "../../types";
 import Outcome from "./Outcome";
-import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { FULLCOUNT_ASSETS_PATH, ZERO_ADDRESS } from "../../constants";
+import {
+  FULLCOUNT_ASSETS_PATH,
+  MULTICALL2_CONTRACT_ADDRESSES,
+  ZERO_ADDRESS,
+} from "../../constants";
 import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 import TokenView from "../tokens/TokenView";
-import Narrate from "./Narrate";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
 import styles from "./PlayView.module.css";
+import MulticallABIImported from "../../web3/abi/Multicall2.json";
+import AtBatNavigator from "./AtBatNavigator";
+const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -77,6 +81,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
   const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
+  const MULTICALL2_CONTRACT_ADDRESS =
+    MULTICALL2_CONTRACT_ADDRESSES[
+      String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
+    ];
+  const multicallContract = new web3ctx.web3.eth.Contract(
+    MulticallABI,
+    MULTICALL2_CONTRACT_ADDRESS,
+  );
   const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
   const [opponent, setOpponent] = useState<Token | undefined>(undefined);
   const [gameOver, setGameOver] = useState(false);
@@ -110,23 +122,35 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
 
       const atBatID = atBat.data;
       const status = await gameContract.methods.getAtBat(atBatID).call();
+
       const numSessions = Number(
         await gameContract.methods.getNumberOfSessionsInAtBat(atBatID).call(),
       );
-      const currentSessionID = await gameContract.methods
-        .AtBatSessions(atBatID, numSessions - 1)
-        .call();
+      const queries = [];
+      for (let i = 0; i < numSessions; i += 1) {
+        queries.push({
+          target: contractAddress,
+          callData: gameContract.methods.AtBatSessions(atBatID, i).encodeABI(),
+        });
+      }
+      const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
+      const sessionIDs = multicallRes.map((res: any) => Number(res[1]));
+      // const currentSessionID = await gameContract.methods
+      //   .AtBatSessions(atBatID, numSessions - 1)
+      //   .call();
       console.log({
         atBat: {
           ...status,
-          currentSessionID,
+          currentSessionID: sessionIDs[numSessions - 1],
           numSessions,
+          sessionIDs,
         },
       });
       return {
         ...status,
-        currentSessionID,
+        currentSessionID: sessionIDs[numSessions - 1],
         numSessions,
+        sessionIDs,
       };
     },
     {
@@ -282,22 +306,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
         {!isSmallView && <Flex w={"20px"} h={"10px"} />}
 
-        {/*{(sessionStatus.data?.progress === 3 ||*/}
-        {/*  sessionStatus.data?.progress === 4 ||*/}
-        {/*  sessionStatus.data?.progress === 2 ||*/}
-        {/*  sessionStatus.data?.progress === 5) && (*/}
-        {/*  <Timer*/}
-        {/*    balls={atBatStatus.data?.balls ?? 3}*/}
-        {/*    strikes={atBatStatus.data?.strikes ?? 2}*/}
-        {/*    start={Number(sessionStatus.data?.phaseStartTimestamp)}*/}
-        {/*    delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}*/}
-        {/*    isActive={*/}
-        {/*      sessionStatus.data?.progress === 3 ||*/}
-        {/*      sessionStatus.data?.progress === 4 ||*/}
-        {/*      sessionStatus.data?.progress === 5*/}
-        {/*    }*/}
-        {/*  />*/}
-        {/*)}*/}
         {!isSmallView && (
           <Flex w={"20px"} justifyContent={"end"}>
             <Image
@@ -346,11 +354,16 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
           <InviteLink session={selectedSession} token={selectedToken} />
         )}
+        {atBatStatus.data && (
+          // <Text className={styles.pitchTitle}>Pitch {atBatStatus.data.numSessions}</Text>
+          <AtBatNavigator sessionsIDs={atBatStatus.data.sessionIDs} />
+        )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
             <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
               {atBatStatus.data && (
-                <Text className={styles.pitchTitle}>Pitch {atBatStatus.data.numSessions}</Text>
+                // <Text className={styles.pitchTitle}>Pitch {atBatStatus.data.numSessions}</Text>
+                <AtBatNavigator sessionsIDs={atBatStatus.data.sessionIDs} />
               )}
               <Timer
                 balls={atBatStatus.data?.balls ?? 3}
