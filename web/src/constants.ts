@@ -3,6 +3,7 @@ export const TOKEN_CONTRACT = "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227";
 export const CHAIN_ID = 322;
 export const GAME_CONTRACT_VERSION = "0.1.0";
 export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
+export const SESSIONS_OFFSET = 20;
 
 export const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/1ZsWoXlYgL6XkAdA2BLyM6phJOfyg7Jo1EZiMMBeir4M";

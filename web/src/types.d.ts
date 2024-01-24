@@ -69,6 +69,7 @@ interface Pair {
 }
 
 interface AtBat {
+  id: number;
   pitcher: Token | undefined;
   batter: Token | undefined;
   balls: number;
@@ -92,6 +93,15 @@ interface Session {
   requiresSignature: boolean;
   atBat?: any;
   atBatID?: number;
+}
+
+interface AtBat {
+  pitcherNFT: { nftAddress: string; tokenID: number };
+  batterNFT: { nftAddress: string; tokenID: number };
+  balls: number;
+  strikes: number;
+  outcome: number;
+  sessions: Session[];
 }
 
 interface FullcountContractSession {
