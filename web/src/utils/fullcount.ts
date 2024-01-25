@@ -16,7 +16,7 @@ import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 const MulticallABI = MulticallABIImported as unknown as AbiItem[];
-import { FullcountABI as FullcountContract } from "../../types/web3-v1-contracts";
+import { FullcountABI as FullcountContract, Multicall2 } from "../../types/web3-v1-contracts";
 
 export const getSessions = async ({
   web3ctx,
@@ -210,7 +210,7 @@ const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {
   const multicallContract = new web3ctx.web3.eth.Contract(
     MulticallABI,
     MULTICALL2_CONTRACT_ADDRESS,
-  );
+  ) as unknown as Multicall2;
   return { gameContract, tokenContract, multicallContract };
 };
 
@@ -223,3 +223,43 @@ const getAtBatsFromSessions = (sessions: Session[]) => {
   }, new Map());
   return Array.from(uniqueAtBatIDArray.values());
 };
+
+export const getAtBats = async ({
+  web3ctx,
+  tokensCache,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  tokensCache: Token[];
+}) => {
+  console.log("FETCHING SESSIONS");
+  const { gameContract, tokenContract, multicallContract } = getContracts(web3ctx);
+  const numAtBats = Number(await gameContract.methods.NumAtBats().call());
+  const oldestAtBatNumber = Math.max(numAtBats - SESSIONS_OFFSET, 1);
+  const callData = [];
+  for (let i = oldestAtBatNumber; i <= numAtBats; i += 1) {
+    callData.push(gameContract.methods.AtBatState(i).encodeABI());
+    callData.push(gameContract.methods.getNumberOfSessionsInAtBat(i).encodeABI());
+  }
+  const queries = callData.map((callData) => {
+    return {
+      target: GAME_CONTRACT,
+      callData,
+    };
+  });
+
+  const atBatsRes = await multicallContract.methods.tryAggregate(false, queries).call();
+  const [atBatStateRes, numSessions] = splitArray(atBatsRes, 2);
+  const atBatsStates = atBatStateRes.map((atBat: string) =>
+    web3ctx.web3.eth.abi.decodeParameters(getAtBatOutputs, atBat),
+  );
+
+  return numAtBats;
+};
+
+function splitArray<T>(arr: T[][], n: number): T[][] {
+  const result = Array.from({ length: n }, (): T[] => []);
+  for (let i = 0; i < arr.length; i++) {
+    result[i % n].push(arr[i][1]);
+  }
+  return result;
+}
