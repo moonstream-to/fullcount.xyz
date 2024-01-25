@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
 import Web3Context from "../../contexts/Web3Context/context";
@@ -13,6 +13,8 @@ import PlayerView from "./PlayerView";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+  const [isCommitted, setIsCommitted] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(false);
   const web3ctx = useContext(Web3Context);
   const { contractAddress } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -36,6 +38,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
     },
     {
       onSuccess: () => {
+        setIsCommitted(true);
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
         // setIsCommitted(true);
@@ -77,7 +80,7 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
     },
     {
       onSuccess: () => {
-        // setIsRevealed(true);
+        setIsRevealed(true);
         queryClient.invalidateQueries("sessions");
         queryClient.refetchQueries("session");
       },
@@ -87,12 +90,23 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
     },
   );
 
+  useEffect(() => {
+    if (sessionStatus.didPitcherReveal) {
+      setIsRevealed(true);
+    }
+    if (sessionStatus.didPitcherCommit) {
+      setIsCommitted(true);
+    }
+  }, [sessionStatus]);
+
   return (
     <PlayerView
       sessionStatus={sessionStatus}
       isPitcher={true}
       commitMutation={commitPitch}
       revealMutation={revealPitch}
+      isCommitted={isCommitted}
+      isRevealed={isRevealed}
     />
   );
 };

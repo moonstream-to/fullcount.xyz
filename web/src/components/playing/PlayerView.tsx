@@ -19,15 +19,17 @@ const PlayerView = ({
   isPitcher,
   commitMutation,
   revealMutation,
+  isCommitted,
+  isRevealed,
 }: {
   sessionStatus: SessionStatus;
   isPitcher: boolean;
   commitMutation: any;
   revealMutation: any;
+  isCommitted: boolean;
+  isRevealed: boolean;
 }) => {
   const [actionChoice, setActionChoice] = useState(0);
-  const [isCommitted, setIsCommitted] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
   const [gridIndex, setGridIndex] = useState(-1);
   const [showTooltip, setShowTooltip] = useState(false);
   const { contractAddress, selectedToken } = useGameContext();
@@ -90,36 +92,6 @@ const PlayerView = ({
     });
     commitMutation.mutate({ sign });
   };
-
-  useEffect(() => {
-    if (
-      (isPitcher && sessionStatus.didPitcherCommit) ||
-      (!isPitcher && sessionStatus.didBatterCommit)
-    ) {
-      setIsCommitted(true);
-    }
-  }, [isPitcher, sessionStatus.didBatterCommit, sessionStatus.didPitcherCommit]);
-
-  useEffect(() => {
-    if (commitMutation.isSuccess) {
-      setIsCommitted(true);
-    }
-  }, [commitMutation.isSuccess]);
-
-  useEffect(() => {
-    if (
-      (isPitcher && sessionStatus.didPitcherReveal) ||
-      (!isPitcher && sessionStatus.didBatterReveal)
-    ) {
-      setIsCommitted(true);
-    }
-  }, [isPitcher, sessionStatus.didBatterReveal, sessionStatus.didPitcherReveal]);
-
-  useEffect(() => {
-    if (revealMutation.isSuccess) {
-      setIsRevealed(true);
-    }
-  }, [revealMutation.isSuccess]);
 
   useEffect(() => {
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
