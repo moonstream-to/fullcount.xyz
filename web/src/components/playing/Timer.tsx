@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Text, Flex } from "@chakra-ui/react";
 import styles from "./Timer.module.css";
+import DotsCounter from "../sessions/DotsCounter";
 
 interface TimerProps {
   start: number; // Start time in Unix timestamp format
   delay: number; // Delay in seconds
   isActive: boolean;
+  balls: number;
+  strikes: number;
 }
 
-const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
+const Timer: React.FC<TimerProps> = ({ start, delay, isActive, balls, strikes }) => {
   const [timeLeft, setTimeLeft] = useState("00:00");
   const [minutesLeft, setMinutesLeft] = useState("0");
   const [secondsLeft, setSecondsLeft] = useState("00");
@@ -24,7 +27,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
 
       if (remainingTime <= 0) {
         setMinutesLeft("0");
-        setSecondsLeft("0");
+        setSecondsLeft("00");
         setTimeLeft("00:00");
         return;
       }
@@ -41,77 +44,14 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
   }, [start, delay]);
 
   return (
-    <Flex gap={"10px"} mx={"auto"}>
-      <Flex className={styles.countLeft}>
-        <Flex direction={"column"} alignItems={"center"} gap={"4px"}>
-          <Text
-            fontSize={{ base: "9px", lg: "14px" }}
-            fontWeight={"700"}
-            color={"#1B1B1B"}
-            lineHeight={"1"}
-          >
-            HOME
-          </Text>
-          <Text
-            fontSize={{ base: "12px", lg: "17px" }}
-            fontWeight={"700"}
-            color={"#FFF"}
-            lineHeight={"1"}
-            py={"4px"}
-          >
-            0
-          </Text>
-        </Flex>
-        <Flex direction={"column"} alignItems={"center"} gap={"4px"} justifyContent={"end"}>
-          <Text
-            fontSize={{ base: "8px", lg: "13px" }}
-            fontWeight={"700"}
-            color={"#1B1B1B"}
-            lineHeight={"1"}
-          >
-            INN
-          </Text>
-          <Text
-            fontSize={{ base: "10px", lg: "15px" }}
-            fontWeight={"700"}
-            color={"#FFF"}
-            lineHeight={"1"}
-          >
-            BOT&nbsp;9
-          </Text>
-        </Flex>
-        <Flex direction={"column"} alignItems={"center"} gap={"4px"}>
-          <Text
-            fontSize={{ base: "9px", lg: "14px" }}
-            fontWeight={"700"}
-            color={"#1B1B1B"}
-            lineHeight={"1"}
-          >
-            AWAY
-          </Text>
-          <Text
-            fontSize={{ base: "12px", lg: "17px" }}
-            fontWeight={"700"}
-            color={"#FFF"}
-            lineHeight={"1"}
-            py={"4px"}
-          >
-            1
-          </Text>
-        </Flex>
-      </Flex>
-      <Flex className={styles.timerContainer} opacity={isActive ? "1" : "0.3"}>
-        <Text className={styles.title}>TIME LEFT</Text>
-        <Flex gap={"7px"} alignItems={"start"}>
+    <Flex gap={"0px"} mx={"auto"} direction={"row-reverse"} w={"100%"}>
+      <Flex className={styles.timerContainer}>
+        {/*<Text className={styles.title}>TIME LEFT</Text>*/}
+        <Flex gap={"7px"} my="auto" alignItems={"center"} opacity={isActive ? "1" : "0.3"}>
           <Text className={styles.time} fontFamily="Segment7Standard">
             {minutesLeft}
           </Text>
-          <Text
-            h={"25px"}
-            fontSize={{ base: "10px", lg: "20px" }}
-            lineHeight={"1"}
-            color={"#FF8D8D"}
-          >
+          <Text fontSize={"20px"} lineHeight={"1"} color={"#FF8D8D"}>
             :
           </Text>
           <Text className={styles.time} fontFamily="Segment7Standard">
@@ -120,7 +60,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
         </Flex>
       </Flex>
 
-      <Flex className={styles.countLeft} minW={{ base: "100px", lg: "186px" }}>
+      <Flex className={styles.countLeft} gap={"15px"} flex={"1"}>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
           <Text
             fontSize={{ base: "9px", lg: "14px" }}
@@ -130,11 +70,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           >
             BALL
           </Text>
-          <Flex gap={1}>
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-          </Flex>
+          <DotsCounter label={""} count={balls} capacity={4} />
         </Flex>
         <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
           <Text
@@ -145,24 +81,7 @@ const Timer: React.FC<TimerProps> = ({ start, delay, isActive }) => {
           >
             STRIKE
           </Text>
-          <Flex gap={1}>
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-          </Flex>
-        </Flex>{" "}
-        <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
-          <Text
-            fontSize={{ base: "9px", lg: "14px" }}
-            fontWeight={"700"}
-            color={"#1B1B1B"}
-            lineHeight={"1"}
-          >
-            OUT
-          </Text>
-          <Flex gap={1}>
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-            <div style={{ width: 6, height: 6, background: "white", borderRadius: 9999 }} />
-          </Flex>
+          <DotsCounter label={""} count={strikes} capacity={3} />
         </Flex>
       </Flex>
     </Flex>

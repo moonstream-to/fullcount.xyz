@@ -145,3 +145,62 @@ export const outputs = [
     type: "tuple",
   },
 ];
+
+export const getAtBatOutputs = [
+  {
+    components: [
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "nftAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct NFT",
+        name: "pitcherNFT",
+        type: "tuple",
+      },
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "nftAddress",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "tokenID",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct NFT",
+        name: "batterNFT",
+        type: "tuple",
+      },
+      {
+        internalType: "uint256",
+        name: "balls",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "strikes",
+        type: "uint256",
+      },
+      {
+        internalType: "enum AtBatOutcome",
+        name: "outcome",
+        type: "uint8",
+      },
+    ],
+    internalType: "struct AtBat",
+    name: "",
+    type: "tuple",
+  },
+];

@@ -1,11 +1,11 @@
 .time {
     color: #FF8D8D;
     /*font-family: Segment7;*/
-    font-size: 27.027px;
+    font-size: 25px;
     font-style: normal;
     font-weight: 600;
-    line-height: normal;
-    height: 25px;
+    line-height: 1;
+    /*height: 25px;*/
 }
 
 .title {
@@ -33,7 +33,7 @@
     display: flex;
     padding: 10px 12px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 15px;
     flex: 0 0 0;
     border: 1px solid #F1E3BF;
@@ -46,7 +46,7 @@
         gap: 3px;
     }
     .timerContainer {
-        padding: 2px 4px;
+        /*padding: 2px 4px;*/
     }
 
     .title {
@@ -54,6 +54,6 @@
     }
 
     .time {
-        font-size: 12px;
+        /*font-size: 12px;*/
     }
 }

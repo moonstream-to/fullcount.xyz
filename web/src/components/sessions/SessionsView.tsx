@@ -15,7 +15,7 @@ import OwnedTokens from "../tokens/OwnedTokens";
 import styles from "./SessionsView.module.css";
 import { FullcountContractSession, Session, Token } from "../../types";
 
-import { outputs } from "../../web3/abi/ABIITems";
+import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
@@ -85,7 +85,9 @@ const SessionsView = () => {
         callData.push(gameContract.methods.sessionProgress(i).encodeABI());
         callData.push(gameContract.methods.getSession(i).encodeABI());
         callData.push(gameContract.methods.SessionRequiresSignature(i).encodeABI());
+        callData.push(gameContract.methods.SessionAtBat(i).encodeABI());
       }
+      const callsPerSession = 4;
       const queries = callData.map((callData) => {
         return {
           target,
@@ -94,14 +96,34 @@ const SessionsView = () => {
       });
 
       const multicallRes = await multicallContract.methods.tryAggregate(false, queries).call();
-      const res: { progress: string; session: string; requiresSignature: boolean }[] = [];
-      for (let i = 0; i < multicallRes.length; i += 3) {
+      const res: {
+        progress: string;
+        session: string;
+        requiresSignature: boolean;
+        atBatID: number;
+      }[] = [];
+      for (let i = 0; i < multicallRes.length; i += callsPerSession) {
         res.push({
           progress: multicallRes[i][1],
           session: multicallRes[i + 1][1],
           requiresSignature: !!Number(multicallRes[i + 2][1]),
+          atBatID: Number(multicallRes[i + 3][1]),
         });
       }
+      const uniqueAtBatIDs = Array.from(new Set(res.map((item) => item.atBatID)));
+      const atBatQueries = uniqueAtBatIDs.map((id) => {
+        return {
+          target,
+          callData: gameContract.methods.getAtBat(id).encodeABI(),
+        };
+      });
+      const atBatsRes = await multicallContract.methods.tryAggregate(false, atBatQueries).call();
+      const decodedAtBatsRes = atBatsRes.map(
+        (atBat: any) => web3ctx.web3.eth.abi.decodeParameters(getAtBatOutputs, atBat[1])[0],
+      );
+      const atBats = uniqueAtBatIDs.map((id, idx) => {
+        return { id, ...decodedAtBatsRes[idx] };
+      });
       const decodedRes = res.map((data) => {
         const sessionRaw = web3ctx.web3.eth.abi.decodeParameters(
           outputs,
@@ -114,6 +136,7 @@ const SessionsView = () => {
           batterAddress: sessionRaw.batterNFT.nftAddress,
           batterTokenID: sessionRaw.batterNFT.tokenID,
           requiresSignature: data.requiresSignature,
+          atBatID: data.atBatID,
         };
         return {
           progress: Number(data.progress),
@@ -202,6 +225,8 @@ const SessionsView = () => {
           phaseStartTimestamp: Number(session.session.phaseStartTimestamp),
           secondsPerPhase,
           progress: session.progress,
+          atBatID: session.session.atBatID,
+          atBat: atBats.find((atBat: any) => atBat.id === session.session.atBatID),
           didPitcherCommit: session.session.didPitcherCommit,
           didPitcherReveal: session.session.didPitcherReveal,
           didBatterCommit: session.session.didBatterCommit,
@@ -210,15 +235,12 @@ const SessionsView = () => {
           requiresSignature: session.session.requiresSignature,
         };
       });
-
-      return sessionsWithTokens
-        .filter(
-          (s) =>
-            (s.progress !== 6 && s.progress !== 1) ||
-            s.pair.batter?.staker === web3ctx.account ||
-            s.pair.pitcher?.staker === web3ctx.account,
-        )
-        .reverse();
+      return getAtBats(sessionsWithTokens.reverse()).filter(
+        (s) =>
+          (s.progress !== 6 && s.progress !== 1) ||
+          s.pair.batter?.staker === web3ctx.account ||
+          s.pair.pitcher?.staker === web3ctx.account,
+      );
     },
     {
       onSuccess: (data) => {
@@ -227,6 +249,16 @@ const SessionsView = () => {
       refetchInterval: 5 * 1000,
     },
   );
+
+  const getAtBats = (sessions: Session[]) => {
+    const uniqueAtBatIDArray = sessions.reduce((accumulator, current) => {
+      if (!accumulator.has(current.atBatID)) {
+        accumulator.set(current.atBatID, current);
+      }
+      return accumulator;
+    }, new Map());
+    return Array.from(uniqueAtBatIDArray.values());
+  };
 
   return (
     <Flex className={styles.container}>

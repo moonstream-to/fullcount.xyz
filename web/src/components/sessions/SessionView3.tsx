@@ -1,26 +1,28 @@
-import { Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
 import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
+import DotsCounter from "./DotsCounter";
+import styles from "./SessionView.module.css";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
 export const sessionStates = [
   "session does not exist",
-  "session aborted",
+  "aborted",
   "session started, but second player has not yet joined",
   "session started, both players joined, ready for commitments",
   "both players committed, ready for reveals",
   "session complete",
-  "session expired",
+  "expired",
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
@@ -126,6 +128,17 @@ const SessionView3 = ({ session }: { session: Session }) => {
     "#FF8D8D",
   ];
 
+  const outcomes = [
+    "In Progress",
+    "Strikeout",
+    "Walk",
+    "Single",
+    "Double",
+    "Triple",
+    "Home Run",
+    "In Play Out",
+  ];
+
   return (
     <Flex
       justifyContent={"space-between"}
@@ -134,12 +147,33 @@ const SessionView3 = ({ session }: { session: Session }) => {
       py={"15px"}
       direction={{ base: "column", lg: "row" }}
     >
-      <Text
-        color={progressMessageColors[session.progress]}
-        title={`Session ${session.sessionID}. Progress - ${session.progress}`}
-      >
-        {progressMessage(session)}
-      </Text>
+      {/*<Text*/}
+      {/*  color={progressMessageColors[session.progress]}*/}
+      {/*  title={`Session ${session.sessionID}. Progress - ${session.progress}`}*/}
+      {/*>*/}
+      {/*  {progressMessage(session)}*/}
+      {/*</Text>*/}
+      {session.atBat && session.atBatID && (
+        <Flex gap={"15px"} p={"5px 0px"} alignItems={"center"}>
+          <DotsCounter label={"ball"} count={session.atBat.balls} capacity={4} />
+          <DotsCounter label={"strike"} count={session.atBat.strikes} capacity={3} />
+          <Box h={"23px"} bg={"#4d4d4d"} w={"0.5px"} />
+          <Text
+            className={
+              session.progress === 6 || session.progress === 1
+                ? styles.expired
+                : Number(session.atBat.outcome) === 0
+                ? styles.inProcess
+                : styles.finished
+            }
+          >
+            {session.progress === 6 || session.progress === 1
+              ? sessionStates[session.progress]
+              : outcomes[Number(session.atBat.outcome)]}
+          </Text>
+          {/*<Text>{`AtBat #${session.atBatID}/${session.sessionID}`}</Text>*/}
+        </Flex>
+      )}
 
       <Flex
         alignItems={{ base: "start", lg: "center" }}

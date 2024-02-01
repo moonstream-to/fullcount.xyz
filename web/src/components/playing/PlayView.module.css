@@ -5,9 +5,9 @@
     align-items: center;
     gap: 10px;
     border-radius: 30px;
-    border: 1px solid #00A341;
-    background: #00A341;
-    color: #FFF;
+    border: 1px solid #FFF;
+    background: #FFF;
+    color: #000;
     leading-trim: both;
     text-edge: cap;
     font-family: Inter;
@@ -100,5 +100,24 @@
     gap: 10px;
     border: 1px solid #767676;
     background: #4D4D4D;
+    line-height: normal;
+}
+
+.waitingMessage {
+    color: #BFBFBF;
+    text-align: center;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.pitchTitle {
+    color: #FFF;
+    font-family: Inter, sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 700;
     line-height: normal;
 }

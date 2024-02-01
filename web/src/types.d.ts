@@ -68,6 +68,14 @@ interface Pair {
   batter: Token | undefined;
 }
 
+interface AtBat {
+  pitcher: Token | undefined;
+  batter: Token | undefined;
+  balls: number;
+  strikes: number;
+  outcome: number;
+}
+
 interface Session {
   pair: Pair;
   sessionID: number;
@@ -82,6 +90,8 @@ interface Session {
   didBatterReveal: boolean;
   outcome: number;
   requiresSignature: boolean;
+  atBat?: any;
+  atBatID?: number;
 }
 
 interface FullcountContractSession {

@@ -1,0 +1,21 @@
+.inProcess, .expired, .finished {
+    color: #FFF;
+    font-family: Inter, sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300;
+    line-height: normal;
+    text-transform: uppercase;
+}
+
+.inProcess {
+    color: #FFDA7A;
+}
+
+.expired {
+    color: #FF8D8D;
+}
+
+.finished {
+    font-weight: 700;
+}
