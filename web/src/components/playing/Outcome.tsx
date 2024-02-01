@@ -112,7 +112,7 @@ const Outcome = ({
   };
 
   useEffect(() => {
-    const start = 3000;
+    const start = 0;
 
     const timers: NodeJS.Timeout[] = [];
 
