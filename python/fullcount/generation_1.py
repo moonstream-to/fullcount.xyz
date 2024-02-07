@@ -4,17 +4,18 @@ from typing import Optional, List, Tuple
 
 from . import data
 
-Distance0: data.OutcomeDistribution = (0, 0, 0, 4458, 1408, 126, 1008, 3000)
+Distance0: data.OutcomeDistribution = (0, 0, 0, 1000, 3000, 1000, 5000, 0)
 
-Distance1: data.OutcomeDistribution = (500, 0, 500, 3185, 1005, 90, 720, 4000)
+Distance1: data.OutcomeDistribution = (0, 0, 2500, 2500, 2000, 500, 2500, 0)
 
-Distance2: data.OutcomeDistribution = (1500, 0, 1500, 1910, 603, 55, 432, 4000)
+Distance2: data.OutcomeDistribution = (
+    1000, 0, 3200, 3200, 1100, 200, 800, 500)
 
-Distance3: data.OutcomeDistribution = (4500, 0, 1500, 736, 241, 23, 0, 3000)
+Distance3: data.OutcomeDistribution = (4000, 0, 3000, 1500, 250, 0, 0, 1250)
 
-Distance4: data.OutcomeDistribution = (6000, 0, 1000, 0, 0, 0, 0, 3000)
+Distance4: data.OutcomeDistribution = (7000, 0, 2000, 0, 0, 0, 0, 1000)
 
-DistanceGT4: data.OutcomeDistribution = (10000, 0, 0, 0, 0, 0, 0, 0)
+DistanceGT4: data.OutcomeDistribution = (10_000, 0, 0, 0, 0, 0, 0, 0)
 
 
 def result(
@@ -51,7 +52,7 @@ def result(
     elif distance == 2:
         distribution = Distance2
     elif distance == 3:
-        distribution = Distance3   
+        distribution = Distance3
     elif distance == 4:
         distribution = Distance4
     elif distance > 4:
@@ -161,14 +162,16 @@ def handle_result(args: argparse.Namespace) -> None:
 def handle_rollout(args: argparse.Namespace) -> None:
     results = rollout(
         args.num_samples,
-        data.PitchType(args.pitch_type) if args.pitch_type is not None else None,
+        data.PitchType(
+            args.pitch_type) if args.pitch_type is not None else None,
         data.VerticalLocation(args.pitch_vertical)
         if args.pitch_vertical is not None
         else None,
         data.HorizontalLocation(args.pitch_horizontal)
         if args.pitch_horizontal is not None
         else None,
-        data.SwingType(args.swing_type) if args.swing_type is not None else None,
+        data.SwingType(
+            args.swing_type) if args.swing_type is not None else None,
         data.VerticalLocation(args.swing_vertical)
         if args.swing_vertical is not None
         else None,
@@ -185,7 +188,8 @@ def handle_rollout(args: argparse.Namespace) -> None:
 
 
 def generate_cli() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Fullcount rules: Generation 1")
+    parser = argparse.ArgumentParser(
+        description="Fullcount rules: Generation 1")
     parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
