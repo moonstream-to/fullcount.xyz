@@ -3,9 +3,9 @@ with  dedup_events as (
         DISTINCT ON(transaction_hash, log_index) *
     FROM wyrm_labels
     WHERE label='moonworm-alpha'
-        AND address='0xde191e8c352BA59F95cf19f0931cCbBcc7B60934'
+        AND address='0xC90F37D09f2f8fB2e9D1Aa9a9d5142f5aE100d84'
         AND log_index IS NOT NULL
-), SessionResolved as (
+), AtBats as (
     SELECT
         label_data->'args'->>'sessionID' as session_id,
         label_data->'args'->>'outcome' as outcome,
@@ -15,34 +15,34 @@ with  dedup_events as (
         label_data->'args'->>'pitcherTokenID' as pitcher_token_id,
         log_index
     FROM dedup_events
-    WHERE label_data->>'name'='SessionResolved'
+    WHERE label_data->>'name'='AtBatProgress' AND label_data->'args'->>'outcome'!='0'
 ), batter_stats as ( 
     SELECT
         SUM(CASE
-            WHEN outcome = '0' THEN 1 ELSE 0 
+            WHEN outcome = '1' THEN 1 ELSE 0 
         END) as strikeouts,
         SUM(CASE
-            WHEN outcome = '1' THEN 1 ELSE 0 
+            WHEN outcome = '2' THEN 1 ELSE 0 
         END) as walks,
         SUM(CASE
-            WHEN outcome = '2' THEN 1 ELSE 0 
+            WHEN outcome = '3' THEN 1 ELSE 0 
         END) as singles,
         SUM(CASE
-            WHEN outcome = '3' THEN 1 ELSE 0 
+            WHEN outcome = '4' THEN 1 ELSE 0 
         END) as doubles,
         SUM(CASE
-            WHEN outcome = '4' THEN 1 ELSE 0 
+            WHEN outcome = '5' THEN 1 ELSE 0 
         END) as triples,
         SUM(CASE
-            WHEN outcome = '5' THEN 1 ELSE 0 
+            WHEN outcome = '6' THEN 1 ELSE 0 
         END) as home_runs,
         SUM(CASE
-            WHEN outcome = '6' THEN 1 ELSE 0 
+            WHEN outcome = '7' THEN 1 ELSE 0 
         END) as in_play_outs,
         count(*) as total_batter_events,
         batter_address as batter_address,
         batter_token_id as batter_token_id
-    FROM SessionResolved
+    FROM AtBats
     GROUP BY batter_address, batter_token_id
     ORDER BY home_runs DESC
 )
