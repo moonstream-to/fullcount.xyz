@@ -98,7 +98,8 @@ contract Fullcount is EIP712 {
         address indexed nftAddress,
         uint256 indexed tokenID,
         uint256 firstSessionID,
-        PlayerType role
+        PlayerType role,
+        bool requiresSignature
     );
 
     event AtBatJoined(
@@ -374,7 +375,7 @@ contract Fullcount is EIP712 {
         AtBatSessions[NumAtBats] = [firstSessionID];
         SessionAtBat[firstSessionID] = NumAtBats;
 
-        emit AtBatStarted(NumAtBats, nftAddress, tokenID, firstSessionID, role);
+        emit AtBatStarted(NumAtBats, nftAddress, tokenID, firstSessionID, role, requireSignature);
 
         return NumAtBats;
     }
