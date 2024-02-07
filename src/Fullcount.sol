@@ -62,11 +62,24 @@ contract Fullcount is EIP712 {
 
     uint256 public NumSessions;
 
-    uint256[8] public Distance0Distribution = [0, 0, 0, 4458, 1408, 126, 1008, 3000];
-    uint256[8] public Distance1Distribution = [500, 0, 500, 3185, 1005, 90, 720, 4000];
-    uint256[8] public Distance2Distribution = [1500, 0, 1500, 1910, 603, 55, 432, 4000];
-    uint256[8] public Distance3Distribution = [4500, 0, 1500, 736, 241, 23, 0, 3000];
-    uint256[8] public Distance4Distribution = [6000, 0, 1000, 0, 0, 0, 0, 3000];
+    // We want to strongly reward distance 0 swings.
+    // 10% chance of single, 30% chance of double, 10% chance of triple, 50% chance of home run
+    uint256[8] public Distance0Distribution = [0, 0, 0, 1000, 3000, 1000, 5000, 0];
+    // Distance 1 swings should also be mostly postive outcomes and have no negative outsomes (for batter)
+    // but considerably lower chances at big hits.
+    // 25% chamce of foul, 25% chance of single, 20% chance of double, 5% chance of triple, 25% chance of home run
+    uint256[8] public Distance1Distribution = [0, 0, 2500, 2500, 2000, 500, 2500, 0];
+    // Distance 2 swings should be half hits (mostly weaker) with some neutral and few negative outcomes
+    // 10% chance of strike, 32% chance of foul, 32% chance of single, 11% chance of double, 2% chance of triple,
+    // 8% chance of home run, 5% chance of out
+    uint256[8] public Distance2Distribution = [1000, 0, 3200, 3200, 1100, 200, 800, 500];
+    // Distance 3 swings should be mostly negative outcomes and little chance of big hits
+    // 40% chance of strike, 30% chance of foul, 15% chance of single, 2.5% chance of double, 12.5% chance of out
+    uint256[8] public Distance3Distribution = [4000, 0, 3000, 1500, 250, 0, 0, 1250];
+    // Distance 4 swings should be mostly strikes and have no positive outcomes (for batter)
+    // 70% chance of strike, 20% chance of foul, 10% chance of out
+    uint256[8] public Distance4Distribution = [7000, 0, 2000, 0, 0, 0, 0, 1000];
+    // Distance 5+ swings should all be strikes
     uint256[8] public DistanceGT4Distribution = [10_000, 0, 0, 0, 0, 0, 0, 0];
 
     // Session ID => session state
