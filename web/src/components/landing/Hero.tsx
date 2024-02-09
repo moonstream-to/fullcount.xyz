@@ -8,7 +8,7 @@ const Hero = () => {
   return (
     <div className={styles.heroContainer}>
       <FullcountLogo />
-      <Image w="100%" src={`${assets}/hero-illustration-sm.png`} />
+      <Image w="252px" h="450px" src={`${assets}/hero-illustration-sm.png`} />
       <div className={styles.heroTextContainer}>
         <div className={styles.heroTextTitle}>Become a baseball legend with Fullcount</div>
         <div className={styles.heroTextText}>
