@@ -1,0 +1,63 @@
+.container {
+    display: flex;
+    padding: 15px 7%;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    align-self: stretch;
+
+    background: #0B0B0B;
+}
+
+.title {
+    color: #FFF;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%; /* 16px */
+}
+
+.date {
+    color: #FFF;
+    text-align: right;
+    font-family: Inter;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.label {
+
+    color: #FFF;
+    font-family: Inter;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+}
+
+.eventsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    width: 275.2px;
+    gap: 10px;
+}
+
+.event {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2px;
+    flex: 1 0 0;
+}
+
+.divider {
+    height: 1px;
+    align-self: stretch;
+
+    background: #4D4D4D;
+}
