@@ -1,0 +1,57 @@
+.heroContainer {
+    display: flex;
+    padding: 20px 7% 40px 7%;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    align-self: stretch;
+}
+
+.heroTextContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    align-self: stretch;
+}
+
+.heroTextTitle {
+    color: #FFF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    max-width: 247px;
+}
+
+.heroTextText {
+    color: #FFF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.button {
+    display: flex;
+    padding: 11px 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+
+    border: 1px solid #F1E3BF;
+    background: #00A341;
+
+    color: #FFF;
+
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
