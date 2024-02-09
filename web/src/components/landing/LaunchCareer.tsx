@@ -20,6 +20,7 @@ const LaunchCareer = () => {
           Coming soon: Play with any NFT on any EVM chain. Turn your favorite NFT into a baseball
           star!
         </div>
+        \\\u
       </div>
       <div className={styles.card}>
         <div className={styles.cardTitle}>Shape your legend</div>
