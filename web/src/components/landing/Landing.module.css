@@ -46,7 +46,7 @@
 
     border: 1px solid #F1E3BF;
     background: #00A341;
-white-space: nowrap;
+    white-space: nowrap;
     color: #FFF;
 
     font-family: Inter;
@@ -56,9 +56,30 @@ white-space: nowrap;
     line-height: normal;
 }
 
+.heroInnerContainer {
+    display: flex;
+
+    flex-direction: column;
+    gap: 60px;
+    align-items: center;
+}
+
 @media (min-width: 768px) {
     .button {
         align-self: center;
         padding: 11px 80px;
+    }
+    .heroContainer {
+        padding: 40px 7% 80px 7%;
+        gap: 60px;
+    }
+}
+
+@media (min-height: 768px) {
+    .heroInnerContainer {
+        margin-top: -20px;
+        padding: 40px;
+        border: 1px solid #4D4D4D;
+        background: #232323;
     }
 }
