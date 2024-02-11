@@ -1,8 +1,10 @@
 import styles from "./UpcomingEvents.module.css";
-import { Flex } from "@chakra-ui/react";
+import { Flex, Image } from "@chakra-ui/react";
 import CalendarIcon from "../icons/CalendarIcon";
 import NovaLogo from "../icons/NovaLogo";
 import BaseLogo from "../icons/BaseLogo";
+import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+const assets = FULLCOUNT_ASSETS_PATH;
 
 const UpcomingEvents = () => {
   return (
@@ -14,7 +16,13 @@ const UpcomingEvents = () => {
       <div className={styles.eventsContainer}>
         <Flex alignItems={"center"} gap={"10px"}>
           <div style={{ width: "40px", height: "40px" }}>
-            <NovaLogo />
+            {/*<NovaLogo />*/}
+            <Image
+              src={`${assets}/landing/arbitrum-nova-logo.svg`}
+              w={{ base: "32px", md: "40px" }}
+              h={{ base: "32px", md: "40px" }}
+              alt="arbitrum-nova"
+            />
           </div>
           <div className={styles.event}>
             <div className={styles.date}>March, 15</div>
@@ -24,7 +32,12 @@ const UpcomingEvents = () => {
         <div className={styles.divider} />
         <Flex alignItems={"center"} gap={"10px"}>
           <div style={{ width: "40px", height: "40px" }}>
-            <BaseLogo />
+            <Image
+              src={`${assets}/landing/base-logo.svg`}
+              w={{ base: "32px", md: "40px" }}
+              h={{ base: "32px", md: "40px" }}
+              alt="base"
+            />
           </div>
           <div className={styles.label}>Base League launch on Base</div>
         </Flex>

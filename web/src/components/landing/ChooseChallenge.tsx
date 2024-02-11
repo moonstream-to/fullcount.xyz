@@ -10,7 +10,12 @@ const ChooseChallenge = () => {
     <div className={styles.container}>
       <div className={styles.challengesContainer}>
         <div className={styles.challengeContainer}>
-          <PvPIcon />
+          <Image
+            src={`${assets}/PvP.svg`}
+            w={{ base: "50px", md: "70px" }}
+            h={{ base: "50px", md: "70px" }}
+            alt="PvP"
+          />
           <div className={styles.textContainer}>
             <div className={styles.challengeTitle}>Play PvP mode</div>
             <div className={styles.challengeText}>
@@ -19,7 +24,12 @@ const ChooseChallenge = () => {
           </div>
         </div>
         <div className={styles.challengeContainer}>
-          <Image src={`${assets}/campaign.svg`} />
+          <Image
+            src={`${assets}/campaign.svg`}
+            w={{ base: "50px", md: "70px" }}
+            h={{ base: "50px", md: "70px" }}
+            alt="campaign"
+          />
           <div className={styles.textContainer}>
             <div className={styles.challengeTitle}>Play a campaign</div>
             <div className={styles.challengeText}>
