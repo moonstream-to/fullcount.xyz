@@ -59,3 +59,20 @@
     font-weight: 500;
     line-height: normal;
 }
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+    }
+    .secondBlock {
+        gap: 40px;
+    }
+
+    .firstBlock, .secondBlock {
+        padding: 40px;
+        flex: 1 1;
+    }
+    .firstBlock {
+        justify-content: space-between;
+    }
+}

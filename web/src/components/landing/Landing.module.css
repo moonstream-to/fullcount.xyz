@@ -46,7 +46,7 @@
 
     border: 1px solid #F1E3BF;
     background: #00A341;
-
+white-space: nowrap;
     color: #FFF;
 
     font-family: Inter;
@@ -54,4 +54,11 @@
     font-style: normal;
     font-weight: 500;
     line-height: normal;
+}
+
+@media (min-width: 768px) {
+    .button {
+        align-self: center;
+        padding: 11px 80px;
+    }
 }

@@ -13,7 +13,9 @@ const UpcomingEvents = () => {
       </Flex>
       <div className={styles.eventsContainer}>
         <Flex alignItems={"center"} gap={"10px"}>
-          <NovaLogo />
+          <div style={{ width: "40px", height: "40px" }}>
+            <NovaLogo />
+          </div>
           <div className={styles.event}>
             <div className={styles.date}>March, 15</div>
             <div className={styles.label}>Nova League launch on Arbitrum Nova</div>
@@ -21,7 +23,9 @@ const UpcomingEvents = () => {
         </Flex>
         <div className={styles.divider} />
         <Flex alignItems={"center"} gap={"10px"}>
-          <BaseLogo />
+          <div style={{ width: "40px", height: "40px" }}>
+            <BaseLogo />
+          </div>
           <div className={styles.label}>Base League launch on Base</div>
         </Flex>
       </div>
