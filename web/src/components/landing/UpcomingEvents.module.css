@@ -5,7 +5,6 @@
     align-items: center;
     gap: 20px;
     align-self: stretch;
-
     background: #0B0B0B;
 }
 
@@ -53,11 +52,23 @@
     align-items: flex-start;
     gap: 2px;
     flex: 1 0 0;
+
 }
 
 .divider {
     height: 1px;
     align-self: stretch;
-
     background: #4D4D4D;
+}
+
+@media (min-width: 768px) {
+    .divider {
+        height: 36px;
+        width: 1px;
+    }
+    .eventsContainer {
+        flex-direction: row;
+        width: auto;
+        gap: 20px;
+    }
 }

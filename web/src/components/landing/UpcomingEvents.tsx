@@ -15,15 +15,12 @@ const UpcomingEvents = () => {
       </Flex>
       <div className={styles.eventsContainer}>
         <Flex alignItems={"center"} gap={"10px"}>
-          <div style={{ width: "40px", height: "40px" }}>
-            {/*<NovaLogo />*/}
-            <Image
-              src={`${assets}/landing/arbitrum-nova-logo.svg`}
-              w={{ base: "32px", md: "40px" }}
-              h={{ base: "32px", md: "40px" }}
-              alt="arbitrum-nova"
-            />
-          </div>
+          <Image
+            src={`${assets}/landing/arbitrum-nova-logo.svg`}
+            w={{ base: "32px", md: "40px" }}
+            h={{ base: "32px", md: "40px" }}
+            alt="arbitrum-nova"
+          />
           <div className={styles.event}>
             <div className={styles.date}>March, 15</div>
             <div className={styles.label}>Nova League launch on Arbitrum Nova</div>
@@ -31,14 +28,12 @@ const UpcomingEvents = () => {
         </Flex>
         <div className={styles.divider} />
         <Flex alignItems={"center"} gap={"10px"}>
-          <div style={{ width: "40px", height: "40px" }}>
-            <Image
-              src={`${assets}/landing/base-logo.svg`}
-              w={{ base: "32px", md: "40px" }}
-              h={{ base: "32px", md: "40px" }}
-              alt="base"
-            />
-          </div>
+          <Image
+            src={`${assets}/landing/base-logo.svg`}
+            w={{ base: "32px", md: "40px" }}
+            h={{ base: "32px", md: "40px" }}
+            alt="base"
+          />
           <div className={styles.label}>Base League launch on Base</div>
         </Flex>
       </div>

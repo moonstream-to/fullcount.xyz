@@ -82,6 +82,11 @@
     .textContainer {
         gap: 20px;
     }
+
+    .container {
+        padding: 80px 7%;
+        gap: 60px;
+    }
 }
 
 

@@ -55,6 +55,11 @@
 }
 
 @media (min-width: 768px) {
+
+    .container {
+        padding: 80px 7%;
+        gap: 60px;
+    }
     .card {
         gap: 40px;
         padding: 40px;

@@ -1,6 +1,5 @@
 import styles from "./ChooseChallenge.module.css";
 import parentStyles from "./Landing.module.css";
-import PvPIcon from "../icons/PvPIcon";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image } from "@chakra-ui/react";
 const assets = `${FULLCOUNT_ASSETS_PATH}/landing`;
@@ -8,10 +7,11 @@ const assets = `${FULLCOUNT_ASSETS_PATH}/landing`;
 const ChooseChallenge = () => {
   return (
     <div className={styles.container}>
+      <div className={styles.title}>Choose your challenge</div>
       <div className={styles.challengesContainer}>
         <div className={styles.challengeContainer}>
           <Image
-            src={`${assets}/PvP.svg`}
+            src={`${assets}/PvP2.svg`}
             w={{ base: "50px", md: "70px" }}
             h={{ base: "50px", md: "70px" }}
             alt="PvP"

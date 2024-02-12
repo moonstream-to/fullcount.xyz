@@ -63,6 +63,8 @@
 @media (min-width: 768px) {
     .container {
         flex-direction: row;
+        padding: 80px 7%;
+
     }
     .secondBlock {
         gap: 40px;
