@@ -31,7 +31,13 @@ export default function Layout({
         />
         <meta name="og:image" content={`${assetsPath}/fullcount-og-image.png`} />
       </Head>
-      <Flex minH="100vh" fontFamily="Inter, serif" direction={"column"}>
+      <Flex
+        minH="100vh"
+        bg="#1B1B1B"
+        alignItems={"center"}
+        fontFamily="Inter, serif"
+        direction={"column"}
+      >
         {children}
       </Flex>
     </div>

@@ -6,7 +6,7 @@ const ConnectAndJoin = () => {
     <div className={styles.container}>
       <div className={styles.firstBlock}>
         <div className={styles.title}>Be first to receive news and updates</div>
-        <button className={parentStyles.button}>Get connected</button>
+        <button className={styles.greenButton}>Get connected</button>
       </div>
       <div className={styles.secondBlock}>
         <div className={styles.message}>

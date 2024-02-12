@@ -5,10 +5,8 @@
     align-items: center;
     gap: 40px;
     align-self: stretch;
-
     border-top: 1px solid #4D4D4D;
     background: #1B1B1B;
-
 }
 
 .socialsContainer {
@@ -58,4 +56,21 @@
     font-weight: 400;
     line-height: normal;
 }
+
+@media (min-width: 768px) {
+    .legalText {
+        font-size: 16px;
+    }
+}
+
+@media (min-width: 1440px) {
+.container {
+    max-width: 1238px;
+    width: 100%;
+    place-self: center;
+    padding: 40px 0;
+}
+}
+
+
 
