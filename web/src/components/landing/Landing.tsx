@@ -9,15 +9,17 @@ import Footer from "./Footer";
 import MadeBy from "./MadeBy";
 const Landing = () => {
   return (
-    <Flex w={"100%"} direction={"column"} bg={"#1B1B1B"}>
-      <Hero />
-      <UpcomingEvents />
-      <ChooseChallenge />
-      <LaunchCareer />
-      <ConnectAndJoin />
-      <Footer />
+    <>
+      <Flex w={"100%"} direction={"column"} bg={"#1B1B1B"} maxW={"1440px"} alignItems={"center"}>
+        <Hero />
+        <UpcomingEvents />
+        <ChooseChallenge />
+        <LaunchCareer />
+        <ConnectAndJoin />
+        <Footer />
+      </Flex>
       <MadeBy />
-    </Flex>
+    </>
   );
 };
 

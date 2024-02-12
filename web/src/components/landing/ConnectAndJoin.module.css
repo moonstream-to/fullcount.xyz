@@ -10,7 +10,7 @@
 .firstBlock, .secondBlock {
     display: flex;
     min-width: 275.2px;
-    padding: 30px;
+    padding: 29px;
     flex-direction: column;
     align-items: center;
     gap: 40px;
@@ -59,8 +59,25 @@
     font-weight: 500;
     line-height: normal;
 }
+.greenButton {
+    display: flex;
+    padding: 11px 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border: 1px solid #F1E3BF;
+    background: #00A341;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
 
 @media (min-width: 768px) {
+
     .container {
         flex-direction: row;
         padding: 80px 7%;
@@ -70,8 +87,12 @@
         gap: 40px;
     }
 
+    .message, .title {
+        text-align: start;
+    }
+
     .firstBlock, .secondBlock {
-        padding: 40px;
+        padding: 39px;
         flex: 1 1;
     }
     .firstBlock {

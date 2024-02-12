@@ -14,7 +14,12 @@ const UpcomingEvents = () => {
         <div className={styles.title}>Upcoming events</div>
       </Flex>
       <div className={styles.eventsContainer}>
-        <Flex alignItems={"center"} gap={"10px"}>
+        <Flex
+          alignItems={"center"}
+          gap={"10px"}
+          w={{ base: "auto", md: "351px" }}
+          justifyContent={"end"}
+        >
           <Image
             src={`${assets}/landing/arbitrum-nova-logo.svg`}
             w={{ base: "32px", md: "40px" }}
@@ -27,7 +32,7 @@ const UpcomingEvents = () => {
           </div>
         </Flex>
         <div className={styles.divider} />
-        <Flex alignItems={"center"} gap={"10px"}>
+        <Flex alignItems={"center"} gap={"10px"} w={{ base: "auto", md: "351px" }}>
           <Image
             src={`${assets}/landing/base-logo.svg`}
             w={{ base: "32px", md: "40px" }}

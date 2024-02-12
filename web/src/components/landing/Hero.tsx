@@ -19,10 +19,17 @@ const Hero = () => {
         }
         <div className={styles.heroTextContainer}>
           <div className={styles.heroTextTitle}>Become a baseball legend with Fullcount</div>
-          <div className={styles.heroTextText}>
-            Experience the epic duel between batter and pitcher in this fully on-chain baseball
-            strategy game.
-          </div>
+          {!is768View ? (
+            <div className={styles.heroTextText}>
+              Experience the epic duel between batter and pitcher in this fully on-chain baseball
+              strategy game.
+            </div>
+          ) : (
+            <div className={styles.heroTextText}>
+              Experience the epic duel between batter and pitcher <br />
+              in this fully on-chain baseball strategy game.
+            </div>
+          )}
         </div>
         <button className={styles.button}>Playtest now</button>
       </div>

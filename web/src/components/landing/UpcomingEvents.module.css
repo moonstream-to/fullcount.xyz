@@ -6,6 +6,7 @@
     gap: 20px;
     align-self: stretch;
     background: #0B0B0B;
+
 }
 
 .title {
@@ -28,7 +29,6 @@
 }
 
 .label {
-
     color: #FFF;
     font-family: Inter;
     font-size: 12px;
@@ -52,7 +52,6 @@
     align-items: flex-start;
     gap: 2px;
     flex: 1 0 0;
-
 }
 
 .divider {
@@ -70,5 +69,30 @@
         flex-direction: row;
         width: auto;
         gap: 20px;
+        justify-content: center;
+    }
+
+    .container {
+        padding: 30px 7%;
+    }
+
+    .date {
+        font-size: 12px;
+    }
+    .label {
+        font-size: 16px;
+    }
+    .title {
+        font-size: 20px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .container {
+        max-width: 1238px;
+        align-self: center;
+        width: 100%;
+        border: 1px solid #4D4D4D;
+        background: #0B0B0B;
     }
 }

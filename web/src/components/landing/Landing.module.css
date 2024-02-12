@@ -58,9 +58,8 @@
 
 .heroInnerContainer {
     display: flex;
-
     flex-direction: column;
-    gap: 60px;
+    gap: 40px;
     align-items: center;
 }
 
@@ -73,13 +72,35 @@
         padding: 40px 7% 80px 7%;
         gap: 60px;
     }
+
+    .heroTextTitle {
+        font-size: 40px;
+        max-width: 425px;
+        line-height: 110%;
+    }
+
+    .heroInnerContainer {
+        gap: 60px;
+    }
+
+    .heroTextContainer {
+        gap: 40px;
+    }
 }
 
-@media (min-height: 768px) {
+@media (min-width: 1024px) {
     .heroInnerContainer {
         margin-top: -20px;
         padding: 40px;
         border: 1px solid #4D4D4D;
         background: #232323;
+        place-self: stretch;
+    }
+}
+
+@media (min-width: 1440px) {
+    .heroTextTitle {
+        font-size: 50px;
+        max-width: 532px;
     }
 }
