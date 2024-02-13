@@ -231,7 +231,7 @@ export const getAtBats = async ({
   web3ctx: MoonstreamWeb3ProviderInterface;
   tokensCache: Token[];
 }) => {
-  console.log("FETCHING SESSIONS");
+  console.log("FETCHING ATBATS");
   const { gameContract, tokenContract, multicallContract } = getContracts(web3ctx);
   const numAtBats = Number(await gameContract.methods.NumAtBats().call());
   const oldestAtBatNumber = Math.max(numAtBats - SESSIONS_OFFSET, 1);
@@ -249,11 +249,13 @@ export const getAtBats = async ({
 
   const atBatsRes = await multicallContract.methods.tryAggregate(false, queries).call();
   const [atBatStateRes, numSessions] = splitArray(atBatsRes, 2);
-  const atBatsStates = atBatStateRes.map((atBat: string) =>
-    web3ctx.web3.eth.abi.decodeParameters(getAtBatOutputs, atBat),
+  console.log(atBatStateRes);
+  const atBatsStates = atBatStateRes.map(
+    (atBat: [boolean, string]) =>
+      web3ctx.web3.eth.abi.decodeParameters(getAtBatOutputs, atBat[1])[0],
   );
 
-  return numAtBats;
+  return atBatsStates;
 };
 
 function splitArray<T>(arr: T[][], n: number): T[][] {
