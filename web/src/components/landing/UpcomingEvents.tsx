@@ -1,8 +1,6 @@
 import styles from "./UpcomingEvents.module.css";
 import { Flex, Image } from "@chakra-ui/react";
 import CalendarIcon from "../icons/CalendarIcon";
-import NovaLogo from "../icons/NovaLogo";
-import BaseLogo from "../icons/BaseLogo";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 const assets = FULLCOUNT_ASSETS_PATH;
 
@@ -27,7 +25,7 @@ const UpcomingEvents = () => {
             alt="arbitrum-nova"
           />
           <div className={styles.event}>
-            <div className={styles.date}>March, 15</div>
+            <div className={styles.date}>March 15</div>
             <div className={styles.label}>Nova League launch on Arbitrum Nova</div>
           </div>
         </Flex>
