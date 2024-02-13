@@ -75,6 +75,14 @@
     line-height: normal;
 }
 
+.greenButton:hover {
+    background: #008033;
+}
+
+.button:hover {
+    color: #00A341;
+}
+
 
 @media (min-width: 768px) {
 

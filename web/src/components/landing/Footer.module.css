@@ -61,6 +61,11 @@
     .legalText {
         font-size: 16px;
     }
+
+    .iconsContainer {
+        justify-content: start;
+        margin-right: auto;
+    }
 }
 
 @media (min-width: 1440px) {

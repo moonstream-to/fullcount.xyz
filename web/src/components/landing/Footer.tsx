@@ -1,6 +1,5 @@
 import styles from "./Footer.module.css";
 import DiscordLogo from "../icons/DiscordLogo";
-import TwitterLogo from "../icons/TwitterLogo";
 import FullcountLogo from "../icons/FullcountLogo";
 import { Flex, useMediaQuery } from "@chakra-ui/react";
 
@@ -29,7 +28,6 @@ const Footer = () => {
               <div className={styles.socialsTitle}>Follow us</div>
               <div className={styles.iconsContainer}>
                 <DiscordLogo />
-                <TwitterLogo />
               </div>
             </div>
           </Flex>
@@ -44,7 +42,6 @@ const Footer = () => {
             <div className={styles.socialsTitle}>Follow us</div>
             <div className={styles.iconsContainer}>
               <DiscordLogo />
-              <TwitterLogo />
             </div>
           </div>
           <div className={styles.legalContainer}>
