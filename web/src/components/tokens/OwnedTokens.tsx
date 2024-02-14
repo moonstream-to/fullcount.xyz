@@ -19,14 +19,13 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { OwnedToken, Session, Token } from "../../types";
+import { OwnedToken, Session } from "../../types";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
-import { signSession } from "../../utils/signSession";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import {
   fetchOwnedBLBTokens,
@@ -38,6 +37,7 @@ import {
   fetchFullcountPlayerTokens,
   joinSessionFullcountPlayer,
   startSessionFullcountPlayer,
+  unstakeFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
@@ -47,15 +47,8 @@ const assets = FULLCOUNT_ASSETS_PATH;
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
-  const {
-    tokensCache,
-    tokenAddress,
-    contractAddress,
-    selectedToken,
-    updateContext,
-    invitedTo,
-    inviteCode,
-  } = useGameContext();
+  const { tokenAddress, contractAddress, selectedToken, updateContext, invitedTo, inviteCode } =
+    useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -91,7 +84,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens"],
     async () => {
-      const BLBTokens = await fetchOwnedBLBTokens({ web3ctx, tokensCache });
+      const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
       const fullcountPlayerTokens = await fetchFullcountPlayerTokens();
       return BLBTokens.concat(fullcountPlayerTokens);
     },
@@ -246,6 +239,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       switch (token.source) {
         case "BLBContract":
           return unstakeBLBToken({ web3ctx, token });
+        case "FullcountPlayerAPI":
+          return unstakeFullcountPlayer({ token });
         default:
           return Promise.reject(
             new Error(`Unknown or unsupported token source for unstaking: ${token.source}`),

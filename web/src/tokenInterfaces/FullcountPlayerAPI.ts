@@ -1,6 +1,4 @@
-import { OwnedToken } from "../types";
-import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
-import { sendTransactionWithEstimate } from "../utils/sendTransactions";
+import { Token } from "../types";
 
 export async function fetchFullcountPlayerTokens() {
   console.log(`${fetchFullcountPlayerTokens.name} is not implemented`);
@@ -12,7 +10,7 @@ export async function startSessionFullcountPlayer({
   role,
   requireSignature,
 }: {
-  token: OwnedToken;
+  token: Token;
   role: number;
   requireSignature: boolean;
 }): Promise<{ sessionID: string; sign: string | undefined }> {
@@ -24,12 +22,16 @@ export function joinSessionFullcountPlayer({
   sessionID,
   inviteCode,
 }: {
-  token: OwnedToken;
+  token: Token;
   sessionID: number;
   inviteCode: string | undefined;
 }): Promise<unknown> {
   return Promise.reject(new Error(`${joinSessionFullcountPlayer.name} is not implemented`));
 }
+
+export const unstakeFullcountPlayer = ({ token }: { token: Token }) => {
+  return Promise.reject(new Error(`${unstakeFullcountPlayer.name} is not implemented`));
+};
 
 export function commitSwingFullcountPlayer({
   sign,

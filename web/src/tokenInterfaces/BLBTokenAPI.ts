@@ -15,10 +15,8 @@ import { signSession } from "../utils/signSession";
 
 export const fetchOwnedBLBTokens = async ({
   web3ctx,
-  tokensCache,
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
-  tokensCache: Token[];
 }) => {
   const { tokenContract, gameContract } = getContracts(web3ctx);
   const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
@@ -32,30 +30,25 @@ export const fetchOwnedBLBTokens = async ({
       await gameContract.methods.sessionProgress(stakedSessionID).call(),
     );
     const isStaked = stakedSessionID !== 0;
-    const tokenFromCache = tokensCache.find(
-      (t) => t.id === tokenId && t.address === tokenContract.options.address,
-    );
-    if (!tokenFromCache) {
-      const URI = await tokenContract.methods.tokenURI(tokenId).call();
-      let tokenMetadata = { name: "", image: "" };
-      try {
-        tokenMetadata = await getTokenMetadata(URI);
-        tokens.push({
-          id: tokenId,
-          name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-          image: tokenMetadata.image,
-          address: tokenContract.options.address,
-          staker: web3ctx.account,
-          isStaked,
-          stakedSessionID,
-          tokenProgress,
-          source: "BLBContract",
-        });
-      } catch (e) {
-        console.log(e);
-      }
-    } else {
-      tokens.push({ ...tokenFromCache, isStaked, stakedSessionID, tokenProgress });
+
+    // if (!tokenFromCache) {
+    const URI = await tokenContract.methods.tokenURI(tokenId).call();
+    let tokenMetadata = { name: "", image: "" };
+    try {
+      tokenMetadata = await getTokenMetadata(URI);
+      tokens.push({
+        id: tokenId,
+        name: tokenMetadata.name.split(` - ${tokenId}`)[0],
+        image: tokenMetadata.image,
+        address: tokenContract.options.address,
+        staker: web3ctx.account,
+        isStaked,
+        stakedSessionID,
+        tokenProgress,
+        source: "BLBContract",
+      });
+    } catch (e) {
+      console.log(e);
     }
   }
   return tokens;
@@ -68,7 +61,7 @@ export const startSessionBLB = ({
   requireSignature,
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
-  token: OwnedToken;
+  token: Token;
   role: number;
   requireSignature: boolean;
 }): Promise<{ sessionID: string; sign: string | undefined }> => {
@@ -100,7 +93,7 @@ export const joinSessionBLB = ({
   inviteCode,
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
-  token: OwnedToken;
+  token: Token;
   sessionID: number;
   inviteCode: string | undefined;
 }) => {
