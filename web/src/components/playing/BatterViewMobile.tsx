@@ -7,20 +7,13 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
-import {
-  commitSwingBLBToken,
-  joinSessionBLB,
-  revealSwingBLBToken,
-} from "../../tokenInterfaces/BLBTokenAPI";
+import { commitSwingBLBToken, revealSwingBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
 import {
   commitSwingFullcountPlayer,
-  joinSessionFullcountPlayer,
   revealSwingFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
-import { OwnedToken, Token } from "../../types";
-import sessionView3 from "../sessions/SessionView3";
+import { Token } from "../../types";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 

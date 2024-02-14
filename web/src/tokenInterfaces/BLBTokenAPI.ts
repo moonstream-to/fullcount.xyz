@@ -31,7 +31,6 @@ export const fetchOwnedBLBTokens = async ({
     );
     const isStaked = stakedSessionID !== 0;
 
-    // if (!tokenFromCache) {
     const URI = await tokenContract.methods.tokenURI(tokenId).call();
     let tokenMetadata = { name: "", image: "" };
     try {
@@ -66,11 +65,7 @@ export const startSessionBLB = ({
   requireSignature: boolean;
 }): Promise<{ sessionID: string; sign: string | undefined }> => {
   const { gameContract } = getContracts(web3ctx);
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
+
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.startAtBat(token.address, token.id, role, requireSignature),
@@ -97,11 +92,6 @@ export const joinSessionBLB = ({
   sessionID: number;
   inviteCode: string | undefined;
 }) => {
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
   const { gameContract } = getContracts(web3ctx);
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -146,11 +136,6 @@ export const commitSwingBLBToken = ({
   sessionID: number;
 }) => {
   const { gameContract } = getContracts(web3ctx);
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
 
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -174,11 +159,6 @@ export const revealSwingBLBToken = ({
   sessionID: number;
 }) => {
   const { gameContract } = getContracts(web3ctx);
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.revealSwing(sessionID, nonce, actionChoice, vertical, horizontal),
@@ -195,12 +175,6 @@ export const commitPitchBLBToken = ({
   sessionID: number;
 }) => {
   const { gameContract } = getContracts(web3ctx);
-
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
 
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -224,11 +198,6 @@ export const revealPitchBLBToken = ({
   sessionID: number;
 }) => {
   const { gameContract } = getContracts(web3ctx);
-  if (!web3ctx.account) {
-    return new Promise((_, reject) => {
-      reject(new Error(`Account address isn't set`));
-    });
-  }
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.revealPitch(sessionID, nonce, actionChoice, vertical, horizontal),
