@@ -10,9 +10,21 @@ import { AbiItem } from "web3-utils";
 
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
+import { commitPitchBLBToken, revealPitchBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
+import {
+  commitPitchFullcountPlayer,
+  revealPitchFullcountPlayer,
+} from "../../tokenInterfaces/FullcountPlayerAPI";
+import { Token } from "../../types";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+const PitcherViewMobile = ({
+  sessionStatus,
+  token,
+}: {
+  sessionStatus: SessionStatus;
+  token: Token;
+}) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const web3ctx = useContext(Web3Context);
@@ -25,23 +37,20 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
 
   const commitPitch = useMutation(
     async ({ sign }: { sign: string }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+      switch (token.source) {
+        case "BLBContract":
+          return commitPitchBLBToken({ web3ctx, sessionID: sessionStatus.sessionID, sign });
+        case "FullcountPlayerAPI":
+          return commitPitchFullcountPlayer({ sessionID: sessionStatus.sessionID, sign });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.commitPitch(sessionStatus.sessionID, sign),
-      );
     },
     {
       onSuccess: () => {
         setIsCommitted(true);
         queryClient.refetchQueries("sessions");
         queryClient.refetchQueries("session");
-        // setIsCommitted(true);
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -61,22 +70,27 @@ const PitcherViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) 
       vertical: number;
       horizontal: number;
     }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+      switch (token.source) {
+        case "BLBContract":
+          return revealPitchBLBToken({
+            web3ctx,
+            sessionID: sessionStatus.sessionID,
+            nonce,
+            vertical,
+            horizontal,
+            actionChoice,
+          });
+        case "FullcountPlayerAPI":
+          return revealPitchFullcountPlayer({
+            sessionID: sessionStatus.sessionID,
+            nonce,
+            vertical,
+            horizontal,
+            actionChoice,
+          });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.revealPitch(
-          sessionStatus.sessionID,
-          nonce,
-          actionChoice,
-          vertical,
-          horizontal,
-        ),
-      );
     },
     {
       onSuccess: () => {

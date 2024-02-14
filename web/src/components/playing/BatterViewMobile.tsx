@@ -9,10 +9,28 @@ import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
+import {
+  commitSwingBLBToken,
+  joinSessionBLB,
+  revealSwingBLBToken,
+} from "../../tokenInterfaces/BLBTokenAPI";
+import {
+  commitSwingFullcountPlayer,
+  joinSessionFullcountPlayer,
+  revealSwingFullcountPlayer,
+} from "../../tokenInterfaces/FullcountPlayerAPI";
+import { OwnedToken, Token } from "../../types";
+import sessionView3 from "../sessions/SessionView3";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+const BatterViewMobile = ({
+  sessionStatus,
+  token,
+}: {
+  sessionStatus: SessionStatus;
+  token: Token;
+}) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const web3ctx = useContext(Web3Context);
@@ -25,16 +43,14 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
 
   const commitSwing = useMutation(
     async ({ sign }: { sign: string }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+      switch (token.source) {
+        case "BLBContract":
+          return commitSwingBLBToken({ web3ctx, sessionID: sessionStatus.sessionID, sign });
+        case "FullcountPlayerAPI":
+          return commitSwingFullcountPlayer({ sessionID: sessionStatus.sessionID, sign });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.commitSwing(sessionStatus.sessionID, sign),
-      );
     },
     {
       onSuccess: () => {
@@ -60,21 +76,27 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
       vertical: number;
       horizontal: number;
     }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+      switch (token.source) {
+        case "BLBContract":
+          return revealSwingBLBToken({
+            web3ctx,
+            sessionID: sessionStatus.sessionID,
+            nonce,
+            vertical,
+            horizontal,
+            actionChoice,
+          });
+        case "FullcountPlayerAPI":
+          return revealSwingFullcountPlayer({
+            sessionID: sessionStatus.sessionID,
+            nonce,
+            vertical,
+            horizontal,
+            actionChoice,
+          });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.revealSwing(
-          sessionStatus.sessionID,
-          nonce,
-          actionChoice,
-          vertical,
-          horizontal,
-        ),
-      );
     },
     {
       onSuccess: () => {

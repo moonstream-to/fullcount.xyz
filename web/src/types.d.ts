@@ -55,13 +55,13 @@ interface Token {
   name: string;
   image: string;
   staker: string;
+  source?: "BLBContract" | "FullcountPlayerAPI";
 }
 
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
-  source?: "BLBContract" | "FullcountPlayerAPI";
 }
 
 interface Pair {

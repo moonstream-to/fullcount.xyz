@@ -12,6 +12,8 @@ import SelectToken from "./SelectToken";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import DotsCounter from "./DotsCounter";
 import styles from "./SessionView.module.css";
+import { joinSessionBLB } from "../../tokenInterfaces/BLBTokenAPI";
+import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -40,17 +42,15 @@ const SessionView3 = ({ session }: { session: Session }) => {
   } = useDisclosure();
 
   const joinSession = useMutation(
-    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    async ({ sessionID, token }: { sessionID: number; token: OwnedToken }) => {
+      switch (token.source) {
+        case "BLBContract":
+          return joinSessionBLB({ web3ctx, token, sessionID, inviteCode: undefined });
+        case "FullcountPlayerAPI":
+          return joinSessionFullcountPlayer({ token, sessionID, inviteCode: undefined });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      const signature = "0x";
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, signature),
-      );
     },
     {
       onSuccess: (_, variables) => {

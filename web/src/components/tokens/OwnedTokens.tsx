@@ -28,9 +28,15 @@ import TokenABIImported from "../../web3/abi/BLBABI.json";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import { signSession } from "../../utils/signSession";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
-import { fetchOwnedBLBTokens, startSessionBLB } from "../../tokenInterfaces/BLBTokenAPI";
+import {
+  fetchOwnedBLBTokens,
+  joinSessionBLB,
+  startSessionBLB,
+  unstakeBLBToken,
+} from "../../tokenInterfaces/BLBTokenAPI";
 import {
   fetchFullcountPlayerTokens,
+  joinSessionFullcountPlayer,
   startSessionFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
 
@@ -175,23 +181,17 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       inviteCode,
     }: {
       sessionID: number;
-      token: Token;
+      token: OwnedToken;
       inviteCode: string;
-    }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    }): Promise<unknown> => {
+      switch (token.source) {
+        case "BLBContract":
+          return joinSessionBLB({ web3ctx, token, sessionID, inviteCode });
+        case "FullcountPlayerAPI":
+          return joinSessionFullcountPlayer({ token, sessionID, inviteCode });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.joinSession(
-          sessionID,
-          tokenAddress,
-          token.id,
-          inviteCode ? inviteCode : "0x",
-        ),
-      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -243,17 +243,13 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
   const unstakeNFT = useMutation(
     async (token: OwnedToken) => {
-      if (token.tokenProgress === 2 && token.stakedSessionID) {
-        return sendTransactionWithEstimate(
-          web3ctx.account,
-          gameContract.methods.abortSession(token.stakedSessionID),
-        );
-      }
-      if (token.tokenProgress === 5 || token.tokenProgress === 6) {
-        return sendTransactionWithEstimate(
-          web3ctx.account,
-          gameContract.methods.unstakeNFT(token.address, token.id),
-        );
+      switch (token.source) {
+        case "BLBContract":
+          return unstakeBLBToken({ web3ctx, token });
+        default:
+          return Promise.reject(
+            new Error(`Unknown or unsupported token source for unstaking: ${token.source}`),
+          );
       }
     },
     {

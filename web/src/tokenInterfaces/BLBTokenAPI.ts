@@ -61,7 +61,7 @@ export const fetchOwnedBLBTokens = async ({
   return tokens;
 };
 
-export const startSessionBLB = async ({
+export const startSessionBLB = ({
   web3ctx,
   token,
   role,
@@ -91,6 +91,155 @@ export const startSessionBLB = async ({
         : undefined;
       return { sessionID, sign };
     });
+};
+
+export const joinSessionBLB = ({
+  web3ctx,
+  token,
+  sessionID,
+  inviteCode,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  token: OwnedToken;
+  sessionID: number;
+  inviteCode: string | undefined;
+}) => {
+  if (!web3ctx.account) {
+    return new Promise((_, reject) => {
+      reject(new Error(`Account address isn't set`));
+    });
+  }
+  const { gameContract } = getContracts(web3ctx);
+  return sendTransactionWithEstimate(
+    web3ctx.account,
+    gameContract.methods.joinSession(
+      sessionID,
+      token.address,
+      token.id,
+      inviteCode ? inviteCode : "0x",
+    ),
+  );
+};
+export const unstakeBLBToken = ({
+  web3ctx,
+  token,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  token: OwnedToken;
+}) => {
+  const { gameContract } = getContracts(web3ctx);
+
+  if (token.tokenProgress === 2 && token.stakedSessionID) {
+    return sendTransactionWithEstimate(
+      web3ctx.account,
+      gameContract.methods.abortSession(token.stakedSessionID),
+    );
+  }
+  if (token.tokenProgress === 5 || token.tokenProgress === 6) {
+    return sendTransactionWithEstimate(
+      web3ctx.account,
+      gameContract.methods.unstakeNFT(token.address, token.id),
+    );
+  }
+};
+
+export const commitSwingBLBToken = ({
+  web3ctx,
+  sign,
+  sessionID,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  sign: string;
+  sessionID: number;
+}) => {
+  const { gameContract } = getContracts(web3ctx);
+  if (!web3ctx.account) {
+    return new Promise((_, reject) => {
+      reject(new Error(`Account address isn't set`));
+    });
+  }
+
+  return sendTransactionWithEstimate(
+    web3ctx.account,
+    gameContract.methods.commitSwing(sessionID, sign),
+  );
+};
+
+export const revealSwingBLBToken = ({
+  web3ctx,
+  nonce,
+  sessionID,
+  actionChoice,
+  vertical,
+  horizontal,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  nonce: string;
+  actionChoice: number;
+  vertical: number;
+  horizontal: number;
+  sessionID: number;
+}) => {
+  const { gameContract } = getContracts(web3ctx);
+  if (!web3ctx.account) {
+    return new Promise((_, reject) => {
+      reject(new Error(`Account address isn't set`));
+    });
+  }
+  return sendTransactionWithEstimate(
+    web3ctx.account,
+    gameContract.methods.revealSwing(sessionID, nonce, actionChoice, vertical, horizontal),
+  );
+};
+
+export const commitPitchBLBToken = ({
+  web3ctx,
+  sign,
+  sessionID,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  sign: string;
+  sessionID: number;
+}) => {
+  const { gameContract } = getContracts(web3ctx);
+
+  if (!web3ctx.account) {
+    return new Promise((_, reject) => {
+      reject(new Error(`Account address isn't set`));
+    });
+  }
+
+  return sendTransactionWithEstimate(
+    web3ctx.account,
+    gameContract.methods.commitPitch(sessionID, sign),
+  );
+};
+
+export const revealPitchBLBToken = ({
+  web3ctx,
+  nonce,
+  sessionID,
+  actionChoice,
+  vertical,
+  horizontal,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  nonce: string;
+  actionChoice: number;
+  vertical: number;
+  horizontal: number;
+  sessionID: number;
+}) => {
+  const { gameContract } = getContracts(web3ctx);
+  if (!web3ctx.account) {
+    return new Promise((_, reject) => {
+      reject(new Error(`Account address isn't set`));
+    });
+  }
+  return sendTransactionWithEstimate(
+    web3ctx.account,
+    gameContract.methods.revealPitch(sessionID, nonce, actionChoice, vertical, horizontal),
+  );
 };
 
 const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {

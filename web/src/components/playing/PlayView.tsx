@@ -1,5 +1,4 @@
 import { useGameContext } from "../../contexts/GameContext";
-import PitcherView from "./PitcherView";
 import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
 import { useQuery } from "react-query";
@@ -7,7 +6,6 @@ import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import { Token } from "../../types";
 import Outcome from "./Outcome";
-import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
@@ -365,11 +363,11 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               />
               {isPitcher(selectedToken) && sessionStatus.data && (
                 <>
-                  <PitcherViewMobile sessionStatus={sessionStatus.data} />
+                  <PitcherViewMobile sessionStatus={sessionStatus.data} token={selectedToken} />
                 </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
-                <BatterViewMobile sessionStatus={sessionStatus.data} />
+                <BatterViewMobile sessionStatus={sessionStatus.data} token={selectedToken} />
               )}
             </Flex>
           )}
