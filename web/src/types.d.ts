@@ -61,6 +61,7 @@ interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
+  source?: "BLBContract" | "FullcountPlayerAPI";
 }
 
 interface Pair {
@@ -168,4 +169,20 @@ interface SwingLocation {
 interface EthereumError {
   code: number;
   message: string;
+}
+
+interface SessionStartedReturnValues {
+  sessionID: string;
+}
+
+interface SessionStartedEvent {
+  returnValues: SessionStartedReturnValues;
+}
+
+interface FullcountContractEvents {
+  SessionStarted: SessionStartedEvent;
+}
+
+interface FullcountContractEventContainer {
+  events: FullcountContractEvents;
 }
