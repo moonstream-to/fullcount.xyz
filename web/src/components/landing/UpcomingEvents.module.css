@@ -40,7 +40,8 @@
 .eventsContainer {
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: flex-start;
+    margin-right: auto;
     width: 275.2px;
     gap: 10px;
 }
@@ -70,6 +71,7 @@
         width: auto;
         gap: 20px;
         justify-content: center;
+        margin-left: auto;
     }
 
     .container {
