@@ -2,6 +2,7 @@ import styles from "./Footer.module.css";
 import DiscordLogo from "../icons/DiscordLogo";
 import FullcountLogo from "../icons/FullcountLogo";
 import { Flex, useMediaQuery } from "@chakra-ui/react";
+import { DISCORD_LINK } from "../../constants";
 
 const Footer = () => {
   const [is768View, is1024View] = useMediaQuery(["(min-width: 768px)", "(min-width: 1024px)"]);
@@ -27,7 +28,10 @@ const Footer = () => {
             <div className={styles.socialsContainer}>
               <div className={styles.socialsTitle}>Follow us</div>
               <div className={styles.iconsContainer}>
-                <DiscordLogo />
+                <DiscordLogo
+                  cursor={"pointer"}
+                  onClick={() => window.open(DISCORD_LINK, "_blank", "noopener,noreferrer")}
+                />
               </div>
             </div>
           </Flex>
@@ -41,7 +45,10 @@ const Footer = () => {
           <div className={styles.socialsContainer}>
             <div className={styles.socialsTitle}>Follow us</div>
             <div className={styles.iconsContainer}>
-              <DiscordLogo />
+              <DiscordLogo
+                cursor={"pointer"}
+                onClick={() => window.open(DISCORD_LINK, "_blank", "noopener,noreferrer")}
+              />
             </div>
           </div>
           <div className={styles.legalContainer}>

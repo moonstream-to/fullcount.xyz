@@ -2,6 +2,7 @@ import styles from "./ChooseChallenge.module.css";
 import parentStyles from "./Landing.module.css";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image } from "@chakra-ui/react";
+import Link from "next/link";
 const assets = `${FULLCOUNT_ASSETS_PATH}/landing`;
 
 const ChooseChallenge = () => {
@@ -38,7 +39,9 @@ const ChooseChallenge = () => {
           </div>
         </div>
       </div>
-      <button className={parentStyles.button}>Play</button>
+      <Link href="/" passHref>
+        <button className={parentStyles.button}>Play</button>
+      </Link>
     </div>
   );
 };

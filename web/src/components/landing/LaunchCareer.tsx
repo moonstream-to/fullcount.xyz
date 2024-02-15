@@ -2,6 +2,7 @@ import styles from "./LaunchCareer.module.css";
 import parentStyles from "./Landing.module.css";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image } from "@chakra-ui/react";
+import Link from "next/link";
 const assets = `${FULLCOUNT_ASSETS_PATH}/landing`;
 
 const LaunchCareer = () => {
@@ -32,7 +33,9 @@ const LaunchCareer = () => {
           </div>
         </div>
       </div>
-      <button className={parentStyles.button}>Create a character</button>
+      <Link href="/" passHref>
+        <button className={parentStyles.button}>Create a character</button>
+      </Link>
     </div>
   );
 };

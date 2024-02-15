@@ -2,6 +2,7 @@ import styles from "./Landing.module.css";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image, useMediaQuery } from "@chakra-ui/react";
 import FullcountLogo from "../icons/FullcountLogo";
+import Link from "next/link";
 const assets = `${FULLCOUNT_ASSETS_PATH}/landing`;
 
 const Hero = () => {
@@ -31,7 +32,9 @@ const Hero = () => {
             </div>
           )}
         </div>
-        <button className={styles.button}>Playtest now</button>
+        <Link href="/" passHref>
+          <button className={styles.button}>Playtest now</button>
+        </Link>
       </div>
     </div>
   );
