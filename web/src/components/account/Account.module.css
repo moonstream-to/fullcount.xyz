@@ -1,0 +1,84 @@
+.loginButton {
+    display: flex;
+    padding: 5px 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 20px;
+    background: #353535;
+    color: #FFF;
+    font-family: Space Grotesk, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.signUpButton {
+    display: flex;
+    padding: 5px 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border-radius: 20px;
+    background: #F56646;
+    color: #FFF;
+    font-family: Space Grotesk, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 100%;
+    white-space: nowrap;
+}
+
+.portalButton {
+    display: flex;
+    padding: 4px 9px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 30px;
+    border: 1px solid #FFF;
+    background-color: transparent;
+    color: #FFF;
+    text-align: center;
+    font-family: Space Grotesk, sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 12px */
+}
+
+.divider {
+    background-color: #8F8F8F;
+    height: 3px;
+    width: 3px;
+    border-radius: 50%;
+}
+
+@media (min-width: 768px) {
+    .portalButton {
+        padding: 9px 14px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .loginButton, .signUpButton {
+        padding: 5px 15px;
+        font-size: 16px;
+        height: 36px;
+
+    }
+}
+
+.portalButton:hover {
+    background-color: #FFF;
+    color: black;
+}
+
+
+.portalButtonText:hover {
+    background: -webkit-linear-gradient(0deg, #F56646, #f89a85);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
