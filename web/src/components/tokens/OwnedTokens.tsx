@@ -84,13 +84,14 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens"],
     async () => {
+      console.log("FETCHING TOKENS");
       const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
-      const fullcountPlayerTokens = await fetchFullcountPlayerTokens();
+      const fullcountPlayerTokens = await fetchFullcountPlayerTokens({ web3ctx });
       return BLBTokens.concat(fullcountPlayerTokens);
     },
     {
       ...queryCacheProps,
-      refetchInterval: 5000,
+      refetchInterval: 500000,
     },
   );
 
@@ -108,7 +109,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         case "BLBContract":
           return startSessionBLB({ web3ctx, token, role, requireSignature });
         case "FullcountPlayerAPI":
-          return startSessionFullcountPlayer({ token, role, requireSignature });
+          return startSessionFullcountPlayer({ token, roleNumber: role, requireSignature });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }

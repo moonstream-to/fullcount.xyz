@@ -49,13 +49,20 @@ interface TokenMetadata {
   image: string;
 }
 
+type TokenSource = "BLBContract" | "FullcountPlayerAPI";
+
+type TokenId = {
+  id: string;
+  address: string;
+};
+
 interface Token {
   address: string;
   id: string;
   name: string;
   image: string;
   staker: string;
-  source?: "BLBContract" | "FullcountPlayerAPI";
+  source?: TokenSource;
 }
 
 interface OwnedToken extends Token {

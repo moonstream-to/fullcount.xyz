@@ -1,56 +1,105 @@
-import { FullcountContractEventContainer, OwnedToken, Token } from "../types";
+import { FullcountContractEventContainer, OwnedToken, Token, TokenId, TokenSource } from "../types";
 import { getTokenMetadata } from "../utils/decoders";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import TokenABIImported from "../web3/abi/BLBABI.json";
 import MulticallABIImported from "../web3/abi/Multicall2.json";
 import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
-const FullcountABI = FullcountABIImported as unknown as AbiItem[];
-const TokenABI = TokenABIImported as unknown as AbiItem[];
-const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 import { FullcountABI as FullcountContract, Multicall2 } from "../../types/web3-v1-contracts";
 import { GAME_CONTRACT, MULTICALL2_CONTRACT_ADDRESSES, TOKEN_CONTRACT } from "../constants";
 import { sendTransactionWithEstimate } from "../utils/sendTransactions";
 import { signSession } from "../utils/signSession";
+import { getMulticallResults } from "../utils/multicall";
+
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
+const TokenABI = TokenABIImported as unknown as AbiItem[];
+const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 
 export const fetchOwnedBLBTokens = async ({
   web3ctx,
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
 }) => {
-  const { tokenContract, gameContract } = getContracts(web3ctx);
+  const { tokenContract } = getContracts(web3ctx);
   const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
-  const tokens: OwnedToken[] = [];
-  for (let i = 0; i < balanceOf; i++) {
-    const tokenId = await tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).call();
-    const stakedSessionID = Number(
-      await gameContract.methods.StakedSession(tokenContract.options.address, tokenId).call(),
-    );
-    const tokenProgress = Number(
-      await gameContract.methods.sessionProgress(stakedSessionID).call(),
-    );
-    const isStaked = stakedSessionID !== 0;
-
-    const URI = await tokenContract.methods.tokenURI(tokenId).call();
-    let tokenMetadata = { name: "", image: "" };
-    try {
-      tokenMetadata = await getTokenMetadata(URI);
-      tokens.push({
-        id: tokenId,
-        name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-        image: tokenMetadata.image,
-        address: tokenContract.options.address,
-        staker: web3ctx.account,
-        isStaked,
-        stakedSessionID,
-        tokenProgress,
-        source: "BLBContract",
-      });
-    } catch (e) {
-      console.log(e);
-    }
+  const tokensQueries = [];
+  for (let i = 0; i < balanceOf; i += 1) {
+    tokensQueries.push({
+      target: TOKEN_CONTRACT,
+      callData: tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).encodeABI(),
+    });
   }
-  return tokens;
+
+  const [tokens] = await getMulticallResults(
+    web3ctx,
+    TokenABI,
+    ["tokenOfOwnerByIndex"],
+    tokensQueries,
+  );
+  return await getTokensData({
+    web3ctx,
+    tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
+    tokensSource: "BLBContract",
+  });
+};
+
+export const getTokensData = async ({
+  web3ctx,
+  tokens,
+  tokensSource,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  tokens: TokenId[];
+  tokensSource: TokenSource;
+}) => {
+  const { tokenContract, gameContract } = getContracts(web3ctx);
+  const stakedQueries = tokens.map((t) => ({
+    target: gameContract.options.address,
+    callData: gameContract.methods.StakedSession(t.address, t.id).encodeABI(),
+  }));
+  console.log(stakedQueries);
+  const [stakedSessions] = await getMulticallResults(
+    web3ctx,
+    FullcountABI,
+    ["StakedSession"],
+    stakedQueries,
+  );
+
+  const progressQueries = stakedSessions.map((s) => ({
+    target: gameContract.options.address,
+    callData: gameContract.methods.sessionProgress(s).encodeABI(),
+  }));
+
+  const [progresses] = await getMulticallResults(
+    web3ctx,
+    FullcountABI,
+    ["sessionProgress"],
+    progressQueries,
+  );
+
+  const uriQueries = tokens.map((t) => ({
+    target: t.address,
+    callData: tokenContract.methods.tokenURI(t.id).encodeABI(),
+  }));
+
+  const [uris] = await getMulticallResults(web3ctx, TokenABI, ["tokenURI"], uriQueries);
+
+  const promises = uris.map(async (uri, idx) => {
+    const { name, image } = await getTokenMetadata(uri);
+    return {
+      id: tokens[idx].id,
+      name: name, //.split(` - ${tokens[idx].id}`)[0],
+      image: image,
+      address: tokenContract.options.address,
+      staker: web3ctx.account,
+      isStaked: stakedSessions[idx] !== "0",
+      stakedSessionID: stakedSessions[idx],
+      tokenProgress: progresses[idx],
+      source: tokensSource,
+    };
+  });
+
+  return await Promise.all(promises);
 };
 
 export const startSessionBLB = ({
