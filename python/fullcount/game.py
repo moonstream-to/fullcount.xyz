@@ -8,8 +8,7 @@ Distance0: data.OutcomeDistribution = (0, 0, 0, 1000, 3000, 1000, 5000, 0)
 
 Distance1: data.OutcomeDistribution = (0, 0, 2500, 2500, 2000, 500, 2500, 0)
 
-Distance2: data.OutcomeDistribution = (
-    1000, 0, 3200, 3200, 1100, 200, 800, 500)
+Distance2: data.OutcomeDistribution = (1000, 0, 3200, 3200, 1100, 200, 800, 500)
 
 Distance3: data.OutcomeDistribution = (4000, 0, 3000, 1500, 250, 0, 0, 1250)
 
@@ -18,7 +17,7 @@ Distance4: data.OutcomeDistribution = (7000, 0, 2000, 0, 0, 0, 0, 1000)
 DistanceGT4: data.OutcomeDistribution = (10_000, 0, 0, 0, 0, 0, 0, 0)
 
 
-def result(
+def pitch_result(
     pitch_type: data.PitchType,
     pitch_vertical: data.VerticalLocation,
     pitch_horizontal: data.HorizontalLocation,
@@ -61,7 +60,7 @@ def result(
     return data.sample(distribution)
 
 
-def rollout(
+def simulate_pitches(
     num_samples: int,
     pitch_type: Optional[data.PitchType] = None,
     pitch_vertical: Optional[data.VerticalLocation] = None,
@@ -132,7 +131,7 @@ def rollout(
                 sample_swing_type,
                 sample_swing_vertical,
                 sample_swing_horizontal,
-                result(
+                pitch_result(
                     sample_pitch_type,
                     sample_pitch_vertical,
                     sample_pitch_horizontal,
@@ -146,38 +145,31 @@ def rollout(
     return results
 
 
-def handle_result(args: argparse.Namespace) -> None:
-    print(
-        result(
-            data.PitchType(args.pitch_type),
-            data.VerticalLocation(args.pitch_vertical),
-            data.HorizontalLocation(args.pitch_horizontal),
-            data.SwingType(args.swing_type),
-            data.VerticalLocation(args.swing_vertical),
-            data.HorizontalLocation(args.swing_horizontal),
-        )
-    )
-
-
-def handle_rollout(args: argparse.Namespace) -> None:
-    results = rollout(
+def handle_simulate_pitches(args: argparse.Namespace) -> None:
+    results = simulate_pitches(
         args.num_samples,
-        data.PitchType(
-            args.pitch_type) if args.pitch_type is not None else None,
-        data.VerticalLocation(args.pitch_vertical)
-        if args.pitch_vertical is not None
-        else None,
-        data.HorizontalLocation(args.pitch_horizontal)
-        if args.pitch_horizontal is not None
-        else None,
-        data.SwingType(
-            args.swing_type) if args.swing_type is not None else None,
-        data.VerticalLocation(args.swing_vertical)
-        if args.swing_vertical is not None
-        else None,
-        data.HorizontalLocation(args.swing_horizontal)
-        if args.swing_horizontal is not None
-        else None,
+        data.PitchType(args.pitch_type) if args.pitch_type is not None else None,
+        (
+            data.VerticalLocation(args.pitch_vertical)
+            if args.pitch_vertical is not None
+            else None
+        ),
+        (
+            data.HorizontalLocation(args.pitch_horizontal)
+            if args.pitch_horizontal is not None
+            else None
+        ),
+        data.SwingType(args.swing_type) if args.swing_type is not None else None,
+        (
+            data.VerticalLocation(args.swing_vertical)
+            if args.swing_vertical is not None
+            else None
+        ),
+        (
+            data.HorizontalLocation(args.swing_horizontal)
+            if args.swing_horizontal is not None
+            else None
+        ),
     )
 
     print(
@@ -188,26 +180,23 @@ def handle_rollout(args: argparse.Namespace) -> None:
 
 
 def generate_cli() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Fullcount rules: Generation 1")
+    parser = argparse.ArgumentParser(description="Fullcount rules: Generation 1")
     parser.set_defaults(func=lambda _: parser.print_help())
 
     subparsers = parser.add_subparsers()
 
-    result_parser = subparsers.add_parser("result")
-    data.configure_move_type_handler(result_parser)
-    result_parser.set_defaults(func=handle_result)
-
-    rollout_parser = subparsers.add_parser("rollout")
-    rollout_parser.add_argument(
+    simulate_pitches_parser = subparsers.add_parser(
+        "simulate-pitches", help="Simulate pitches"
+    )
+    simulate_pitches_parser.add_argument(
         "--num-samples",
         "-n",
         type=int,
         default=100,
         help="Number of samples to generate",
     )
-    data.configure_move_type_handler(rollout_parser, required=False)
-    rollout_parser.set_defaults(func=handle_rollout)
+    data.configure_move_type_handler(simulate_pitches_parser, required=False)
+    simulate_pitches_parser.set_defaults(func=handle_simulate_pitches)
 
     return parser
 

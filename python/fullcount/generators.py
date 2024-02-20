@@ -22,7 +22,7 @@ from .data import (
     HorizontalLocation,
     MAX_UINT256,
 )
-from .generation_1 import Distance0, Distance1, Distance2, Distance3, Distance4, DistanceGT4
+from .game import Distance0, Distance1, Distance2, Distance3, Distance4, DistanceGT4
 from .randomness import grind
 
 OUTCOME_TEST_TEMPLATE = """
@@ -132,10 +132,9 @@ def outcome_tests(
     elif distance == 2:
         outcome_distribution = Distance2
     elif distance == 3:
-        outcome_distribution = Distance3    
+        outcome_distribution = Distance3
     elif distance == 4:
         outcome_distribution = Distance4
-    
 
     boundary_0 = sum(outcome_distribution[: desired_outcome.value])
     boundary_1 = sum(outcome_distribution[: desired_outcome.value + 1]) - 1

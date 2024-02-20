@@ -13,7 +13,7 @@ from tqdm import tqdm
 def random_sample(nonce_1: int, nonce_2: int, denominator: int = 10000) -> int:
     assert denominator != 0, "denominator cannot be zero"
     combination_raw = web3.keccak(encode(["uint256", "uint256"], [nonce_1, nonce_2]))
-    combination = web3.toInt(combination_raw)
+    combination = web3.to_int(combination_raw)
     return combination % denominator
 
 

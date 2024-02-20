@@ -1,6 +1,6 @@
 import argparse
 
-from . import BeerLeagueBallers, Fullcount, generation_1, randomness, generators, signatures
+from . import BeerLeagueBallers, Fullcount, game, randomness, generators, signatures
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -16,8 +16,8 @@ def generate_cli() -> argparse.ArgumentParser:
     contract_parser = Fullcount.generate_cli()
     subparsers.add_parser("contract", parents=[contract_parser], add_help=False)
 
-    generation_1_parser = generation_1.generate_cli()
-    subparsers.add_parser("gen-1", parents=[generation_1_parser], add_help=False)
+    generation_1_parser = game.generate_cli()
+    subparsers.add_parser("game", parents=[generation_1_parser], add_help=False)
 
     blb_parser = BeerLeagueBallers.generate_cli()
     subparsers.add_parser("blb", parents=[blb_parser], add_help=False)
