@@ -62,5 +62,5 @@ export const getChainImage = (identifier: string | number): string | undefined =
   }
 };
 
-export const application_id = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
+export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
 export const FULLCOUNT_PLAYER_API = "http://localhost:4357";

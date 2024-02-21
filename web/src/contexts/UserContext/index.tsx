@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useContext, createContext } from "react";
 import http from "axios";
 import { AUTH_URL } from "../../services/auth.service";
-import { application_id } from "../../constants";
 
 type UserContextType = {
   user: any;

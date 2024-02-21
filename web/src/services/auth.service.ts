@@ -1,4 +1,5 @@
 import http from "../utils/httpFullcountPlayer";
+import { APPLICATION_ID } from "../constants";
 
 export const AUTH_URL = `https://auth.bugout.dev`;
 
@@ -14,7 +15,7 @@ export const loginService = ({
   const data = new FormData();
   data.append("username", username);
   data.append("password", password);
-  data.append("application_id", "6a97c2fa-e485-4073-9b5f-a533f4718837");
+  data.append("application_id", APPLICATION_ID);
   if (token_note) {
     data.append("token_note", token_note);
   }
@@ -40,10 +41,11 @@ export const registerService =
     data.append("username", username);
     data.append("email", email);
     data.append("password", password);
+    data.append("application_id", APPLICATION_ID);
 
     return http({
       method: "POST",
-      url: `${AUTH_URL}/`,
+      url: `${AUTH_URL}/user`,
       data,
     }).then(() =>
       http({
