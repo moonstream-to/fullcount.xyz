@@ -93,7 +93,7 @@ export const getTokensData = async ({
       address: tokenContract.options.address,
       staker: web3ctx.account,
       isStaked: stakedSessions[idx] !== "0",
-      stakedSessionID: stakedSessions[idx],
+      stakedSessionID: Number(stakedSessions[idx]),
       tokenProgress: Number(progresses[idx]),
       source: tokensSource,
     };
