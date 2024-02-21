@@ -91,7 +91,7 @@ export const getTokensData = async ({
       name: name, //.split(` - ${tokens[idx].id}`)[0],
       image: image,
       address: tokenContract.options.address,
-      staker: web3ctx.account,
+      staker: tokensSource === "BLBContract" ? web3ctx.account : "",
       isStaked: stakedSessions[idx] !== "0",
       stakedSessionID: Number(stakedSessions[idx]),
       tokenProgress: Number(progresses[idx]),
@@ -251,6 +251,19 @@ export const revealPitchBLBToken = ({
     web3ctx.account,
     gameContract.methods.revealPitch(sessionID, nonce, actionChoice, vertical, horizontal),
   );
+};
+
+export const mintBLBToken = ({
+  web3ctx,
+  name,
+  imageIndex,
+}: {
+  web3ctx: MoonstreamWeb3ProviderInterface;
+  name: string;
+  imageIndex: number;
+}) => {
+  const { tokenContract } = getContracts(web3ctx);
+  return sendTransactionWithEstimate(web3ctx.account, tokenContract.methods.mint(name, imageIndex));
 };
 
 const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {

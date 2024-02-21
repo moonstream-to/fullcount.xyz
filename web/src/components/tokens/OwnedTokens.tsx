@@ -25,17 +25,18 @@ import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import {
   fetchOwnedBLBTokens,
   joinSessionBLB,
+  mintBLBToken,
   startSessionBLB,
   unstakeBLBToken,
 } from "../../tokenInterfaces/BLBTokenAPI";
 import {
   fetchFullcountPlayerTokens,
   joinSessionFullcountPlayer,
+  mintFullcountPlayerToken,
   startSessionFullcountPlayer,
   unstakeFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
@@ -68,16 +69,16 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const { user } = useUser();
 
   const mintToken = useMutation(
-    async ({ name, imageIndex }: { name: string; imageIndex: number }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    async ({ name, imageIndex, source }: { name: string; imageIndex: number; source: string }) => {
+      console.log(imageIndex);
+      switch (source) {
+        case "BLBContract":
+          return mintBLBToken({ web3ctx, name, imageIndex });
+        case "FullcountPlayerAPI":
+          return mintFullcountPlayerToken({ name, imageIndex });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        tokenContract.methods.mint(name, imageIndex),
-      );
     },
     {
       onSuccess: () => {
@@ -527,9 +528,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       <CreateNewCharacter
         isOpen={isOpen}
         onClose={onClose}
-        onSave={(name, imageIndex) => {
+        onSave={(name, imageIndex, source) => {
           onClose();
-          mintToken.mutate({ name, imageIndex });
+          mintToken.mutate({ name, imageIndex, source });
         }}
       />
     </>

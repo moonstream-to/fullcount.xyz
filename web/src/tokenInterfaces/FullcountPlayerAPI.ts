@@ -195,3 +195,32 @@ export const commitOrRevealSwingFullcountPlayer = ({
       console.error("Error:", error);
     });
 };
+
+export const mintFullcountPlayerToken = ({
+  name,
+  imageIndex,
+}: {
+  name: string;
+  imageIndex: number;
+}) => {
+  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
+  const postData = {
+    character_name: name,
+    character_portrait: imageIndex,
+  };
+  const headers = {
+    Authorization: `bearer ${ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  };
+  return axios
+    .post(`${FULLCOUNT_PLAYER_API}/mintblb`, postData, {
+      headers,
+    })
+    .then((response) => {
+      console.log("Success:", response.data);
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+};
