@@ -7,13 +7,12 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
-import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import DotsCounter from "./DotsCounter";
 import styles from "./SessionView.module.css";
 import { joinSessionBLB } from "../../tokenInterfaces/BLBTokenAPI";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
+import useUser from "../../contexts/UserContext";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
@@ -30,6 +29,7 @@ export const sessionStates = [
 const SessionView3 = ({ session }: { session: Session }) => {
   const { updateContext, progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
     useGameContext();
+  const { user } = useUser();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -77,22 +77,25 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
           return newSessions ?? [];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: variables.sessionID,
-                tokenProgress: 3,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: variables.sessionID,
+                  tokenProgress: 3,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");

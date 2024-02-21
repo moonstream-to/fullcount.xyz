@@ -39,6 +39,7 @@ import {
   startSessionFullcountPlayer,
   unstakeFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
+import useUser from "../../contexts/UserContext";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
@@ -64,6 +65,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   tokenContract.options.address = tokenAddress;
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
+  const { user } = useUser();
 
   const mintToken = useMutation(
     async ({ name, imageIndex }: { name: string; imageIndex: number }) => {
@@ -89,11 +91,11 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const ownedTokens = useQuery<OwnedToken[]>(
-    ["owned_tokens"],
+    ["owned_tokens", web3ctx.account, user],
     async () => {
       console.log("FETCHING TOKENS");
       const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
-      const fullcountPlayerTokens = await fetchFullcountPlayerTokens({ web3ctx });
+      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
       return BLBTokens.concat(fullcountPlayerTokens);
     },
     {
@@ -152,22 +154,25 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return oldData ? [...oldData, newSession] : [newSession];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: Number(data.sessionID),
-                tokenProgress: 2,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: Number(data.sessionID),
+                  tokenProgress: 2,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Start failed" + e?.message, "error");
@@ -219,22 +224,25 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
           return newSessions ?? [];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: variables.sessionID,
-                tokenProgress: 3,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: variables.sessionID,
+                  tokenProgress: 3,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -281,15 +289,18 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return newSessions;
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
-          if (!oldData) {
-            return [newToken];
-          }
-          return oldData.map((t: OwnedToken) =>
-            t.address === variables.address && t.id === variables.id ? newToken : t,
-          );
-        });
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
+            if (!oldData) {
+              return [newToken];
+            }
+            return oldData.map((t: OwnedToken) =>
+              t.address === variables.address && t.id === variables.id ? newToken : t,
+            );
+          },
+        );
       },
       onError: (e: Error) => {
         console.log(e);
