@@ -4,7 +4,7 @@ import Timer from "./Timer";
 import { useQuery } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { Token } from "../../types";
+import { OwnedToken, Token } from "../../types";
 import Outcome from "./Outcome";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
@@ -363,11 +363,17 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               />
               {isPitcher(selectedToken) && sessionStatus.data && (
                 <>
-                  <PitcherViewMobile sessionStatus={sessionStatus.data} token={selectedToken} />
+                  <PitcherViewMobile
+                    sessionStatus={sessionStatus.data}
+                    token={selectedToken as OwnedToken}
+                  />
                 </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
-                <BatterViewMobile sessionStatus={sessionStatus.data} token={selectedToken} />
+                <BatterViewMobile
+                  sessionStatus={sessionStatus.data}
+                  token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
+                />
               )}
             </Flex>
           )}
