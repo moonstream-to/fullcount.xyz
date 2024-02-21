@@ -1,6 +1,5 @@
-import { Token } from "../types";
-import http from "../utils/httpFullcountPlayer";
-import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
+import { OwnedToken, Token } from "../types";
+import { FULLCOUNT_PLAYER_API, GAME_CONTRACT } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
 import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
@@ -15,7 +14,7 @@ export async function fetchFullcountPlayerTokens({
     params: {
       limit: 10,
       offset: 0,
-    },
+    }, //TODO
     headers: {
       Authorization: `bearer ${ACCESS_TOKEN}`,
     },
@@ -93,7 +92,7 @@ export async function joinSessionFullcountPlayer({
     });
 }
 
-export const unstakeFullcountPlayer = ({ token }: { token: Token }) => {
+export const unstakeFullcountPlayer = ({ token }: { token: OwnedToken }) => {
   const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const postData = {
     fullcount_address: GAME_CONTRACT,
@@ -105,7 +104,11 @@ export const unstakeFullcountPlayer = ({ token }: { token: Token }) => {
     "Content-Type": "application/json",
   };
   return axios
-    .post(`${FULLCOUNT_PLAYER_API}/game/unstake`, postData, { headers })
+    .post(
+      `${FULLCOUNT_PLAYER_API}/game/${token.tokenProgress === 2 ? "abort" : "unstake"}`,
+      postData,
+      { headers },
+    )
     .then((response) => {
       console.log("Success:", response.data);
       return response.data;
@@ -115,76 +118,80 @@ export const unstakeFullcountPlayer = ({ token }: { token: Token }) => {
     });
 };
 
-export const abortSessionFullcountPlayer = ({ token }: { token: Token }) => {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
-  const postData = {
-    fullcount_address: GAME_CONTRACT,
-    erc721_address: token.address,
-    token_id: token.id,
-  };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
-  return axios
-    .post(`${FULLCOUNT_PLAYER_API}/game/abort`, postData, { headers })
-    .then((response) => {
-      console.log("Success:", response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
-};
-
-export function commitSwingFullcountPlayer({
-  sign,
-  sessionID,
-}: {
-  sign: string;
-  sessionID: number;
-}) {
-  return Promise.reject(new Error(`${commitSwingFullcountPlayer.name} is not implemented`));
+function hexToDecimalString(hexValue: string): string {
+  return BigInt(hexValue).toString();
 }
 
-export const revealSwingFullcountPlayer = ({
-  nonce,
-  sessionID,
-  actionChoice,
-  vertical,
-  horizontal,
+export const commitOrRevealPitchFullcountPlayer = ({
+  token,
+  commit,
+  isCommit,
 }: {
-  nonce: string;
-  actionChoice: number;
-  vertical: number;
-  horizontal: number;
-  sessionID: number;
+  commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
+  token: OwnedToken;
+  isCommit: boolean;
 }) => {
-  return Promise.reject(new Error(`${revealSwingFullcountPlayer.name} is not implemented`));
+  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
+  const { nonce, vertical, horizontal, actionChoice: speed } = commit;
+  const postData = {
+    fullcount_address: GAME_CONTRACT,
+    erc721_address: token.address,
+    token_id: token.id,
+    nonce: hexToDecimalString(nonce),
+    vertical,
+    horizontal,
+    speed,
+  };
+  const headers = {
+    Authorization: `bearer ${ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  };
+  return axios
+    .post(`${FULLCOUNT_PLAYER_API}/game/pitch/${isCommit ? "commit" : "reveal"}`, postData, {
+      headers,
+    })
+    .then((response) => {
+      console.log("Success:", response.data);
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 };
 
-export const commitPitchFullcountPlayer = ({
-  sign,
-  sessionID,
+export const commitOrRevealSwingFullcountPlayer = ({
+  token,
+  commit,
+  isCommit,
 }: {
-  sign: string;
-  sessionID: number;
+  commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
+  token: OwnedToken;
+  isCommit: boolean;
 }) => {
-  return Promise.reject(new Error(`${commitPitchFullcountPlayer.name} is not implemented`));
-};
-
-export const revealPitchFullcountPlayer = ({
-  nonce,
-  sessionID,
-  actionChoice,
-  vertical,
-  horizontal,
-}: {
-  nonce: string;
-  actionChoice: number;
-  vertical: number;
-  horizontal: number;
-  sessionID: number;
-}) => {
-  return Promise.reject(new Error(`${revealPitchFullcountPlayer.name} is not implemented`));
+  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
+  const { nonce, vertical, horizontal, actionChoice: kind } = commit;
+  const postData = {
+    fullcount_address: GAME_CONTRACT,
+    erc721_address: token.address,
+    token_id: token.id,
+    nonce: hexToDecimalString(nonce),
+    vertical,
+    horizontal,
+    kind,
+  };
+  const headers = {
+    Authorization: `bearer ${ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  };
+  return axios
+    .post(`${FULLCOUNT_PLAYER_API}/game/swing/${isCommit ? "commit" : "reveal"}`, postData, {
+      headers,
+    })
+    .then((response) => {
+      console.log("Success:", response.data);
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
 };

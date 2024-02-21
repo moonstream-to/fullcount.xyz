@@ -94,7 +94,7 @@ export const getTokensData = async ({
       staker: web3ctx.account,
       isStaked: stakedSessions[idx] !== "0",
       stakedSessionID: stakedSessions[idx],
-      tokenProgress: progresses[idx],
+      tokenProgress: Number(progresses[idx]),
       source: tokensSource,
     };
   });

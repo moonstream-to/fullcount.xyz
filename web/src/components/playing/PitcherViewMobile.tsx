@@ -11,11 +11,8 @@ import { AbiItem } from "web3-utils";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
 import { commitPitchBLBToken, revealPitchBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
-import {
-  commitPitchFullcountPlayer,
-  revealPitchFullcountPlayer,
-} from "../../tokenInterfaces/FullcountPlayerAPI";
-import { Token } from "../../types";
+import { commitOrRevealPitchFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
+import { OwnedToken, Token } from "../../types";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherViewMobile = ({
@@ -23,7 +20,7 @@ const PitcherViewMobile = ({
   token,
 }: {
   sessionStatus: SessionStatus;
-  token: Token;
+  token: OwnedToken;
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -36,12 +33,24 @@ const PitcherViewMobile = ({
   const queryClient = useQueryClient();
 
   const commitPitch = useMutation(
-    async ({ sign }: { sign: string }) => {
+    async ({
+      sign,
+      commit,
+    }: {
+      sign?: string;
+      commit?: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
+    }) => {
       switch (token.source) {
         case "BLBContract":
+          if (!sign) {
+            return Promise.reject(new Error("BLB commit isn't signed"));
+          }
           return commitPitchBLBToken({ web3ctx, sessionID: sessionStatus.sessionID, sign });
         case "FullcountPlayerAPI":
-          return commitPitchFullcountPlayer({ sessionID: sessionStatus.sessionID, sign });
+          if (!commit) {
+            return Promise.reject(new Error("FulcountPlayerAPI commit doesn't have commit data"));
+          }
+          return commitOrRevealPitchFullcountPlayer({ token, commit, isCommit: true });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
@@ -81,12 +90,10 @@ const PitcherViewMobile = ({
             actionChoice,
           });
         case "FullcountPlayerAPI":
-          return revealPitchFullcountPlayer({
-            sessionID: sessionStatus.sessionID,
-            nonce,
-            vertical,
-            horizontal,
-            actionChoice,
+          return commitOrRevealPitchFullcountPlayer({
+            commit: { nonce, vertical, horizontal, actionChoice },
+            isCommit: false,
+            token,
           });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));

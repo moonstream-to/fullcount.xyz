@@ -74,23 +74,28 @@ const PlayerView = ({
     const vertical = gridIndex === -1 ? 0 : getRowCol(gridIndex)[0];
     const horizontal = gridIndex === -1 ? 0 : getRowCol(gridIndex)[1];
     const nonce = web3ctx.web3.utils.randomHex(32);
-    const signFn = isPitcher ? signPitch : signSwing;
-    const sign = await signFn(
-      web3ctx.account,
-      window.ethereum,
+    const commit = {
       nonce,
       actionChoice,
       vertical,
       horizontal,
-    );
+    };
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    setLocalStorageItem(localStorageKey, {
-      nonce,
-      actionChoice,
-      vertical,
-      horizontal,
-    });
-    commitMutation.mutate({ sign });
+    setLocalStorageItem(localStorageKey, commit);
+    if (selectedToken?.source === "FullcountPlayerAPI") {
+      commitMutation.mutate({ sign: undefined, commit });
+    } else {
+      const signFn = isPitcher ? signPitch : signSwing;
+      const sign = await signFn(
+        web3ctx.account,
+        window.ethereum,
+        nonce,
+        actionChoice,
+        vertical,
+        horizontal,
+      );
+      commitMutation.mutate({ sign });
+    }
   };
 
   useEffect(() => {

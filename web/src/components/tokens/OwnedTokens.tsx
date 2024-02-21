@@ -47,8 +47,15 @@ const assets = FULLCOUNT_ASSETS_PATH;
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
-  const { tokenAddress, contractAddress, selectedToken, updateContext, invitedTo, inviteCode } =
-    useGameContext();
+  const {
+    tokenAddress,
+    contractAddress,
+    sessions,
+    selectedToken,
+    updateContext,
+    invitedTo,
+    inviteCode,
+  } = useGameContext();
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -431,18 +438,33 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         {selectedToken && selectedToken.isStaked && (
           <Flex direction={"column"} minH={"229px"} minW={"139px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
+            <Flex>
               <button
-                className={globalStyles.button}
-                onClick={() => unstakeNFT.mutate(selectedToken)}
+                style={{ width: "50%" }}
+                onClick={() => {
+                  console.log(selectedToken, sessions);
+                  updateContext({
+                    selectedSession: sessions?.find(
+                      (s) => s.sessionID === Number(selectedToken?.stakedSessionID),
+                    ),
+                  });
+                }}
               >
-                {unstakeNFT.isLoading ? (
-                  <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
-                ) : (
-                  "unstake"
-                )}
+                go
               </button>
-            )}
+              {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
+                <button
+                  className={globalStyles.button}
+                  onClick={() => unstakeNFT.mutate(selectedToken)}
+                >
+                  {unstakeNFT.isLoading ? (
+                    <Spinner pt="6px" pb="7px" h={"16px"} w={"16px"} />
+                  ) : (
+                    "unstake"
+                  )}
+                </button>
+              )}
+            </Flex>
           </Flex>
         )}
         <Flex className={styles.cards}>
