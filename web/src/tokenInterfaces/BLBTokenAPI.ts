@@ -57,7 +57,6 @@ export const getTokensData = async ({
     target: gameContract.options.address,
     callData: gameContract.methods.StakedSession(t.address, t.id).encodeABI(),
   }));
-  console.log(stakedQueries);
   const [stakedSessions] = await getMulticallResults(
     web3ctx,
     FullcountABI,
