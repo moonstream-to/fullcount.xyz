@@ -98,6 +98,32 @@ const variantPlainOrange = () => {
   };
 };
 
+const variantPlainGreen = () => {
+  return {
+    alignItems: "center",
+    justifyContent: "center",
+    border: "solid transparent",
+    borderRadius: "30px",
+    // variant: "solid",
+    fontSize: ["md", "md", "lg", "lg", "xl", "xl"],
+    textColor: "white",
+    bg: "#00a341",
+    fontWeight: "700",
+    padding: "10px 30px",
+    _hover: {
+      backgroundColor: "#00a341",
+      textDecoration: "none",
+      borderRadius: "20px",
+    },
+    _focus: {
+      backgroundColor: "#00a341",
+    },
+    _active: {
+      backgroundColor: "#00a341",
+    },
+  };
+};
+
 const variantTransparent = () => {
   return {
     backgroundColor: "transparent",
@@ -264,6 +290,7 @@ const Button = {
   variants: {
     menuButton: variantMenuButton,
     plainOrange: variantPlainOrange,
+    plainGreen: variantPlainGreen,
     whiteOutline: variantWhiteOutline,
     orangeGradient: variantOrangeGradient,
     wyrmButton: variantWyrmButton,

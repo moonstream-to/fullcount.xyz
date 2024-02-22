@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   Button,
@@ -10,7 +10,6 @@ import {
   FormLabel,
   Input,
   Flex,
-  Image,
   Text,
   Spinner,
 } from "@chakra-ui/react";
@@ -148,7 +147,14 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                   onChange={(event) => setPassword(event.target.value)}
                 />
               </FormControl>
-              <Button w="100%" h="54px" type="submit" variant="plainOrange" p="10px 30px">
+              <Button
+                w="100%"
+                h="54px"
+                type="submit"
+                variant="plainGreen"
+                bg="#00a341"
+                p="10px 30px"
+              >
                 {isLoading ? <Spinner /> : <Text lineHeight="26px">Create account</Text>}
               </Button>
               <button onClick={createWeb3Account}>web3</button>

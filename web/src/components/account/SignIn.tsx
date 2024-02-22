@@ -9,14 +9,12 @@ import {
   FormLabel,
   Input,
   Flex,
-  Image,
   Text,
   Spinner,
 } from "@chakra-ui/react";
 import useLogin from "../../hooks/useLogin";
 import { CloseIcon } from "@chakra-ui/icons";
-
-import { useRouter } from "next/router";
+import globalStyles from "../GlobalStyles.module.css";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -100,7 +98,7 @@ const SignIn: React.FC<LoginModalProps> = ({ isOpen, onClose, onSignUp, onForgot
                       p="0"
                       h="auto"
                       fontWeight="400"
-                      color="#F88F78"
+                      color="#ffda7a"
                       onClick={() => {
                         onForgotPassword();
                         onClose();
@@ -129,9 +127,11 @@ const SignIn: React.FC<LoginModalProps> = ({ isOpen, onClose, onSignUp, onForgot
                 w="100%"
                 h="54px"
                 type="submit"
-                variant="plainOrange"
+                variant="plainGreen"
+                bg={"#00A341"}
                 p="10px 30px"
                 tabIndex={3}
+                className={globalStyles.button}
               >
                 {isLoading ? <Spinner /> : <Text lineHeight="26px">Login</Text>}
               </Button>
@@ -142,12 +142,12 @@ const SignIn: React.FC<LoginModalProps> = ({ isOpen, onClose, onSignUp, onForgot
                 justifyContent="center"
                 alignItems="center"
               >
-                <Text>New&nbsp;to&nbsp;Moonstream?</Text>
+                <Text>New&nbsp;to&nbsp;Fullcount?</Text>
                 <Button
                   variant="transparent"
                   p="0"
                   fontWeight="400"
-                  color="#F88F78"
+                  color="#ffda7a"
                   onClick={() => {
                     onSignUp();
                     onClose();

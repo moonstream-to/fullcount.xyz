@@ -17,8 +17,8 @@ import { BsPerson } from "react-icons/bs";
 import useUser from "../../contexts/UserContext";
 import useLogout from "../../hooks/useLogout";
 import SignUp from "./SignUp";
-import styles from "./Account.module.css";
 import { useRouter } from "next/router";
+import globalStyles from "../GlobalStyles.module.css";
 
 const Account = ({ ...props }: { [x: string]: any }) => {
   const { user } = useUser();
@@ -34,12 +34,12 @@ const Account = ({ ...props }: { [x: string]: any }) => {
         {!user && (
           <>
             <LoginButton>
-              <button className={styles.loginButton}>Log in</button>
+              <button className={globalStyles.button}>Log in</button>
             </LoginButton>
             {!isBaseView && (
               <>
                 <SignUp isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
-                <button className={styles.signUpButton} onClick={() => setIsSignUpOpen(true)}>
+                <button className={globalStyles.button} onClick={() => setIsSignUpOpen(true)}>
                   Sign up
                 </button>
               </>
