@@ -57,7 +57,7 @@ export async function startSessionFullcountPlayer({
     .catch((error) => {
       console.error("Error:", error);
     });
-  return { sessionID: data.session_id, sign: data.signature };
+  return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
 export async function joinSessionFullcountPlayer({
@@ -137,7 +137,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
     token_id: token.id,
-    nonce: hexToDecimalString(nonce),
+    nonce,
     vertical,
     horizontal,
     speed,
