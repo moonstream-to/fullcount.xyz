@@ -17,6 +17,9 @@ import {
 import { CloseIcon } from "@chakra-ui/icons";
 
 import useSignUp from "../../hooks/useSignUp";
+import Web3Context from "../../contexts/Web3Context/context";
+import { signWeb3AuthorizationMessage } from "../../utils/signAccount";
+import { APPLICATION_ID, FULLCOUNT_PLAYER_API } from "../../constants";
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -30,6 +33,7 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const [showErrors, setShowErrors] = useState(false);
 
   const { signUp, isLoading, isSuccess } = useSignUp();
+  const web3ctx = useContext(Web3Context);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -38,6 +42,40 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     } else {
       setShowErrors(true);
     }
+  };
+
+  const createWeb3Account = async () => {
+    const signedMessage = await signWeb3AuthorizationMessage(window.ethereum, web3ctx.account);
+    const payload = {
+      address: web3ctx.account,
+      deadline: 1708523541,
+      application: "FullcountPlayer",
+      signed_message: signedMessage,
+    };
+
+    const encodedPayload = Buffer.from(JSON.stringify(payload)).toString("base64");
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        application_id: APPLICATION_ID,
+        username: username,
+        signature: encodedPayload,
+      }),
+    };
+
+    fetch(`${FULLCOUNT_PLAYER_API}/user`, requestOptions)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to create user");
+        }
+        console.log("User created successfully");
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+    console.log(signedMessage);
   };
 
   useEffect(() => {
@@ -113,6 +151,7 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               <Button w="100%" h="54px" type="submit" variant="plainOrange" p="10px 30px">
                 {isLoading ? <Spinner /> : <Text lineHeight="26px">Create account</Text>}
               </Button>
+              <button onClick={createWeb3Account}>web3</button>
             </Flex>
           </ModalBody>
         </ModalContent>
