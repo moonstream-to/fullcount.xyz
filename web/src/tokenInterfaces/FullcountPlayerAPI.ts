@@ -9,15 +9,13 @@ export async function fetchFullcountPlayerTokens({
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
 }) {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
+  const headers = getHeaders();
   const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
     params: {
       limit: 10,
       offset: 0,
     }, //TODO
-    headers: {
-      Authorization: `bearer ${ACCESS_TOKEN}`,
-    },
+    headers,
   });
   const tokens = res.data.nfts.map((nft: { erc721_address: string; token_id: string }) => ({
     id: nft.token_id,
@@ -36,7 +34,6 @@ export async function startSessionFullcountPlayer({
   roleNumber: number;
   requireSignature: boolean;
 }): Promise<{ sessionID: string; sign: string | undefined }> {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
@@ -44,10 +41,8 @@ export async function startSessionFullcountPlayer({
     role: roleNumber === 0 ? "pitcher" : "batter",
     require_signature: requireSignature,
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
+
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
     .then((response) => {
@@ -69,7 +64,6 @@ export async function joinSessionFullcountPlayer({
   sessionID: number;
   inviteCode: string | undefined;
 }): Promise<unknown> {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
@@ -77,10 +71,8 @@ export async function joinSessionFullcountPlayer({
     session_id: String(sessionID),
     signature: inviteCode ?? "",
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
+
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/join`, postData, { headers })
     .then((response) => {
@@ -93,16 +85,13 @@ export async function joinSessionFullcountPlayer({
 }
 
 export const unstakeFullcountPlayer = ({ token }: { token: OwnedToken }) => {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
     token_id: token.id,
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
+
   return axios
     .post(
       `${FULLCOUNT_PLAYER_API}/game/${token.tokenProgress === 2 ? "abort" : "unstake"}`,
@@ -131,7 +120,6 @@ export const commitOrRevealPitchFullcountPlayer = ({
   token: OwnedToken;
   isCommit: boolean;
 }) => {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const { nonce, vertical, horizontal, actionChoice: speed } = commit;
   const postData = {
     fullcount_address: GAME_CONTRACT,
@@ -142,10 +130,8 @@ export const commitOrRevealPitchFullcountPlayer = ({
     horizontal,
     speed,
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
+
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/pitch/${isCommit ? "commit" : "reveal"}`, postData, {
       headers,
@@ -168,7 +154,6 @@ export const commitOrRevealSwingFullcountPlayer = ({
   token: OwnedToken;
   isCommit: boolean;
 }) => {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const { nonce, vertical, horizontal, actionChoice: kind } = commit;
   const postData = {
     fullcount_address: GAME_CONTRACT,
@@ -179,10 +164,8 @@ export const commitOrRevealSwingFullcountPlayer = ({
     horizontal,
     kind,
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
+
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/swing/${isCommit ? "commit" : "reveal"}`, postData, {
       headers,
@@ -203,15 +186,11 @@ export const mintFullcountPlayerToken = ({
   name: string;
   imageIndex: number;
 }) => {
-  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   const postData = {
     character_name: name,
     character_portrait: imageIndex,
   };
-  const headers = {
-    Authorization: `bearer ${ACCESS_TOKEN}`,
-    "Content-Type": "application/json",
-  };
+  const headers = getHeaders();
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/mintblb`, postData, {
       headers,
@@ -223,4 +202,12 @@ export const mintFullcountPlayerToken = ({
     .catch((error) => {
       console.error("Error:", error);
     });
+};
+
+const getHeaders = () => {
+  const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
+  return {
+    Authorization: `bearer ${ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  };
 };
