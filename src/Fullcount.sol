@@ -212,11 +212,6 @@ contract Fullcount is EIP712 {
         return _hashTypedDataV4(structHash);
     }
 
-    function atBatHash(uint256 atBatID) public view returns (bytes32) {
-        bytes32 structHash = keccak256(abi.encode(keccak256("AtBatMessage(uint256 atBatID)"), uint256(atBatID)));
-        return _hashTypedDataV4(structHash);
-    }
-
     function _isTokenOwner(address nftAddress, uint256 tokenID) internal view returns (bool) {
         return msg.sender == IERC721(nftAddress).ownerOf(tokenID);
     }
