@@ -1,7 +1,7 @@
 import { useGameContext } from "../../contexts/GameContext";
 import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import { OwnedToken, Token } from "../../types";
@@ -98,6 +98,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
+  const queryClient = useQueryClient();
+
   const atBatStatus = useQuery(
     ["atBatStatus", atBat.data],
     async () => {
@@ -121,6 +123,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           numSessions,
         },
       });
+      if (Number(status.outcome) !== 0) {
+        queryClient.refetchQueries("owned_tokens");
+      }
       return {
         ...status,
         currentSessionID,
