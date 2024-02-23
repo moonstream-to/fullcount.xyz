@@ -24,6 +24,7 @@ interface GameContextProps {
   tokensCache: Token[];
   sessionOffset: number;
   soundVolume: number;
+  ownedTokens: OwnedToken[];
 }
 
 interface GameContextType extends GameContextProps {
@@ -60,6 +61,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     tokensCache: [],
     sessionOffset: 20,
     soundVolume: 20,
+    ownedTokens: [],
   });
 
   useEffect(() => {

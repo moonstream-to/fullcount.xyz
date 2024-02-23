@@ -97,7 +97,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       console.log("FETCHING TOKENS");
       const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
       const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
-      return BLBTokens.concat(fullcountPlayerTokens);
+      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
+      updateContext({ ownedTokens: [...ownedTokens] });
+      return ownedTokens;
     },
     {
       ...queryCacheProps,
@@ -450,21 +452,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         {selectedToken && selectedToken.isStaked && (
           <Flex direction={"column"} minH={"229px"} minW={"139px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
-            {/*<Flex>*/}
-            {/*<button*/}
-            {/*  style={{ width: "50%" }}*/}
-            {/*  onClick={() => {*/}
-            {/*    console.log(selectedToken, sessions);*/}
-            {/*    updateContext({*/}
-            {/*      selectedSession: sessions?.find(*/}
-            {/*        (s) => s.sessionID === Number(selectedToken?.stakedSessionID),*/}
-            {/*      ),*/}
-            {/*    });*/}
-            {/*  }}*/}
-            {/*>*/}
-            {/*  go*/}
-            {/*</button>*/}
-            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
+
+            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 ? (
               <button
                 className={globalStyles.button}
                 onClick={() => unstakeNFT.mutate(selectedToken)}
@@ -475,8 +464,20 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   "unstake"
                 )}
               </button>
+            ) : (
+              <button
+                className={globalStyles.button}
+                onClick={() => {
+                  updateContext({
+                    selectedSession: sessions?.find(
+                      (s) => s.sessionID === Number(selectedToken?.stakedSessionID),
+                    ),
+                  });
+                }}
+              >
+                go
+              </button>
             )}
-            {/*</Flex>*/}
           </Flex>
         )}
         <Flex className={styles.cards}>

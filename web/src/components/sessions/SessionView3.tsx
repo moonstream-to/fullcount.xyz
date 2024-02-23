@@ -27,7 +27,7 @@ export const sessionStates = [
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
-  const { updateContext, progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
+  const { updateContext, ownedTokens, progressFilter, selectedToken, contractAddress } =
     useGameContext();
   const { user } = useUser();
   const web3ctx = useContext(Web3Context);
@@ -189,13 +189,29 @@ const SessionView3 = ({ session }: { session: Session }) => {
         {session.pair.pitcher ? (
           <Flex gap={4}>
             <CharacterCardSmall
-              token={session.pair.pitcher}
+              token={
+                ownedTokens.find(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                ) ?? session.pair.pitcher
+              }
               session={session}
               minW={"215px"}
               isClickable={
-                session.progress === 5 || session.pair.pitcher.staker === web3ctx.account
+                session.progress === 5 ||
+                session.pair.pitcher.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                )
               }
-              isOwned={session.pair.pitcher.staker === web3ctx.account}
+              isOwned={
+                session.pair.pitcher.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                )
+              }
             />
           </Flex>
         ) : (
@@ -210,11 +226,29 @@ const SessionView3 = ({ session }: { session: Session }) => {
         {session.pair.batter ? (
           <Flex gap={4}>
             <CharacterCardSmall
-              token={session.pair.batter}
+              token={
+                ownedTokens.find(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                ) ?? session.pair.batter
+              }
               session={session}
               minW={"215px"}
-              isClickable={session.progress === 5 || session.pair.batter.staker === web3ctx.account}
-              isOwned={session.pair.batter.staker === web3ctx.account}
+              isClickable={
+                session.progress === 5 ||
+                session.pair.batter.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                )
+              }
+              isOwned={
+                session.pair.batter.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                )
+              }
             />
           </Flex>
         ) : (
