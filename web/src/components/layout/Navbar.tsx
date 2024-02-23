@@ -5,6 +5,7 @@ import styles from "../GlobalStyles.module.css";
 import SoundFxSlider from "./SoundFxSlider";
 import { FEEDBACK_FORM_URL } from "../../constants";
 import About from "./About";
+import Account from "../account/Account";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -51,6 +52,7 @@ const Navbar = () => {
           </Text>
         </Flex>
       </Flex>
+      <Account />
     </Flex>
   );
 };

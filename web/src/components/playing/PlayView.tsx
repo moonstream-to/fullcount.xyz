@@ -1,13 +1,11 @@
 import { useGameContext } from "../../contexts/GameContext";
-import PitcherView from "./PitcherView";
 import { Flex, Image, useMediaQuery, Text } from "@chakra-ui/react";
 import Timer from "./Timer";
-import { useQuery } from "react-query";
+import { useQuery, useQueryClient } from "react-query";
 import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
-import { Token } from "../../types";
+import { OwnedToken, Token } from "../../types";
 import Outcome from "./Outcome";
-import BatterView2 from "./BatterView2";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
@@ -16,7 +14,6 @@ import { getTokenMetadata } from "../../utils/decoders";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tokenABI = require("../../web3/abi/BLBABI.json");
 import TokenView from "../tokens/TokenView";
-import Narrate from "./Narrate";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
 import styles from "./PlayView.module.css";
@@ -100,6 +97,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
+  const queryClient = useQueryClient();
+
   const atBatStatus = useQuery(
     ["atBatStatus", atBat.data],
     async () => {
@@ -123,6 +122,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           numSessions,
         },
       });
+      if (Number(status.outcome) !== 0) {
+        queryClient.refetchQueries("owned_tokens");
+      }
       return {
         ...status,
         currentSessionID,
@@ -170,6 +172,15 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       const pitcherTokenID = session.pitcherNFT.tokenID;
       const batterAddress = session.batterNFT.nftAddress;
       const batterTokenID = session.batterNFT.tokenID;
+      const isPitcherNFTSelected =
+        selectedToken.address === session.pitcherNFT.nftAddress &&
+        selectedToken.id === session.pitcherNFT.tokenID;
+      const isBatterNFTSelected =
+        selectedToken.address === session.batterNFT.nftAddress &&
+        selectedToken.id === session.batterNFT.tokenID;
+
+      const isSelectedTokenInSession = isPitcherNFTSelected || isBatterNFTSelected;
+
       const otherToken =
         batterAddress === selectedToken.address && batterTokenID === selectedToken.id
           ? { address: pitcherAddress, id: pitcherTokenID }
@@ -240,9 +251,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           vertical: Number(batterReveal[2]),
           horizontal: Number(batterReveal[3]),
         },
+        isSelectedTokenInSession,
       };
     },
+
     {
+      onSuccess: (data) => {
+        console.log("sessionStatus success: ", data);
+      },
       refetchInterval: 3000,
     },
   );
@@ -282,22 +298,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       <Flex justifyContent={"space-between"} minW={"100%"} alignItems={"center"}>
         {!isSmallView && <Flex w={"20px"} h={"10px"} />}
 
-        {/*{(sessionStatus.data?.progress === 3 ||*/}
-        {/*  sessionStatus.data?.progress === 4 ||*/}
-        {/*  sessionStatus.data?.progress === 2 ||*/}
-        {/*  sessionStatus.data?.progress === 5) && (*/}
-        {/*  <Timer*/}
-        {/*    balls={atBatStatus.data?.balls ?? 3}*/}
-        {/*    strikes={atBatStatus.data?.strikes ?? 2}*/}
-        {/*    start={Number(sessionStatus.data?.phaseStartTimestamp)}*/}
-        {/*    delay={sessionStatus.data?.progress === 5 ? 0 : sessionStatus.data?.secondsPerPhase}*/}
-        {/*    isActive={*/}
-        {/*      sessionStatus.data?.progress === 3 ||*/}
-        {/*      sessionStatus.data?.progress === 4 ||*/}
-        {/*      sessionStatus.data?.progress === 5*/}
-        {/*    }*/}
-        {/*  />*/}
-        {/*)}*/}
         {!isSmallView && (
           <Flex w={"20px"} justifyContent={"end"}>
             <Image
@@ -343,9 +343,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
             isPitcher={true}
           />
         )}
-        {sessionStatus.data?.progress === 2 && selectedSession && selectedToken && (
-          <InviteLink session={selectedSession} token={selectedToken} />
-        )}
+        {sessionStatus.data?.progress === 2 &&
+          selectedSession &&
+          selectedToken &&
+          sessionStatus.data?.isSelectedTokenInSession && (
+            <InviteLink session={selectedSession} token={selectedToken} />
+          )}
         {(sessionStatus.data?.progress === 3 || sessionStatus.data?.progress === 4) &&
           !sessionStatus.data?.isExpired && (
             <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
@@ -365,11 +368,17 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
               />
               {isPitcher(selectedToken) && sessionStatus.data && (
                 <>
-                  <PitcherViewMobile sessionStatus={sessionStatus.data} />
+                  <PitcherViewMobile
+                    sessionStatus={sessionStatus.data}
+                    token={selectedToken as OwnedToken}
+                  />
                 </>
               )}
               {!isPitcher(selectedToken) && sessionStatus.data && (
-                <BatterViewMobile sessionStatus={sessionStatus.data} />
+                <BatterViewMobile
+                  sessionStatus={sessionStatus.data}
+                  token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
+                />
               )}
             </Flex>
           )}

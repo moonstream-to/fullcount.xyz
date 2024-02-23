@@ -49,12 +49,20 @@ interface TokenMetadata {
   image: string;
 }
 
+type TokenSource = "BLBContract" | "FullcountPlayerAPI";
+
+type TokenId = {
+  id: string;
+  address: string;
+};
+
 interface Token {
   address: string;
   id: string;
   name: string;
   image: string;
   staker: string;
+  source?: TokenSource;
 }
 
 interface OwnedToken extends Token {
@@ -168,4 +176,20 @@ interface SwingLocation {
 interface EthereumError {
   code: number;
   message: string;
+}
+
+interface SessionStartedReturnValues {
+  sessionID: string;
+}
+
+interface SessionStartedEvent {
+  returnValues: SessionStartedReturnValues;
+}
+
+interface FullcountContractEvents {
+  SessionStarted: SessionStartedEvent;
+}
+
+interface FullcountContractEventContainer {
+  events: FullcountContractEvents;
 }

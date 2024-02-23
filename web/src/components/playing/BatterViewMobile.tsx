@@ -7,12 +7,20 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
+import { commitSwingBLBToken, revealSwingBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
+import { commitOrRevealSwingFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
+import { OwnedToken } from "../../types";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
+const BatterViewMobile = ({
+  sessionStatus,
+  token,
+}: {
+  sessionStatus: SessionStatus;
+  token: OwnedToken;
+}) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const web3ctx = useContext(Web3Context);
@@ -24,17 +32,27 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
   const queryClient = useQueryClient();
 
   const commitSwing = useMutation(
-    async ({ sign }: { sign: string }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    async ({
+      sign,
+      commit,
+    }: {
+      sign?: string;
+      commit?: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
+    }) => {
+      switch (token.source) {
+        case "BLBContract":
+          if (!sign) {
+            return Promise.reject(new Error("BLB commit isn't signed"));
+          }
+          return commitSwingBLBToken({ web3ctx, sessionID: sessionStatus.sessionID, sign });
+        case "FullcountPlayerAPI":
+          if (!commit) {
+            return Promise.reject(new Error("FulcountPlayerAPI commit doesn't have commit data"));
+          }
+          return commitOrRevealSwingFullcountPlayer({ token, commit, isCommit: true });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.commitSwing(sessionStatus.sessionID, sign),
-      );
     },
     {
       onSuccess: () => {
@@ -60,21 +78,25 @@ const BatterViewMobile = ({ sessionStatus }: { sessionStatus: SessionStatus }) =
       vertical: number;
       horizontal: number;
     }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+      switch (token.source) {
+        case "BLBContract":
+          return revealSwingBLBToken({
+            web3ctx,
+            sessionID: sessionStatus.sessionID,
+            nonce,
+            vertical,
+            horizontal,
+            actionChoice,
+          });
+        case "FullcountPlayerAPI":
+          return commitOrRevealSwingFullcountPlayer({
+            commit: { nonce, vertical, horizontal, actionChoice },
+            isCommit: false,
+            token,
+          });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.revealSwing(
-          sessionStatus.sessionID,
-          nonce,
-          actionChoice,
-          vertical,
-          horizontal,
-        ),
-      );
     },
     {
       onSuccess: () => {

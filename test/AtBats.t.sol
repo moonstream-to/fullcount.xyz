@@ -24,7 +24,8 @@ contract FullcountAtBatTest is FullcountTestBase {
         address indexed nftAddress,
         uint256 indexed tokenID,
         uint256 firstSessionID,
-        PlayerType role
+        PlayerType role,
+        bool requiresSignature
     );
     event AtBatJoined(
         uint256 indexed atBatID,
@@ -57,9 +58,8 @@ contract FullcountTest_startAtBat is FullcountAtBatTest {
         vm.startPrank(player1);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
         emit AtBatStarted(
-            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher, false
         );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
@@ -92,9 +92,8 @@ contract FullcountTest_startAtBat is FullcountAtBatTest {
         vm.startPrank(player1);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
         emit AtBatStarted(
-            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter, false
         );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
@@ -134,9 +133,8 @@ contract FullcountTest_joinAtBatSession is FullcountAtBatTest {
         vm.startPrank(player1);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Pitcher);
         emit AtBatStarted(
-            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher, false
         );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, false);
 
@@ -152,7 +150,6 @@ contract FullcountTest_joinAtBatSession is FullcountAtBatTest {
         vm.startPrank(player2);
 
         vm.expectEmit(address(game));
-        emit SessionJoined(firstSessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Batter);
         emit AtBatJoined(atBatID, address(otherCharacterNFTs), otherTokenID, firstSessionID, PlayerType.Batter);
         game.joinSession(firstSessionID, address(otherCharacterNFTs), otherTokenID, "");
 
@@ -184,9 +181,8 @@ contract FullcountTest_joinAtBatSession is FullcountAtBatTest {
         vm.startPrank(player1);
 
         vm.expectEmit(address(game));
-        emit SessionStarted(initialNumSessions + 1, address(characterNFTs), tokenID, PlayerType.Batter);
         emit AtBatStarted(
-            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter, false
         );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, false);
 
@@ -202,7 +198,6 @@ contract FullcountTest_joinAtBatSession is FullcountAtBatTest {
         vm.startPrank(player2);
 
         vm.expectEmit(address(game));
-        emit SessionJoined(firstSessionID, address(otherCharacterNFTs), otherTokenID, PlayerType.Pitcher);
         emit AtBatJoined(atBatID, address(otherCharacterNFTs), otherTokenID, firstSessionID, PlayerType.Pitcher);
         game.joinSession(firstSessionID, address(otherCharacterNFTs), otherTokenID, "");
 
@@ -287,13 +282,15 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
     function _foulSession(uint256 sessionID) internal {
         // From Resolutinos test file
+
         Pitch memory pitch = Pitch(
-            8_896_391_875_205_613_932_298_229_962_938_938_694_841_002_446_457_628_837_939_997_515_662_919_318_336,
-            PitchSpeed.Fast,
-            VerticalLocation.Middle,
+            76_272_677_889_733_487_807_869_088_975_394_561_199_007_238_211_299_295_369_669_345_782_657_832_457_462,
+            PitchSpeed.Slow,
+            VerticalLocation.HighBall,
             HorizontalLocation.OutsideStrike
         );
-        Swing memory swing = Swing(19_734, SwingType.Power, VerticalLocation.HighStrike, HorizontalLocation.Middle);
+
+        Swing memory swing = Swing(5027, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
 
         _commitPitch(sessionID, player1, player1PrivateKey, pitch);
         _commitSwing(sessionID, player2, player2PrivateKey, swing);
@@ -800,12 +797,13 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
         // Generates a double
         Pitch memory pitch = Pitch(
-            57_761_167_149_431_627_567_619_636_552_548_080_695_738_090_550_175_245_247_314_135_192_585_439_073_298,
-            PitchSpeed.Slow,
-            VerticalLocation.LowBall,
-            HorizontalLocation.OutsideStrike
+            115_501_419_915_073_027_201_528_450_984_807_047_638_958_490_173_387_813_223_494_386_604_734_350_200_751,
+            PitchSpeed.Fast,
+            VerticalLocation.Middle,
+            HorizontalLocation.Middle
         );
-        Swing memory swing = Swing(10_508, SwingType.Power, VerticalLocation.LowBall, HorizontalLocation.OutsideBall);
+
+        Swing memory swing = Swing(4574, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
 
         _commitPitch(sixthSessionID, player1, player1PrivateKey, pitch);
         _commitSwing(sixthSessionID, player2, player2PrivateKey, swing);
@@ -886,7 +884,7 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
     }
 
-    function test_atBatProgress_events() public {
+    function test_at_bat_progress_events() public {
         AtBat memory atBat = game.getAtBat(AtBatID);
         assertEq(atBat.pitcherNFT.nftAddress, address(characterNFTs));
         assertEq(atBat.pitcherNFT.tokenID, PitcherTokenID);
@@ -1031,17 +1029,18 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
         nextSessionID = game.AtBatSessions(AtBatID, 5);
 
+        // Generates a home run
         Pitch memory hrPitch = Pitch(
-            63_640_271_245_765_366_210_780_587_460_610_203_501_690_580_269_930_603_495_014_854_898_867_107_880_639,
-            PitchSpeed.Slow,
-            VerticalLocation.HighStrike,
-            HorizontalLocation.OutsideStrike
+            80_491_828_288_466_500_398_500_201_838_979_874_564_536_822_010_908_142_391_208_468_039_821_070_678_148,
+            PitchSpeed.Fast,
+            VerticalLocation.Middle,
+            HorizontalLocation.InsideStrike
         );
 
-        _commitPitch(nextSessionID, player1, player1PrivateKey, hrPitch);
-
         Swing memory hrSwing =
-            Swing(1982, SwingType.Contact, VerticalLocation.HighStrike, HorizontalLocation.OutsideStrike);
+            Swing(32_155, SwingType.Power, VerticalLocation.LowStrike, HorizontalLocation.InsideStrike);
+
+        _commitPitch(nextSessionID, player1, player1PrivateKey, hrPitch);
 
         _commitSwing(nextSessionID, player2, player2PrivateKey, hrSwing);
 
@@ -1067,7 +1066,7 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
     }
 }
 
-contract FullcountTest_atBatInviteOnly is FullcountTestBase {
+contract FullcountTest_atBatInviteOnly is FullcountAtBatTest {
     function test_as_batter() public {
         charactersMinted++;
         uint256 tokenID = charactersMinted;
@@ -1083,6 +1082,10 @@ contract FullcountTest_atBatInviteOnly is FullcountTestBase {
 
         vm.startPrank(player1);
 
+        vm.expectEmit(address(game));
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Batter, true
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Batter, true);
 
         vm.stopPrank();
@@ -1125,6 +1128,10 @@ contract FullcountTest_atBatInviteOnly is FullcountTestBase {
 
         vm.startPrank(player1);
 
+        vm.expectEmit(address(game));
+        emit AtBatStarted(
+            initialNumAtBats + 1, address(characterNFTs), tokenID, initialNumSessions + 1, PlayerType.Pitcher, true
+        );
         uint256 atBatID = game.startAtBat(address(characterNFTs), tokenID, PlayerType.Pitcher, true);
 
         vm.stopPrank();
