@@ -10,6 +10,7 @@ import { signPitch, signSwing } from "../../utils/signing";
 import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStorage";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
+import AnimatedMessage from "../AnimatedMessage";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -140,12 +141,12 @@ const PlayerView = ({
       {isCommitted &&
         ((!isPitcher && !sessionStatus.didPitcherCommit) ||
           (isPitcher && !sessionStatus.didBatterCommit)) && (
-          <Text className={styles.waitingMessage}>Waiting for opponent to commit...</Text>
+          <AnimatedMessage message={"Waiting for opponent to commit"} />
         )}
       {isRevealed &&
         ((!isPitcher && !sessionStatus.didPitcherReveal) ||
           (isPitcher && !sessionStatus.didBatterReveal)) && (
-          <Text className={styles.waitingMessage}>Waiting for opponent to reveal...</Text>
+          <AnimatedMessage message={"Waiting for opponent to reveal"} />
         )}
     </Flex>
   );

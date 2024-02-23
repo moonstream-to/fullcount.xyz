@@ -5,7 +5,6 @@ import GrowingText from "./GrowingText";
 import { pitchSpeed, swingKind } from "./PlayView";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import BallAnimation from "./BallAnimation";
-import { Session } from "../../types";
 import BatAnimation from "./BatAnimation";
 import { useGameContext } from "../../contexts/GameContext";
 const outcomes = [
@@ -204,7 +203,7 @@ const Outcome = ({
           endTop={(Number(pitch.vertical) + 1) * 50 - 25 - 20}
           curve={pitch.speed === 1 ? 40 : 0}
           duration={"2.0s"}
-          zIndex={"-1"}
+          zIndex={"1"}
         >
           <Image src={`${assets}/ball2.png`} h={"40px"} w={"40px"} alt={"o"} />
         </BallAnimation>
@@ -214,6 +213,7 @@ const Outcome = ({
             endLeft={(Number(swing.horizontal) + 1) * 50 - 25 - 20}
             endTop={(Number(swing.vertical) + 1) * 50 - 25 - 20}
             duration={"0.5s"}
+            zIndex={"2"}
           >
             <Image src={`${assets}/bat2.png`} h={"40px"} w={"40px"} alt={"x"} />
           </BatAnimation>

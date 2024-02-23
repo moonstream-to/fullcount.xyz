@@ -1,41 +1,28 @@
+const colors: string[] = ["#2f38c0", "#5f64cf", "#8c91dc", "#e38b87", "#d65c5a"];
+
 function interpolateColor(color1: string, color2: string, factor = 0.5): string {
-  const hexToRgb = (hex: string): number[] => hex.match(/.{2}/g)!.map((hex) => parseInt(hex, 16));
+  const color1Match = color1.slice(1).match(/.{2}/g);
+  const color2Match = color2.slice(1).match(/.{2}/g);
 
-  const lerp = (start: number, end: number, t: number): number =>
-    Math.round(start + t * (end - start));
+  if (!color1Match || !color2Match) {
+    throw new Error("Invalid color format");
+  }
 
-  const [r1, g1, b1] = hexToRgb(color1.slice(1));
-  const [r2, g2, b2] = hexToRgb(color2.slice(1));
+  const result: string[] = color1Match.map((hexNum, index) => {
+    const color1Num: number = parseInt(hexNum, 16);
+    const color2Num: number = parseInt(color2Match[index], 16);
+    const diff: number = color2Num - color1Num;
+    const newNum: number = color1Num + Math.round(diff * factor);
+    return newNum.toString(16).padStart(2, "0");
+  });
 
-  const r = lerp(r1, r2, factor).toString(16).padStart(2, "0");
-  const g = lerp(g1, g2, factor).toString(16).padStart(2, "0");
-  const b = lerp(b1, b2, factor).toString(16).padStart(2, "0");
-
-  return `#${r}${g}${b}`;
+  return `#${result.join("")}`;
 }
 
-const colors = [
-  "#2f38c0",
-  "#5f64cf",
-  "#8c91dc",
-  "#d2d3f0",
-  "#ffffff",
-  "#f4d2cf",
-  "#e38b87",
-  "#d65c5a",
-  "#d65c5a",
-];
-
-export function getColorByFactor(array: number[], factor: number): string {
-  const sortedArray = [...array].sort((a, b) => a - b);
-  const bracketIndices = [2, 5, 8, 11, 14, 17, 21, 24];
-  const brackets = bracketIndices.map((index) => sortedArray[index]);
-
-  let bracketTopIndex = brackets.findIndex((b) => b >= factor);
-  bracketTopIndex = bracketTopIndex === -1 ? 7 : bracketTopIndex;
-  const top = brackets[bracketTopIndex];
-  const bottom = bracketTopIndex === 0 ? sortedArray[0] : brackets[bracketTopIndex - 1];
-  const placeInBracket = top === bottom ? 1 : (factor - bottom) / (top - bottom);
-  const endColorIndex = bracketTopIndex + 1;
-  return interpolateColor(colors[endColorIndex - 1], colors[endColorIndex], placeInBracket);
+export function valueToColor(value: number, values: number[]): string {
+  const normValue = value / Math.max(...values);
+  const segment: number = 1 / (colors.length - 1);
+  const index: number = Math.min(Math.floor(normValue / segment), colors.length - 2);
+  const factor: number = (normValue % segment) / segment;
+  return interpolateColor(colors[index], colors[index + 1], factor);
 }

@@ -1,0 +1,110 @@
+.heroContainer {
+    display: flex;
+    padding: 20px 7% 40px 7%;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    align-self: stretch;
+}
+
+.heroTextContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    align-self: stretch;
+}
+
+.heroTextTitle {
+    color: #FFF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: normal;
+    max-width: 247px;
+}
+
+.heroTextText {
+    color: #FFF;
+    text-align: center;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.button {
+    display: flex;
+    padding: 11px 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+
+    border: 1px solid #F1E3BF;
+    background: #00A341;
+    white-space: nowrap;
+    color: #FFF;
+
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+}
+
+.button:hover {
+    background: #008033;
+}
+
+.heroInnerContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    align-items: center;
+}
+
+@media (min-width: 768px) {
+    .button {
+        align-self: center;
+        padding: 11px 80px;
+    }
+    .heroContainer {
+        padding: 40px 7% 80px 7%;
+        gap: 60px;
+    }
+
+    .heroTextTitle {
+        font-size: 40px;
+        max-width: 425px;
+        line-height: 110%;
+    }
+
+    .heroInnerContainer {
+        gap: 60px;
+    }
+
+    .heroTextContainer {
+        gap: 40px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .heroInnerContainer {
+        margin-top: -20px;
+        padding: 40px;
+        border: 1px solid #4D4D4D;
+        background: #232323;
+        place-self: stretch;
+    }
+}
+
+@media (min-width: 1440px) {
+    .heroTextTitle {
+        font-size: 50px;
+        max-width: 532px;
+    }
+}
