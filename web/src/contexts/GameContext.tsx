@@ -59,7 +59,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     watchingToken: undefined,
     isTokenSelected: false,
     tokensCache: [],
-    sessionOffset: 20,
+    sessionOffset: 40,
     soundVolume: 20,
     ownedTokens: [],
   });
