@@ -64,7 +64,7 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
       }),
     };
 
-    fetch(`${FULLCOUNT_PLAYER_API}/user`, requestOptions)
+    fetch(`https://auth.bugout.dev/user`, requestOptions)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to create user");
@@ -157,7 +157,7 @@ const SignUp: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               >
                 {isLoading ? <Spinner /> : <Text lineHeight="26px">Create account</Text>}
               </Button>
-              <button onClick={createWeb3Account}>web3</button>
+              {/*<button onClick={createWeb3Account}>web3</button>*/}
             </Flex>
           </ModalBody>
         </ModalContent>
