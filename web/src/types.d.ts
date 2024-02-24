@@ -65,10 +65,20 @@ interface Token {
   source?: TokenSource;
 }
 
+interface LeaderboardPosition {
+  address: string;
+  id: string;
+  rank: number;
+  score: number;
+}
+
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
+  pitcherPosition?: any;
+  batterPosition?: any;
+  highestRank?: number | undefined;
 }
 
 interface Pair {

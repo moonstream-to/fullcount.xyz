@@ -57,6 +57,14 @@ const CharacterCard = ({
       }}
       cursor={isClickable ? "pointer" : "default"}
     >
+      {token.highestRank && (
+        <>
+          <div className={styles.rankBackground} />
+          <div className={styles.rank}>
+            <div className={styles.rankText}> {token.highestRank}</div>
+          </div>
+        </>
+      )}
       <Image
         h={{ base: "137px", lg: "137px" }}
         w={{ base: "137px", lg: "137px" }}

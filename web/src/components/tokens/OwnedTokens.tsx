@@ -19,7 +19,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { OwnedToken, Session } from "../../types";
+import { LeaderboardPosition, OwnedToken, Session } from "../../types";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
@@ -41,11 +41,15 @@ import {
   unstakeFullcountPlayer,
 } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useUser from "../../contexts/UserContext";
+import axios from "axios";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 
 const assets = FULLCOUNT_ASSETS_PATH;
+
+const BATTERS_LEADERBOARD_ID = "7a9dd040-bbde-48b3-8b02-dcd8aeae1c5e";
+const PITCHERS_LEADERBOARD_ID = "f12c61a5-93b4-486a-881e-c159e20b72bc";
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
@@ -95,9 +99,55 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     ["owned_tokens", web3ctx.account, user],
     async () => {
       console.log("FETCHING TOKENS");
-      const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
-      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
-      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
+
+      async function fetchLeaderboardData(leaderboardId: string) {
+        try {
+          const res = await axios.get(
+            `https://engineapi.moonstream.to/leaderboard/?leaderboard_id=${leaderboardId}&limit=100&offset=0`,
+          );
+          return res.data.map((t: { address: string }) => {
+            const [address, id] = t.address.split("_");
+            return { ...t, address, id };
+          });
+        } catch (e) {
+          console.log(e);
+          return [];
+        }
+      }
+
+      const [topBatters, topPitchers, BLBTokens, fullcountPlayerTokens] = await Promise.all([
+        fetchLeaderboardData(BATTERS_LEADERBOARD_ID),
+        fetchLeaderboardData(PITCHERS_LEADERBOARD_ID),
+        fetchOwnedBLBTokens({ web3ctx }).catch((e: any): OwnedToken[] => {
+          console.log(e);
+          return [];
+        }),
+        user
+          ? fetchFullcountPlayerTokens({ web3ctx }).catch((e: any): OwnedToken[] => {
+              console.log(e);
+              return [];
+            })
+          : Promise.resolve([]),
+      ]);
+
+      const ownedTokens = ([] as OwnedToken[]).concat(BLBTokens, fullcountPlayerTokens).map((t) => {
+        const pitcherPosition: LeaderboardPosition = topPitchers.find(
+          (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
+        );
+        const batterPosition: LeaderboardPosition = topBatters.find(
+          (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
+        );
+        let highestRank = undefined;
+
+        if (pitcherPosition && batterPosition) {
+          highestRank = Math.min(pitcherPosition.rank, batterPosition.rank);
+        } else if (pitcherPosition) {
+          highestRank = pitcherPosition.rank;
+        } else if (batterPosition) {
+          highestRank = batterPosition.rank;
+        }
+        return { ...t, pitcherPosition, batterPosition, highestRank };
+      });
       updateContext({ ownedTokens: [...ownedTokens] });
       return ownedTokens;
     },
@@ -491,23 +541,33 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                       <Spinner />
                     </Flex>
                   ) : (
-                    <Image
-                      src={token.image}
-                      alt={""}
-                      cursor={"pointer"}
-                      h={"75px"}
-                      w={"75px"}
-                      onClick={() => {
-                        updateContext({ selectedToken: token });
-                        if (forJoin && invitedTo) {
-                          joinSession.mutate({
-                            sessionID: invitedTo,
-                            token,
-                            inviteCode,
-                          });
-                        }
-                      }}
-                    />
+                    <Flex position={"relative"}>
+                      {token.highestRank && (
+                        <>
+                          <div className={styles.rankBackground} />
+                          <div className={styles.rank}>
+                            <div className={styles.rankText}> {token.highestRank}</div>
+                          </div>
+                        </>
+                      )}
+                      <Image
+                        src={token.image}
+                        alt={""}
+                        cursor={"pointer"}
+                        h={"75px"}
+                        w={"75px"}
+                        onClick={() => {
+                          updateContext({ selectedToken: token });
+                          if (forJoin && invitedTo) {
+                            joinSession.mutate({
+                              sessionID: invitedTo,
+                              token,
+                              inviteCode,
+                            });
+                          }
+                        }}
+                      />
+                    </Flex>
                   )}
                 </React.Fragment>
               ))}

@@ -36,7 +36,7 @@ export const fetchOwnedBLBTokens = async ({
     ["tokenOfOwnerByIndex"],
     tokensQueries,
   );
-  return await getTokensData({
+  return getTokensData({
     web3ctx,
     tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
     tokensSource: "BLBContract",

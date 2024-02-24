@@ -13,6 +13,7 @@
     font-style: normal;
     font-weight: 700;
     line-height: 120%; /* 16.8px */
+    position: relative;
 }
 
 .image {
@@ -36,4 +37,42 @@
     padding: 4px;
     align-items: center;
     gap: 10px;
+}
+
+.rank {
+    display: flex;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 1;
+    transform: translateY(-50%) translateX(50%);
+    z-index: 3;
+}
+.rankBackground {
+    display: flex;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #444;
+    opacity: 0.5;
+    transform: translateY(-50%) translateX(50%);
+    z-index: 2;
+}
+
+.rankText{
+    color: gold;
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 1;
 }

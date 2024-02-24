@@ -183,3 +183,41 @@
     font-weight: 700;
 }
 
+.rank {
+    display: flex;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid white;
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 1;
+    transform: translateY(-50%) translateX(50%);
+    z-index: 3;
+}
+.rankBackground {
+    display: flex;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #444;
+    opacity: 0.5;
+    transform: translateY(-50%) translateX(50%);
+    z-index: 2;
+}
+
+.rankText{
+    color: gold;
+    font-size: 10px;
+    font-weight: bold;
+    opacity: 1;
+}
+
