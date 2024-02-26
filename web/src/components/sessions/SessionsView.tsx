@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { Fragment, useContext, useEffect } from "react";
 import { useQuery } from "react-query";
-import { Box, Flex, useDisclosure } from "@chakra-ui/react";
+import { Box, Flex, useDisclosure, Text } from "@chakra-ui/react";
 import { getTokenMetadata } from "../../utils/decoders";
 
 import { useGameContext } from "../../contexts/GameContext";
@@ -24,6 +24,7 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
+import WaitingTokens from "./WaitingTokens";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -35,6 +36,7 @@ const SessionsView = () => {
     progressFilter,
     tokensCache,
     sessionOffset,
+    openSessions,
   } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
@@ -235,6 +237,7 @@ const SessionsView = () => {
           requiresSignature: session.session.requiresSignature,
         };
       });
+      // const openSessions = sessionsWithTokens.filter((s) => s.progress === 2);
       return getAtBats(sessionsWithTokens.reverse()).filter(
         (s) =>
           (s.progress !== 6 && s.progress !== 1) ||
@@ -244,7 +247,8 @@ const SessionsView = () => {
     },
     {
       onSuccess: (data) => {
-        updateContext({ sessions: data });
+        const openSessions = data.filter((s) => s.progress === 2);
+        updateContext({ sessions: data, openSessions });
       },
       refetchInterval: 5 * 1000,
     },
@@ -269,19 +273,36 @@ const SessionsView = () => {
         </Flex>
       </Flex>
 
+      {openSessions.length > 0 && (
+        <Flex gap={"50px"} w={"100%"}>
+          <Flex direction={"column"} gap={"20px"} alignItems={"center"} w={"50%"}>
+            <Text fontSize={"12px"}>Pitchers</Text>
+            <WaitingTokens sessions={openSessions.filter((s) => s.pair.pitcher)} />
+          </Flex>
+          <Flex direction={"column"} gap={"20px"} alignItems={"center"} w={"50%"}>
+            <Text fontSize={"12px"}>Batters</Text>
+            <WaitingTokens sessions={openSessions.filter((s) => s.pair.batter)} />
+          </Flex>
+        </Flex>
+      )}
+
       <FiltersView2 />
       {sessions.data && (
         <Flex direction={"column"} gap={"10px"} w={"100%"}>
-          {sessions.data.map((session, idx) => (
-            <Fragment key={idx}>
-              {progressFilter[session.progress] && (
-                <>
-                  <SessionView3 session={session} />
-                  {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
-                </>
-              )}
-            </Fragment>
-          ))}
+          {sessions.data
+            .filter((s) => s.progress !== 2)
+            .map((session, idx) => (
+              <Fragment key={idx}>
+                {progressFilter[session.progress] && (
+                  <>
+                    <SessionView3 session={session} />
+                    {idx + 1 < sessions.data.length && (
+                      <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />
+                    )}
+                  </>
+                )}
+              </Fragment>
+            ))}
         </Flex>
       )}
     </Flex>
