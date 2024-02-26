@@ -23,7 +23,11 @@ import { LeaderboardPosition, OwnedToken, Session } from "../../types";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
-import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import {
+  BATTERS_LEADERBOARD_ID,
+  FULLCOUNT_ASSETS_PATH,
+  PITCHERS_LEADERBOARD_ID,
+} from "../../constants";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import {
@@ -42,14 +46,12 @@ import {
 } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useUser from "../../contexts/UserContext";
 import axios from "axios";
+import RankInfo from "./RankInfo";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 
 const assets = FULLCOUNT_ASSETS_PATH;
-
-const BATTERS_LEADERBOARD_ID = "7a9dd040-bbde-48b3-8b02-dcd8aeae1c5e";
-const PITCHERS_LEADERBOARD_ID = "f12c61a5-93b4-486a-881e-c159e20b72bc";
 
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
@@ -380,6 +382,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
   );
 
+  //updating selected token data
   useEffect(() => {
     if (!selectedToken || !ownedTokens.data) return;
     const newSelectedToken = ownedTokens.data.find(
@@ -560,14 +563,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                     </Flex>
                   ) : (
                     <Flex position={"relative"}>
-                      {token.highestRank && (
-                        <>
-                          <div className={styles.rankBackground} />
-                          <div className={styles.rank}>
-                            <div className={styles.rankText}> {token.highestRank}</div>
-                          </div>
-                        </>
-                      )}
+                      {token.highestRank && <RankInfo token={token} />}
                       <Image
                         src={token.image}
                         alt={""}

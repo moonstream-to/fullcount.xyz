@@ -214,10 +214,22 @@
     z-index: 2;
 }
 
-.rankText{
+.rankText {
     color: gold;
     font-size: 10px;
     font-weight: bold;
     opacity: 1;
+}
+
+.leaderboardRows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 300px;
+}
+
+.leaderboardsContainer {
+    display: flex;
+    gap: 20px;
 }
 
