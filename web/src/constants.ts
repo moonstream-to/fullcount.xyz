@@ -66,3 +66,6 @@ export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
 export const GAME_CONTRACT = "0xC90F37D09f2f8fB2e9D1Aa9a9d5142f5aE100d84"; //TODO env
 export const TOKEN_CONTRACT = "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227"; //TODO env
 export const CHAIN_ID = 322; //TODO env
+
+export const BATTERS_LEADERBOARD_ID = "7a9dd040-bbde-48b3-8b02-dcd8aeae1c5e";
+export const PITCHERS_LEADERBOARD_ID = "f12c61a5-93b4-486a-881e-c159e20b72bc";
