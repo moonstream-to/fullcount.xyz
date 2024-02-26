@@ -130,24 +130,42 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           : Promise.resolve([]),
       ]);
 
-      const ownedTokens = ([] as OwnedToken[]).concat(BLBTokens, fullcountPlayerTokens).map((t) => {
-        const pitcherPosition: LeaderboardPosition = topPitchers.find(
-          (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
-        );
-        const batterPosition: LeaderboardPosition = topBatters.find(
-          (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
-        );
-        let highestRank = undefined;
-
-        if (pitcherPosition && batterPosition) {
-          highestRank = Math.min(pitcherPosition.rank, batterPosition.rank);
-        } else if (pitcherPosition) {
-          highestRank = pitcherPosition.rank;
-        } else if (batterPosition) {
-          highestRank = batterPosition.rank;
+      const sortingFn = (
+        a: { highestRank: number | undefined },
+        b: { highestRank: number | undefined },
+      ) => {
+        if (a.highestRank === undefined && b.highestRank === undefined) {
+          return 0;
+        } else if (a.highestRank === undefined) {
+          return 1;
+        } else if (b.highestRank === undefined) {
+          return -1;
+        } else {
+          return a.highestRank - b.highestRank;
         }
-        return { ...t, pitcherPosition, batterPosition, highestRank };
-      });
+      };
+
+      const ownedTokens = ([] as OwnedToken[])
+        .concat(BLBTokens, fullcountPlayerTokens)
+        .map((t) => {
+          const pitcherPosition: LeaderboardPosition = topPitchers.find(
+            (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
+          );
+          const batterPosition: LeaderboardPosition = topBatters.find(
+            (p: { address: string; id: string }) => p.address === t.address && p.id === t.id,
+          );
+          let highestRank = undefined;
+
+          if (pitcherPosition && batterPosition) {
+            highestRank = Math.min(pitcherPosition.rank, batterPosition.rank);
+          } else if (pitcherPosition) {
+            highestRank = pitcherPosition.rank;
+          } else if (batterPosition) {
+            highestRank = batterPosition.rank;
+          }
+          return { ...t, pitcherPosition, batterPosition, highestRank };
+        })
+        .sort(sortingFn);
       updateContext({ ownedTokens: [...ownedTokens] });
       return ownedTokens;
     },
