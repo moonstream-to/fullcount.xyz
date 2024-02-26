@@ -57,6 +57,9 @@ const Account = ({ ...props }: { [x: string]: any }) => {
             </Flex>
           </MenuButton>
           <MenuList borderRadius="10px" border="1px solid white" minW="fit-content" p="20px">
+            <MenuItem p="0px">
+              <RouterLink href="/tokens">Your tokens</RouterLink>
+            </MenuItem>
             <MenuItem p="0px" onClick={() => logout()}>
               Log out
             </MenuItem>

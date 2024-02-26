@@ -1,0 +1,38 @@
+.container {
+    display: flex;
+    gap: 100px;
+}
+
+.tokensContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.header {
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.token, .selectedToken {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.selectedToken {
+    border: 1px solid white;
+    padding: 4px;
+
+}
+
+.tokenName {
+    font-size: 10px;
+    flex-grow: 2;
+    margin-right: 10;
+}
