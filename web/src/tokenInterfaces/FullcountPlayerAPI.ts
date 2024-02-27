@@ -9,20 +9,29 @@ export async function fetchFullcountPlayerTokens({
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
 }) {
-  const headers = getHeaders();
-  const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
-    params: {
-      limit: 10,
-      offset: 0,
-    }, //TODO
-    headers,
-  });
-  const tokens = res.data.nfts.map((nft: { erc721_address: string; token_id: string }) => ({
-    id: nft.token_id,
-    address: nft.erc721_address,
-  }));
+  try {
+    const headers = getHeaders();
+    const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
+      params: {
+        limit: 10,
+        offset: 0,
+      }, //TODO context vars
+      headers,
+    });
+    const tokens = res.data.nfts.map((nft: { erc721_address: string; token_id: string }) => ({
+      id: nft.token_id,
+      address: nft.erc721_address,
+    }));
 
-  return getTokensData({ web3ctx, tokens, tokensSource: "FullcountPlayerAPI" });
+    return await getTokensData({
+      web3ctx,
+      tokens,
+      tokensSource: "FullcountPlayerAPI",
+    });
+  } catch (e) {
+    console.log("Error catching FullcountPlayer tokens\n", e);
+    return [];
+  }
 }
 
 export async function startSessionFullcountPlayer({
