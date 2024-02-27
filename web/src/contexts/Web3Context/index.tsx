@@ -12,6 +12,7 @@ import {
   supportedChains,
   TokenInterface,
 } from "../../types/Moonstream";
+import { CHAIN_ID } from "../../constants";
 const REQUEST_SIGNATURE = "false";
 
 if (typeof REQUEST_SIGNATURE == "undefined") {
@@ -130,6 +131,11 @@ export const chains: { [key in supportedChains]: ChainInterface } = {
       url: "https://api.gnosisscan.io/api?module=contract&action=getabi",
     },
   },
+  sepolia: {
+    name: "sepolia",
+    chainId: 421614,
+    rpcs: ["https://sepolia-rollup.arbitrum.io/rpc"],
+  },
 };
 
 export function chainByChainId(chainId: number): supportedChains | null {
@@ -143,8 +149,18 @@ const isKnownChain = (_chainId: number) => {
   });
 };
 
+function getFirstRpcUrl(chainId: number): string | undefined {
+  const chain = Object.values(chains).find((chain) => chain.chainId === chainId);
+  if (chain && chain.rpcs.length > 0) {
+    return chain.rpcs[0];
+  } else {
+    return undefined;
+  }
+}
+
 const Web3Provider = ({ children }: { children: JSX.Element }) => {
-  const [web3] = React.useState<Web3>(new Web3(null));
+  const rpc = getFirstRpcUrl(CHAIN_ID) ?? null;
+  const [web3] = React.useState<Web3>(new Web3(rpc));
   const [polygonClient] = React.useState<Web3>(
     new Web3(new Web3.providers.HttpProvider("https://polygon-rpc.com")),
   );
