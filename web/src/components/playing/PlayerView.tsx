@@ -108,6 +108,12 @@ const PlayerView = ({
     }
   }, [sessionStatus.sessionID]);
 
+  useEffect(() => {
+    if (sessionStatus.progress === 4 && !isRevealed) {
+      handleReveal();
+    }
+  }, [sessionStatus.progress, isRevealed]);
+
   return (
     <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
       <ActionTypeSelector
@@ -133,11 +139,7 @@ const PlayerView = ({
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
       )}
-      {sessionStatus.didBatterCommit && sessionStatus.didPitcherCommit && !isRevealed && (
-        <button className={globalStyles.mobileButton} onClick={handleReveal}>
-          {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
-        </button>
-      )}
+      {revealMutation.isLoading && <AnimatedMessage message={"Revealing..."} />}
       {isCommitted &&
         ((!isPitcher && !sessionStatus.didPitcherCommit) ||
           (isPitcher && !sessionStatus.didBatterCommit)) && (

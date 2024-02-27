@@ -20,27 +20,32 @@ export const fetchOwnedBLBTokens = async ({
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
 }) => {
-  const { tokenContract } = getContracts(web3ctx);
-  const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
-  const tokensQueries = [];
-  for (let i = 0; i < balanceOf; i += 1) {
-    tokensQueries.push({
-      target: TOKEN_CONTRACT,
-      callData: tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).encodeABI(),
-    });
-  }
+  try {
+    const { tokenContract } = getContracts(web3ctx);
+    const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
+    const tokensQueries = [];
+    for (let i = 0; i < balanceOf; i += 1) {
+      tokensQueries.push({
+        target: TOKEN_CONTRACT,
+        callData: tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).encodeABI(),
+      });
+    }
 
-  const [tokens] = await getMulticallResults(
-    web3ctx,
-    TokenABI,
-    ["tokenOfOwnerByIndex"],
-    tokensQueries,
-  );
-  return await getTokensData({
-    web3ctx,
-    tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
-    tokensSource: "BLBContract",
-  });
+    const [tokens] = await getMulticallResults(
+      web3ctx,
+      TokenABI,
+      ["tokenOfOwnerByIndex"],
+      tokensQueries,
+    );
+    return await getTokensData({
+      web3ctx,
+      tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
+      tokensSource: "BLBContract",
+    });
+  } catch (e) {
+    console.log("Error catching BLB tokens \n", e);
+    return [];
+  }
 };
 
 export const getTokensData = async ({
