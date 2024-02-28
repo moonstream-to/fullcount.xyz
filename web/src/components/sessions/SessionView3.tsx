@@ -2,7 +2,7 @@ import { Box, Flex, Spinner, Text, useDisclosure } from "@chakra-ui/react";
 import globalStyles from "../tokens/OwnedTokens.module.css";
 import { OwnedToken, Session, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQuery, useQueryClient } from "react-query";
@@ -30,6 +30,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
   const { updateContext, ownedTokens, progressFilter, selectedToken, contractAddress } =
     useGameContext();
   const { user } = useUser();
+  const [joiningTries, setJoiningTries] = useState(0);
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -53,7 +54,30 @@ const SessionView3 = ({ session }: { session: Session }) => {
       }
     },
     {
-      onSuccess: (_, variables) => {
+      onSuccess: async (_, variables) => {
+        const MAX_ATTEMPTS = 8;
+        const INTERVAL_MS = 3000;
+
+        const checkSessionStarted = async () => {
+          let progress;
+          for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+            try {
+              progress = await gameContract.methods.sessionProgress(variables.sessionID).call();
+              if (progress === "3") {
+                return true;
+              }
+            } catch (error) {}
+            await new Promise((resolve) => setTimeout(resolve, INTERVAL_MS));
+          }
+          return false;
+        };
+
+        const sessionStarted = await checkSessionStarted();
+        if (!sessionStarted) {
+          toast("Timeout. Try again, please", "warning", 3000, "Can't join");
+          return;
+        }
+
         queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           if (!oldData) {
             return [];
