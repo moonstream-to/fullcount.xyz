@@ -19,7 +19,7 @@ const FullcountABI = require("../../web3/abi/FullcountABI.json");
 export const sessionStates = [
   "session does not exist",
   "aborted",
-  "session started, but second player has not yet joined",
+  "open",
   "session started, both players joined, ready for commitments",
   "both players committed, ready for reveals",
   "session complete",
@@ -170,7 +170,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
                 : styles.finished
             }
           >
-            {session.progress === 6 || session.progress === 1
+            {session.progress === 6 || session.progress === 1 || session.progress === 2
               ? sessionStates[session.progress]
               : outcomes[Number(session.atBat.outcome)]}
           </Text>
