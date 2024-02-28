@@ -1,9 +1,6 @@
 import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
 import { AbiItem } from "web3-utils";
-import { MULTICALL2_CONTRACT_ADDRESSES } from "../constants";
-import { Multicall2 } from "../../types/web3-v1-contracts";
-import MulticallABIImported from "../web3/abi/Multicall2.json";
-const MulticallABI = MulticallABIImported as unknown as AbiItem[];
+import { getMulticallContract } from "./getWeb3Contracts";
 
 export async function getMulticallResults(
   web3ctx: MoonstreamWeb3ProviderInterface,
@@ -19,14 +16,7 @@ export async function getMulticallResults(
     return result;
   }
 
-  const MULTICALL2_CONTRACT_ADDRESS =
-    MULTICALL2_CONTRACT_ADDRESSES[
-      String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
-    ];
-  const multicallContract = new web3ctx.web3.eth.Contract(
-    MulticallABI,
-    MULTICALL2_CONTRACT_ADDRESS,
-  ) as unknown as Multicall2;
+  const multicallContract = getMulticallContract(web3ctx);
   const result = [];
   const response = await multicallContract.methods.tryAggregate(false, queries).call();
   const splitResponses = splitArray(response, functionNames.length);

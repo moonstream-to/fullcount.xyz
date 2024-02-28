@@ -16,39 +16,16 @@ import styles from "./SessionsView.module.css";
 import { FullcountContractSession, Session, Token } from "../../types";
 
 import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
-import { AbiItem } from "web3-utils";
-import FullcountABIImported from "../../web3/abi/FullcountABI.json";
-import TokenABIImported from "../../web3/abi/BLBABI.json";
-import MulticallABIImported from "../../web3/abi/Multicall2.json";
-const FullcountABI = FullcountABIImported as unknown as AbiItem[];
-const TokenABI = TokenABIImported as unknown as AbiItem[];
-const MulticallABI = MulticallABIImported as unknown as AbiItem[];
-import { MULTICALL2_CONTRACT_ADDRESSES } from "../../constants";
+import { getContracts } from "../../utils/getWeb3Contracts";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const SessionsView = () => {
-  const {
-    updateContext,
-    tokenAddress,
-    contractAddress,
-    progressFilter,
-    tokensCache,
-    sessionOffset,
-  } = useGameContext();
+  const { updateContext, contractAddress, progressFilter, tokensCache, sessionOffset } =
+    useGameContext();
   const web3ctx = useContext(Web3Context);
-  const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
-  gameContract.options.address = contractAddress;
-  const tokenContract = new web3ctx.web3.eth.Contract(TokenABI);
-  tokenContract.options.address = tokenAddress;
-  const MULTICALL2_CONTRACT_ADDRESS =
-    MULTICALL2_CONTRACT_ADDRESSES[
-      String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
-    ];
-  const multicallContract = new web3ctx.web3.eth.Contract(
-    MulticallABI,
-    MULTICALL2_CONTRACT_ADDRESS,
-  );
+
+  const { gameContract, tokenContract, multicallContract } = getContracts(web3ctx);
 
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -76,7 +53,7 @@ const SessionsView = () => {
     async () => {
       console.log("FETCHING SESSIONS");
 
-      const numSessions = await gameContract.methods.NumSessions().call();
+      const numSessions = Number(await gameContract.methods.NumSessions().call());
       const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
       const target = contractAddress;
       const callData: string[] = [];

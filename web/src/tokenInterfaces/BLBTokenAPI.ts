@@ -3,17 +3,15 @@ import { getTokenMetadata } from "../utils/decoders";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import TokenABIImported from "../web3/abi/BLBABI.json";
-import MulticallABIImported from "../web3/abi/Multicall2.json";
 import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
-import { FullcountABI as FullcountContract, Multicall2 } from "../../types/web3-v1-contracts";
-import { GAME_CONTRACT, MULTICALL2_CONTRACT_ADDRESSES, TOKEN_CONTRACT } from "../constants";
+import { TOKEN_CONTRACT } from "../constants";
 import { sendTransactionWithEstimate } from "../utils/sendTransactions";
 import { signSession } from "../utils/signSession";
 import { getMulticallResults } from "../utils/multicall";
+import { getContracts } from "../utils/getWeb3Contracts";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
-const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 
 export const fetchOwnedBLBTokens = async ({
   web3ctx,
@@ -271,22 +269,4 @@ export const mintBLBToken = ({
 }) => {
   const { tokenContract } = getContracts(web3ctx);
   return sendTransactionWithEstimate(web3ctx.account, tokenContract.methods.mint(name, imageIndex));
-};
-
-const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {
-  const { web3 } = web3ctx;
-  const gameContract = new web3.eth.Contract(FullcountABI) as unknown as FullcountContract;
-  gameContract.options.address = GAME_CONTRACT;
-  const tokenContract = new web3.eth.Contract(TokenABI);
-  tokenContract.options.address = TOKEN_CONTRACT;
-
-  const MULTICALL2_CONTRACT_ADDRESS =
-    MULTICALL2_CONTRACT_ADDRESSES[
-      String(web3ctx.chainId) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES
-    ];
-  const multicallContract = new web3ctx.web3.eth.Contract(
-    MulticallABI,
-    MULTICALL2_CONTRACT_ADDRESS,
-  ) as unknown as Multicall2;
-  return { gameContract, tokenContract, multicallContract };
 };
