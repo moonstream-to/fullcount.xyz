@@ -22,17 +22,11 @@ const TitleScreen = () => {
 
   return (
     <>
-      {web3ctx.buttonText !== "Connected" || web3ctx.chainId !== chainId ? (
-        <TitleScreenLayout>
-          <ConnectingView />
-        </TitleScreenLayout>
-      ) : (
-        <>
-          <PlayingLayout>
-            <Playing />
-          </PlayingLayout>
-        </>
-      )}
+      <>
+        <PlayingLayout>
+          <Playing />
+        </PlayingLayout>
+      </>
     </>
   );
 };
