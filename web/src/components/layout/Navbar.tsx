@@ -6,6 +6,7 @@ import SoundFxSlider from "./SoundFxSlider";
 import { FEEDBACK_FORM_URL } from "../../constants";
 import About from "./About";
 import Account from "../account/Account";
+import useUser from "../../contexts/UserContext";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -13,6 +14,7 @@ const Navbar = () => {
     "(min-width: 1024px)",
   ]);
   const { account } = useContext(Web3Context);
+  const { user } = useUser();
 
   const address = !isMediumScreen ? `${account.slice(0, 6)}...${account.slice(-4)}` : account;
   const { onOpen, isOpen, onClose } = useDisclosure();
@@ -39,7 +41,7 @@ const Navbar = () => {
       </Flex>
       <Flex gap={"10px"}>
         <SoundFxSlider />
-        {address && (
+        {address && !user && (
           <Flex
             justifyContent="space-between"
             alignItems="center"

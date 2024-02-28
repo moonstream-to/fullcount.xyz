@@ -95,7 +95,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     ["owned_tokens", web3ctx.account, user],
     async () => {
       console.log("FETCHING TOKENS");
-      const BLBTokens = await fetchOwnedBLBTokens({ web3ctx });
+      const BLBTokens = user ? [] : await fetchOwnedBLBTokens({ web3ctx });
       const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
       const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
       updateContext({ ownedTokens: [...ownedTokens] });
@@ -103,7 +103,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
     },
     {
       ...queryCacheProps,
-      refetchInterval: 10000,
+      refetchInterval: 3000,
     },
   );
 
