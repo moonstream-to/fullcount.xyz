@@ -20,6 +20,9 @@ export const fetchOwnedBLBTokens = async ({
 }: {
   web3ctx: MoonstreamWeb3ProviderInterface;
 }) => {
+  if (!web3ctx.account) {
+    return [];
+  }
   try {
     const { tokenContract } = getContracts(web3ctx);
     const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
