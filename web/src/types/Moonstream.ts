@@ -8,7 +8,14 @@ export interface WalletStatesInterface {
   UNKNOWN_CHAIN: string;
 }
 
-export type supportedChains = "localhost" | "mumbai" | "polygon" | "ethereum" | "wyrm" | "gnosis";
+export type supportedChains =
+  | "localhost"
+  | "mumbai"
+  | "polygon"
+  | "ethereum"
+  | "wyrm"
+  | "gnosis"
+  | "sepolia";
 
 export interface ChainInterface {
   chainId: number;

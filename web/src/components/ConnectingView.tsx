@@ -14,9 +14,36 @@ const ConnectingView = () => {
   const [isSwitching, setIsSwitching] = useState(false);
   const { chainId } = useGameContext();
 
-  const switchToWyrm = async () => {
-    const wyrmID = 322;
-    const hexString = `0x${wyrmID.toString(16)}`;
+  type Chain = {
+    chainIdDec: number;
+    chainName: string;
+    rpcUrls: string[];
+    blockExplorerUrls: string[];
+    nativeCurrency: {
+      decimals: number;
+      name: string;
+      symbol: string;
+    };
+  };
+
+  const WYRM: Chain = {
+    chainIdDec: 322,
+    chainName: "Wyrm",
+    rpcUrls: ["https://wyrm.constellationchain.xyz/http"],
+    blockExplorerUrls: ["https://wyrm.constellationchain.xyz/http"],
+    nativeCurrency: { decimals: 18, name: "cMATIC", symbol: "cMATIC" },
+  };
+
+  const SEPOLIA = {
+    chainName: "Arbitrum Sepolia",
+    chainIdDec: 421614,
+    rpcUrls: ["https://sepolia-rollup.arbitrum.io/rpc"],
+    blockExplorerUrls: ["https://sepolia.arbiscan.io/"],
+    nativeCurrency: { decimals: 18, name: "SepoliaETH", symbol: "ETH" },
+  };
+
+  const switchToChain = async (chain: Chain) => {
+    const hexString = `0x${chain.chainIdDec.toString(16)}`;
     setIsSwitching(true);
     try {
       await window.ethereum.request({
@@ -31,10 +58,10 @@ const ConnectingView = () => {
             params: [
               {
                 chainId: hexString,
-                chainName: "Wyrm",
-                rpcUrls: ["https://wyrm.constellationchain.xyz/http"],
-                blockExplorerUrls: ["https://wyrm.constellationchain.xyz/http"],
-                nativeCurrency: { decimals: 18, name: "cMATIC", symbol: "cMATIC" },
+                chainName: chain.chainName,
+                rpcUrls: chain.rpcUrls,
+                blockExplorerUrls: chain.blockExplorerUrls,
+                nativeCurrency: chain.nativeCurrency,
               },
             ],
           });
@@ -65,7 +92,7 @@ const ConnectingView = () => {
         </button>
       )}
       {web3Provider.buttonText === "Connected" && (
-        <button className={globalStyles.connectionButton} onClick={switchToWyrm}>
+        <button className={globalStyles.connectionButton} onClick={() => switchToChain(SEPOLIA)}>
           {isSwitching ? (
             <Spinner h={"14px"} w={"14px"} />
           ) : (
