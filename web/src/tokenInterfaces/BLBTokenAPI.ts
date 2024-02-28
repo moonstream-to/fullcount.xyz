@@ -93,7 +93,7 @@ export const getTokensData = async ({
     const { name, image } = await getTokenMetadata(uri);
     return {
       id: tokens[idx].id,
-      name: name, //.split(` - ${tokens[idx].id}`)[0],
+      name: name.split(` - ${tokens[idx].id}`)[0],
       image: image,
       address: tokenContract.options.address,
       staker: tokensSource === "BLBContract" ? web3ctx.account : "",

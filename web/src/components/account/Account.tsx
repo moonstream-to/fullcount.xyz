@@ -34,13 +34,13 @@ const Account = ({ ...props }: { [x: string]: any }) => {
         {!user && (
           <>
             <LoginButton>
-              <button className={globalStyles.button}>Log in</button>
+              <button className={globalStyles.button}>Log&nbsp;in</button>
             </LoginButton>
             {!isBaseView && (
               <>
                 <SignUp isOpen={isSignUpOpen} onClose={() => setIsSignUpOpen(false)} />
                 <button className={globalStyles.button} onClick={() => setIsSignUpOpen(true)}>
-                  Sign up
+                  Sign&nbsp;up
                 </button>
               </>
             )}
