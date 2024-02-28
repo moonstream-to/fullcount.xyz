@@ -10,6 +10,8 @@ import { signPitch, signSwing } from "../../utils/signing";
 import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStorage";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
+import AnimatedMessage from "../AnimatedMessage";
+import { OwnedToken } from "../../types";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -21,6 +23,7 @@ const PlayerView = ({
   revealMutation,
   isCommitted,
   isRevealed,
+  token,
 }: {
   sessionStatus: SessionStatus;
   isPitcher: boolean;
@@ -28,6 +31,7 @@ const PlayerView = ({
   revealMutation: any;
   isCommitted: boolean;
   isRevealed: boolean;
+  token: OwnedToken;
 }) => {
   const [actionChoice, setActionChoice] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
@@ -74,23 +78,28 @@ const PlayerView = ({
     const vertical = gridIndex === -1 ? 0 : getRowCol(gridIndex)[0];
     const horizontal = gridIndex === -1 ? 0 : getRowCol(gridIndex)[1];
     const nonce = web3ctx.web3.utils.randomHex(32);
-    const signFn = isPitcher ? signPitch : signSwing;
-    const sign = await signFn(
-      web3ctx.account,
-      window.ethereum,
+    const commit = {
       nonce,
       actionChoice,
       vertical,
       horizontal,
-    );
+    };
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    setLocalStorageItem(localStorageKey, {
-      nonce,
-      actionChoice,
-      vertical,
-      horizontal,
-    });
-    commitMutation.mutate({ sign });
+    setLocalStorageItem(localStorageKey, commit);
+    if (selectedToken?.source === "FullcountPlayerAPI") {
+      commitMutation.mutate({ sign: undefined, commit });
+    } else {
+      const signFn = isPitcher ? signPitch : signSwing;
+      const sign = await signFn(
+        web3ctx.account,
+        window.ethereum,
+        nonce,
+        actionChoice,
+        vertical,
+        horizontal,
+      );
+      commitMutation.mutate({ sign });
+    }
   };
 
   useEffect(() => {
@@ -101,6 +110,12 @@ const PlayerView = ({
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
     }
   }, [sessionStatus.sessionID]);
+
+  useEffect(() => {
+    if (token.source === "FullcountPlayerAPI" && sessionStatus.progress === 4 && !isRevealed) {
+      handleReveal();
+    }
+  }, [sessionStatus.progress, isRevealed, token.source]);
 
   return (
     <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
@@ -127,20 +142,26 @@ const PlayerView = ({
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
       )}
-      {sessionStatus.didBatterCommit && sessionStatus.didPitcherCommit && !isRevealed && (
-        <button className={globalStyles.mobileButton} onClick={handleReveal}>
-          {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
-        </button>
+      {token.source === "BLBContract" &&
+        sessionStatus.didBatterCommit &&
+        sessionStatus.didPitcherCommit &&
+        !isRevealed && (
+          <button className={globalStyles.mobileButton} onClick={handleReveal}>
+            {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+          </button>
+        )}
+      {token.source !== "BLBContract" && revealMutation.isLoading && (
+        <AnimatedMessage message={"Revealing..."} />
       )}
       {isCommitted &&
         ((!isPitcher && !sessionStatus.didPitcherCommit) ||
           (isPitcher && !sessionStatus.didBatterCommit)) && (
-          <Text className={styles.waitingMessage}>Waiting for opponent to commit...</Text>
+          <AnimatedMessage message={"Waiting for opponent to commit"} />
         )}
       {isRevealed &&
         ((!isPitcher && !sessionStatus.didPitcherReveal) ||
           (isPitcher && !sessionStatus.didBatterReveal)) && (
-          <Text className={styles.waitingMessage}>Waiting for opponent to reveal...</Text>
+          <AnimatedMessage message={"Waiting for opponent to reveal"} />
         )}
     </Flex>
   );

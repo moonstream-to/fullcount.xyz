@@ -1,11 +1,10 @@
-export const GAME_CONTRACT = "0xC90F37D09f2f8fB2e9D1Aa9a9d5142f5aE100d84";
-export const TOKEN_CONTRACT = "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227";
-export const CHAIN_ID = 322;
-export const GAME_CONTRACT_VERSION = "0.1.0";
+export const GAME_CONTRACT_VERSION = "0.1.0"; //TODO fetch from contract
 export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
 
 export const FEEDBACK_FORM_URL =
   "https://docs.google.com/forms/d/1ZsWoXlYgL6XkAdA2BLyM6phJOfyg7Jo1EZiMMBeir4M";
+
+export const GET_CONNECTED_URL = "https://forms.gle/Nk1bT1iLBYRDdyND9";
 
 const MULTICALL2_POLYGON_CONTRACT_ADDRESS =
   process.env.NEXT_PUBLIC_MULTICALL2_POLYGON_CONTRACT_ADDRESS;
@@ -61,3 +60,9 @@ export const getChainImage = (identifier: string | number): string | undefined =
     return chainIdToImagePath[identifier as ChainId];
   }
 };
+
+export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
+export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
+export const GAME_CONTRACT = "0xC90F37D09f2f8fB2e9D1Aa9a9d5142f5aE100d84"; //TODO env
+export const TOKEN_CONTRACT = "0x0642aE350D9BF3ceb3695bF0895aD8B60872B227"; //TODO env
+export const CHAIN_ID = 322; //TODO env

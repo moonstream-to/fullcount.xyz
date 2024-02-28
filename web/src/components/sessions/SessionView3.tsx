@@ -7,18 +7,19 @@ import Web3Context from "../../contexts/Web3Context/context";
 import CharacterCardSmall from "../tokens/CharacterCardSmall";
 import { useMutation, useQuery, useQueryClient } from "react-query";
 import useMoonToast from "../../hooks/useMoonToast";
-import { progressMessage } from "../../utils/messages";
 import SelectToken from "./SelectToken";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import DotsCounter from "./DotsCounter";
 import styles from "./SessionView.module.css";
+import { joinSessionBLB } from "../../tokenInterfaces/BLBTokenAPI";
+import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
+import useUser from "../../contexts/UserContext";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const FullcountABI = require("../../web3/abi/FullcountABI.json");
 
 export const sessionStates = [
   "session does not exist",
   "aborted",
-  "session started, but second player has not yet joined",
+  "open",
   "session started, both players joined, ready for commitments",
   "both players committed, ready for reveals",
   "session complete",
@@ -26,8 +27,9 @@ export const sessionStates = [
 ];
 
 const SessionView3 = ({ session }: { session: Session }) => {
-  const { updateContext, progressFilter, tokenAddress, selectedToken, contractAddress, sessions } =
+  const { updateContext, ownedTokens, progressFilter, selectedToken, contractAddress } =
     useGameContext();
+  const { user } = useUser();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -40,17 +42,15 @@ const SessionView3 = ({ session }: { session: Session }) => {
   } = useDisclosure();
 
   const joinSession = useMutation(
-    async ({ sessionID, token }: { sessionID: number; token: Token }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    async ({ sessionID, token }: { sessionID: number; token: OwnedToken }) => {
+      switch (token.source) {
+        case "BLBContract":
+          return joinSessionBLB({ web3ctx, token, sessionID, inviteCode: undefined });
+        case "FullcountPlayerAPI":
+          return joinSessionFullcountPlayer({ token, sessionID, inviteCode: undefined });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      const signature = "0x";
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.joinSession(sessionID, tokenAddress, token.id, signature),
-      );
     },
     {
       onSuccess: (_, variables) => {
@@ -77,22 +77,25 @@ const SessionView3 = ({ session }: { session: Session }) => {
 
           return newSessions ?? [];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: variables.sessionID,
-                tokenProgress: 3,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: variables.sessionID,
+                  tokenProgress: 3,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -167,7 +170,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
                 : styles.finished
             }
           >
-            {session.progress === 6 || session.progress === 1
+            {session.progress === 6 || session.progress === 1 || session.progress === 2
               ? sessionStates[session.progress]
               : outcomes[Number(session.atBat.outcome)]}
           </Text>
@@ -186,13 +189,29 @@ const SessionView3 = ({ session }: { session: Session }) => {
         {session.pair.pitcher ? (
           <Flex gap={4}>
             <CharacterCardSmall
-              token={session.pair.pitcher}
+              token={
+                ownedTokens.find(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                ) ?? session.pair.pitcher
+              }
               session={session}
               minW={"215px"}
               isClickable={
-                session.progress === 5 || session.pair.pitcher.staker === web3ctx.account
+                session.progress === 5 ||
+                session.pair.pitcher.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                )
               }
-              isOwned={session.pair.pitcher.staker === web3ctx.account}
+              isOwned={
+                session.pair.pitcher.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.pitcher?.address === t.address && session.pair.pitcher.id === t.id,
+                )
+              }
             />
           </Flex>
         ) : (
@@ -207,16 +226,34 @@ const SessionView3 = ({ session }: { session: Session }) => {
         {session.pair.batter ? (
           <Flex gap={4}>
             <CharacterCardSmall
-              token={session.pair.batter}
+              token={
+                ownedTokens.find(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                ) ?? session.pair.batter
+              }
               session={session}
               minW={"215px"}
-              isClickable={session.progress === 5 || session.pair.batter.staker === web3ctx.account}
-              isOwned={session.pair.batter.staker === web3ctx.account}
+              isClickable={
+                session.progress === 5 ||
+                session.pair.batter.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                )
+              }
+              isOwned={
+                session.pair.batter.staker === web3ctx.account ||
+                ownedTokens.some(
+                  (t) =>
+                    session.pair.batter?.address === t.address && session.pair.batter.id === t.id,
+                )
+              }
             />
           </Flex>
         ) : (
           <>
-            {session.progress === 2 && !session.requiresSignature && (
+            {session.progress === 2 && !session.requiresSignature && (user || web3ctx.account) && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
                 {joinSession.isLoading ? <Spinner /> : "join as batter"}
               </button>

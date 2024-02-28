@@ -1,0 +1,81 @@
+.container {
+    display: flex;
+    padding: 40px 7%;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    align-self: stretch;
+    border-top: 1px solid #4D4D4D;
+    background: #1B1B1B;
+}
+
+.socialsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.socialsTitle {
+    color: #FFF;
+    font-feature-settings: 'case' on;
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 140%; /* 22.4px */
+}
+
+.iconsContainer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.legalContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    align-self: stretch;
+}
+
+.legalHeaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.legalText {
+    text-align: center;
+    color: #FFF;
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+@media (min-width: 768px) {
+    .legalText {
+        font-size: 16px;
+    }
+
+    .iconsContainer {
+        justify-content: start;
+        margin-right: auto;
+    }
+}
+
+@media (min-width: 1440px) {
+.container {
+    max-width: 1238px;
+    width: 100%;
+    place-self: center;
+    padding: 40px 0;
+}
+}
+
+
+

@@ -19,16 +19,28 @@ import useMoonToast from "../../hooks/useMoonToast";
 import CreateNewCharacter from "./CreateNewCharacter";
 import queryCacheProps from "../../hooks/hookCommon";
 import CharacterCard from "./CharacterCard";
-import { getTokenMetadata } from "../../utils/decoders";
-import { OwnedToken, Session, Token } from "../../types";
+import { OwnedToken, Session } from "../../types";
 
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
-import { signSession } from "../../utils/signSession";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
+import {
+  fetchOwnedBLBTokens,
+  joinSessionBLB,
+  mintBLBToken,
+  startSessionBLB,
+  unstakeBLBToken,
+} from "../../tokenInterfaces/BLBTokenAPI";
+import {
+  fetchFullcountPlayerTokens,
+  joinSessionFullcountPlayer,
+  mintFullcountPlayerToken,
+  startSessionFullcountPlayer,
+  unstakeFullcountPlayer,
+} from "../../tokenInterfaces/FullcountPlayerAPI";
+import useUser from "../../contexts/UserContext";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
@@ -38,9 +50,9 @@ const assets = FULLCOUNT_ASSETS_PATH;
 const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   const web3ctx = useContext(Web3Context);
   const {
-    tokensCache,
     tokenAddress,
     contractAddress,
+    sessions,
     selectedToken,
     updateContext,
     invitedTo,
@@ -54,18 +66,19 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   tokenContract.options.address = tokenAddress;
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI);
   gameContract.options.address = contractAddress;
+  const { user } = useUser();
 
   const mintToken = useMutation(
-    async ({ name, imageIndex }: { name: string; imageIndex: number }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    async ({ name, imageIndex, source }: { name: string; imageIndex: number; source: string }) => {
+      console.log(imageIndex);
+      switch (source) {
+        case "BLBContract":
+          return mintBLBToken({ web3ctx, name, imageIndex });
+        case "FullcountPlayerAPI":
+          return mintFullcountPlayerToken({ name, imageIndex });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        tokenContract.methods.mint(name, imageIndex),
-      );
     },
     {
       onSuccess: () => {
@@ -79,49 +92,18 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   const ownedTokens = useQuery<OwnedToken[]>(
-    ["owned_tokens"],
+    ["owned_tokens", web3ctx.account, user],
     async () => {
-      const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
-      const tokens: OwnedToken[] = [];
-      for (let i = 0; i < balanceOf; i++) {
-        const tokenId = await tokenContract.methods.tokenOfOwnerByIndex(web3ctx.account, i).call();
-        const stakedSessionID = Number(
-          await gameContract.methods.StakedSession(tokenContract.options.address, tokenId).call(),
-        );
-        const tokenProgress = Number(
-          await gameContract.methods.sessionProgress(stakedSessionID).call(),
-        );
-        const isStaked = stakedSessionID !== 0;
-        const tokenFromCache = tokensCache.find(
-          (t) => t.id === tokenId && t.address === tokenContract.options.address,
-        );
-        if (!tokenFromCache) {
-          const URI = await tokenContract.methods.tokenURI(tokenId).call();
-          let tokenMetadata = { name: "", image: "" };
-          try {
-            tokenMetadata = await getTokenMetadata(URI);
-            tokens.push({
-              id: tokenId,
-              name: tokenMetadata.name.split(` - ${tokenId}`)[0],
-              image: tokenMetadata.image,
-              address: tokenContract.options.address,
-              staker: web3ctx.account,
-              isStaked,
-              stakedSessionID,
-              tokenProgress,
-            });
-          } catch (e) {
-            console.log(e);
-          }
-        } else {
-          tokens.push({ ...tokenFromCache, isStaked, stakedSessionID, tokenProgress });
-        }
-      }
-      return tokens;
+      console.log("FETCHING TOKENS");
+      const BLBTokens = user ? [] : await fetchOwnedBLBTokens({ web3ctx });
+      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
+      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
+      updateContext({ ownedTokens: [...ownedTokens] });
+      return ownedTokens;
     },
     {
       ...queryCacheProps,
-      refetchInterval: 5000,
+      refetchInterval: 3000,
     },
   );
 
@@ -132,32 +114,23 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       requireSignature,
     }: {
       role: number;
-      token: Token;
+      token: OwnedToken;
       requireSignature: boolean;
-    }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    }): Promise<{ sessionID: string; sign: string | undefined }> => {
+      switch (token.source) {
+        case "BLBContract":
+          return startSessionBLB({ web3ctx, token, role, requireSignature });
+        case "FullcountPlayerAPI":
+          return startSessionFullcountPlayer({ token, roleNumber: role, requireSignature });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.startAtBat(tokenAddress, token.id, role, requireSignature),
-      );
     },
     {
-      onSuccess: async (data, variables) => {
-        if (variables.requireSignature) {
-          const sign = await signSession(
-            web3ctx.account,
-            window.ethereum,
-            Number(data.events.SessionStarted.returnValues.sessionID),
-          );
-          const inviteCodeKey = getLocalStorageInviteCodeKey(
-            contractAddress,
-            data.events.SessionStarted.returnValues.sessionID,
-          );
-          setLocalStorageItem(inviteCodeKey, sign);
+      onSuccess: async (data: { sessionID: string; sign: string | undefined }, variables) => {
+        if (data.sign) {
+          const inviteCodeKey = getLocalStorageInviteCodeKey(contractAddress, data.sessionID);
+          setLocalStorageItem(inviteCodeKey, data.sign);
         }
         queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           const newSession: Session = {
@@ -165,7 +138,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
             batterLeftSession: false,
             pitcherLeftSession: false,
             progress: 2,
-            sessionID: Number(data.events.SessionStarted.returnValues.sessionID),
+            sessionID: Number(data.sessionID),
             pair: {
               batter: variables.role === 0 ? undefined : variables.token,
               pitcher: variables.role === 1 ? undefined : variables.token,
@@ -184,22 +157,25 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return oldData ? [...oldData, newSession] : [newSession];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: Number(data.events.SessionStarted.returnValues.sessionID),
-                tokenProgress: 2,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: Number(data.sessionID),
+                  tokenProgress: 2,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Start failed" + e?.message, "error");
@@ -214,23 +190,17 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       inviteCode,
     }: {
       sessionID: number;
-      token: Token;
+      token: OwnedToken;
       inviteCode: string;
-    }) => {
-      if (!web3ctx.account) {
-        return new Promise((_, reject) => {
-          reject(new Error(`Account address isn't set`));
-        });
+    }): Promise<unknown> => {
+      switch (token.source) {
+        case "BLBContract":
+          return joinSessionBLB({ web3ctx, token, sessionID, inviteCode });
+        case "FullcountPlayerAPI":
+          return joinSessionFullcountPlayer({ token, sessionID, inviteCode });
+        default:
+          return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
-      return sendTransactionWithEstimate(
-        web3ctx.account,
-        gameContract.methods.joinSession(
-          sessionID,
-          tokenAddress,
-          token.id,
-          inviteCode ? inviteCode : "0x",
-        ),
-      );
     },
     {
       onSuccess: async (data, variables) => {
@@ -257,22 +227,25 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
           return newSessions ?? [];
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: variables.sessionID,
-                tokenProgress: 3,
-              };
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            if (!oldData) {
+              return [];
             }
-            return t;
-          });
-        });
+            return oldData.map((t) => {
+              if (t.address === variables.token.address && t.id === variables.token.id) {
+                return {
+                  ...t,
+                  isStaked: true,
+                  stakedSessionID: variables.sessionID,
+                  tokenProgress: 3,
+                };
+              }
+              return t;
+            });
+          },
+        );
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
@@ -282,17 +255,15 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
 
   const unstakeNFT = useMutation(
     async (token: OwnedToken) => {
-      if (token.tokenProgress === 2 && token.stakedSessionID) {
-        return sendTransactionWithEstimate(
-          web3ctx.account,
-          gameContract.methods.abortSession(token.stakedSessionID),
-        );
-      }
-      if (token.tokenProgress === 5 || token.tokenProgress === 6) {
-        return sendTransactionWithEstimate(
-          web3ctx.account,
-          gameContract.methods.unstakeNFT(token.address, token.id),
-        );
+      switch (token.source) {
+        case "BLBContract":
+          return unstakeBLBToken({ web3ctx, token });
+        case "FullcountPlayerAPI":
+          return unstakeFullcountPlayer({ token });
+        default:
+          return Promise.reject(
+            new Error(`Unknown or unsupported token source for unstaking: ${token.source}`),
+          );
       }
     },
     {
@@ -321,15 +292,18 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           });
           return newSessions;
         });
-        queryClient.setQueryData(["owned_tokens"], (oldData: OwnedToken[] | undefined) => {
-          const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
-          if (!oldData) {
-            return [newToken];
-          }
-          return oldData.map((t: OwnedToken) =>
-            t.address === variables.address && t.id === variables.id ? newToken : t,
-          );
-        });
+        queryClient.setQueryData(
+          ["owned_tokens", web3ctx.account, user],
+          (oldData: OwnedToken[] | undefined) => {
+            const newToken = { ...variables, isStaked: false, stakedSessionID: 0 };
+            if (!oldData) {
+              return [newToken];
+            }
+            return oldData.map((t: OwnedToken) =>
+              t.address === variables.address && t.id === variables.id ? newToken : t,
+            );
+          },
+        );
       },
       onError: (e: Error) => {
         console.log(e);
@@ -349,7 +323,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   return (
     <>
       <Flex gap={"15px"}>
-        {ownedTokens.data && ownedTokens.data.length < 1 && (
+        {(user || web3ctx.account) && ownedTokens.data && ownedTokens.data.length < 1 && (
           <>
             <Flex
               w={"137px"}
@@ -478,6 +452,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         {selectedToken && selectedToken.isStaked && (
           <Flex direction={"column"} minH={"229px"} minW={"139px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
+
             {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
               <button
                 className={globalStyles.button}
@@ -541,9 +516,9 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       <CreateNewCharacter
         isOpen={isOpen}
         onClose={onClose}
-        onSave={(name, imageIndex) => {
+        onSave={(name, imageIndex, source) => {
           onClose();
-          mintToken.mutate({ name, imageIndex });
+          mintToken.mutate({ name, imageIndex, source });
         }}
       />
     </>
