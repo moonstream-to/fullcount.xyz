@@ -271,6 +271,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   useEffect(() => {
     console.log("sessionStatus.data useEffect:", sessionStatus.data);
     atBatStatus.refetch();
+
+    //this happens after joining sessions sometimes. Sepolia maybe will solve this
+    if (sessionStatus.data?.progress === 6) {
+      queryClient.invalidateQueries("owned_tokens");
+      updateContext({ selectedSession: undefined });
+    }
   }, [sessionStatus.data]);
 
   const numberToOrdinal = (n: number): string => {

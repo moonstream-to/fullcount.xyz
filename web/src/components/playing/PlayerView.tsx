@@ -11,6 +11,7 @@ import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStora
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
 import AnimatedMessage from "../AnimatedMessage";
+import { OwnedToken } from "../../types";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -22,6 +23,7 @@ const PlayerView = ({
   revealMutation,
   isCommitted,
   isRevealed,
+  token,
 }: {
   sessionStatus: SessionStatus;
   isPitcher: boolean;
@@ -29,6 +31,7 @@ const PlayerView = ({
   revealMutation: any;
   isCommitted: boolean;
   isRevealed: boolean;
+  token: OwnedToken;
 }) => {
   const [actionChoice, setActionChoice] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
@@ -108,11 +111,11 @@ const PlayerView = ({
     }
   }, [sessionStatus.sessionID]);
 
-  // useEffect(() => {
-  //   if (sessionStatus.progress === 4 && !isRevealed) {
-  //     handleReveal();
-  //   }
-  // }, [sessionStatus.progress, isRevealed]);
+  useEffect(() => {
+    if (token.source === "FullcountPlayerAPI" && sessionStatus.progress === 4 && !isRevealed) {
+      handleReveal();
+    }
+  }, [sessionStatus.progress, isRevealed, token.source]);
 
   return (
     <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
@@ -139,12 +142,17 @@ const PlayerView = ({
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
       )}
-      {sessionStatus.didBatterCommit && sessionStatus.didPitcherCommit && !isRevealed && (
-        <button className={globalStyles.mobileButton} onClick={handleReveal}>
-          {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
-        </button>
+      {token.source === "BLBContract" &&
+        sessionStatus.didBatterCommit &&
+        sessionStatus.didPitcherCommit &&
+        !isRevealed && (
+          <button className={globalStyles.mobileButton} onClick={handleReveal}>
+            {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+          </button>
+        )}
+      {token.source !== "BLBContract" && revealMutation.isLoading && (
+        <AnimatedMessage message={"Revealing..."} />
       )}
-      {/*{revealMutation.isLoading && <AnimatedMessage message={"Revealing..."} />}*/}
       {isCommitted &&
         ((!isPitcher && !sessionStatus.didPitcherCommit) ||
           (isPitcher && !sessionStatus.didBatterCommit)) && (
