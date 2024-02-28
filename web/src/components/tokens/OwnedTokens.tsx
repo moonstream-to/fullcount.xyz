@@ -453,7 +453,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           <Flex direction={"column"} minH={"229px"} minW={"139px"}>
             <CharacterCard token={selectedToken} isActive={false} placeSelf={"start"} />
 
-            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 ? (
+            {selectedToken.tokenProgress !== 3 && selectedToken.tokenProgress !== 4 && (
               <button
                 className={globalStyles.button}
                 onClick={() => unstakeNFT.mutate(selectedToken)}
@@ -463,19 +463,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                 ) : (
                   "unstake"
                 )}
-              </button>
-            ) : (
-              <button
-                className={globalStyles.button}
-                onClick={() => {
-                  updateContext({
-                    selectedSession: sessions?.find(
-                      (s) => s.sessionID === Number(selectedToken?.stakedSessionID),
-                    ),
-                  });
-                }}
-              >
-                go
               </button>
             )}
           </Flex>
