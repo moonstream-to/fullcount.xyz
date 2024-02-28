@@ -323,7 +323,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   return (
     <>
       <Flex gap={"15px"}>
-        {ownedTokens.data && ownedTokens.data.length < 1 && (
+        {(user || web3ctx.account) && ownedTokens.data && ownedTokens.data.length < 1 && (
           <>
             <Flex
               w={"137px"}
