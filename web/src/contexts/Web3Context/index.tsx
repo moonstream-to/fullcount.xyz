@@ -162,7 +162,6 @@ const Web3Provider = ({ children }: { children: JSX.Element }) => {
   const rpc = getFirstRpcUrl(CHAIN_ID) ?? null;
   const [web3] = React.useState<Web3>(new Web3(rpc));
 
-
   const [polygonClient] = React.useState<Web3>(
     new Web3(new Web3.providers.HttpProvider("https://polygon-rpc.com")),
   );
