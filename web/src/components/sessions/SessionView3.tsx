@@ -253,7 +253,7 @@ const SessionView3 = ({ session }: { session: Session }) => {
           </Flex>
         ) : (
           <>
-            {session.progress === 2 && !session.requiresSignature && (
+            {session.progress === 2 && !session.requiresSignature && (user || web3ctx.account) && (
               <button className={globalStyles.joinButton} onClick={handleClick}>
                 {joinSession.isLoading ? <Spinner /> : "join as batter"}
               </button>
