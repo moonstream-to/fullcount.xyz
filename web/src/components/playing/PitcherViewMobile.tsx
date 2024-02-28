@@ -8,11 +8,10 @@ import { SessionStatus } from "./PlayView";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 
-import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import PlayerView from "./PlayerView";
 import { commitPitchBLBToken, revealPitchBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
 import { commitOrRevealPitchFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
-import { OwnedToken, Token } from "../../types";
+import { OwnedToken } from "../../types";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherViewMobile = ({
@@ -122,6 +121,7 @@ const PitcherViewMobile = ({
 
   return (
     <PlayerView
+      token={token}
       sessionStatus={sessionStatus}
       isPitcher={true}
       commitMutation={commitPitch}

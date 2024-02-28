@@ -120,6 +120,7 @@ const BatterViewMobile = ({
 
   return (
     <PlayerView
+      token={token}
       sessionStatus={sessionStatus}
       isPitcher={false}
       commitMutation={commitSwing}
