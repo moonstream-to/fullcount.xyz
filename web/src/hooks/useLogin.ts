@@ -17,7 +17,6 @@ const useLogin = () => {
         return;
       }
       localStorage.setItem("FULLCOUNT_ACCESS_TOKEN", data.data.id);
-      console.log(data);
       getUser(data.data.user_id);
     },
     onError: (error: any) => {

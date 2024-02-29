@@ -1,8 +1,9 @@
 import { OwnedToken, Token } from "../types";
-import { FULLCOUNT_PLAYER_API, GAME_CONTRACT } from "../constants";
+import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
 import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
+import Web3 from "web3";
 
 export async function fetchFullcountPlayerTokens({
   web3ctx,
@@ -29,7 +30,7 @@ export async function fetchFullcountPlayerTokens({
       tokensSource: "FullcountPlayerAPI",
     });
   } catch (e) {
-    console.log("Error catching FullcountPlayer tokens\n", e);
+    console.log("Error fetching FullcountPlayer tokens\n", e);
     return [];
   }
 }
@@ -54,17 +55,24 @@ export async function startSessionFullcountPlayer({
 
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
-export async function joinSessionFullcountPlayer({
+export const checkTransaction = async (transactionHash: string) => {
+  const web3 = new Web3(RPC);
+  const receipt = await web3.eth.getTransactionReceipt(transactionHash);
+  return receipt && receipt.status;
+};
+
+export function joinSessionFullcountPlayer({
   token,
   sessionID,
   inviteCode,
@@ -84,12 +92,13 @@ export async function joinSessionFullcountPlayer({
 
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/join`, postData, { headers })
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
 }
 
@@ -107,12 +116,13 @@ export const unstakeFullcountPlayer = ({ token }: { token: OwnedToken }) => {
       postData,
       { headers },
     )
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
 };
 
@@ -145,12 +155,13 @@ export const commitOrRevealPitchFullcountPlayer = ({
     .post(`${FULLCOUNT_PLAYER_API}/game/pitch/${isCommit ? "commit" : "reveal"}`, postData, {
       headers,
     })
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
 };
 
@@ -179,12 +190,13 @@ export const commitOrRevealSwingFullcountPlayer = ({
     .post(`${FULLCOUNT_PLAYER_API}/game/swing/${isCommit ? "commit" : "reveal"}`, postData, {
       headers,
     })
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
 };
 
@@ -204,12 +216,13 @@ export const mintFullcountPlayerToken = ({
     .post(`${FULLCOUNT_PLAYER_API}/mintblb`, postData, {
       headers,
     })
-    .then((response) => {
+    .then(async (response) => {
+      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
+      if (!isTransactionMinted) {
+        throw new Error("Transaction failed. Try again, please");
+      }
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((error) => {
-      console.error("Error:", error);
     });
 };
 

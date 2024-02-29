@@ -24,6 +24,7 @@ const PlayerView = ({
   isCommitted,
   isRevealed,
   token,
+  isRevealFailed,
 }: {
   sessionStatus: SessionStatus;
   isPitcher: boolean;
@@ -32,6 +33,7 @@ const PlayerView = ({
   isCommitted: boolean;
   isRevealed: boolean;
   token: OwnedToken;
+  isRevealFailed: boolean;
 }) => {
   const [actionChoice, setActionChoice] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
@@ -142,7 +144,7 @@ const PlayerView = ({
           {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
         </button>
       )}
-      {token.source === "BLBContract" &&
+      {(token.source === "BLBContract" || isRevealFailed) &&
         sessionStatus.didBatterCommit &&
         sessionStatus.didPitcherCommit &&
         !isRevealed && (

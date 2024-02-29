@@ -86,7 +86,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       },
       onError: (e: Error) => {
         console.log(e);
-        toast("Minting failed.", "error");
+        toast("Minting failed: " + e?.message, "error");
       },
     },
   );
@@ -178,7 +178,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         );
       },
       onError: (e: Error) => {
-        toast("Start failed" + e?.message, "error");
+        toast("Start failed: " + e?.message, "error");
       },
     },
   );
@@ -307,7 +307,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
       },
       onError: (e: Error) => {
         console.log(e);
-        toast("Unstake failed", "error");
+        toast("Unstake failed: " + e?.message, "error");
       },
     },
   );

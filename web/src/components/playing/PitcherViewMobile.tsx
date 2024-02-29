@@ -22,7 +22,8 @@ const PitcherViewMobile = ({
   token: OwnedToken;
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(sessionStatus.didPitcherReveal);
+  const [isRevealFailed, setIsRevealFailed] = useState(false);
   const web3ctx = useContext(Web3Context);
   const { contractAddress } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -78,6 +79,7 @@ const PitcherViewMobile = ({
       vertical: number;
       horizontal: number;
     }) => {
+      setIsRevealFailed(false);
       switch (token.source) {
         case "BLBContract":
           return revealPitchBLBToken({
@@ -105,7 +107,8 @@ const PitcherViewMobile = ({
         queryClient.refetchQueries("session");
       },
       onError: (e: Error) => {
-        toast("Reveal failed." + e?.message, "error");
+        setIsRevealFailed(true);
+        toast("Reveal failed: " + e?.message, "error");
       },
     },
   );
@@ -128,6 +131,7 @@ const PitcherViewMobile = ({
       revealMutation={revealPitch}
       isCommitted={isCommitted}
       isRevealed={isRevealed}
+      isRevealFailed={isRevealFailed}
     />
   );
 };
