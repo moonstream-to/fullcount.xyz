@@ -69,3 +69,4 @@ export const GAME_CONTRACT = "0x3a1Ad54d12b1f39805Ea77aFe7DeeFf2F32C97f5"; //TOD
 export const TOKEN_CONTRACT = "0x0b9299858d7E5d20c54629587D960b634A96D823"; //TODO env
 // export const CHAIN_ID = 322; //TODO env
 export const CHAIN_ID = 421614;
+export const RPC = "https://sepolia-rollup.arbitrum.io/rpc";
