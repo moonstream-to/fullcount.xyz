@@ -23,6 +23,8 @@ const BatterViewMobile = ({
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealFailed, setIsRevealFailed] = useState(false);
+
   const web3ctx = useContext(Web3Context);
   const { contractAddress } = useGameContext();
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
@@ -78,6 +80,7 @@ const BatterViewMobile = ({
       vertical: number;
       horizontal: number;
     }) => {
+      setIsRevealFailed(false);
       switch (token.source) {
         case "BLBContract":
           return revealSwingBLBToken({
@@ -105,7 +108,8 @@ const BatterViewMobile = ({
         queryClient.refetchQueries("session");
       },
       onError: (e: Error) => {
-        toast("Reveal failed." + e?.message, "error");
+        setIsRevealFailed(true);
+        toast("Reveal failed: " + e?.message, "error");
       },
     },
   );
@@ -127,6 +131,7 @@ const BatterViewMobile = ({
       revealMutation={revealSwing}
       isCommitted={isCommitted}
       isRevealed={isRevealed}
+      isRevealFailed={isRevealFailed}
     />
   );
 };
