@@ -74,7 +74,9 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
   const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
-  const isPitcher = (token?: Token) => selectedSession?.pair.pitcher?.id === token?.id;
+  const isPitcher = (token?: Token) =>
+    selectedSession?.pair.pitcher?.id === token?.id &&
+    selectedSession?.pair.pitcher?.address === token?.address;
   const [opponent, setOpponent] = useState<Token | undefined>(undefined);
   const [gameOver, setGameOver] = useState(false);
 
@@ -185,7 +187,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         batterAddress === selectedToken.address && batterTokenID === selectedToken.id
           ? { address: pitcherAddress, id: pitcherTokenID }
           : { address: batterAddress, id: batterTokenID };
-
       if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
         tokenContract.options.address = otherToken.address;
         const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
@@ -271,12 +272,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   useEffect(() => {
     console.log("sessionStatus.data useEffect:", sessionStatus.data);
     atBatStatus.refetch();
-
-    //this happens after joining sessions sometimes. Sepolia maybe will solve this
-    if (sessionStatus.data?.progress === 6) {
-      queryClient.invalidateQueries("owned_tokens");
-      updateContext({ selectedSession: undefined });
-    }
   }, [sessionStatus.data]);
 
   const numberToOrdinal = (n: number): string => {
