@@ -22,7 +22,7 @@ const BatterViewMobile = ({
   token: OwnedToken;
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(sessionStatus.didBatterReveal);
   const [isRevealFailed, setIsRevealFailed] = useState(false);
 
   const web3ctx = useContext(Web3Context);

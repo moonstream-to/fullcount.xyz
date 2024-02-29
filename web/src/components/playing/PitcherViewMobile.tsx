@@ -22,7 +22,7 @@ const PitcherViewMobile = ({
   token: OwnedToken;
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(sessionStatus.didPitcherReveal);
   const [isRevealFailed, setIsRevealFailed] = useState(false);
   const web3ctx = useContext(Web3Context);
   const { contractAddress } = useGameContext();
