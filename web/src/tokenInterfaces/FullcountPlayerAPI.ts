@@ -66,10 +66,22 @@ export async function startSessionFullcountPlayer({
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
+const delay = (delayInms: number) => {
+  return new Promise((resolve) => setTimeout(resolve, delayInms));
+};
+
+const getTransaction = async (transactionHash: string) => {
+  for (let attempt = 1; attempt <= 10; attempt++) {
+    const web3 = new Web3(RPC);
+    const transaction = await web3.eth.getTransaction(transactionHash);
+    if (transaction) return transaction;
+    await delay(2 * 1000);
+  }
+  throw new Error(`Failed to receive transaction from getTransaction("${transactionHash}")`);
+};
+
 export const checkTransaction = async (transactionHash: string) => {
-  const web3 = new Web3(RPC);
-  const receipt = await web3.eth.getTransactionReceipt(transactionHash);
-  return receipt && receipt.status;
+  return await getTransaction(transactionHash);
 };
 
 export function joinSessionFullcountPlayer({
