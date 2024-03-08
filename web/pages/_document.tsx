@@ -8,6 +8,13 @@ export default function Document() {
           name="robots"
           content={process.env.NEXT_PUBLIC_BUILD_TARGET == "alpha" ? "noindex" : "all"}
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={"anonymous"} />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Bangers&family=Pangolin&display=swap"
+          rel="stylesheet"
+        />
+
         <link href="https://fonts.googleapis.com/css?family=Space Grotesk" rel="stylesheet" />
         <link
           rel="stylesheet"
