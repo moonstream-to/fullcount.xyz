@@ -1,4 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
+import { FULLCOUNT_ASSETS_PATH } from "../src/constants";
 
 export default function Document() {
   return (
@@ -8,6 +9,8 @@ export default function Document() {
           name="robots"
           content={process.env.NEXT_PUBLIC_BUILD_TARGET == "alpha" ? "noindex" : "all"}
         />
+        <link rel="prefetch" href={`${FULLCOUNT_ASSETS_PATH}/bi-banner.png`} as="image" />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin={"anonymous"} />
         <link
