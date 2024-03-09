@@ -9,6 +9,7 @@ const useLogin = () => {
   const {
     mutate: login,
     isLoading,
+    isSuccess,
     error,
     data,
   } = useMutation(loginService, {
@@ -29,6 +30,7 @@ const useLogin = () => {
   return {
     login,
     isLoading,
+    isSuccess,
     data,
     error,
   };
