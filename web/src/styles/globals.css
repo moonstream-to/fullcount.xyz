@@ -73,19 +73,33 @@ input:-moz-placeholder { /* Firefox 18- */
 
 .inputError {
   border-color: darkred;
+  transition: all 0.5s ease-out;
+}
+
+.inputError:focus-visible {
+  border-color: darkred;
+  outline: none;
 }
 
 .inputError::-webkit-input-placeholder {
   color: darkred;
+  transition: all 0.5s ease-out;
+
 }
 .inputError::-moz-placeholder {
   color: darkred;
+  transition: all 1s ease-out;
+
 }
 .inputError:-ms-input-placeholder {
   color: darkred;
+  transition: all 1s ease-out;
+
 }
 .inputError:-moz-placeholder {
   color: darkred;
+  transition: all 1s ease-out;
+
 }
 
 @media (prefers-color-scheme: dark) {
