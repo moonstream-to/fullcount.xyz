@@ -11,7 +11,7 @@ import LoginForm from "./account/LoginForm";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
 const TitleScreen = () => {
   const { user } = useUser();
-  const [isLogging, setIsLogging] = useState(false); // login or signUp
+  const [isLogging, setIsLogging] = useState(true); // login or signUp
   const [isSuccess, setIsSuccess] = useState(false);
 
   return (
