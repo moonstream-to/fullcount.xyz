@@ -11,7 +11,7 @@ input {
   border: 1px solid #4D4D4D;
   background: #FCECD9;
   color: #262019;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -28,7 +28,7 @@ input:focus-visible {
 
 input::placeholder {
   color: #7E8E7F;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -37,7 +37,7 @@ input::placeholder {
 
 input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
   color: #7E8E7F;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -46,7 +46,7 @@ input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 
   input::-moz-placeholder { /* Firefox 19+ */
   color: #7E8E7F;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -55,7 +55,7 @@ input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
 
 input:-ms-input-placeholder { /* IE 10+ */
   color: #7E8E7F;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
@@ -64,7 +64,7 @@ input:-ms-input-placeholder { /* IE 10+ */
 
 input:-moz-placeholder { /* Firefox 18- */
   color: #7E8E7F;
-  font-family: 'Pangolin', sans-serif;
+  font-family: 'Pangolin', cursive;
   font-size: 16px;
   font-style: normal;
   font-weight: 400;
