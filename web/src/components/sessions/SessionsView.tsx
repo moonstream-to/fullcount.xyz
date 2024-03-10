@@ -13,10 +13,16 @@ import InviteView from "./InviteView";
 import OwnedTokens from "../tokens/OwnedTokens";
 
 import styles from "./SessionsView.module.css";
-import { FullcountContractSession, Session, Token } from "../../types";
+import { FullcountContractSession, OwnedToken, Session, Token } from "../../types";
 
 import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
 import { getContracts } from "../../utils/getWeb3Contracts";
+import Image from "next/image";
+import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { fetchOwnedBLBTokens } from "../../tokenInterfaces/BLBTokenAPI";
+import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
+import queryCacheProps from "../../hooks/hookCommon";
+import useUser from "../../contexts/UserContext";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -29,6 +35,7 @@ const SessionsView = () => {
 
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = useUser();
 
   useEffect(() => {
     if (router.query.invitedBy && router.query.session) {
@@ -237,31 +244,57 @@ const SessionsView = () => {
     return Array.from(uniqueAtBatIDArray.values());
   };
 
-  return (
-    <Flex className={styles.container}>
-      <Flex gap={"20px"} alignItems={"start"}>
-        <InviteView isOpen={isOpen} onClose={onClose} />
-        <Flex gap={"30px"}>
-          <OwnedTokens />
-        </Flex>
-      </Flex>
+  const ownedTokens = useQuery<OwnedToken[]>(
+    ["owned_tokens", web3ctx.account, user],
+    async () => {
+      console.log("FETCHING TOKENS");
+      const BLBTokens = user ? [] : await fetchOwnedBLBTokens({ web3ctx });
+      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
+      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
+      updateContext({ ownedTokens: [...ownedTokens] });
+      return ownedTokens;
+    },
+    {
+      ...queryCacheProps,
+      refetchInterval: 3000,
+    },
+  );
 
-      <FiltersView2 />
-      {sessions.data && (
-        <Flex direction={"column"} gap={"10px"} w={"100%"}>
-          {sessions.data.map((session, idx) => (
-            <Fragment key={idx}>
-              {progressFilter[session.progress] && (
-                <>
-                  <SessionView3 session={session} />
-                  {idx + 1 < sessions.data.length && <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />}
-                </>
-              )}
-            </Fragment>
-          ))}
+  return (
+    <>
+      {!ownedTokens.data ? (
+        <div className={styles.suspend}></div>
+      ) : (
+        <Flex className={styles.container}>
+          {ownedTokens.data && (
+            <Flex gap={"20px"} alignItems={"start"}>
+              <InviteView isOpen={isOpen} onClose={onClose} />
+              <Flex gap={"30px"}>
+                <OwnedTokens ownedTokens={ownedTokens.data} />
+              </Flex>
+            </Flex>
+          )}
+
+          <FiltersView2 />
+          {sessions.data && (
+            <Flex direction={"column"} gap={"10px"} w={"100%"}>
+              {sessions.data.map((session, idx) => (
+                <Fragment key={idx}>
+                  {progressFilter[session.progress] && (
+                    <>
+                      <SessionView3 session={session} />
+                      {idx + 1 < sessions.data.length && (
+                        <Box w={"100%"} h={"0.5px"} bg={"#BFBFBF"} />
+                      )}
+                    </>
+                  )}
+                </Fragment>
+              ))}
+            </Flex>
+          )}
         </Flex>
       )}
-    </Flex>
+    </>
   );
 };
 
