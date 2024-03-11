@@ -17,25 +17,19 @@ import { FullcountContractSession, OwnedToken, Session, Token } from "../../type
 
 import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
 import { getContracts } from "../../utils/getWeb3Contracts";
-import Image from "next/image";
-import { FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { fetchOwnedBLBTokens } from "../../tokenInterfaces/BLBTokenAPI";
-import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
-import queryCacheProps from "../../hooks/hookCommon";
 import useUser from "../../contexts/UserContext";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-const SessionsView = () => {
+const SessionsView = ({ ownedTokens }: { ownedTokens: OwnedToken[] }) => {
   const { updateContext, contractAddress, progressFilter, tokensCache, sessionOffset } =
     useGameContext();
   const web3ctx = useContext(Web3Context);
 
-  const { gameContract, tokenContract, multicallContract } = getContracts(web3ctx);
+  const { gameContract, tokenContract, multicallContract } = getContracts();
 
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user } = useUser();
 
   useEffect(() => {
     if (router.query.invitedBy && router.query.session) {
@@ -244,33 +238,17 @@ const SessionsView = () => {
     return Array.from(uniqueAtBatIDArray.values());
   };
 
-  const ownedTokens = useQuery<OwnedToken[]>(
-    ["owned_tokens", web3ctx.account, user],
-    async () => {
-      console.log("FETCHING TOKENS");
-      const BLBTokens = user ? [] : await fetchOwnedBLBTokens({ web3ctx });
-      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
-      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
-      updateContext({ ownedTokens: [...ownedTokens] });
-      return ownedTokens;
-    },
-    {
-      ...queryCacheProps,
-      refetchInterval: 3000,
-    },
-  );
-
   return (
     <>
-      {!ownedTokens.data ? (
+      {!ownedTokens ? (
         <div className={styles.suspend}></div>
       ) : (
         <Flex className={styles.container}>
-          {ownedTokens.data && (
+          {ownedTokens && (
             <Flex gap={"20px"} alignItems={"start"}>
               <InviteView isOpen={isOpen} onClose={onClose} />
               <Flex gap={"30px"}>
-                <OwnedTokens ownedTokens={ownedTokens.data} />
+                <OwnedTokens ownedTokens={ownedTokens} />
               </Flex>
             </Flex>
           )}
