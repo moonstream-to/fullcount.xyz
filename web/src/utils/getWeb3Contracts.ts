@@ -18,8 +18,8 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const TokenABI = TokenABIImported as unknown as AbiItem[];
 const MulticallABI = MulticallABIImported as unknown as AbiItem[];
 
-export const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {
-  const { web3 } = web3ctx;
+export const getContracts = () => {
+  const web3 = new Web3(RPC);
   const gameContract = new web3.eth.Contract(FullcountABI) as unknown as FullcountContract;
   gameContract.options.address = GAME_CONTRACT;
   const tokenContract = new web3.eth.Contract(TokenABI);
@@ -34,7 +34,7 @@ export const getContracts = (web3ctx: MoonstreamWeb3ProviderInterface) => {
   return { gameContract, tokenContract, multicallContract };
 };
 
-export const getMulticallContract = (web3ctx: MoonstreamWeb3ProviderInterface) => {
+export const getMulticallContract = () => {
   const web3 = new Web3(RPC);
   const MULTICALL2_CONTRACT_ADDRESS =
     MULTICALL2_CONTRACT_ADDRESSES[String(CHAIN_ID) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES];

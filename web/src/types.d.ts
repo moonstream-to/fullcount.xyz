@@ -61,7 +61,7 @@ interface Token {
   id: string;
   name: string;
   image: string;
-  staker: string;
+  staker?: string;
   source?: TokenSource;
 }
 

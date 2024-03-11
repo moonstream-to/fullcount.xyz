@@ -1,9 +1,9 @@
-import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
+import Web3 from "web3";
+
 import { AbiItem } from "web3-utils";
 import { getMulticallContract } from "./getWeb3Contracts";
 
 export async function getMulticallResults(
-  web3ctx: MoonstreamWeb3ProviderInterface,
   ABI: AbiItem[],
   functionNames: string[],
   queries: { target: string; callData: string }[],
@@ -16,10 +16,11 @@ export async function getMulticallResults(
     return result;
   }
 
-  const multicallContract = getMulticallContract(web3ctx);
+  const multicallContract = getMulticallContract();
   const result = [];
   const response = await multicallContract.methods.tryAggregate(false, queries).call();
   const splitResponses = splitArray(response, functionNames.length);
+  const web3 = new Web3();
 
   for (let i = 0; i < functionNames.length; i++) {
     const functionName = functionNames[i];
@@ -33,7 +34,7 @@ export async function getMulticallResults(
       if (result === undefined) {
         return undefined;
       }
-      const decoded = web3ctx.web3.eth.abi.decodeParameters(outputs, result);
+      const decoded = web3.eth.abi.decodeParameters(outputs, result);
       if (outputs.length === 1 && outputs[0].type !== "tuple") {
         // If the output is a primitive type, return the primitive value
         return decoded[Object.keys(decoded)[0]]; // Extract the first (and only) parameter

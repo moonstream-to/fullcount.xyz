@@ -2,14 +2,9 @@ import { OwnedToken, Token } from "../types";
 import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
-import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
 import Web3 from "web3";
 
-export async function fetchFullcountPlayerTokens({
-  web3ctx,
-}: {
-  web3ctx: MoonstreamWeb3ProviderInterface;
-}) {
+export async function fetchFullcountPlayerTokens() {
   try {
     const headers = getHeaders();
     const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
@@ -25,7 +20,6 @@ export async function fetchFullcountPlayerTokens({
     }));
 
     return await getTokensData({
-      web3ctx,
       tokens,
       tokensSource: "FullcountPlayerAPI",
     });
