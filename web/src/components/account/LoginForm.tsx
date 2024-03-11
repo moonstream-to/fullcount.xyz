@@ -38,6 +38,8 @@ const LoginForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => voi
           name="username"
           value={username}
           className={showInvalid && !isUsernameValid ? "inputError" : ""}
+          style={{ marginBottom: "10px" }}
+          spellCheck={false}
           onChange={(event) => {
             setShowInvalid(false);
             setUsername(event.target.value);
@@ -50,6 +52,8 @@ const LoginForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => voi
           value={password}
           name="password"
           className={showInvalid && !isPasswordValid ? "inputError" : ""}
+          style={{ marginBottom: "10px" }}
+          spellCheck={false}
           onChange={(event) => {
             setShowInvalid(false);
             setPassword(event.target.value);

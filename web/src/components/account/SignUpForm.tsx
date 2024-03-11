@@ -41,7 +41,10 @@ const SignUpForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => vo
           value={username}
           className={showErrors && !username ? "inputError" : ""}
           onChange={(event) => setUsername(event.target.value)}
+          style={{ marginBottom: "10px" }}
+          spellCheck={false}
         />
+
         <div className={styles.label}>Email</div>
         <input
           type="text"
@@ -49,7 +52,9 @@ const SignUpForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => vo
           name="email"
           value={email}
           className={showErrors && !email ? "inputError" : ""}
+          style={{ marginBottom: "10px" }}
           onChange={(event) => setEmail(event.target.value)}
+          spellCheck={false}
         />
 
         <div className={styles.label}>Password</div>
@@ -59,7 +64,9 @@ const SignUpForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => vo
           value={password}
           name="password"
           className={showErrors && !password ? "inputError" : ""}
+          style={{ marginBottom: "10px" }}
           onChange={(event) => setPassword(event.target.value)}
+          spellCheck={false}
         />
       </div>
       <button className={styles.button}>
