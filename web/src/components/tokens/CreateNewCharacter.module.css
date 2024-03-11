@@ -62,3 +62,55 @@
 .label {
     margin-bottom: -10px;
 }
+
+.buttonsContainer {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.button, .inactiveButton {
+    display: flex;
+    padding: 4px 19px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border: 1px solid #262019;
+    background: #328449;
+    flex: 1 0 0;
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 1.2px;
+    min-height: 35.5px;
+}
+
+.inactiveButton {
+    background: #4D4D4D;
+}
+
+.cancelButton {
+    display: flex;
+    padding: 5px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    align-self: stretch;
+    border: 1px solid #262019;
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 1.2px;
+}

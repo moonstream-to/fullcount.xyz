@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Flex, Spinner } from "@chakra-ui/react";
 import Image from "next/image";
 
 import styles from "./CreateNewCharacter.module.css";
@@ -14,7 +14,7 @@ for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
   images.push(i);
 }
 
-const CreateCharacterForm = () => {
+const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
   const [name, setName] = useState("");
   const [imageIndex, setImageIndex] = useState(0);
   const source: TokenSource = "FullcountPlayerAPI";
@@ -80,25 +80,33 @@ const CreateCharacterForm = () => {
         <input
           type={"text"}
           id={"name"}
-          // className={styles.input}
           placeholder={"Enter name"}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onKeyDown={handleKeyDown}
+          spellCheck={false}
         />
       </div>
-      <Flex className={styles.buttons}>
-        {/*<button className={styles.cancelButton} onClick={onClose}>*/}
-        {/*  Cancel*/}
-        {/*</button>*/}
+      <div className={styles.buttonsContainer}>
+        {onClose && (
+          <button className={styles.cancelButton} onClick={onClose}>
+            Cancel
+          </button>
+        )}
         <button
           disabled={!name || imageIndex === -1}
-          className={styles.saveButton}
+          className={!name || imageIndex === -1 ? styles.inactiveButton : styles.button}
           onClick={() => mintToken.mutate({ name, imageIndex, source })}
         >
-          Create
+          {mintToken.isLoading ? (
+            <Spinner h={4} w={4} />
+          ) : mintToken.isSuccess ? (
+            <div>Success</div>
+          ) : (
+            <div>Create</div>
+          )}
         </button>
-      </Flex>
+      </div>
     </div>
   );
 };
