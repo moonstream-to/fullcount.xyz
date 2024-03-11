@@ -17,9 +17,7 @@ const TitleScreen = () => {
   return (
     <>
       {user ? (
-        <PlayingLayout>
-          <Playing />
-        </PlayingLayout>
+        <Playing />
       ) : (
         <div className={styles.loginContainer}>
           <Image
