@@ -102,6 +102,18 @@ input:-moz-placeholder { /* Firefox 18- */
 
 }
 
+label {
+  color: #262019;
+  font-family: Pangolin, cursive;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: start;
+  place-self: start;
+  margin-bottom: 5px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
