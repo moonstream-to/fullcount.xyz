@@ -30,7 +30,7 @@ const LoginForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => voi
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
       <div className={`${styles.container} ${isSuccess ? styles.fadeOut : ""}`}>
-        <div className={`${styles.header} ${isSuccess ? styles.fadeOut : ""}`}>Welcome!</div>
+        <div className={`${styles.header} ${isSuccess ? styles.fadeOut : ""}`}>Welcome back!</div>
         <label className={styles.label}>Username</label>
         <input
           type="text"
