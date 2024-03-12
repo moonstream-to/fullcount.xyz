@@ -32,6 +32,9 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
     },
     {
       onSuccess: () => {
+        if (onClose) {
+          onClose();
+        }
         queryClient.invalidateQueries("owned_tokens"); //TODO data update
       },
       onError: (e: Error) => {
