@@ -11,9 +11,18 @@ import { fetchFullcountPlayerTokens } from "../tokenInterfaces/FullcountPlayerAP
 import queryCacheProps from "../hooks/hookCommon";
 import useUser from "../contexts/UserContext";
 import CreateCharacterForm from "./tokens/CreateCharacterForm";
+import PlayingLayout from "./layout/PlayingLayout";
+import ChooseToken from "./tokens/ChooseToken";
 
 const Playing = () => {
-  const { selectedSession, selectedToken, watchingToken, updateContext } = useGameContext();
+  const {
+    selectedSession,
+    selectedToken,
+    watchingToken,
+    updateContext,
+    invitedTo,
+    isCreateCharacter,
+  } = useGameContext();
   const { user } = useUser();
 
   const ownedTokens = useQuery<OwnedToken[]>(
@@ -31,18 +40,38 @@ const Playing = () => {
   );
 
   return (
-    // <Flex className={styles.container}>
     <>
-      {ownedTokens.data && ownedTokens.data.length < 5 && <CreateCharacterForm />}
-      {!selectedSession && ownedTokens.data && ownedTokens.data.length > 4 && (
-        <SessionsView ownedTokens={ownedTokens.data} />
+      {isCreateCharacter && (
+        <CreateCharacterForm onClose={() => updateContext({ isCreateCharacter: false })} />
       )}
+
+      {ownedTokens.data && ownedTokens.data.length < 1 && <CreateCharacterForm />}
+
+      {!selectedSession &&
+        ownedTokens.data &&
+        ownedTokens.data.length >= 1 &&
+        !invitedTo &&
+        !isCreateCharacter && (
+          <PlayingLayout>
+            <SessionsView ownedTokens={ownedTokens.data} />
+          </PlayingLayout>
+        )}
+
+      {invitedTo && ownedTokens.data && !isCreateCharacter && (
+        <ChooseToken
+          tokens={ownedTokens.data}
+          onChoose={(token) => {
+            updateContext({ selectedToken: token, invitedTo: undefined });
+          }}
+          onClose={() => updateContext({ invitedTo: undefined })}
+        />
+      )}
+
       {selectedSession && watchingToken && <PlayView selectedToken={watchingToken} />}
       {selectedSession && !watchingToken && selectedToken && (
         <PlayView selectedToken={selectedToken} />
       )}
     </>
-    // </Flex>
   );
 };
 
