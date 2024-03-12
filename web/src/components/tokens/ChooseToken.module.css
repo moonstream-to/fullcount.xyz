@@ -1,9 +1,9 @@
 .container {
+    flex-direction: column;
     display: flex;
     height: 100vh;
     width: 100vw;
     padding: 20px;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 20px;
@@ -26,6 +26,8 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    flex: 1 0 0;
+    width: 286px;
 }
 
 .title {
@@ -55,6 +57,5 @@
     gap: 15px;
     flex-wrap: wrap;
     overflow-y: auto;
-    height: fit-content;
     max-height: calc(100vh - 221px); /*console.log(20 + 30 + 20 + 25.5 + 15 + 17.5 + 15 + 20 + 37.5 + 20);*/
 }
