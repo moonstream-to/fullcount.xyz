@@ -18,6 +18,7 @@ import { FullcountContractSession, OwnedToken, Session, Token } from "../../type
 import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import useUser from "../../contexts/UserContext";
+import Roster from "../tokens/Roster";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -244,15 +245,7 @@ const SessionsView = ({ ownedTokens }: { ownedTokens: OwnedToken[] }) => {
         <div className={styles.suspend}></div>
       ) : (
         <Flex className={styles.container}>
-          {ownedTokens && (
-            <Flex gap={"20px"} alignItems={"start"}>
-              <InviteView isOpen={isOpen} onClose={onClose} />
-              <Flex gap={"30px"}>
-                <OwnedTokens ownedTokens={ownedTokens} />
-              </Flex>
-            </Flex>
-          )}
-
+          <Roster tokens={ownedTokens} />
           <FiltersView2 />
           {sessions.data && (
             <Flex direction={"column"} gap={"10px"} w={"100%"}>
