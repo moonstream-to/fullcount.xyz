@@ -3,9 +3,11 @@ import { OwnedToken } from "../../types";
 import { useState } from "react";
 import Image from "next/image";
 import NewCharacterButton from "./NewCharacterButton";
+import PlayButtons from "./PlayButtons";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const [selectedTokenIdx, setSelectedTokenIdx] = useState(0);
+
   return (
     <div className={styles.container}>
       <div className={styles.header}>roster</div>
@@ -16,10 +18,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
             <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
           </div>
-          <div className={styles.buttonsContainer}>
-            <div className={styles.button}>Bat</div>
-            <div className={styles.button}>Pitch</div>
-          </div>
+          <PlayButtons token={tokens[selectedTokenIdx]} />
         </div>
         <div className={styles.tokenCards}>
           {tokens.map((t, idx) => (

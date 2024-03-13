@@ -77,6 +77,7 @@
     align-items: flex-start;
     gap: 5px;
     align-self: stretch;
+    width: 130px;
 }
 
 .button {
@@ -95,7 +96,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: 100%; /* 18px */
-    width: 62.5px;
+    min-width: 62.5px;
 }
 
 .tokenCards {

@@ -65,10 +65,16 @@ interface Token {
   source?: TokenSource;
 }
 
+interface NFT {
+  nftAddress: string;
+  tokenID: string;
+}
+
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
+  activeSession?: { batterNFT: NFT; pitcherNFT: NFT };
 }
 
 interface Pair {
@@ -77,8 +83,8 @@ interface Pair {
 }
 
 interface AtBat {
-  pitcher: Token;
-  batter: Token;
+  pitcher: Token | undefined;
+  batter: Token | undefined;
   balls: number; // uint256, using number in TypeScript
   strikes: number; // uint256, using number in TypeScript
   outcome: number;
