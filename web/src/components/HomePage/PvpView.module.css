@@ -43,6 +43,7 @@
 
 .list {
     display: flex;
+    min-width: 130px;
     flex-direction: column;
     align-items: center;
     gap: 10px;
