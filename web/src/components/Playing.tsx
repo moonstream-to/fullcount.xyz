@@ -13,6 +13,8 @@ import useUser from "../contexts/UserContext";
 import CreateCharacterForm from "./tokens/CreateCharacterForm";
 import PlayingLayout from "./layout/PlayingLayout";
 import ChooseToken from "./tokens/ChooseToken";
+import HomePage from "./HomePage/HomePage";
+import { getAtBats } from "../services/fullcounts";
 
 const Playing = () => {
   const {
@@ -22,6 +24,7 @@ const Playing = () => {
     updateContext,
     invitedTo,
     isCreateCharacter,
+    tokensCache,
   } = useGameContext();
   const { user } = useUser();
 
@@ -30,12 +33,27 @@ const Playing = () => {
     async () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
-      updateContext({ ownedTokens: [...ownedTokens] });
-      return ownedTokens;
+      // updateContext({ ownedTokens: [...ownedTokens.slice(0, 3)] });
+      return ownedTokens.slice(0, 3); //TURN OFF THIS!!!
     },
     {
       ...queryCacheProps,
       refetchInterval: 15000,
+    },
+  );
+
+  const atBats = useQuery(
+    ["atBats"],
+    async () => {
+      return getAtBats({ tokensCache });
+    },
+    {
+      onSuccess: (data: any) => {
+        console.log(data);
+        if (data.tokens.length !== tokensCache.length) {
+          updateContext({ tokensCache: [...data.tokens] });
+        }
+      },
     },
   );
 
@@ -53,7 +71,7 @@ const Playing = () => {
         !invitedTo &&
         !isCreateCharacter && (
           <PlayingLayout>
-            <SessionsView ownedTokens={ownedTokens.data} />
+            <HomePage tokens={ownedTokens.data} atBats={atBats.data?.atBats} />
           </PlayingLayout>
         )}
 

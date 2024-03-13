@@ -1,0 +1,6 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;  /*Roster has 10px bottom margin*/
+}
+
