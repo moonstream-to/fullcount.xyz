@@ -3,6 +3,11 @@ import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
 import Web3 from "web3";
+import { getContracts } from "../utils/getWeb3Contracts";
+import { getMulticallResults } from "../utils/multicall";
+import { AbiItem } from "web3-utils";
+import FullcountABIImported from "../web3/abi/FullcountABI.json";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 export async function fetchFullcountPlayerTokens() {
   try {
@@ -19,9 +24,28 @@ export async function fetchFullcountPlayerTokens() {
       address: nft.erc721_address,
     }));
 
-    return await getTokensData({
+    const tokensData = await getTokensData({
       tokens,
       tokensSource: "FullcountPlayerAPI",
+    });
+    const { gameContract } = getContracts();
+    const activeSessionsIds = tokensData.filter((t) => t.isStaked).map((t) => t.stakedSessionID);
+    const activeSessionsQueries = activeSessionsIds.map((id) => ({
+      target: GAME_CONTRACT,
+      callData: gameContract.methods.SessionState(id).encodeABI(),
+    }));
+
+    const [activeSessions] = await getMulticallResults(
+      FullcountABI,
+      ["SessionState"],
+      activeSessionsQueries,
+    );
+
+    return tokensData.map((t) => {
+      const sessionIdx = activeSessionsIds.indexOf(t.stakedSessionID);
+      return sessionIdx === -1
+        ? { ...t }
+        : { ...t, activeSession: { ...activeSessions[sessionIdx] } };
     });
   } catch (e) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
