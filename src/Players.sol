@@ -6,9 +6,10 @@ import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC
 import { ERC721Enumerable } from "../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Base64 } from "../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import { Strings } from "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
+import { ITerminus } from "lib/web3/contracts/interfaces/Iterminus.sol";
 
 contract BeerLeagueBallers is ERC721Enumerable {
-    string[24] public ProfileImages = [
+    string[] public ProfileImages = [
         "https://badges.moonstream.to/blb/p0.png",
         "https://badges.moonstream.to/blb/p1.png",
         "https://badges.moonstream.to/blb/p2.png",
@@ -17,28 +18,40 @@ contract BeerLeagueBallers is ERC721Enumerable {
         "https://badges.moonstream.to/blb/p5.png",
         "https://badges.moonstream.to/blb/p6.png",
         "https://badges.moonstream.to/blb/p7.png",
-        "https://badges.moonstream.to/blb/p8.png",
-        "https://badges.moonstream.to/blb/p9.png",
-        "https://badges.moonstream.to/blb/p10.png",
-        "https://badges.moonstream.to/blb/p11.png",
-        "https://badges.moonstream.to/blb/p12.png",
-        "https://badges.moonstream.to/blb/p13.png",
-        "https://badges.moonstream.to/blb/p14.png",
-        "https://badges.moonstream.to/blb/p15.png",
-        "https://badges.moonstream.to/blb/p16.png",
-        "https://badges.moonstream.to/blb/p17.png",
-        "https://badges.moonstream.to/blb/p18.png",
-        "https://badges.moonstream.to/blb/p19.png",
-        "https://badges.moonstream.to/blb/p20.png",
-        "https://badges.moonstream.to/blb/p21.png",
-        "https://badges.moonstream.to/blb/p22.png",
-        "https://badges.moonstream.to/blb/p23.png"
+        "https://badges.moonstream.to/blb/p8.png"
     ];
 
     mapping(uint256 => string) public Name;
     mapping(uint256 => uint256) public ImageIndex;
 
-    constructor() ERC721("Beer League Ballers", "BLB") { }
+    address adminTerminus;
+    uint256 adminPoolID;
+
+    constructor(address _adminTerminus, uint256 _adminPoolID) ERC721("Beer League Ballers", "BLB") {
+        adminTerminus = _adminTerminus;
+        adminPoolID = _adminPoolID;
+    }
+
+    function _enforceIsAdmin() internal view {
+        ITerminus terminus = ITerminus(address(adminTerminus));
+        require(terminus.balanceOf(msg.sender, adminPoolID) > 0, "BeerLeagueBallers._enforceIsAdmin: not admin");
+    }
+
+    function getProfileImageCount() external view returns (uint256) {
+        return ProfileImages.length;
+    }
+
+    function addProfileImage(string memory newImage) public {
+        _enforceIsAdmin();
+
+        ProfileImages.push(newImage);
+    }
+
+    function setProfileImage(uint256 index, string memory newImage) public {
+        _enforceIsAdmin();
+
+        ProfileImages[index] = newImage;
+    }
 
     function mint(string memory name, uint256 imageIndex) public returns (uint256) {
         require(imageIndex < ProfileImages.length, "BLB.mint: invalid image index");
