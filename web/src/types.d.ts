@@ -51,10 +51,10 @@ interface TokenMetadata {
 
 type TokenSource = "BLBContract" | "FullcountPlayerAPI";
 
-type TokenId = {
+interface TokenId {
   id: string;
   address: string;
-};
+}
 
 interface Token {
   address: string;
@@ -77,11 +77,12 @@ interface Pair {
 }
 
 interface AtBat {
-  pitcher: Token | undefined;
-  batter: Token | undefined;
-  balls: number;
-  strikes: number;
+  pitcher: Token;
+  batter: Token;
+  balls: number; // uint256, using number in TypeScript
+  strikes: number; // uint256, using number in TypeScript
   outcome: number;
+  progress: number;
 }
 
 interface Session {
