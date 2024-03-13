@@ -29,11 +29,24 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
           <div className={styles.list}>
             PITCHERS
             {atBats
-              .filter((a) => a.progress === 2 && a.pitcher.address !== ZERO_ADDRESS)
+              .filter((a) => a.progress === 2 && a.pitcher && a.pitcher?.address !== ZERO_ADDRESS)
               .map((openAtBat, idx) => (
                 <TokenToPlay
                   token={openAtBat.pitcher}
                   isPitcher={true}
+                  onClick={() => handlePlay(openAtBat)}
+                  key={idx}
+                />
+              ))}
+          </div>
+          <div className={styles.list}>
+            BATTERS
+            {atBats
+              .filter((a) => a.progress === 2 && a.batter && a.batter?.address !== ZERO_ADDRESS)
+              .map((openAtBat, idx) => (
+                <TokenToPlay
+                  token={openAtBat.batter}
+                  isPitcher={false}
                   onClick={() => handlePlay(openAtBat)}
                   key={idx}
                 />
