@@ -3,6 +3,7 @@ import styles from "./TokenToPlay.module.css";
 import Image from "next/image";
 import { useQuery } from "react-query";
 import axios from "axios";
+import HeatMapSmall from "./HeatMapSmall";
 
 const TokenToPlay = ({
   token,
@@ -13,40 +14,10 @@ const TokenToPlay = ({
   isPitcher: boolean;
   onClick: () => void;
 }) => {
-  const pitcherStats = useQuery(
-    ["pitcher_stat", token],
-    async () => {
-      if (!token) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!token && isPitcher,
-    },
-  );
-
-  const batterStats = useQuery(
-    ["batter_stat", token],
-    async () => {
-      if (!token) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/stats";
-      const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-      return stat.data;
-    },
-    {
-      enabled: !!token && !isPitcher,
-    },
-  );
-
   const pitchDistributions = useQuery(
     ["pitch_distribution", token],
     async () => {
-      if (!token) {
+      if (!token || !isPitcher) {
         return;
       }
       const API_URL = "https://api.fullcount.xyz/pitch_distribution";
@@ -67,7 +38,7 @@ const TokenToPlay = ({
   const swingDistributions = useQuery(
     ["swing_distribution", token],
     async () => {
-      if (!token) {
+      if (!token || isPitcher) {
         return;
       }
       const API_URL = "https://api.fullcount.xyz/swing_distribution";
@@ -89,6 +60,16 @@ const TokenToPlay = ({
   );
   return (
     <div className={styles.container}>
+      {isPitcher && pitchDistributions.data && (
+        <div className={styles.heatMapContainer}>
+          <HeatMapSmall rates={pitchDistributions.data.rates} />
+        </div>
+      )}
+      {!isPitcher && swingDistributions.data && (
+        <div className={styles.heatMapContainer}>
+          <HeatMapSmall rates={swingDistributions.data.rates} />
+        </div>
+      )}
       <Image src={token.image} alt={""} height={"130"} width={"130"} />
       <div className={styles.content}>
         <div className={styles.info}>
