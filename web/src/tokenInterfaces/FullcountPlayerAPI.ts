@@ -70,6 +70,7 @@ export async function startSessionFullcountPlayer({
     require_signature: requireSignature,
   };
   const headers = getHeaders();
+  await unstakeFullcountPlayer({ token });
 
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
@@ -132,20 +133,23 @@ export function joinSessionFullcountPlayer({
     });
 }
 
-export const unstakeFullcountPlayer = ({ token }: { token: OwnedToken }) => {
+export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
     token_id: token.id,
   };
   const headers = getHeaders();
-
+  const { gameContract } = getContracts();
+  const sessionId = await gameContract.methods.StakedSession(token.address, token.id).call();
+  const progress = await gameContract.methods.sessionProgress(sessionId).call();
+  const action = progress === "2" ? "abort" : progress === "6" ? "unstake" : undefined;
+  if (!action) {
+    return "Token is not staked";
+  }
+  console.log("unstaking...", { sessionId, progress });
   return axios
-    .post(
-      `${FULLCOUNT_PLAYER_API}/game/${token.tokenProgress === 2 ? "abort" : "unstake"}`,
-      postData,
-      { headers },
-    )
+    .post(`${FULLCOUNT_PLAYER_API}/game/${action}`, postData, { headers })
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
