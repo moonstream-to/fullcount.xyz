@@ -85,7 +85,7 @@ export const getTokensData = async ({
       id: tokens[idx].id,
       name: name.split(` - ${tokens[idx].id}`)[0],
       image: image,
-      address: tokenContract.options.address,
+      address: tokens[idx].address,
       isStaked: stakedSessions[idx] !== "0",
       stakedSessionID: Number(stakedSessions[idx]),
       tokenProgress: Number(progresses[idx]),
