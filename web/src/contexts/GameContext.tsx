@@ -77,6 +77,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
   }, []);
 
   const updateContext = (newState: Partial<GameContextProps>) => {
+    console.log("updating context: ", { newState });
     setContextState((prevState) => {
       const isTokenSelected =
         prevState.isTokenSelected || !!newState.selectedToken || !!prevState.selectedToken;
