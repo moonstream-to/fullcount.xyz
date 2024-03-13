@@ -16,6 +16,12 @@ const nextConfig = {
         port: "",
         pathname: "/blb/**",
       },
+      {
+        protocol: "https",
+        hostname: "badges.moonstream.to",
+        port: "",
+        pathname: "/fullcount-coaches/**",
+      },
     ],
   },
 };
