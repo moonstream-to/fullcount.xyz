@@ -34,7 +34,6 @@ export const fetchOwnedBLBTokens = async ({
 
     const [tokens] = await getMulticallResults(TokenABI, ["tokenOfOwnerByIndex"], tokensQueries);
     return await getTokensData({
-      web3ctx,
       tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
       tokensSource: "BLBContract",
     });
@@ -45,14 +44,17 @@ export const fetchOwnedBLBTokens = async ({
 };
 
 export const getTokensData = async ({
-  web3ctx,
   tokens,
   tokensSource,
 }: {
-  web3ctx: MoonstreamWeb3ProviderInterface;
   tokens: TokenId[];
   tokensSource: TokenSource;
 }) => {
+
+  if (tokens.length < 1) {
+    return [];
+  }
+
   const { tokenContract, gameContract } = getContracts();
   const stakedQueries = tokens.map((t) => ({
     target: gameContract.options.address,
@@ -88,8 +90,7 @@ export const getTokensData = async ({
       id: tokens[idx].id,
       name: name.split(` - ${tokens[idx].id}`)[0],
       image: image,
-      address: tokenContract.options.address,
-      staker: tokensSource === "BLBContract" ? web3ctx.account : "",
+      address: tokens[idx].address,
       isStaked: stakedSessions[idx] !== "0",
       stakedSessionID: Number(stakedSessions[idx]),
       tokenProgress: Number(progresses[idx]),

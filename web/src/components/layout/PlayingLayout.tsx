@@ -20,11 +20,11 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
     <Flex
       direction="column"
       minH={"100vh"}
-      gap={"40px"}
-      p={{ lg: "0 7% 60px 7%", base: "0 10px 80px 10px" }}
-      maxW={"1440px"}
+      gap={"30px"}
+      p={"20px"}
       placeSelf={"center"}
       w={"100%"}
+      background={"#FCECD9"}
     >
       <Navbar />
       <audio id="heartbeat" src={sounds.heartbeat} preload={"auto"} />

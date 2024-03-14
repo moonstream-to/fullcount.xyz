@@ -26,6 +26,7 @@ interface GameContextProps {
   soundVolume: number;
   ownedTokens: OwnedToken[];
   secondsPerPhase: number | undefined;
+  isCreateCharacter: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -64,6 +65,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     soundVolume: 20,
     ownedTokens: [],
     secondsPerPhase: undefined,
+    isCreateCharacter: false,
   });
 
   useEffect(() => {
@@ -77,6 +79,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
   }, []);
 
   const updateContext = (newState: Partial<GameContextProps>) => {
+    console.log("updating context: ", { newState });
     setContextState((prevState) => {
       const isTokenSelected =
         prevState.isTokenSelected || !!newState.selectedToken || !!prevState.selectedToken;

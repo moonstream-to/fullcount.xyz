@@ -51,24 +51,30 @@ interface TokenMetadata {
 
 type TokenSource = "BLBContract" | "FullcountPlayerAPI";
 
-type TokenId = {
+interface TokenId {
   id: string;
   address: string;
-};
+}
 
 interface Token {
   address: string;
   id: string;
   name: string;
   image: string;
-  staker: string;
+  staker?: string;
   source?: TokenSource;
+}
+
+interface NFT {
+  nftAddress: string;
+  tokenID: string;
 }
 
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
+  activeSession?: { batterNFT: NFT; pitcherNFT: NFT };
 }
 
 interface Pair {
@@ -79,9 +85,10 @@ interface Pair {
 interface AtBat {
   pitcher: Token | undefined;
   batter: Token | undefined;
-  balls: number;
-  strikes: number;
+  balls: number; // uint256, using number in TypeScript
+  strikes: number; // uint256, using number in TypeScript
   outcome: number;
+  progress: number;
 }
 
 interface Session {

@@ -47,7 +47,13 @@ const TokenABI = TokenABIImported as unknown as AbiItem[];
 
 const assets = FULLCOUNT_ASSETS_PATH;
 
-const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
+const OwnedTokens = ({
+  forJoin = false,
+  ownedTokens,
+}: {
+  forJoin?: boolean;
+  ownedTokens: OwnedToken[];
+}) => {
   const web3ctx = useContext(Web3Context);
   const {
     tokenAddress,
@@ -88,22 +94,6 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
         console.log(e);
         toast("Minting failed: " + e?.message, "error");
       },
-    },
-  );
-
-  const ownedTokens = useQuery<OwnedToken[]>(
-    ["owned_tokens", web3ctx.account, user],
-    async () => {
-      console.log("FETCHING TOKENS");
-      const BLBTokens = user ? [] : await fetchOwnedBLBTokens({ web3ctx });
-      const fullcountPlayerTokens = user ? await fetchFullcountPlayerTokens({ web3ctx }) : [];
-      const ownedTokens = BLBTokens.concat(fullcountPlayerTokens);
-      updateContext({ ownedTokens: [...ownedTokens] });
-      return ownedTokens;
-    },
-    {
-      ...queryCacheProps,
-      refetchInterval: 3000,
     },
   );
 
@@ -313,17 +303,17 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
   );
 
   useEffect(() => {
-    if (!selectedToken || !ownedTokens.data) return;
-    const newSelectedToken = ownedTokens.data.find(
+    if (!selectedToken || !ownedTokens) return;
+    const newSelectedToken = ownedTokens.find(
       (t) => t.address === selectedToken.address && t.id === selectedToken.id,
     );
     updateContext({ selectedToken: newSelectedToken });
-  }, [ownedTokens.data]);
+  }, [ownedTokens]);
 
   return (
     <>
       <Flex gap={"15px"}>
-        {(user || web3ctx.account) && ownedTokens.data && ownedTokens.data.length < 1 && (
+        {(user || web3ctx.account) && ownedTokens && ownedTokens.length < 1 && (
           <>
             <Flex
               w={"137px"}
@@ -468,8 +458,8 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
           </Flex>
         )}
         <Flex className={styles.cards}>
-          {ownedTokens.data &&
-            ownedTokens.data
+          {ownedTokens &&
+            ownedTokens
               .filter((t) => !forJoin || !t.isStaked)
               .map((token: OwnedToken, idx: number) => (
                 <React.Fragment key={idx}>
@@ -498,7 +488,7 @@ const OwnedTokens = ({ forJoin = false }: { forJoin?: boolean }) => {
                   )}
                 </React.Fragment>
               ))}
-          {ownedTokens.data && ownedTokens.data.length > 0 && (
+          {ownedTokens && ownedTokens.length > 0 && (
             <Flex
               w={"75px"}
               h={"75px"}

@@ -1,40 +1,116 @@
 :root {
-  --max-width: 1100px;
-  --border-radius: 12px;
-  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono", "Roboto Mono",
-    "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro", "Fira Mono", "Droid Sans Mono",
-    "Courier New", monospace;
+}
 
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
 
-  --primary-glow: conic-gradient(
-    from 180deg at 50% 50%,
-    #16abff33 0deg,
-    #0885ff33 55deg,
-    #54d6ff33 120deg,
-    #0071ff33 160deg,
-    transparent 360deg
-  );
-  --secondary-glow: radial-gradient(rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+input {
+  display: flex;
+  padding: 9px 14px;
+  align-items: center;
+  align-self: stretch;
+  border: 1px solid #4D4D4D;
+  background: #FCECD9;
+  color: #262019;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
 
-  --tile-start-rgb: 239, 245, 249;
-  --tile-end-rgb: 228, 232, 233;
-  --tile-border: conic-gradient(
-    #00000080,
-    #00000040,
-    #00000030,
-    #00000020,
-    #00000010,
-    #00000010,
-    #00000080
-  );
 
-  --callout-rgb: 238, 240, 241;
-  --callout-border-rgb: 172, 175, 176;
-  --card-rgb: 180, 185, 188;
-  --card-border-rgb: 131, 134, 135;
+
+input:focus-visible {
+  border: 1px solid #4D4D4D;
+  outline: none;
+}
+
+
+input::placeholder {
+  color: #7E8E7F;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: #7E8E7F;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+  input::-moz-placeholder { /* Firefox 19+ */
+  color: #7E8E7F;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+input:-ms-input-placeholder { /* IE 10+ */
+  color: #7E8E7F;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+input:-moz-placeholder { /* Firefox 18- */
+  color: #7E8E7F;
+  font-family: 'Pangolin', cursive;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.inputError {
+  border-color: darkred;
+  transition: all 0.5s ease-out;
+}
+
+.inputError:focus-visible {
+  border-color: darkred;
+  outline: none;
+}
+
+.inputError::-webkit-input-placeholder {
+  color: darkred;
+  transition: all 0.5s ease-out;
+
+}
+.inputError::-moz-placeholder {
+  color: darkred;
+  transition: all 1s ease-out;
+
+}
+.inputError:-ms-input-placeholder {
+  color: darkred;
+  transition: all 1s ease-out;
+
+}
+.inputError:-moz-placeholder {
+  color: darkred;
+  transition: all 1s ease-out;
+
+}
+
+label {
+  color: #262019;
+  font-family: Pangolin, cursive;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  text-align: start;
+  place-self: start;
+  margin-bottom: 5px;
 }
 
 @media (prefers-color-scheme: dark) {
