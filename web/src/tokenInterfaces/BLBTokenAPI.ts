@@ -50,9 +50,11 @@ export const getTokensData = async ({
   tokens: TokenId[];
   tokensSource: TokenSource;
 }) => {
+
   if (tokens.length < 1) {
     return [];
   }
+
   const { tokenContract, gameContract } = getContracts();
   const stakedQueries = tokens.map((t) => ({
     target: gameContract.options.address,

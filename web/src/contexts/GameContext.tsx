@@ -25,6 +25,7 @@ interface GameContextProps {
   sessionOffset: number;
   soundVolume: number;
   ownedTokens: OwnedToken[];
+  secondsPerPhase: number | undefined;
   isCreateCharacter: boolean;
 }
 
@@ -63,6 +64,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     sessionOffset: 40,
     soundVolume: 20,
     ownedTokens: [],
+    secondsPerPhase: undefined,
     isCreateCharacter: false,
   });
 

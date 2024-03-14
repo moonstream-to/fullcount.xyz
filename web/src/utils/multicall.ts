@@ -1,7 +1,6 @@
-import Web3 from "web3";
-
 import { AbiItem } from "web3-utils";
 import { getMulticallContract } from "./getWeb3Contracts";
+import Web3 from "web3";
 
 export async function getMulticallResults(
   ABI: AbiItem[],
@@ -39,7 +38,7 @@ export async function getMulticallResults(
         // If the output is a primitive type, return the primitive value
         return decoded[Object.keys(decoded)[0]]; // Extract the first (and only) parameter
       } else {
-        return decoded;
+        return decoded[0]; //decodeParameters returns [object with access by index or name, length]
       }
     });
     result.push(decodedResults);
