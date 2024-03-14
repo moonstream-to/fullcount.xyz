@@ -84,7 +84,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
   const tokenContract = new web3ctx.web3.eth.Contract(tokenABI) as any;
-  // console.log("rerender");
   const isPitcher = (token?: Token) =>
     selectedSession?.pair.pitcher?.id === token?.id &&
     selectedSession?.pair.pitcher?.address === token?.address;
@@ -105,7 +104,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       refetchInterval: 100000000,
       onSuccess: (data) => {
         console.log("sessionAtBatID success: ", data);
-        // atBatStatus.refetch();
       },
     },
   );
@@ -160,7 +158,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       if (!selectedSession) return undefined;
       const id = sessionID ?? selectedSession.sessionID;
       if (!secondsPerPhase) {
-        console.log("SECONDS PER PHASE CALL", secondsPerPhase);
         const secondsPerPhaseRes = Number(await gameContract.methods.SecondsPerPhase().call());
         updateContext({ secondsPerPhase: secondsPerPhaseRes });
       }
@@ -211,7 +208,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         );
         if (!tokenFromCache) {
           tokenContract.options.address = otherToken.address;
-          console.log("TOKEN CALLS", otherToken, opponent);
           const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
           const tokenMetadata = await getTokenMetadata(URI);
           setOpponent({
