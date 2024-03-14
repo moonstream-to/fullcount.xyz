@@ -12,7 +12,7 @@ const TokenToPlay = ({
 }: {
   token: Token;
   isPitcher: boolean;
-  onClick: () => void;
+  onClick?: () => void;
 }) => {
   const pitchDistributions = useQuery(
     ["pitch_distribution", token],
@@ -65,20 +65,28 @@ const TokenToPlay = ({
           <HeatMapSmall rates={pitchDistributions.data.rates} />
         </div>
       )}
-      {!isPitcher && swingDistributions.data && (
-        <div className={styles.heatMapContainer}>
-          <HeatMapSmall rates={swingDistributions.data.rates} />
-        </div>
-      )}
-      <Image src={token.image} alt={""} height={"130"} width={"130"} />
+
+      <Image
+        src={token.image}
+        alt={""}
+        height={onClick ? "130" : "100"}
+        width={onClick ? "130" : "100"}
+      />
       <div className={styles.content}>
+        {!isPitcher && swingDistributions.data && (
+          <div className={styles.heatMapContainer}>
+            <HeatMapSmall rates={swingDistributions.data.rates} />
+          </div>
+        )}
         <div className={styles.info}>
           <div className={styles.name}>{token.name}</div>
           <div className={styles.id}>{token.id}</div>
         </div>
-        <div className={styles.button} onClick={onClick}>
-          Play
-        </div>
+        {onClick && (
+          <div className={styles.button} onClick={onClick}>
+            Play
+          </div>
+        )}
       </div>
     </div>
   );
