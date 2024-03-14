@@ -25,7 +25,7 @@ const SessionsView = () => {
     useGameContext();
   const web3ctx = useContext(Web3Context);
 
-  const { gameContract, tokenContract, multicallContract } = getContracts(web3ctx);
+  const { gameContract, tokenContract, multicallContract } = getContracts();
 
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
