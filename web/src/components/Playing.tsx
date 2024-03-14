@@ -33,8 +33,8 @@ const Playing = () => {
     async () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
-      // updateContext({ ownedTokens: [...ownedTokens.slice(0, 3)] });
-      return ownedTokens.slice(0, 3); //TURN OFF THIS!!!
+      // updateContext({ ownedTokens: [...ownedTokens.slice(0, 3)] }); //check if something changed
+      return ownedTokens.slice(0, 3); //TODO TURN  THIS OFFFFF!!!
     },
     {
       ...queryCacheProps,
@@ -48,6 +48,7 @@ const Playing = () => {
       return getAtBats({ tokensCache });
     },
     {
+      refetchInterval: 5000,
       onSuccess: (data: any) => {
         console.log(data);
         if (data.tokens.length !== tokensCache.length) {
