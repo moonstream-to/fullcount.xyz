@@ -11,7 +11,7 @@ const HomePage = ({ tokens, atBats }: { tokens: OwnedToken[]; atBats: AtBat[] })
     <div className={styles.container}>
       <Roster tokens={tokens} />
       <ModeSelector selectedMode={selectedMode} setSelectedMode={setSelectedMode} />
-      {selectedMode === 0 && atBats && <PvpView atBats={atBats} />}
+      {selectedMode === 0 && atBats && <PvpView atBats={atBats} tokens={tokens} />}
     </div>
   );
 };

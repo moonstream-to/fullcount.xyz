@@ -1,12 +1,12 @@
 import styles from "./PvpView.module.css";
 import { useState } from "react";
-import { AtBat } from "../../types";
+import { AtBat, OwnedToken } from "../../types";
 import { ZERO_ADDRESS } from "../../constants";
 import TokenToPlay from "./TokenToPlay";
 import AtBatsList from "./AtBatsList";
 const views = ["Open", "My games", "Other"];
 
-const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
+const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
   const handlePlay = (atBat: AtBat) => {
     console.log(atBat);
   };
@@ -27,6 +27,17 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
       </div>
       {selectedView === 2 && atBats && (
         <AtBatsList atBats={atBats.filter((a) => a.progress !== 6 && a.progress !== 2)} />
+      )}
+      {selectedView === 1 && atBats && (
+        <AtBatsList
+          atBats={atBats.filter((a) =>
+            tokens.some(
+              (t) =>
+                (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
+                (t.address === a.batter?.address && t.id === a.batter.id),
+            ),
+          )}
+        />
       )}
       {atBats && selectedView === 0 && (
         <div className={styles.listsContainer}>
