@@ -55,7 +55,7 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
                 return openAtBat.batter ? (
                   <TokenToPlay
                     token={openAtBat.batter}
-                    isPitcher={true}
+                    isPitcher={false}
                     onClick={() => handlePlay(openAtBat)}
                     key={idx}
                   />
