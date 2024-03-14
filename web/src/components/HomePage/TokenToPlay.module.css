@@ -26,7 +26,6 @@
 }
 
 .name {
-    overflow: hidden;
     color: #FFF;
     text-overflow: ellipsis;
     font-family: Bangers, cursive;
@@ -37,7 +36,6 @@
 }
 
 .id {
-    overflow: hidden;
     color: #8EAB8F;
     text-overflow: ellipsis;
     font-family: Bangers, cursive;

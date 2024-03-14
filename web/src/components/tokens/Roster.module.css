@@ -61,7 +61,6 @@
 }
 
 .tokenId {
-    overflow: hidden;
     color: #8EAB8F;
     text-overflow: ellipsis;
     font-family: Bangers, cursive;

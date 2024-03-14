@@ -23,7 +23,6 @@
 }
 
 .username {
-    overflow: hidden;
     color: #262019;
     text-overflow: ellipsis;
     font-family: Pangolin, cursive;
