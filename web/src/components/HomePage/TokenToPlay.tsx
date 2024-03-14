@@ -15,7 +15,7 @@ const TokenToPlay = ({
   onClick?: () => void;
 }) => {
   const pitchDistributions = useQuery(
-    ["pitch_distribution", token],
+    ["pitch_distribution", token.address, token.id],
     async () => {
       if (!token || !isPitcher) {
         return;
@@ -41,7 +41,7 @@ const TokenToPlay = ({
   );
 
   const swingDistributions = useQuery(
-    ["swing_distribution", token],
+    ["swing_distribution", token.address, token.id],
     async () => {
       if (!token || isPitcher) {
         return;
