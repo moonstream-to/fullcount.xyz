@@ -3,6 +3,7 @@ import { useState } from "react";
 import { AtBat } from "../../types";
 import { ZERO_ADDRESS } from "../../constants";
 import TokenToPlay from "./TokenToPlay";
+import AtBatsList from "./AtBatsList";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
@@ -24,6 +25,9 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
           </div>
         ))}
       </div>
+      {selectedView === 2 && atBats && (
+        <AtBatsList atBats={atBats.filter((a) => a.progress !== 6 && a.progress !== 2)} />
+      )}
       {atBats && selectedView === 0 && (
         <div className={styles.listsContainer}>
           <div className={styles.list}>
