@@ -19,9 +19,9 @@ const Navbar = () => {
   const menuRef = useRef<HTMLDivElement>(null); // Ref for the menu element, typed as HTMLDivElement
 
   const handleClickOutside = (event: MouseEvent) => {
-    event.stopPropagation();
     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
       setIsMenuOpen(false);
+      event.stopPropagation();
     }
   };
 
