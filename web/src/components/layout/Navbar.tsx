@@ -51,6 +51,7 @@ const Navbar = () => {
           <div className={styles.menuButton} onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <MoreHorizontal />
           </div>
+          {isMenuOpen && <div className={styles.overlay}></div>}
           {isMenuOpen && (
             <div ref={menuRef} className={styles.menuList}>
               <div className={styles.menuItem}>About</div>
@@ -58,7 +59,14 @@ const Navbar = () => {
               <div className={styles.menuItem}>Leaderboards</div>
               <div className={styles.menuItem}>Leave feedback</div>
               <div className={styles.divider} />
-              <div className={styles.menuItem} onClick={() => logout()}>
+              <div
+                className={styles.menuItem}
+                onClick={() => {
+                  if (!isLoggingOut) {
+                    logout();
+                  }
+                }}
+              >
                 {isLoggingOut ? "logging out..." : "Log out"}
               </div>
             </div>
