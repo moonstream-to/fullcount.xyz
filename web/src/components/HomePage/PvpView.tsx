@@ -34,27 +34,35 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
             PITCHERS
             {atBats
               .filter((a) => a.progress === 2 && a.pitcher && a.pitcher?.address !== ZERO_ADDRESS)
-              .map((openAtBat, idx) => (
-                <TokenToPlay
-                  token={openAtBat.pitcher}
-                  isPitcher={true}
-                  onClick={() => handlePlay(openAtBat)}
-                  key={idx}
-                />
-              ))}
+              .map((openAtBat, idx) => {
+                return openAtBat.pitcher ? (
+                  <TokenToPlay
+                    token={openAtBat.pitcher}
+                    isPitcher={true}
+                    onClick={() => handlePlay(openAtBat)}
+                    key={idx}
+                  />
+                ) : (
+                  <div style={{ width: "130px", height: "225.5px" }} />
+                );
+              })}
           </div>
           <div className={styles.list}>
             BATTERS
             {atBats
               .filter((a) => a.progress === 2 && a.batter && a.batter?.address !== ZERO_ADDRESS)
-              .map((openAtBat, idx) => (
-                <TokenToPlay
-                  token={openAtBat.batter}
-                  isPitcher={false}
-                  onClick={() => handlePlay(openAtBat)}
-                  key={idx}
-                />
-              ))}
+              .map((openAtBat, idx) => {
+                return openAtBat.batter ? (
+                  <TokenToPlay
+                    token={openAtBat.batter}
+                    isPitcher={true}
+                    onClick={() => handlePlay(openAtBat)}
+                    key={idx}
+                  />
+                ) : (
+                  <div style={{ width: "130px", height: "225.5px" }} />
+                );
+              })}
           </div>
         </div>
       )}
