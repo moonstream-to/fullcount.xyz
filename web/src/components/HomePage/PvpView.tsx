@@ -26,16 +26,31 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
         ))}
       </div>
       {selectedView === 2 && atBats && (
-        <AtBatsList atBats={atBats.filter((a) => a.progress !== 6 && a.progress !== 2)} />
+        <AtBatsList
+          tokens={tokens}
+          atBats={atBats.filter(
+            (a) =>
+              a.progress !== 6 &&
+              a.progress !== 2 &&
+              !tokens.some(
+                (t) =>
+                  (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
+                  (t.address === a.batter?.address && t.id === a.batter.id),
+              ),
+          )}
+        />
       )}
       {selectedView === 1 && atBats && (
         <AtBatsList
-          atBats={atBats.filter((a) =>
-            tokens.some(
-              (t) =>
-                (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
-                (t.address === a.batter?.address && t.id === a.batter.id),
-            ),
+          tokens={tokens}
+          atBats={atBats.filter(
+            (a) =>
+              a.progress !== 6 &&
+              tokens.some(
+                (t) =>
+                  (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
+                  (t.address === a.batter?.address && t.id === a.batter.id),
+              ),
           )}
         />
       )}

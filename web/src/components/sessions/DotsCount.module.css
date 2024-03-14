@@ -1,21 +1,20 @@
-.label {
-    color: #FFF;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    text-transform: uppercase;
+.stat {
+    display: flex;
+    gap: 5px;
 }
-
+.dots {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
 .filledDot, .emptyDot {
-    width: 6px;
     height: 6px;
+    width: 6px;
     border-radius: 50%;
-    background-color: #4D4D4D;
-    text-transform: uppercase;
 }
-
+.emptyDot {
+    background-color: #34603B;
+}
 .filledDot {
     background-color: #FFF;
 }
