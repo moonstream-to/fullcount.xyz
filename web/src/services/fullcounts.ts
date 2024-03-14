@@ -93,22 +93,24 @@ export const getAtBats = async ({ tokensCache }: { tokensCache: Token[] }) => {
   const tokens = [...tokensCache, ...newTokensData];
 
   return {
-    atBats: states.map((s, idx) => ({
-      ...s,
-      balls: Number(s.balls),
-      outcome: Number(s.outcome),
-      strikes: Number(s.strikes),
-      pitcher: tokens.find(
-        (t) => t.address === s.pitcherNFT.nftAddress && t.id === s.pitcherNFT.tokenID,
-      ),
-      batter: tokens.find(
-        (t) => t.address === s.batterNFT.nftAddress && t.id === s.batterNFT.tokenID,
-      ),
-      id: idx + oldestAtBatNumber,
-      numberOfSessions: Number(numbersOfSessions[idx]),
-      lastSessionId: Number(lastSessions[idx]),
-      progress: Number(progresses[idx]),
-    })),
+    atBats: states
+      .map((s, idx) => ({
+        ...s,
+        balls: Number(s.balls),
+        outcome: Number(s.outcome),
+        strikes: Number(s.strikes),
+        pitcher: tokens.find(
+          (t) => t.address === s.pitcherNFT.nftAddress && t.id === s.pitcherNFT.tokenID,
+        ),
+        batter: tokens.find(
+          (t) => t.address === s.batterNFT.nftAddress && t.id === s.batterNFT.tokenID,
+        ),
+        id: idx + oldestAtBatNumber,
+        numberOfSessions: Number(numbersOfSessions[idx]),
+        lastSessionId: Number(lastSessions[idx]),
+        progress: Number(progresses[idx]),
+      }))
+      .reverse(),
     tokens,
   };
 };
