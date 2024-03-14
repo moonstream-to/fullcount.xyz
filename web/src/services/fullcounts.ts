@@ -74,7 +74,6 @@ export const getAtBats = async ({ tokensCache }: { tokensCache: Token[] }) => {
       s.pitcherNFT.nftAddress !== ZERO_ADDRESS &&
       !newTokens.some((t) => t.address === s.pitcherNFT.nftAddress && t.id === s.pitcherNFT.tokenID)
     ) {
-      console.log(s.pitcherNFT.nftAddress, ZERO_ADDRESS);
       newTokens.push({ address: s.pitcherNFT.nftAddress, id: s.pitcherNFT.tokenID });
     }
     if (
