@@ -96,7 +96,7 @@ const TokenToPlay = ({
         </div>
         {onClick && (
           <div className={styles.button} onClick={onClick}>
-            Play
+            {isPitcher ? "Bat" : "Pitch"}
           </div>
         )}
       </div>
