@@ -10,12 +10,12 @@ const TokenToPlay = ({
   isPitcher,
   onClick,
 }: {
-  token: Token;
+  token: Token | undefined;
   isPitcher: boolean;
   onClick?: () => void;
 }) => {
   const pitchDistributions = useQuery(
-    ["pitch_distribution", token.address, token.id],
+    ["pitch_distribution", token?.address, token?.id],
     async () => {
       if (!token || !isPitcher) {
         return;
@@ -41,7 +41,7 @@ const TokenToPlay = ({
   );
 
   const swingDistributions = useQuery(
-    ["swing_distribution", token.address, token.id],
+    ["swing_distribution", token?.address, token?.id],
     async () => {
       if (!token || isPitcher) {
         return;
@@ -68,6 +68,9 @@ const TokenToPlay = ({
       enabled: !!token && !isPitcher,
     },
   );
+  if (!token) {
+    return <></>;
+  }
   return (
     <div className={styles.container}>
       <Image
