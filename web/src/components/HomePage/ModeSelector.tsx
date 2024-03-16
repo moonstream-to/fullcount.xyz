@@ -7,11 +7,11 @@ const modes = [
   },
   {
     title: "campaign",
-    hint: "Try your skills against another player. Join an open at-bat (below) or start your own by choosing ‘bat’ or ‘pitch’.",
+    hint: "Defeat a series of increasingly difficult bot teams to unlock the final boss.",
   },
   {
     title: "Practice",
-    hint: "Try your skills against another player. Join an open at-bat (below) or start your own by choosing ‘bat’ or ‘’ above.",
+    hint: "Play against the coach bots to sharpen your skills. Start here if you'd like some practice before taking on a human opponent.",
   },
 ];
 
