@@ -27,6 +27,7 @@ interface GameContextProps {
   ownedTokens: OwnedToken[];
   secondsPerPhase: number | undefined;
   isCreateCharacter: boolean;
+  atBatsForPractice: (AtBat | undefined)[] | undefined;
 }
 
 interface GameContextType extends GameContextProps {
@@ -66,6 +67,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     ownedTokens: [],
     secondsPerPhase: undefined,
     isCreateCharacter: false,
+    atBatsForPractice: undefined,
   });
 
   useEffect(() => {
