@@ -114,13 +114,9 @@ const BatterViewMobile = ({
     },
   );
   useEffect(() => {
-    if (sessionStatus.didBatterReveal) {
-      setIsRevealed(true);
-    }
-    if (sessionStatus.didBatterCommit) {
-      setIsCommitted(true);
-    }
-  }, [sessionStatus]);
+    setIsRevealed(sessionStatus.didBatterReveal);
+    setIsCommitted(sessionStatus.didBatterCommit);
+  }, [sessionStatus.didBatterCommit, sessionStatus.didBatterReveal]);
 
   return (
     <PlayerView

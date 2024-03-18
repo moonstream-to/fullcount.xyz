@@ -114,13 +114,9 @@ const PitcherViewMobile = ({
   );
 
   useEffect(() => {
-    if (sessionStatus.didPitcherReveal) {
-      setIsRevealed(true);
-    }
-    if (sessionStatus.didPitcherCommit) {
-      setIsCommitted(true);
-    }
-  }, [sessionStatus]);
+    setIsRevealed(sessionStatus.didPitcherReveal);
+    setIsCommitted(sessionStatus.didPitcherCommit);
+  }, [sessionStatus.didPitcherReveal, sessionStatus.didPitcherCommit]);
 
   return (
     <PlayerView
