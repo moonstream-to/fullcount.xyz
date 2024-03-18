@@ -8,6 +8,7 @@ import { OwnedToken, Token } from "../../types";
 import Outcome from "./Outcome";
 import InviteLink from "./InviteLink";
 import FullcountABIImported from "../../web3/abi/FullcountABI.json";
+import TokenABIImported from "../../web3/abi/BLBABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH, ZERO_ADDRESS } from "../../constants";
 import { getTokenMetadata } from "../../utils/decoders";
@@ -17,8 +18,10 @@ import TokenView from "../tokens/TokenView";
 import PitcherViewMobile from "./PitcherViewMobile";
 import BatterViewMobile from "./BatterViewMobile";
 import styles from "./PlayView.module.css";
+import { getMulticallResults } from "../../utils/multicall";
 
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
+const TokenABI = TokenABIImported as unknown as AbiItem[];
 
 export function getRowCol(index: number): [number, number] {
   const size = 5; // Size of the grid (5x5)
@@ -69,7 +72,14 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const [isShowOutcomeDone, setIsShowOutcomeDone] = useState(false);
   const [isSmallView] = useMediaQuery("(max-width: 1023px)");
 
-  const { selectedAtBat, selectedSession, updateContext, contractAddress } = useGameContext();
+  const {
+    tokensCache,
+    secondsPerPhase,
+    selectedAtBat,
+    selectedSession,
+    updateContext,
+    contractAddress,
+  } = useGameContext();
   const web3ctx = useContext(Web3Context);
   const gameContract = new web3ctx.web3.eth.Contract(FullcountABI) as any;
   gameContract.options.address = contractAddress;
@@ -94,7 +104,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       refetchInterval: 100000000,
       onSuccess: (data) => {
         console.log("sessionAtBatID success: ", data);
-        atBatStatus.refetch();
       },
     },
   );
@@ -102,12 +111,13 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const queryClient = useQueryClient();
 
   const atBatStatus = useQuery(
-    ["atBatStatus", atBat.data],
+    ["atBatStatus", atBat.data?.progress],
     async () => {
       if (!atBat.data) {
+        console.log("!atBat.data");
         return;
       }
-      console.log("atBatStatus");
+      console.log("atBatStatus", atBat.data);
 
       const atBatID = atBat.data;
       const status = await gameContract.methods.getAtBat(atBatID).call();
@@ -141,35 +151,40 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
   );
 
-  useEffect(() => {
-    console.log(
-      "atBatStatus.data, isShowOutcomeDone useEffect: ",
-      atBatStatus.data,
-      isShowOutcomeDone,
-      "sessionID: ",
-      sessionID,
-    );
-    if (isShowOutcomeDone && atBatStatus.data?.currentSessionID) {
-      if (Number(atBatStatus.data.currentSessionID) !== sessionStatus.data?.sessionID) {
-        setSessionID(atBatStatus.data.currentSessionID);
-        setIsShowOutcomeDone(false);
-      }
-    }
-  }, [atBatStatus.data, isShowOutcomeDone]);
-
   const sessionStatus = useQuery(
     ["session", selectedSession, atBatStatus.data, sessionID],
     async () => {
       console.log("sessionStatus");
       if (!selectedSession) return undefined;
       const id = sessionID ?? selectedSession.sessionID;
-      const progress = Number(await gameContract.methods.sessionProgress(id).call());
-      const session = await gameContract.methods.getSession(id).call();
+      if (!secondsPerPhase) {
+        const secondsPerPhaseRes = Number(await gameContract.methods.SecondsPerPhase().call());
+        updateContext({ secondsPerPhase: secondsPerPhaseRes });
+      }
+      const queries = [
+        {
+          target: gameContract.options.address,
+          callData: gameContract.methods.sessionProgress(id).encodeABI(),
+        },
+        {
+          target: gameContract.options.address,
+          callData: gameContract.methods.getSession(id).encodeABI(),
+        },
+      ];
+      const [progresses, sessions] = await getMulticallResults(
+        FullcountABI,
+        ["sessionProgress", "getSession"],
+        queries,
+      );
+      const progress = Number(progresses[0]);
+      const session = sessions[0];
+
       if (progress < 2 || progress > 4) {
         setGameOver(true);
       } else {
         setGameOver(false);
       }
+
       const pitcherAddress = session.pitcherNFT.nftAddress;
       const pitcherTokenID = session.pitcherNFT.tokenID;
       const batterAddress = session.batterNFT.nftAddress;
@@ -188,17 +203,22 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
           ? { address: pitcherAddress, id: pitcherTokenID }
           : { address: batterAddress, id: batterTokenID };
       if (otherToken.address !== ZERO_ADDRESS && !(otherToken.address === opponent?.address)) {
-        tokenContract.options.address = otherToken.address;
-        const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
-        const staker = await tokenContract.methods.ownerOf(otherToken.id).call();
-        const tokenMetadata = await getTokenMetadata(URI);
-
-        setOpponent({
-          ...otherToken,
-          staker,
-          image: tokenMetadata.image,
-          name: tokenMetadata.name.split(` - ${otherToken.id}`)[0],
-        });
+        const tokenFromCache = tokensCache.find(
+          (token) => token.address === otherToken.address && token.id === otherToken.id,
+        );
+        if (!tokenFromCache) {
+          tokenContract.options.address = otherToken.address;
+          const URI = await tokenContract.methods.tokenURI(otherToken.id).call();
+          const tokenMetadata = await getTokenMetadata(URI);
+          setOpponent({
+            ...otherToken,
+            staker: "0x",
+            image: tokenMetadata.image,
+            name: tokenMetadata.name.split(` - ${otherToken.id}`)[0],
+          });
+        } else {
+          setOpponent({ ...tokenFromCache });
+        }
       }
 
       const {
@@ -213,8 +233,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         pitcherLeftSession,
         batterLeftSession,
       } = session;
-
-      const secondsPerPhase = Number(await gameContract.methods.SecondsPerPhase().call());
 
       let isExpired = progress === 6;
       if (progress === 3 || progress === 4) {
@@ -240,7 +258,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         batterLeftSession,
         outcome,
         phaseStartTimestamp: Number(phaseStartTimestamp),
-        secondsPerPhase: Number(secondsPerPhase),
         isExpired,
         pitcherReveal: {
           speed,
@@ -261,6 +278,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
         console.log("sessionStatus success: ", data);
       },
       refetchInterval: 3000,
+      retry: false,
     },
   );
 
@@ -270,9 +288,27 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   }, [selectedToken, opponent]);
 
   useEffect(() => {
-    console.log("sessionStatus.data useEffect:", sessionStatus.data);
-    atBatStatus.refetch();
-  }, [sessionStatus.data]);
+    console.log("sessionStatus.data useEffect:", sessionStatus.data?.progress);
+    if (sessionStatus.data) {
+      atBatStatus.refetch();
+    }
+  }, [sessionStatus.data?.progress]);
+
+  useEffect(() => {
+    console.log(
+      "atBatStatus.data, isShowOutcomeDone useEffect: ",
+      atBatStatus.data,
+      isShowOutcomeDone,
+      "sessionID: ",
+      sessionID,
+    );
+    if (isShowOutcomeDone && atBatStatus.data?.currentSessionID) {
+      if (Number(atBatStatus.data.currentSessionID) !== sessionStatus.data?.sessionID) {
+        setSessionID(atBatStatus.data.currentSessionID);
+        setIsShowOutcomeDone(false);
+      }
+    }
+  }, [atBatStatus.data, isShowOutcomeDone]);
 
   const numberToOrdinal = (n: number): string => {
     if (n > 10) return "";
@@ -360,7 +396,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 balls={atBatStatus.data?.balls ?? 3}
                 strikes={atBatStatus.data?.strikes ?? 2}
                 start={Number(sessionStatus.data?.phaseStartTimestamp)}
-                delay={sessionStatus.data?.secondsPerPhase}
+                delay={secondsPerPhase ?? 300}
                 isActive={
                   sessionStatus.data?.progress === 3 ||
                   sessionStatus.data?.progress === 4 ||
