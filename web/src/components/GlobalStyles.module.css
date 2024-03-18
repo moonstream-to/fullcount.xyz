@@ -15,20 +15,22 @@
 
 .commitButton {
     display: flex;
-    padding: 4px 20px;
+    padding: 9px 20px;
     justify-content: center;
     align-items: center;
-    gap: 5px;
-    width: 100%;
-    /*align-self: stretch;*/
-    border: 0.5px solid #f1e3bf;
-    background: #00a341;
-    color: #fff;
-    font-size: 14px;
+    gap: 10px;
+    align-self: stretch;
+    min-height: 38px;
+    border: 1px solid #262019;
+    background: #328449;
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 18px;
     font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-    height: 31px;
+    font-weight: 400;
+    line-height: 100%; /* 18px */
+    letter-spacing: 0.9px;
     position: relative;
 }
 
