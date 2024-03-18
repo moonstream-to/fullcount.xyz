@@ -186,7 +186,7 @@ contract Fullcount is EIP712 {
 
         if (session.didPitcherReveal && session.didBatterReveal) {
             return 5;
-        } else if (session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
+        } else if (session.phaseStartTimestamp > 0 && session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
             return 6;
         } else if (session.pitcherNFT.nftAddress == address(0) || session.batterNFT.nftAddress == address(0)) {
             if (session.pitcherLeftSession || session.batterLeftSession) {
@@ -243,7 +243,7 @@ contract Fullcount is EIP712 {
 
         StakedSession[nftAddress][tokenID] = NumSessions;
 
-        SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
+        // SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
 
         SessionRequiresSignature[NumSessions] = requireSignature;
 
@@ -474,7 +474,7 @@ contract Fullcount is EIP712 {
         SessionAtBat[nextSessionID] = atBatID;
     }
 
-    // TODO Change name of function as tokens are no longer staked?
+    // Possibly change name of function as tokens are no longer staked?
     function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
@@ -500,7 +500,10 @@ contract Fullcount is EIP712 {
 
     function unstakeNFT(address nftAddress, uint256 tokenID) external {
         uint256 progress = _sessionProgress(StakedSession[nftAddress][tokenID]);
-        require(progress == 5 || progress == 6, "Fullcount.unstakeNFT: cannot unstake from session in this state");
+        require(
+            progress == 2 || progress == 5 || progress == 6,
+            "Fullcount.unstakeNFT: cannot unstake from session in this state"
+        );
 
         _unstakeNFT(nftAddress, tokenID);
     }
