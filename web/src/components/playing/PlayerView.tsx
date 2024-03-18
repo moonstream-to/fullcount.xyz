@@ -161,20 +161,21 @@ const PlayerView = ({
               {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
             </button>
           )}
+        {isCommitted &&
+          ((!isPitcher && !sessionStatus.didPitcherCommit) ||
+            (isPitcher && !sessionStatus.didBatterCommit)) && (
+            <div className={globalStyles.waitingMessage}>
+              <AnimatedMessage message={"Waiting for opponent"} />
+            </div>
+          )}
+        {isRevealed &&
+          ((!isPitcher && !sessionStatus.didPitcherReveal) ||
+            (isPitcher && !sessionStatus.didBatterReveal)) && (
+            <div className={globalStyles.waitingMessage}>
+              <AnimatedMessage message={"Waiting for opponent"} />
+            </div>
+          )}
       </div>
-      {/*{token.source !== "BLBContract" && revealMutation.isLoading && (*/}
-      {/*  <AnimatedMessage message={"Revealing"} />*/}
-      {/*)}*/}
-      {/*{isCommitted &&*/}
-      {/*  ((!isPitcher && !sessionStatus.didPitcherCommit) ||*/}
-      {/*    (isPitcher && !sessionStatus.didBatterCommit)) && (*/}
-      {/*    <AnimatedMessage message={"Waiting for opponent to commit"} />*/}
-      {/*  )}*/}
-      {/*{isRevealed &&*/}
-      {/*  ((!isPitcher && !sessionStatus.didPitcherReveal) ||*/}
-      {/*    (isPitcher && !sessionStatus.didBatterReveal)) && (*/}
-      {/*    <AnimatedMessage message={"Waiting for opponent to reveal"} />*/}
-      {/*  )}*/}
     </Flex>
   );
 };

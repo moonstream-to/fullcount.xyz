@@ -106,11 +106,13 @@
 .waitingMessage {
     color: #BFBFBF;
     text-align: center;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
+    font-family: Bangers;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    line-height: 100%; /* 12px */
+    letter-spacing: 0.6px;
+    white-space: nowrap;
 }
 
 .pitchTitle {

@@ -32,6 +32,22 @@
     line-height: 100%; /* 18px */
     letter-spacing: 0.9px;
     position: relative;
+    width: 140px;
+    z-index: 2;
+}
+
+.waitingMessage {
+    display: flex;
+    width: 140px;
+    height: 38px;
+    padding: 10px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    z-index: 5;
+    border: 1px solid #262019;
+    position: relative;
+    background: #4D4D4D;
 }
 
 .mobileButton {
