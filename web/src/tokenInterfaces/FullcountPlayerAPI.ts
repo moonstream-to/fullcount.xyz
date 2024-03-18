@@ -103,7 +103,7 @@ export const checkTransaction = async (transactionHash: string) => {
   return await getTransaction(transactionHash);
 };
 
-export function joinSessionFullcountPlayer({
+export async function joinSessionFullcountPlayer({
   token,
   sessionID,
   inviteCode,
@@ -119,6 +119,8 @@ export function joinSessionFullcountPlayer({
     session_id: String(sessionID),
     signature: inviteCode ?? "",
   };
+  await unstakeFullcountPlayer({ token });
+
   const headers = getHeaders();
 
   return axios
