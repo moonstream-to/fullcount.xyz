@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
+import { Flex, Image, Spinner, Text } from "@chakra-ui/react";
 import ActionTypeSelector from "./ActionTypeSelector";
 import GridComponent from "./GridComponent";
 import globalStyles from "../GlobalStyles.module.css";
@@ -120,13 +120,15 @@ const PlayerView = ({
   }, [sessionStatus.progress, isRevealed, token.source]);
 
   return (
-    <Flex direction={"column"} gap={"30px"} alignItems={"center"} mx={"auto"}>
-      <ActionTypeSelector
-        types={isPitcher ? pitchSpeeds : swingKinds}
-        isDisabled={isCommitted}
-        selected={actionChoice}
-        setSelected={typeChangeHandle}
-      />
+    <Flex
+      direction={"column"}
+      gap={"10px"}
+      alignItems={"center"}
+      mx={"auto"}
+      mb={"15px"}
+      height={"100%"}
+      justifyContent={"end"}
+    >
       <GridComponent
         selectedIndex={gridIndex}
         isPitcher={isPitcher}
@@ -134,37 +136,45 @@ const PlayerView = ({
           isCommitted || (!isPitcher && actionChoice === 2) ? undefined : setGridIndex
         }
       />
-      <Text className={globalStyles.gradientText} fontSize={"18px"} fontWeight={"700"}>
-        {`You're ${isPitcher ? "throwing" : "swinging"}`}
-      </Text>
-      <Text className={styles.actionText}>{getActionDescription()}</Text>
-      {!isCommitted && (
-        <button className={globalStyles.commitButton} onClick={handleCommit} disabled={isCommitted}>
-          {commitMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
-          {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
-        </button>
-      )}
-      {(token.source === "BLBContract" || isRevealFailed) &&
-        sessionStatus.didBatterCommit &&
-        sessionStatus.didPitcherCommit &&
-        !isRevealed && (
-          <button className={globalStyles.mobileButton} onClick={handleReveal}>
-            {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+      <ActionTypeSelector
+        types={isPitcher ? pitchSpeeds : swingKinds}
+        isDisabled={isCommitted}
+        selected={actionChoice}
+        setSelected={typeChangeHandle}
+      />
+      <div style={{ minHeight: "38px" }}>
+        {!isCommitted && (
+          <button
+            className={globalStyles.commitButton}
+            onClick={handleCommit}
+            disabled={isCommitted}
+          >
+            {commitMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
+            {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
           </button>
         )}
-      {token.source !== "BLBContract" && revealMutation.isLoading && (
-        <AnimatedMessage message={"Revealing..."} />
-      )}
-      {isCommitted &&
-        ((!isPitcher && !sessionStatus.didPitcherCommit) ||
-          (isPitcher && !sessionStatus.didBatterCommit)) && (
-          <AnimatedMessage message={"Waiting for opponent to commit"} />
-        )}
-      {isRevealed &&
-        ((!isPitcher && !sessionStatus.didPitcherReveal) ||
-          (isPitcher && !sessionStatus.didBatterReveal)) && (
-          <AnimatedMessage message={"Waiting for opponent to reveal"} />
-        )}
+        {(token.source === "BLBContract" || isRevealFailed) &&
+          sessionStatus.didBatterCommit &&
+          sessionStatus.didPitcherCommit &&
+          !isRevealed && (
+            <button className={globalStyles.mobileButton} onClick={handleReveal}>
+              {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
+            </button>
+          )}
+      </div>
+      {/*{token.source !== "BLBContract" && revealMutation.isLoading && (*/}
+      {/*  <AnimatedMessage message={"Revealing"} />*/}
+      {/*)}*/}
+      {/*{isCommitted &&*/}
+      {/*  ((!isPitcher && !sessionStatus.didPitcherCommit) ||*/}
+      {/*    (isPitcher && !sessionStatus.didBatterCommit)) && (*/}
+      {/*    <AnimatedMessage message={"Waiting for opponent to commit"} />*/}
+      {/*  )}*/}
+      {/*{isRevealed &&*/}
+      {/*  ((!isPitcher && !sessionStatus.didPitcherReveal) ||*/}
+      {/*    (isPitcher && !sessionStatus.didBatterReveal)) && (*/}
+      {/*    <AnimatedMessage message={"Waiting for opponent to reveal"} />*/}
+      {/*  )}*/}
     </Flex>
   );
 };
