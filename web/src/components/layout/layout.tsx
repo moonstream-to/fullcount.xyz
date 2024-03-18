@@ -35,7 +35,7 @@ export default function Layout({
         minH="100vh"
         bg="#1B1B1B"
         alignItems={"center"}
-        fontFamily="Inter, serif"
+        fontFamily="Pangolin, cursive"
         direction={"column"}
       >
         {children}
