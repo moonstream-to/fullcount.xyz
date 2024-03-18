@@ -4,15 +4,20 @@ import Image from "next/image";
 import { useQuery } from "react-query";
 import axios from "axios";
 import HeatMapSmall from "./HeatMapSmall";
+import { Spinner } from "@chakra-ui/react";
 
 const TokenToPlay = ({
   token,
   isPitcher,
   onClick,
+  isLoading,
+  isForGame,
 }: {
   token: Token | undefined;
   isPitcher: boolean;
   onClick?: () => void;
+  isLoading?: boolean;
+  isForGame?: boolean;
 }) => {
   const pitchDistributions = useQuery(
     ["pitch_distribution", token?.address, token?.id],
@@ -71,6 +76,25 @@ const TokenToPlay = ({
   if (!token) {
     return <></>;
   }
+
+  if (isForGame) {
+    return (
+      <div className={isPitcher ? styles.containerForPlayPitcher : styles.containerForPlayBatter}>
+        <Image src={token.image} alt={""} height={"50"} width={"50"} />
+        {isPitcher && pitchDistributions.data && (
+          <div>
+            <HeatMapSmall rates={pitchDistributions.data.rates} size={"10px"} />
+          </div>
+        )}
+        {!isPitcher && swingDistributions.data && (
+          <div>
+            <HeatMapSmall rates={swingDistributions.data.rates} size={"10px"} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <Image
@@ -96,7 +120,7 @@ const TokenToPlay = ({
         </div>
         {onClick && (
           <div className={styles.button} onClick={onClick}>
-            {isPitcher ? "Bat" : "Pitch"}
+            {isLoading ? <Spinner h={4} w={4} /> : isPitcher ? "Bat" : "Pitch"}
           </div>
         )}
       </div>

@@ -65,7 +65,7 @@
     font-weight: 400;
     line-height: normal;
     cursor: pointer;
-    min-height: 31.5px;
+    height: 31.5px;
 }
 
 .heatMapContainer {
@@ -74,3 +74,14 @@
     left: 50%;
     transform: translateY(-100%) translateX(-50%);
 }
+
+.containerForPlayPitcher, .containerForPlayBatter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.containerForPlayBatter {
+    flex-direction: row-reverse;
+}
+
