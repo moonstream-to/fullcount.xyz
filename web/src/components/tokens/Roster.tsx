@@ -1,12 +1,17 @@
 import styles from "./Roster.module.css";
 import { OwnedToken } from "../../types";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import NewCharacterButton from "./NewCharacterButton";
 import PlayButtons from "./PlayButtons";
+import { useGameContext } from "../../contexts/GameContext";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const [selectedTokenIdx, setSelectedTokenIdx] = useState(0);
+  const { updateContext } = useGameContext();
+  useEffect(() => {
+    updateContext({ selectedToken: { ...tokens[selectedTokenIdx] } });
+  }, [selectedTokenIdx, tokens]);
 
   return (
     <div className={styles.container}>
