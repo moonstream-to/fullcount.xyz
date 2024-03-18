@@ -3,7 +3,7 @@ import { AtBat, OwnedToken, Token } from "../../types";
 import TokenToPlay from "./TokenToPlay";
 import DotsCounter from "../sessions/DotsCounter";
 
-const outcomes = [
+export const outcomes = [
   "In Progress",
   "Strikeout",
   "Walk",
@@ -14,7 +14,7 @@ const outcomes = [
   "In Play Out",
 ];
 
-const outcomeType = (tokens: Token[], atBat: AtBat): "positive" | "negative" | undefined => {
+export const outcomeType = (tokens: Token[], atBat: AtBat): "positive" | "negative" | undefined => {
   const { pitcher, batter } = atBat;
   if (tokens.some((t) => t.address === pitcher?.address && t.id === pitcher.id)) {
     return atBat.outcome === 1 || atBat.outcome === 7 ? "positive" : "negative";
@@ -24,7 +24,7 @@ const outcomeType = (tokens: Token[], atBat: AtBat): "positive" | "negative" | u
   }
 };
 
-const AtBatView = ({ atBat, tokens }: { atBat: AtBat; tokens: OwnedToken[] }) => {
+const AtBatItem = ({ atBat, tokens }: { atBat: AtBat; tokens: OwnedToken[] }) => {
   return (
     <div className={styles.atBatContainer}>
       <div className={styles.cards}>
@@ -62,4 +62,4 @@ const AtBatView = ({ atBat, tokens }: { atBat: AtBat; tokens: OwnedToken[] }) =>
   );
 };
 
-export default AtBatView;
+export default AtBatItem;

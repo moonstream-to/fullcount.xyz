@@ -1,0 +1,16 @@
+.container {
+    display: flex;
+    padding: 5px 10px;
+    min-width: 70px;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    background: #262019;
+    color: #FF8D8D;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
