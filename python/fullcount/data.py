@@ -130,14 +130,16 @@ def l1_distance(
     assert swing_type != SwingType.Take, "Distance not used when batter chooses Take"
     return (
         abs(pitch_horizontal_location.value - swing_horizontal_location.value)
-        + abs(pitch_vertical_location.value - swing_vertical_location.value)
+        + 2 * abs(pitch_vertical_location.value -
+                  swing_vertical_location.value)
         + abs(pitch_type.value - swing_type.value)
     )
 
 
 def sample(distribution: OutcomeDistribution) -> Outcome:
     roll = random.randint(0, 9999)
-    outcome_index = min(i for i in range(8) if sum(distribution[: i + 1]) > roll)
+    outcome_index = min(i for i in range(
+        8) if sum(distribution[: i + 1]) > roll)
     return Outcome(outcome_index)
 
 
@@ -146,7 +148,9 @@ def configure_move_type_handler(
 ) -> None:
     parser.add_argument("--pitch-type", "-t", type=int, required=required)
     parser.add_argument("--pitch-vertical", "-v", type=int, required=required)
-    parser.add_argument("--pitch-horizontal", "-z", type=int, required=required)
+    parser.add_argument("--pitch-horizontal", "-z",
+                        type=int, required=required)
     parser.add_argument("--swing-type", "-T", type=int, required=required)
     parser.add_argument("--swing-vertical", "-V", type=int, required=required)
-    parser.add_argument("--swing-horizontal", "-Z", type=int, required=required)
+    parser.add_argument("--swing-horizontal", "-Z",
+                        type=int, required=required)
