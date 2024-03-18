@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Box, Flex, Grid, Image } from "@chakra-ui/react";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import styles from "./PlayView.module.css";
@@ -36,32 +36,18 @@ const GridComponent = ({
     }
   };
 
-  const numbers = [
-    10, 11, 12, 13, 14, 15, 1, 2, 3, 16, 17, 4, 5, 6, 18, 19, 7, 8, 9, 20, 21, 22, 23, 24, 25,
-  ];
-  const leftBorder = [6, 11, 16];
-  const topBorder = [6, 7, 8];
-  const rightBorder = [8, 13, 18];
-  const bottomBorder = [16, 17, 18];
-  useEffect(() => {
-    console.log(isPitcher);
-  }, [isPitcher]);
+  const strikeZone = [6, 7, 8, 11, 12, 13, 16, 17, 18];
 
-  // Generate cell with click handler and style based on index
   const generateCell = (index: number) => (
     <Box
       key={index}
-      height="50px"
-      width="50px"
-      color={index === selectedIndex ? "#e6482b" : numbers[index] < 10 ? "white" : "#b0b0b0"}
+      backgroundColor={
+        index === selectedIndex ? "#537250" : strikeZone.includes(index) ? "#669568" : "white"
+      }
       display="flex"
       alignItems="center"
       justifyContent="center"
-      border={"1px solid #333333"}
-      borderLeftColor={leftBorder.includes(index) ? "#AAA" : "#333333"}
-      borderRightColor={rightBorder.includes(index) ? "#AAA" : "#33333"}
-      borderTopColor={topBorder.includes(index) ? "#AAA" : "#333333"}
-      borderBottomColor={bottomBorder.includes(index) ? "#AAA" : "#333333"}
+      border={"0.5px solid #262019"}
       cursor={
         selectedIndex === index && !isDragging && setSelectedIndex
           ? "pointer"
@@ -70,9 +56,9 @@ const GridComponent = ({
           : "default"
       }
       fontSize={index === selectedIndex ? "22px" : "16px"}
-      bg={"#111111"}
       onMouseUp={() => handleMouseUp(index)}
       onMouseDown={() => handleMouseDown(index)}
+      position={"relative"}
     >
       {index === selectedIndex && !isDragging && (
         <Image
@@ -96,8 +82,37 @@ const GridComponent = ({
           ? styles.pitcherGrid
           : styles.batterGrid
       }
+      position={"relative"}
+      mb={"5px"}
     >
-      <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
+      <Image
+        src={`${assets}/batter.png`}
+        position={"absolute"}
+        top={"0"}
+        right={"50%"}
+        minW={"165px"}
+        transform={"translateX(0) translateY(-33.3%)"}
+        alt={""}
+        h={"395px"}
+        zIndex={"0"}
+      />
+      <Image
+        src={`${assets}/pitcher.png`}
+        position={"absolute"}
+        top={"0"}
+        right={"50%"}
+        transform={"translateX(50%) translateY(-50px)"}
+        alt={""}
+        w={"60px"}
+        h={"80px"}
+        zIndex={"0"}
+      />
+      <Grid
+        templateColumns="19px 31px 31px 31px 19px"
+        templateRows={"19px 38px 38px 38px 19px"}
+        w={"fit-content"}
+        gap={"2px"}
+      >
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>
     </Flex>
