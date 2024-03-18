@@ -6,7 +6,7 @@ import { ERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/ERC
 import { ERC721Enumerable } from "../lib/openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Base64 } from "../lib/openzeppelin-contracts/contracts/utils/Base64.sol";
 import { Strings } from "../lib/openzeppelin-contracts/contracts/utils/Strings.sol";
-import { ITerminus } from "web3/interfaces/Iterminus.sol";
+import { ITerminus } from "../lib/web3/contracts/interfaces/ITerminus.sol";
 
 contract BeerLeagueBallers is ERC721Enumerable {
     string[] public ProfileImages = [
