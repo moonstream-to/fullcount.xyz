@@ -1,0 +1,33 @@
+.container {
+    display: flex;
+    flex-direction: column;
+
+}
+
+.content {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 5px;
+}
+
+.winImage {
+    width: 80px;
+    height: 80px;
+}
+
+.image {
+    width: 50px;
+    height: 50px;
+}
+
+.imageContainerPitcher, .imageContainerBatter {
+    width: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imageContainerBatter {
+    flex-direction: row-reverse;
+}
