@@ -7,10 +7,12 @@ import { AtBat, OwnedToken, Token } from "../../types";
 import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
+import { useRouter } from "next/router";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
   const toast = useMoonToast();
+  const router = useRouter();
   const { user } = useUser();
   const startSession = useMutation(
     async ({
@@ -91,13 +93,20 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
           token.activeSession?.batterNFT.tokenID === token.id)) && (
         <div
           className={styles.button}
-          onClick={() =>
+          onClick={() => {
+            if (
+              token.activeSession?.batterNFT.nftAddress === token.address &&
+              token.activeSession?.batterNFT.tokenID === token.id
+            ) {
+              router.push(`atbats/?session_id=${token.stakedSessionID}`);
+              return;
+            }
             startSession.mutate({
               role: 1,
               token,
               requireSignature: false,
-            })
-          }
+            });
+          }}
         >
           {startSession.isLoading && startSession.variables?.role === 1 ? (
             <Spinner h={4} w={4} />
