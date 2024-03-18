@@ -82,13 +82,63 @@ interface Pair {
   batter: Token | undefined;
 }
 
+interface SessionState {
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  phaseStartTimestamp: string;
+}
+
+interface PitcherReveal {
+  nonce: string;
+  speed: string;
+  vertical: string;
+  horizontal: string;
+}
+
+interface BatterReveal {
+  nonce: string;
+  kind: string;
+  vertical: string;
+  horizontal: string;
+}
+
+export interface SessionStatus {
+  progress: number;
+  outcome: number;
+  sessionID: number;
+  didPitcherCommit: boolean;
+  didBatterCommit: boolean;
+  didPitcherReveal: boolean;
+  didBatterReveal: boolean;
+  pitcherReveal: PitcherReveal;
+  batterReveal: BatterReveal;
+  phaseStartTimestamp: string;
+}
+
 interface AtBat {
   pitcher: Token | undefined;
   batter: Token | undefined;
-  balls: number; // uint256, using number in TypeScript
-  strikes: number; // uint256, using number in TypeScript
+  balls: number;
+  strikes: number;
   outcome: number;
+  lastSessionId?: number;
+  id?: number;
+  numberOfSessions?: number;
+  lastSession?: SessionState;
   progress: number;
+}
+
+interface AtBatStatus {
+  pitcher: Token | undefined;
+  batter: Token | undefined;
+  balls: number;
+  strikes: number;
+  outcome: number;
+  id: number;
+  pitches: SessionStatus[];
+  numberOfSessions: number;
 }
 
 interface Session {
