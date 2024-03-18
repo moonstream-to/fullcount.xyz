@@ -58,8 +58,7 @@ const PitcherViewMobile = ({
     {
       onSuccess: () => {
         setIsCommitted(true);
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -103,8 +102,7 @@ const PitcherViewMobile = ({
     {
       onSuccess: () => {
         setIsRevealed(true);
-        queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         setIsRevealFailed(true);
