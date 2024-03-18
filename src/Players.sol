@@ -53,6 +53,12 @@ contract BeerLeagueBallers is ERC721Enumerable {
         ProfileImages[index] = newImage;
     }
 
+    function setTokenName(uint256 tokenID, string memory newName) public {
+        _enforceIsAdmin();
+
+        Name[tokenID] = newName;
+    }
+
     function mint(string memory name, uint256 imageIndex) public returns (uint256) {
         require(imageIndex < ProfileImages.length, "BLB.mint: invalid image index");
         uint256 tokenId = totalSupply() + 1;

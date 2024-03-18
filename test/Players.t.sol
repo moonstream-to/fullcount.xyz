@@ -28,9 +28,11 @@ contract PlayersTestBase is Test {
     MockERC1155 terminus;
 
     uint256 adminPrivateKey = 0x1;
+    uint256 playerPrivateKey = 0x2;
     uint256 randomPersonPrivateKey = 0x77;
 
     address admin = vm.addr(adminPrivateKey);
+    address player = vm.addr(playerPrivateKey);
     address randomPerson = vm.addr(randomPersonPrivateKey);
 
     uint256 adminPoolID = 1;
@@ -84,5 +86,38 @@ contract PlayersTestAdmin is PlayersTestBase {
 
         assertEq(players.ProfileImages(index), initialImage);
         assertNotEq(players.ProfileImages(index), "http://www.example.com");
+    }
+
+    function test_admin_can_set_token_name() public {
+        string memory playerName = "Offensive Bunny";
+
+        vm.prank(player);
+        uint256 tokenID = players.mint(playerName, 0);
+
+        assertEq(players.Name(tokenID), playerName);
+
+        string memory adminName = "Fluffy Bunny";
+
+        vm.prank(admin);
+        players.setTokenName(tokenID, adminName);
+
+        assertEq(players.Name(tokenID), adminName);
+    }
+
+    function test_non_admin_cannot_set_token_name() public {
+        string memory playerName = "Offensive Bunny";
+
+        vm.prank(player);
+        uint256 tokenID = players.mint(playerName, 0);
+
+        assertEq(players.Name(tokenID), playerName);
+
+        string memory randomName = "Random Bunny";
+
+        vm.prank(randomPerson);
+        vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
+        players.setTokenName(tokenID, randomName);
+
+        assertEq(players.Name(tokenID), playerName);
     }
 }
