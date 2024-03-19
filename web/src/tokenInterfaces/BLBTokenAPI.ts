@@ -50,7 +50,6 @@ export const getTokensData = async ({
   tokens: TokenId[];
   tokensSource: TokenSource;
 }) => {
-
   if (tokens.length < 1) {
     return [];
   }
