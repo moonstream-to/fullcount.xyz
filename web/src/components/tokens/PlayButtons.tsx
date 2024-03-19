@@ -7,13 +7,14 @@ import { AtBat, OwnedToken, Token } from "../../types";
 import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const router = useRouter();
   const { user } = useUser();
+
   const startSession = useMutation(
     async ({
       role,
@@ -78,6 +79,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
             return t;
           });
         });
+        router.push(`atbats/?session_id=${data.sessionID}`);
       },
       onError: (e: Error) => {
         toast("Start failed: " + e?.message, "error");
