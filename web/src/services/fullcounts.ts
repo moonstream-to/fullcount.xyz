@@ -1,4 +1,4 @@
-import { Token, TokenId } from "../types";
+import { BatterReveal, PitcherReveal, Token, TokenId } from "../types";
 import { getContracts } from "../utils/getWeb3Contracts";
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../constants";
 import { AbiItem } from "web3-utils";
@@ -64,10 +64,21 @@ export const getAtBat = async ({ tokensCache, id }: { tokensCache: Token[]; id: 
       didBatterCommit,
       didPitcherReveal,
       didBatterReveal,
-      pitcherReveal,
-      batterReveal,
       phaseStartTimestamp,
     } = state;
+    const pitcherReveal: PitcherReveal = {
+      nonce: state.pitcherReveal[0],
+      speed: state.pitcherReveal[1],
+      vertical: state.pitcherReveal[2],
+      horizontal: state.pitcherReveal[3],
+    };
+    const batterReveal: BatterReveal = {
+      nonce: state.batterReveal[0],
+      kind: state.batterReveal[1],
+      vertical: state.batterReveal[2],
+      horizontal: state.batterReveal[3],
+    };
+
     return {
       progress: Number(progresses[idx]),
       outcome: Number(state.outcome),
