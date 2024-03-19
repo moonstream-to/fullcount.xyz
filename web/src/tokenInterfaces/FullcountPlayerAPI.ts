@@ -205,15 +205,16 @@ export const commitOrRevealPitchFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
+        console.log("Transaction failed. Try again, please");
       }
       const { gameContract } = getContracts();
       const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
       if (!isCommit && !sessionState.didPitcherReveal) {
-        throw new Error("Revealing error. Try again, please");
+        console.log("Revealing error. Try again, please");
+        // throw new Error("Revealing error. Try again, please");
       }
       if (isCommit && !sessionState.didPitcherCommit) {
-        throw new Error("Committing error. Try again, please");
+        console.log("Committing error. Try again, please");
       }
       console.log({
         isCommit,
@@ -253,15 +254,15 @@ export const commitOrRevealSwingFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
+        console.log("Transaction failed. Try again, please");
       }
       const { gameContract } = getContracts();
       const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
       if (!isCommit && !sessionState.didBatterReveal) {
-        throw new Error("Revealing error. Try again, please");
+        console.log("Revealing error. Try again, please");
       }
       if (isCommit && !sessionState.didBatterCommit) {
-        throw new Error("Committing error. Try again, please");
+        console.log("Committing error. Try again, please");
       }
       console.log({
         isCommit,
