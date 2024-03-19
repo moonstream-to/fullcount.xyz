@@ -207,6 +207,19 @@ export const commitOrRevealPitchFullcountPlayer = ({
       if (!isTransactionMinted) {
         throw new Error("Transaction failed. Try again, please");
       }
+      const { gameContract } = getContracts();
+      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
+      if (!isCommit && !sessionState.didPitcherReveal) {
+        throw new Error("Revealing error. Try again, please");
+      }
+      if (isCommit && !sessionState.didPitcherCommit) {
+        throw new Error("Committing error. Try again, please");
+      }
+      console.log({
+        isCommit,
+        didCommit: sessionState.didBatterCommit,
+        didReveal: sessionState.didBatterReveal,
+      });
       console.log("Success:", response.data);
       return response.data;
     });
@@ -242,6 +255,19 @@ export const commitOrRevealSwingFullcountPlayer = ({
       if (!isTransactionMinted) {
         throw new Error("Transaction failed. Try again, please");
       }
+      const { gameContract } = getContracts();
+      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
+      if (!isCommit && !sessionState.didBatterReveal) {
+        throw new Error("Revealing error. Try again, please");
+      }
+      if (isCommit && !sessionState.didBatterCommit) {
+        throw new Error("Committing error. Try again, please");
+      }
+      console.log({
+        isCommit,
+        didCommit: sessionState.didBatterCommit,
+        didReveal: sessionState.didBatterReveal,
+      });
       console.log("Success:", response.data);
       return response.data;
     });
