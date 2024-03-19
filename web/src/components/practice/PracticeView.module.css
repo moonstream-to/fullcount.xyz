@@ -50,6 +50,24 @@
     position: absolute;
     /*left: 50%;*/
     bottom: 50px;
+    min-height: 36px;
     /*transform: translateX(50%) translateY(100%);*/
 
+}
+
+.exitButton {
+    position: absolute;
+    top: 45.5px;
+    right: 10px;
+    color: black;
+    z-index: 2;
+    display: inline-flex;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    border: 1px solid #7E8E7F;
+    background: rgba(255, 255, 255, 0.70);
+    backdrop-filter: blur(3px);
 }
