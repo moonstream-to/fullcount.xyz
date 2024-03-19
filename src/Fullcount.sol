@@ -473,7 +473,7 @@ contract Fullcount is EIP712 {
         SessionAtBat[nextSessionID] = atBatID;
     }
 
-    // Possibly change name of function as tokens are no longer staked?
+    // TODO change name of function as tokens are no longer staked?
     function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
