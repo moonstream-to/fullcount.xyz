@@ -135,7 +135,7 @@ const PlayerView = ({
       width="100%"
     >
       <div
-        style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative" }}
+        style={{ width: "320px", display: "flex", justifyContent: "center", position: "relative" }}
       >
         <GridComponent
           selectedIndex={gridIndex}
@@ -151,6 +151,19 @@ const PlayerView = ({
             left={`${columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]] - 143}px`}
             top={`${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 19}px`}
             className={styles.batImage}
+          />
+        )}
+        {isPitcher && gridIndex !== -1 && (
+          <Image
+            h={"22px"}
+            w={"22px"}
+            src={`${FULLCOUNT_ASSETS_PATH}/ball.png`}
+            left={`${columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]] - 5}px`}
+            top={`${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 11}px`}
+            className={styles.ballImage}
+            alt={"o"}
+            draggable={false}
+            userSelect={"none"}
           />
         )}
       </div>
