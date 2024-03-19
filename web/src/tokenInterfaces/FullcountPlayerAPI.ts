@@ -9,6 +9,14 @@ import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
+const parseActiveSession = (s: any) => {
+  return {
+    ...s,
+    batterNFT: { nftAddress: s.batterNFT[0], tokenID: s.batterNFT[1] },
+    pitcherNFT: { nftAddress: s.pitcherNFT[0], tokenID: s.pitcherNFT[1] },
+  };
+};
+
 export async function fetchFullcountPlayerTokens() {
   try {
     const headers = getHeaders();
@@ -45,7 +53,10 @@ export async function fetchFullcountPlayerTokens() {
       const sessionIdx = activeSessionsIds.indexOf(t.stakedSessionID);
       return sessionIdx === -1
         ? { ...t }
-        : { ...t, activeSession: { ...activeSessions[sessionIdx] } };
+        : {
+            ...t,
+            activeSession: { ...activeSessions.map((s) => parseActiveSession(s))[sessionIdx] },
+          };
     });
   } catch (e) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
