@@ -144,7 +144,7 @@ const PlayerView = ({
             isCommitted || (!isPitcher && actionChoice === 2) ? undefined : setGridIndex
           }
         />
-        {!isPitcher && actionChoice !== 2 && (
+        {!isPitcher && actionChoice !== 2 && gridIndex !== -1 && (
           <Image
             src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
             alt={"o"}
