@@ -115,10 +115,20 @@ const PlayerView = ({
   }, [sessionStatus.sessionID]);
 
   useEffect(() => {
-    if (token.source === "FullcountPlayerAPI" && sessionStatus.progress === 4 && !isRevealed) {
+    console.log(
+      isPitcher,
+      sessionStatus.progress,
+      sessionStatus.didBatterReveal,
+      sessionStatus.didPitcherReveal,
+      token.source,
+    );
+    if (isPitcher && sessionStatus.progress === 4 && !sessionStatus.didPitcherReveal) {
       handleReveal();
     }
-  }, [sessionStatus.progress, isRevealed, token.source]);
+    if (!isPitcher && sessionStatus.progress === 4 && !sessionStatus.didBatterReveal) {
+      handleReveal();
+    }
+  }, [sessionStatus.progress, sessionStatus.didBatterReveal, sessionStatus.didPitcherReveal]);
 
   const columnCenters = [9.5, 36.5, 69.5, 102.5, 129.5].map((x) => x + 85);
   const rowCenters = [9.5, 40.0, 80.0, 120.0, 150.5];
