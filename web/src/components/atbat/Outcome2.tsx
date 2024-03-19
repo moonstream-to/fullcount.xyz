@@ -2,6 +2,8 @@ import { Image } from "@chakra-ui/react";
 import styles from "./Outcome2.module.css";
 import { AtBatStatus, SessionStatus, Token } from "../../types";
 import OutcomeGrid from "./OutcomeGrid";
+import React, { useEffect } from "react";
+import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 export const sessionOutcomeType = (
   tokens: Token[],
@@ -20,6 +22,11 @@ export const sessionOutcomeType = (
   }
 };
 
+const kinds = ["Contact", "Power", "Take"];
+const speeds = ["Fast", "Slow"];
+const columnCenters = [9.5, 36.5, 69.5, 102.5, 129.5].map((x) => x + 85);
+const rowCenters = [9.5, 40.0, 80.0, 120.0, 150.5];
+
 const Outcome2 = ({
   atBat,
   sessionStatus,
@@ -27,6 +34,9 @@ const Outcome2 = ({
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
 }) => {
+  useEffect(() => {
+    console.log(sessionStatus);
+  }, [sessionStatus]);
   return (
     <div className={styles.container}>
       <div className={styles.content}>
@@ -42,10 +52,22 @@ const Outcome2 = ({
               }
             />
           )}
+          <div className={styles.actionType}>
+            {speeds[Number(sessionStatus.pitcherReveal.speed)]}
+          </div>
         </div>
+        {sessionStatus.batterReveal.kind !== "2" && (
+          <Image
+            src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
+            alt={"o"}
+            left={`${columnCenters[Number(sessionStatus.batterReveal.horizontal)] - 145}px`}
+            top={`${rowCenters[Number(sessionStatus.batterReveal.vertical)] - 15}px`}
+            className={styles.batImage}
+          />
+        )}
         <OutcomeGrid
-          pitchReveal={{ speed: 1, vertical: 1, horizontal: 2 }}
-          swingReveal={{ kind: 1, vertical: 3, horizontal: 4 }}
+          pitchReveal={sessionStatus.pitcherReveal}
+          swingReveal={sessionStatus.batterReveal}
         />
         <div className={styles.imageContainerBatter}>
           {atBat?.batter && (
@@ -59,6 +81,7 @@ const Outcome2 = ({
               }
             />
           )}
+          <div className={styles.actionType}>{kinds[Number(sessionStatus.batterReveal.kind)]}</div>
         </div>
       </div>
     </div>

@@ -56,6 +56,7 @@ const AtBatView: React.FC = () => {
     }
   }, [router.query.id]);
 
+  const queryClient = useQueryClient();
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
     ["atBat", atBatId, sessionId],
     async () => {
@@ -83,6 +84,10 @@ const AtBatView: React.FC = () => {
           setShowPitchOutcome(true);
           setTimeout(() => setShowPitchOutcome(false), 5000);
         }
+        if (data && data.atBat.outcome !== 0) {
+          queryClient.invalidateQueries("owned_tokens");
+          setShowPitchOutcome(true);
+        }
         if (tokensCache.length !== data?.tokens.length) {
           updateContext({ tokensCache: data?.tokens ?? tokensCache });
         }
@@ -95,10 +100,6 @@ const AtBatView: React.FC = () => {
   useEffect(() => {
     console.log(selectedToken, atBatState.data?.atBat.batter);
   }, [atBatState.data?.atBat.batter, selectedToken]);
-
-  useEffect(() => {
-    console.log(atBatState.data, atBatState.data?.atBat.outcome !== 0, selectedToken);
-  }, [atBatState.data, selectedToken]);
 
   const isSameToken = (a: Token | undefined, b: Token | undefined) => {
     if (!a || !b) return false;
@@ -154,17 +155,16 @@ const AtBatView: React.FC = () => {
         </div>
       )}
       {atBatState.data?.atBat.outcome === 0 &&
+        !showPitchOutcome &&
         atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
           <>
             {selectedToken &&
               isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
               atBatState.data && (
-                <>
-                  <PitcherViewMobile
-                    sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
-                    token={selectedToken as OwnedToken}
-                  />
-                </>
+                <PitcherViewMobile
+                  sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
+                  token={selectedToken as OwnedToken}
+                />
               )}
             {selectedToken &&
               isSameToken(selectedToken, atBatState.data?.atBat.batter) &&
@@ -176,18 +176,20 @@ const AtBatView: React.FC = () => {
               )}
           </>
         )}
-      {/*{atBatState.data?.atBat && showPitchOutcome && (*/}
-      {/*  <>*/}
-      {/*    {atBatState.data?.atBat && (*/}
-      {/*      <Outcome2*/}
-      {/*        atBat={atBatState.data?.atBat}*/}
-      {/*        sessionStatus={*/}
-      {/*          atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2]*/}
-      {/*        }*/}
-      {/*      />*/}
-      {/*    )}*/}
-      {/*  </>*/}
-      {/*)}*/}
+      {atBatState.data?.atBat && showPitchOutcome && atBatState.data.atBat.pitches.length > 1 && (
+        <>
+          {atBatState.data?.atBat && (
+            <Outcome2
+              atBat={atBatState.data?.atBat}
+              sessionStatus={
+                atBatState.data.atBat.outcome === 0
+                  ? atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2]
+                  : atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1]
+              }
+            />
+          )}
+        </>
+      )}
       {atBatState.data && <AtBatFooter atBat={atBatState.data.atBat} />}
     </div>
   );
