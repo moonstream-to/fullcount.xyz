@@ -797,13 +797,13 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
         // Generates a double
         Pitch memory pitch = Pitch(
-            115_501_419_915_073_027_201_528_450_984_807_047_638_958_490_173_387_813_223_494_386_604_734_350_200_751,
-            PitchSpeed.Fast,
+            111_226_050_657_822_924_597_491_446_253_991_213_025_840_145_394_201_015_488_938_793_738_637_304_727_056,
+            PitchSpeed.Slow,
             VerticalLocation.Middle,
-            HorizontalLocation.Middle
+            HorizontalLocation.InsideStrike
         );
 
-        Swing memory swing = Swing(4574, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
+        Swing memory swing = Swing(5682, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.OutsideStrike);
 
         _commitPitch(sixthSessionID, player1, player1PrivateKey, pitch);
         _commitSwing(sixthSessionID, player2, player2PrivateKey, swing);
@@ -1031,14 +1031,13 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
         // Generates a home run
         Pitch memory hrPitch = Pitch(
-            80_491_828_288_466_500_398_500_201_838_979_874_564_536_822_010_908_142_391_208_468_039_821_070_678_148,
+            70_742_784_270_056_657_581_884_307_797_108_841_089_344_138_257_779_225_355_304_684_713_507_588_495_343,
             PitchSpeed.Fast,
-            VerticalLocation.Middle,
-            HorizontalLocation.InsideStrike
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideStrike
         );
 
-        Swing memory hrSwing =
-            Swing(32_155, SwingType.Power, VerticalLocation.LowStrike, HorizontalLocation.InsideStrike);
+        Swing memory hrSwing = Swing(6874, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
 
         _commitPitch(nextSessionID, player1, player1PrivateKey, hrPitch);
 

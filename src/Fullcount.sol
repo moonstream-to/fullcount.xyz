@@ -63,22 +63,21 @@ contract Fullcount is EIP712 {
     uint256 public NumSessions;
 
     // We want to strongly reward distance 0 swings.
-    // 10% chance of single, 30% chance of double, 10% chance of triple, 50% chance of home run
-    uint256[8] public Distance0Distribution = [0, 0, 0, 1000, 3000, 1000, 5000, 0];
+    // 10% chance of single, 25% chance of double, 15% chance of triple, 60% chance of home run
+    uint256[8] public Distance0Distribution = [0, 0, 0, 0, 2500, 1500, 6000, 0];
     // Distance 1 swings should also be mostly postive outcomes and have no negative outsomes (for batter)
     // but considerably lower chances at big hits.
-    // 25% chamce of foul, 25% chance of single, 20% chance of double, 5% chance of triple, 25% chance of home run
-    uint256[8] public Distance1Distribution = [0, 0, 2500, 2500, 2000, 500, 2500, 0];
+    // 25% chamce of foul, 25% chance of single, 25% chance of double, 5% chance of triple, 20% chance of home run
+    uint256[8] public Distance1Distribution = [0, 0, 2500, 2500, 2500, 500, 2000, 0];
     // Distance 2 swings should be half hits (mostly weaker) with some neutral and few negative outcomes
-    // 10% chance of strike, 32% chance of foul, 32% chance of single, 11% chance of double, 2% chance of triple,
-    // 8% chance of home run, 5% chance of out
-    uint256[8] public Distance2Distribution = [1000, 0, 3200, 3200, 1100, 200, 800, 500];
+    // 40% chance of foul, 37% chance of single, 14% chance of double, 2% chance of triple, 7% chance of home run
+    uint256[8] public Distance2Distribution = [0, 0, 4000, 3700, 1400, 200, 700, 0];
     // Distance 3 swings should be mostly negative outcomes and little chance of big hits
-    // 40% chance of strike, 30% chance of foul, 15% chance of single, 2.5% chance of double, 12.5% chance of out
-    uint256[8] public Distance3Distribution = [4000, 0, 3000, 1500, 250, 0, 0, 1250];
+    // 32% chance of strike, 45% chance of foul, 15% chance of single, 5% chance of double, 3% chance of out
+    uint256[8] public Distance3Distribution = [3200, 0, 4500, 1500, 500, 0, 0, 300];
     // Distance 4 swings should be mostly strikes and have no positive outcomes (for batter)
-    // 70% chance of strike, 20% chance of foul, 10% chance of out
-    uint256[8] public Distance4Distribution = [7000, 0, 2000, 0, 0, 0, 0, 1000];
+    // 71% chance of strike, 21% chance of foul, 9% chance of out
+    uint256[8] public Distance4Distribution = [7100, 0, 2000, 0, 0, 0, 0, 900];
     // Distance 5+ swings should all be strikes
     uint256[8] public DistanceGT4Distribution = [10_000, 0, 0, 0, 0, 0, 0, 0];
 
@@ -186,7 +185,7 @@ contract Fullcount is EIP712 {
 
         if (session.didPitcherReveal && session.didBatterReveal) {
             return 5;
-        } else if (session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
+        } else if (session.phaseStartTimestamp > 0 && session.phaseStartTimestamp + SecondsPerPhase < block.timestamp) {
             return 6;
         } else if (session.pitcherNFT.nftAddress == address(0) || session.batterNFT.nftAddress == address(0)) {
             if (session.pitcherLeftSession || session.batterLeftSession) {
@@ -243,7 +242,7 @@ contract Fullcount is EIP712 {
 
         StakedSession[nftAddress][tokenID] = NumSessions;
 
-        SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
+        // SessionState[NumSessions].phaseStartTimestamp = block.timestamp;
 
         SessionRequiresSignature[NumSessions] = requireSignature;
 
@@ -474,7 +473,7 @@ contract Fullcount is EIP712 {
         SessionAtBat[nextSessionID] = atBatID;
     }
 
-    // TODO Change name of function as tokens are no longer staked?
+    // TODO change name of function as tokens are no longer staked?
     function _unstakeNFT(address nftAddress, uint256 tokenID) internal {
         require(_isTokenOwner(nftAddress, tokenID), "Fullcount._unstakeNFT: msg.sender is not NFT owner");
 
@@ -500,7 +499,10 @@ contract Fullcount is EIP712 {
 
     function unstakeNFT(address nftAddress, uint256 tokenID) external {
         uint256 progress = _sessionProgress(StakedSession[nftAddress][tokenID]);
-        require(progress == 5 || progress == 6, "Fullcount.unstakeNFT: cannot unstake from session in this state");
+        require(
+            progress == 2 || progress == 5 || progress == 6,
+            "Fullcount.unstakeNFT: cannot unstake from session in this state"
+        );
 
         _unstakeNFT(nftAddress, tokenID);
     }
@@ -726,9 +728,9 @@ contract Fullcount is EIP712 {
         pitchParam = uint256(pitch.vertical);
         swingParam = uint256(swing.vertical);
         if (pitchParam <= swingParam) {
-            dist += (swingParam - pitchParam);
+            dist += 2 * (swingParam - pitchParam);
         } else {
-            dist += (pitchParam - swingParam);
+            dist += 2 * (pitchParam - swingParam);
         }
 
         pitchParam = uint256(pitch.horizontal);

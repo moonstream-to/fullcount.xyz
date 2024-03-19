@@ -1,6 +1,6 @@
 import argparse
 
-from . import BeerLeagueBallers, Fullcount, generation_1, randomness, generators, signatures
+from . import BeerLeagueBallers, Fullcount, generation_1, randomness, generators, signatures, tuning
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -14,22 +14,30 @@ def generate_cli() -> argparse.ArgumentParser:
     subparsers = parser.add_subparsers()
 
     contract_parser = Fullcount.generate_cli()
-    subparsers.add_parser("contract", parents=[contract_parser], add_help=False)
+    subparsers.add_parser("contract", parents=[
+                          contract_parser], add_help=False)
 
     generation_1_parser = generation_1.generate_cli()
-    subparsers.add_parser("gen-1", parents=[generation_1_parser], add_help=False)
+    subparsers.add_parser(
+        "gen-1", parents=[generation_1_parser], add_help=False)
 
     blb_parser = BeerLeagueBallers.generate_cli()
     subparsers.add_parser("blb", parents=[blb_parser], add_help=False)
 
     randomness_parser = randomness.generate_cli()
-    subparsers.add_parser("randomness", parents=[randomness_parser], add_help=False)
+    subparsers.add_parser("randomness", parents=[
+                          randomness_parser], add_help=False)
 
     codegen_parser = generators.generate_cli()
     subparsers.add_parser("codegen", parents=[codegen_parser], add_help=False)
 
     signatures_parser = signatures.generate_cli()
-    subparsers.add_parser("signatures", parents=[signatures_parser], add_help=False)
+    subparsers.add_parser("signatures", parents=[
+                          signatures_parser], add_help=False)
+
+    tuning_parser = tuning.generate_cli()
+    subparsers.add_parser("tuning", parents=[
+                          tuning_parser], add_help=False)
 
     return parser
 
