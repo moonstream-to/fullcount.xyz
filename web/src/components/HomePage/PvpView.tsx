@@ -74,6 +74,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
             return t;
           });
         });
+        queryClient.invalidateQueries("owned_tokens");
         if (atBatId) {
           router.push(`atbats/?id=${atBatId}`);
         }
