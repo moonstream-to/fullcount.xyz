@@ -5,9 +5,17 @@ import TokenToPlay from "../HomePage/TokenToPlay";
 const AtBatFooter = ({ atBat }: { atBat: AtBatStatus }) => {
   return (
     <div className={styles.container}>
-      {atBat.pitcher && <TokenToPlay token={atBat.pitcher} isPitcher={true} isForGame={true} />}
+      {atBat.pitcher ? (
+        <TokenToPlay token={atBat.pitcher} isPitcher={true} isForGame={true} />
+      ) : (
+        <div style={{ width: "112px" }} />
+      )}
       <div className={styles.vs}>VS</div>
-      {atBat.batter && <TokenToPlay token={atBat.batter} isPitcher={false} isForGame={true} />}
+      {atBat.batter ? (
+        <TokenToPlay token={atBat.batter} isPitcher={false} isForGame={true} />
+      ) : (
+        <div style={{ width: "112px" }} />
+      )}
     </div>
   );
 };
