@@ -17,22 +17,7 @@ contract BeerLeagueBallers is ERC721Enumerable {
         "https://badges.moonstream.to/blb/p5.png",
         "https://badges.moonstream.to/blb/p6.png",
         "https://badges.moonstream.to/blb/p7.png",
-        "https://badges.moonstream.to/blb/p8.png",
-        "https://badges.moonstream.to/blb/p9.png",
-        "https://badges.moonstream.to/blb/p10.png",
-        "https://badges.moonstream.to/blb/p11.png",
-        "https://badges.moonstream.to/blb/p12.png",
-        "https://badges.moonstream.to/blb/p13.png",
-        "https://badges.moonstream.to/blb/p14.png",
-        "https://badges.moonstream.to/blb/p15.png",
-        "https://badges.moonstream.to/blb/p16.png",
-        "https://badges.moonstream.to/blb/p17.png",
-        "https://badges.moonstream.to/blb/p18.png",
-        "https://badges.moonstream.to/blb/p19.png",
-        "https://badges.moonstream.to/blb/p20.png",
-        "https://badges.moonstream.to/blb/p21.png",
-        "https://badges.moonstream.to/blb/p22.png",
-        "https://badges.moonstream.to/blb/p23.png"
+        "https://badges.moonstream.to/blb/p8.png"
     ];
 
     mapping(uint256 => string) public Name;
