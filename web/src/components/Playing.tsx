@@ -38,7 +38,7 @@ const Playing = () => {
     },
     {
       ...queryCacheProps,
-      refetchInterval: 15000,
+      refetchInterval: 5000,
     },
   );
 
