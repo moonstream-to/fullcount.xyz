@@ -36,7 +36,7 @@ const Playing = () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
       // updateContext({ ownedTokens: [...ownedTokens.slice(0, 3)] }); //check if something changed
-      return ownedTokens.slice(0, 3); //TODO TURN  THIS OFFFFF!!!
+      return ownedTokens; //.slice(0, 3); //TODO TURN  THIS OFFFFF!!!
     },
     {
       ...queryCacheProps,
