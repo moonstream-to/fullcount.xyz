@@ -17,8 +17,7 @@ contract BeerLeagueBallers is ERC721Enumerable {
         "https://badges.moonstream.to/blb/p4.png",
         "https://badges.moonstream.to/blb/p5.png",
         "https://badges.moonstream.to/blb/p6.png",
-        "https://badges.moonstream.to/blb/p7.png",
-        "https://badges.moonstream.to/blb/p8.png"
+        "https://badges.moonstream.to/blb/p7.png"
     ];
 
     mapping(uint256 => string) public Name;
