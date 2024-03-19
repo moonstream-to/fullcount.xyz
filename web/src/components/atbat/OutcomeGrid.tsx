@@ -21,27 +21,26 @@ const GridComponent = ({
     console.log(pitchReveal);
   }, [pitchReveal]);
 
+  const getCellColor = (index: number, swing: BatterReveal) => {
+    if (swing.kind !== "2" && index === Number(swing.vertical) * 5 + Number(swing.horizontal)) {
+      return strikeZone.includes(index) ? "#537250" : "#bebcba";
+    }
+    return strikeZone.includes(index) ? "#669568" : "white";
+  };
+
   const generateCell = (index: number) => (
     <Box
       key={index}
-      backgroundColor={strikeZone.includes(index) ? "#669568" : "white"}
       display="flex"
       alignItems="center"
       justifyContent="center"
       border={"0.5px solid #262019"}
+      backgroundColor={getCellColor(index, swingReveal)}
     ></Box>
   );
 
   return (
     <Flex position={"relative"} mb={"5px"}>
-      <Image
-        src={`${FULLCOUNT_ASSETS_PATH}/ball.png`}
-        alt={"o"}
-        className={styles.ballImage}
-        left={`${columnCenters[Number(pitchReveal.horizontal)]}px`}
-        top={`${rowCenters[Number(pitchReveal.vertical)]}px`}
-      />
-
       <Grid
         templateColumns="19px 31px 31px 31px 19px"
         templateRows={"19px 38px 38px 38px 19px"}

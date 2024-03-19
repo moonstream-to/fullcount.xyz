@@ -39,51 +39,71 @@ const Outcome2 = ({
   }, [sessionStatus]);
   return (
     <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.imageContainerPitcher}>
-          {atBat?.pitcher && (
+      <div className={styles.contentWrap}>
+        <div className={styles.whiteSpace} />
+        <div className={styles.content}>
+          <div className={styles.pitcher}>
+            <div className={styles.imageContainer}>
+              {atBat?.pitcher && (
+                <Image
+                  src={atBat.pitcher?.image}
+                  alt={atBat.pitcher?.name}
+                  className={
+                    sessionOutcomeType([atBat.pitcher], atBat, sessionStatus) === "positive"
+                      ? styles.winImage
+                      : styles.image
+                  }
+                />
+              )}
+              <div className={styles.actionType}>
+                {speeds[Number(sessionStatus.pitcherReveal.speed)]}
+              </div>
+            </div>
+          </div>
+          {sessionStatus.batterReveal.kind !== "2" && (
             <Image
-              src={atBat.pitcher?.image}
-              alt={atBat.pitcher?.name}
-              className={
-                sessionOutcomeType([atBat.pitcher], atBat, sessionStatus) === "positive"
-                  ? styles.winImage
-                  : styles.image
-              }
+              src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
+              alt={"o"}
+              opacity={"0.7"}
+              left={`${columnCenters[Number(sessionStatus.batterReveal.horizontal)] - 145}px`}
+              top={`${rowCenters[Number(sessionStatus.batterReveal.vertical)] - 20}px`}
+              className={styles.batImage}
             />
           )}
-          <div className={styles.actionType}>
-            {speeds[Number(sessionStatus.pitcherReveal.speed)]}
+          <Image
+            src={`${FULLCOUNT_ASSETS_PATH}/ball.png`}
+            alt={"o"}
+            className={styles.ballImage}
+            left={`${columnCenters[Number(sessionStatus.pitcherReveal.horizontal)] + 5}px`}
+            top={`${rowCenters[Number(sessionStatus.pitcherReveal.vertical)]}px`}
+            zIndex={2}
+          />
+          <OutcomeGrid
+            pitchReveal={sessionStatus.pitcherReveal}
+            swingReveal={sessionStatus.batterReveal}
+          />
+          <div className={styles.batter}>
+            <div className={styles.imageContainer}>
+              {atBat?.batter && (
+                <Image
+                  src={atBat.batter?.image}
+                  alt={atBat.batter?.name}
+                  className={
+                    sessionOutcomeType([atBat.batter], atBat, sessionStatus) === "positive"
+                      ? styles.winImage
+                      : styles.image
+                  }
+                />
+              )}
+              <div className={styles.actionType}>
+                {kinds[Number(sessionStatus.batterReveal.kind)]}
+              </div>
+            </div>
           </div>
         </div>
-        {sessionStatus.batterReveal.kind !== "2" && (
-          <Image
-            src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
-            alt={"o"}
-            left={`${columnCenters[Number(sessionStatus.batterReveal.horizontal)] - 145}px`}
-            top={`${rowCenters[Number(sessionStatus.batterReveal.vertical)] - 15}px`}
-            className={styles.batImage}
-          />
-        )}
-        <OutcomeGrid
-          pitchReveal={sessionStatus.pitcherReveal}
-          swingReveal={sessionStatus.batterReveal}
-        />
-        <div className={styles.imageContainerBatter}>
-          {atBat?.batter && (
-            <Image
-              src={atBat.batter?.image}
-              alt={atBat.batter?.name}
-              className={
-                sessionOutcomeType([atBat.batter], atBat, sessionStatus) === "positive"
-                  ? styles.winImage
-                  : styles.image
-              }
-            />
-          )}
-          <div className={styles.actionType}>{kinds[Number(sessionStatus.batterReveal.kind)]}</div>
-        </div>
+        <div className={styles.whiteSpace} />
       </div>
+      <div className={styles.homeButton}>Go to home page</div>
     </div>
   );
 };
