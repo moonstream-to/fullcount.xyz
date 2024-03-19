@@ -121,13 +121,20 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
           token.activeSession?.pitcherNFT.tokenID === token.id)) && (
         <div
           className={styles.button}
-          onClick={() =>
+          onClick={() => {
+            if (
+              token.activeSession?.pitcherNFT.nftAddress === token.address &&
+              token.activeSession?.pitcherNFT.tokenID === token.id
+            ) {
+              router.push(`atbats/?session_id=${token.stakedSessionID}`);
+              return;
+            }
             startSession.mutate({
               role: 0,
               token,
               requireSignature: false,
-            })
-          }
+            });
+          }}
         >
           {startSession.isLoading && startSession.variables?.role === 0 ? (
             <Spinner h={4} w={4} />
