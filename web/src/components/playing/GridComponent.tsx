@@ -42,7 +42,13 @@ const GridComponent = ({
     <Box
       key={index}
       backgroundColor={
-        index === selectedIndex ? "#537250" : strikeZone.includes(index) ? "#669568" : "white"
+        index === selectedIndex
+          ? strikeZone.includes(index)
+            ? "#537250"
+            : "#bebcba"
+          : strikeZone.includes(index)
+          ? "#669568"
+          : "white"
       }
       display="flex"
       alignItems="center"
@@ -61,18 +67,7 @@ const GridComponent = ({
       position={"relative"}
       className={styles.gridBox}
       zIndex={selectedIndex === index ? 1 : 2}
-    >
-      {index === selectedIndex && !isDragging && isPitcher && (
-        <Image
-          h={isPitcher ? "22px" : "11px"}
-          // w={"32px"}
-          src={isPitcher ? `${assets}/ball.png` : `${assets}/bat.png`}
-          alt={"ball"}
-          draggable={false}
-          userSelect={"none"}
-        />
-      )}
-    </Box>
+    ></Box>
   );
 
   return (
@@ -101,9 +96,9 @@ const GridComponent = ({
       <Image
         src={`${assets}/pitcher.png`}
         position={"absolute"}
-        top={"0"}
+        top={"-7vh"}
         right={"50%"}
-        transform={"translateX(50%) translateY(-50px)"}
+        transform={"translateX(50%) translateY(-10px)"}
         alt={""}
         w={"60px"}
         h={"80px"}
