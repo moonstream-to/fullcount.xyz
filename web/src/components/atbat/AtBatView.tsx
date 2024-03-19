@@ -85,7 +85,7 @@ const AtBatView: React.FC = () => {
           setTimeout(() => setShowPitchOutcome(false), 5000);
         }
         if (data && data.atBat.outcome !== 0) {
-          queryClient.invalidateQueries("owned_tokens");
+          queryClient.refetchQueries("owned_tokens");
           setShowPitchOutcome(true);
         }
         if (tokensCache.length !== data?.tokens.length) {
@@ -120,6 +120,15 @@ const AtBatView: React.FC = () => {
         top={"35.5px"}
         transform={"translateX(50%)"}
       />
+      {atBatState.data?.atBat &&
+        showPitchOutcome &&
+        atBatState.data.atBat.outcome !== 0 &&
+        atBatState.data.atBat.pitches.length > 1 && (
+          <div className={styles.homeButton} onClick={() => router.push("/")}>
+            Go to home page
+          </div>
+        )}
+
       {atBatState.data && (
         <Score
           atBat={atBatState.data.atBat}
@@ -156,6 +165,7 @@ const AtBatView: React.FC = () => {
       )}
       {atBatState.data?.atBat.outcome === 0 &&
         !showPitchOutcome &&
+        atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
         atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
           <>
             {selectedToken &&
@@ -190,7 +200,7 @@ const AtBatView: React.FC = () => {
           )}
         </>
       )}
-      {atBatState.data && <AtBatFooter atBat={atBatState.data.atBat} />}
+      {atBatState.data && !showPitchOutcome && <AtBatFooter atBat={atBatState.data.atBat} />}
     </div>
   );
 };

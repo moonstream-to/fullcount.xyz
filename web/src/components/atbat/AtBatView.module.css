@@ -95,3 +95,20 @@
     stroke-width: 1px;
     stroke: #CD7676;
 }
+
+
+.homeButton {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateY(-92px) translateX(-50%);
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    text-align: center;
+    z-index: 4;
+}
