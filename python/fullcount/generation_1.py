@@ -4,16 +4,15 @@ from typing import Optional, List, Tuple
 
 from . import data
 
-Distance0: data.OutcomeDistribution = (0, 0, 0, 1000, 3000, 1000, 5000, 0)
+Distance0: data.OutcomeDistribution = (0, 0, 0, 0, 2500, 1500, 6000, 0)
 
-Distance1: data.OutcomeDistribution = (0, 0, 2500, 2500, 2000, 500, 2500, 0)
+Distance1: data.OutcomeDistribution = (0, 0, 2500, 2500, 2500, 500, 2000, 0)
 
-Distance2: data.OutcomeDistribution = (
-    1000, 0, 3200, 3200, 1100, 200, 800, 500)
+Distance2: data.OutcomeDistribution = (0, 0, 4000, 3700, 1400, 200, 700, 0)
 
-Distance3: data.OutcomeDistribution = (4000, 0, 3000, 1500, 250, 0, 0, 1250)
+Distance3: data.OutcomeDistribution = (3200, 0, 4500, 1500, 500, 0, 0, 300)
 
-Distance4: data.OutcomeDistribution = (7000, 0, 2000, 0, 0, 0, 0, 1000)
+Distance4: data.OutcomeDistribution = (7100, 0, 2000, 0, 0, 0, 0, 900)
 
 DistanceGT4: data.OutcomeDistribution = (10_000, 0, 0, 0, 0, 0, 0, 0)
 

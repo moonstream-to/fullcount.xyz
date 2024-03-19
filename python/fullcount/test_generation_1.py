@@ -9,7 +9,9 @@ class Generation1Tests(unittest.TestCase):
             "Distance0": generation_1.Distance0,
             "Distance1": generation_1.Distance1,
             "Distance2": generation_1.Distance2,
-            "DistanceGT2": generation_1.DistanceGT2,
+            "Distance3": generation_1.Distance3,
+            "Distance4": generation_1.Distance4,
+            "DistanceGT4": generation_1.DistanceGT4,
         }
 
         for name, outcome_type in outcome_types.items():
