@@ -38,7 +38,7 @@ export async function getMulticallResults(
         // If the output is a primitive type, return the primitive value
         return decoded[Object.keys(decoded)[0]]; // Extract the first (and only) parameter
       } else {
-        return decoded[0]; //decodeParameters returns [object with access by index or name, length]
+        return decoded; //decodeParameters returns [object with access by index or name, length]
       }
     });
     result.push(decodedResults);
