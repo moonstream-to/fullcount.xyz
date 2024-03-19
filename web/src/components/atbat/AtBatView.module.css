@@ -10,10 +10,19 @@
 
 .exitButton {
     position: absolute;
-    top: 50px;
-    left: 5px;
+    top: 45.5px;
+    right: 10px;
     color: black;
     z-index: 2;
+    display: inline-flex;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    border: 1px solid #7E8E7F;
+    background: rgba(255, 255, 255, 0.70);
+    backdrop-filter: blur(3px);
 }
 
 
@@ -111,4 +120,9 @@
     cursor: pointer;
     text-align: center;
     z-index: 4;
+}
+
+.playerView {
+    display: flex;
+    margin-top: 27%;
 }

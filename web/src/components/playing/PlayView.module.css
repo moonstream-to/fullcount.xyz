@@ -70,7 +70,7 @@
 }
 
 .pitcherGrid {
-    cursor: url("https://static.simiotics.com/fullcount/ball.png"), pointer;
+    /*cursor: url("https://static.simiotics.com/fullcount/ball.png"), pointer;*/
 }
 .pitcherGridSelected {
     cursor: pointer;
@@ -138,8 +138,13 @@
     width: 200px;
     height: 39px;
     z-index: 1;
-    /*right: 50%;*/
-    /*width: auto;*/
-    /*height: auto;*/
-    /*transform: translateX(50%);*/
+}
+
+
+.ballImage {
+    position: absolute;
+    opacity: 100%;
+    width: 200px;
+    height: 39px;
+    z-index: 3;
 }
