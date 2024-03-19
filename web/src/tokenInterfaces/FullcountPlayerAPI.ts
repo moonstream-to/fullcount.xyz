@@ -218,8 +218,8 @@ export const commitOrRevealPitchFullcountPlayer = ({
       }
       console.log({
         isCommit,
-        didCommit: sessionState.didBatterCommit,
-        didReveal: sessionState.didBatterReveal,
+        didCommit: sessionState.didPitcherCommit,
+        didReveal: sessionState.didPitcherReveal,
       });
       console.log("Success:", response.data);
       return response.data;
@@ -271,7 +271,8 @@ export const commitOrRevealSwingFullcountPlayer = ({
       });
       console.log("Success:", response.data);
       return response.data;
-    });
+    })
+    .catch((e) => console.log(e));
 };
 
 export const mintFullcountPlayerToken = ({
