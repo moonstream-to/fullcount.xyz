@@ -12,12 +12,24 @@ import BatterViewMobile from "../playing/BatterViewMobile";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image } from "@chakra-ui/react";
-import Outcome2 from "./Outcome2";
+import Outcome2, { sessionOutcomeType } from "./Outcome2";
+import ExitIcon from "../icons/ExitIcon";
 
 const outcomes = [
   "In Progress",
   "Strikeout",
   "Walk",
+  "Single",
+  "Double",
+  "Triple",
+  "Home Run",
+  "In Play Out",
+];
+
+const sessionOutcomes = [
+  "Strike",
+  "Ball",
+  "Foul",
   "Single",
   "Double",
   "Triple",
@@ -109,7 +121,7 @@ const AtBatView: React.FC = () => {
   return (
     <div className={styles.container}>
       <div className={styles.exitButton} onClick={() => router.push("/")}>
-        Close
+        <ExitIcon onClick={() => router.push("/")} />
       </div>
       <Image
         minW={"441px"}
@@ -123,7 +135,7 @@ const AtBatView: React.FC = () => {
       {atBatState.data?.atBat &&
         showPitchOutcome &&
         atBatState.data.atBat.outcome !== 0 &&
-        atBatState.data.atBat.pitches.length > 1 && (
+        atBatState.data.atBat.pitches.length > 0 && (
           <div className={styles.homeButton} onClick={() => router.push("/")}>
             Go to home page
           </div>
@@ -148,6 +160,32 @@ const AtBatView: React.FC = () => {
           {outcomes[atBatState.data.atBat.outcome]}!
         </div>
       )}
+      {atBatState.data?.atBat &&
+        showPitchOutcome &&
+        atBatState.data.atBat.pitches.length > 0 &&
+        selectedToken &&
+        atBatState.data.atBat.outcome === 0 && (
+          <div
+            className={
+              !outcomeType([selectedToken], atBatState.data.atBat)
+                ? styles.othersOutcome
+                : sessionOutcomeType(
+                    [selectedToken],
+                    atBatState.data.atBat,
+                    atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2],
+                  ) === "positive"
+                ? styles.positiveOutcome
+                : styles.negativeOutcome
+            }
+          >
+            {
+              sessionOutcomes[
+                atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2].outcome
+              ]
+            }
+            !
+          </div>
+        )}
       {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
         <div
           className={
@@ -167,7 +205,7 @@ const AtBatView: React.FC = () => {
         !showPitchOutcome &&
         atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
         atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
-          <>
+          <div className={styles.playerView}>
             {selectedToken &&
               isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
               atBatState.data && (
@@ -184,9 +222,9 @@ const AtBatView: React.FC = () => {
                   token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
                 />
               )}
-          </>
+          </div>
         )}
-      {atBatState.data?.atBat && showPitchOutcome && atBatState.data.atBat.pitches.length > 1 && (
+      {atBatState.data?.atBat && showPitchOutcome && atBatState.data.atBat.pitches.length > 0 && (
         <>
           {atBatState.data?.atBat && (
             <Outcome2
