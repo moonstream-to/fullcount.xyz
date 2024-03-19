@@ -29,7 +29,7 @@
 .positiveOutcome, .negativeOutcome {
     position: absolute;
     right: 50%;
-    top: 49px; /*35.5 + 13.5*/
+    top: 12%; /*35.5 + 13.5*/
     transform: translateX(50%);
     max-height: 36px;
     z-index: 2;
@@ -62,7 +62,7 @@
     justify-content: center;
     position: absolute;
     right: 50%;
-    top: 75px; /*35.5 + 13.5 + x*/
+    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
     transform: translateX(50%);
     height: 49px;
     width: 81px;
@@ -87,7 +87,7 @@
     justify-content: center;
     position: absolute;
     right: 50%;
-    top: 75px; /*35.5 + 13.5 + x*/
+    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
     transform: translateX(50%);
     height: 49px;
     width: 81px;
