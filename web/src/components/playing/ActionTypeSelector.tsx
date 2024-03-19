@@ -1,5 +1,4 @@
-import { Flex } from "@chakra-ui/react";
-import styles from "./PlayView.module.css";
+import parentStyles from "../HomePage/PvpView.module.css";
 
 const ActionTypeSelector = ({
   types,
@@ -13,18 +12,17 @@ const ActionTypeSelector = ({
   setSelected: (value: number) => void;
 }) => {
   return (
-    <Flex justifyContent={"center"} gap={"20px"}>
+    <div className={parentStyles.viewSelector}>
       {types.map((type, idx) => (
-        <Flex
-          key={idx}
-          className={selected === idx ? styles.activeChoice : styles.inactiveChoice}
+        <div
+          className={selected === idx ? parentStyles.buttonSelected : parentStyles.button}
           onClick={isDisabled ? undefined : () => setSelected(idx)}
-          cursor={isDisabled ? "default" : "pointer"}
+          key={idx}
         >
           {type}
-        </Flex>
+        </div>
       ))}
-    </Flex>
+    </div>
   );
 };
 

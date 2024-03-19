@@ -2,14 +2,22 @@ import { OwnedToken, Token } from "../types";
 import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
-import { MoonstreamWeb3ProviderInterface } from "../types/Moonstream";
 import Web3 from "web3";
+import { getContracts } from "../utils/getWeb3Contracts";
+import { getMulticallResults } from "../utils/multicall";
+import { AbiItem } from "web3-utils";
+import FullcountABIImported from "../web3/abi/FullcountABI.json";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-export async function fetchFullcountPlayerTokens({
-  web3ctx,
-}: {
-  web3ctx: MoonstreamWeb3ProviderInterface;
-}) {
+const parseActiveSession = (s: any) => {
+  return {
+    ...s,
+    batterNFT: { nftAddress: s.batterNFT[0], tokenID: s.batterNFT[1] },
+    pitcherNFT: { nftAddress: s.pitcherNFT[0], tokenID: s.pitcherNFT[1] },
+  };
+};
+
+export async function fetchFullcountPlayerTokens() {
   try {
     const headers = getHeaders();
     const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
@@ -24,10 +32,31 @@ export async function fetchFullcountPlayerTokens({
       address: nft.erc721_address,
     }));
 
-    return await getTokensData({
-      web3ctx,
+    const tokensData = await getTokensData({
       tokens,
       tokensSource: "FullcountPlayerAPI",
+    });
+    const { gameContract } = getContracts();
+    const activeSessionsIds = tokensData.filter((t) => t.isStaked).map((t) => t.stakedSessionID);
+    const activeSessionsQueries = activeSessionsIds.map((id) => ({
+      target: GAME_CONTRACT,
+      callData: gameContract.methods.SessionState(id).encodeABI(),
+    }));
+
+    const [activeSessions] = await getMulticallResults(
+      FullcountABI,
+      ["SessionState"],
+      activeSessionsQueries,
+    );
+
+    return tokensData.map((t) => {
+      const sessionIdx = activeSessionsIds.indexOf(t.stakedSessionID);
+      return sessionIdx === -1
+        ? { ...t }
+        : {
+            ...t,
+            activeSession: { ...activeSessions.map((s) => parseActiveSession(s))[sessionIdx] },
+          };
     });
   } catch (e) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
@@ -52,6 +81,7 @@ export async function startSessionFullcountPlayer({
     require_signature: requireSignature,
   };
   const headers = getHeaders();
+  await unstakeFullcountPlayer({ token });
 
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
@@ -84,7 +114,7 @@ export const checkTransaction = async (transactionHash: string) => {
   return await getTransaction(transactionHash);
 };
 
-export function joinSessionFullcountPlayer({
+export async function joinSessionFullcountPlayer({
   token,
   sessionID,
   inviteCode,
@@ -100,6 +130,8 @@ export function joinSessionFullcountPlayer({
     session_id: String(sessionID),
     signature: inviteCode ?? "",
   };
+  await unstakeFullcountPlayer({ token });
+
   const headers = getHeaders();
 
   return axios
@@ -114,20 +146,23 @@ export function joinSessionFullcountPlayer({
     });
 }
 
-export const unstakeFullcountPlayer = ({ token }: { token: OwnedToken }) => {
+export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
     token_id: token.id,
   };
   const headers = getHeaders();
-
+  const { gameContract } = getContracts();
+  const sessionId = await gameContract.methods.StakedSession(token.address, token.id).call();
+  const progress = await gameContract.methods.sessionProgress(sessionId).call();
+  const action = progress === "2" ? "abort" : progress === "6" ? "unstake" : undefined;
+  if (!action) {
+    return "Token is not staked";
+  }
+  console.log("unstaking...", { sessionId, progress });
   return axios
-    .post(
-      `${FULLCOUNT_PLAYER_API}/game/${token.tokenProgress === 2 ? "abort" : "unstake"}`,
-      postData,
-      { headers },
-    )
+    .post(`${FULLCOUNT_PLAYER_API}/game/${action}`, postData, { headers })
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
@@ -172,6 +207,19 @@ export const commitOrRevealPitchFullcountPlayer = ({
       if (!isTransactionMinted) {
         throw new Error("Transaction failed. Try again, please");
       }
+      const { gameContract } = getContracts();
+      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
+      if (!isCommit && !sessionState.didPitcherReveal) {
+        throw new Error("Revealing error. Try again, please");
+      }
+      if (isCommit && !sessionState.didPitcherCommit) {
+        throw new Error("Committing error. Try again, please");
+      }
+      console.log({
+        isCommit,
+        didCommit: sessionState.didBatterCommit,
+        didReveal: sessionState.didBatterReveal,
+      });
       console.log("Success:", response.data);
       return response.data;
     });
@@ -207,6 +255,19 @@ export const commitOrRevealSwingFullcountPlayer = ({
       if (!isTransactionMinted) {
         throw new Error("Transaction failed. Try again, please");
       }
+      const { gameContract } = getContracts();
+      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
+      if (!isCommit && !sessionState.didBatterReveal) {
+        throw new Error("Revealing error. Try again, please");
+      }
+      if (isCommit && !sessionState.didBatterCommit) {
+        throw new Error("Committing error. Try again, please");
+      }
+      console.log({
+        isCommit,
+        didCommit: sessionState.didBatterCommit,
+        didReveal: sessionState.didBatterReveal,
+      });
       console.log("Success:", response.data);
       return response.data;
     });

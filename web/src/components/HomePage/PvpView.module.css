@@ -1,0 +1,57 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.viewSelector {
+    display: flex;
+    gap: 5px;
+    z-index: 1;
+}
+
+.buttonSelected, .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+}
+.buttonSelected {
+    color: #262019;
+    border: 1px solid #262019;
+    background: #FFF;
+    padding: 4px 9px;
+}
+
+.button {
+    color: #FFF;
+    padding: 5px 10px;
+    background: #8EAB8F;
+}
+
+.listsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.list {
+    display: flex;
+    min-width: 130px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}

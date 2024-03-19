@@ -1,0 +1,128 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100vw;
+    height: 100vh;
+    background: #FFF;
+    position: relative;
+}
+
+.exitButton {
+    position: absolute;
+    top: 45.5px;
+    right: 10px;
+    color: black;
+    z-index: 2;
+    display: inline-flex;
+    padding: 8px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    border: 1px solid #7E8E7F;
+    background: rgba(255, 255, 255, 0.70);
+    backdrop-filter: blur(3px);
+}
+
+
+.positiveOutcome, .negativeOutcome {
+    position: absolute;
+    right: 50%;
+    top: 12%; /*35.5 + 13.5*/
+    transform: translateX(50%);
+    max-height: 36px;
+    z-index: 2;
+    white-space: nowrap;
+
+}
+.positiveOutcome {
+    color: #328449;
+    font-family: Bangers, cursive;
+    font-size: 50px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+
+}
+
+.negativeOutcome {
+    color: #CD7676;
+    font-family: Bangers, cursive;
+    font-size: 50px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.negativeOutcome2 {
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+    justify-content: center;
+    position: absolute;
+    right: 50%;
+    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
+    transform: translateX(50%);
+    height: 49px;
+    width: 81px;
+    background-image: url(https://static.simiotics.com/fullcount/outcome-bubble-loss.svg);
+    z-index: 3;
+    color: #CD7676;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    fill: rgba(255, 255, 255, 0.70);
+    stroke-width: 1px;
+    stroke: #CD7676;
+}
+
+.positiveOutcome2 {
+    display: flex;
+    align-items: center;
+    padding-top: 5px;
+    justify-content: center;
+    position: absolute;
+    right: 50%;
+    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
+    transform: translateX(50%);
+    height: 49px;
+    width: 81px;
+    background-image: url(https://static.simiotics.com/fullcount/outcome-bubble-victory.svg);
+    z-index: 3;
+    color: #669568;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    fill: rgba(255, 255, 255, 0.70);
+    stroke-width: 1px;
+    stroke: #CD7676;
+}
+
+
+.homeButton {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateY(-92px) translateX(-50%);
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    text-align: center;
+    z-index: 4;
+}
+
+.playerView {
+    display: flex;
+    margin-top: 27%;
+}

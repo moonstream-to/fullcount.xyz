@@ -1,0 +1,88 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    /*width: 320px;*/
+    place-self: center;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+}
+
+.contentWrap {
+display: flex;
+    justify-content: center;
+}
+.whiteSpace {
+    background-color: white;
+    flex: 1;
+    z-index: 4;
+}
+.content {
+    flex: 1;
+
+    min-width: 320px;
+    max-width: 320px;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    /*padding: 5px;*/
+    position: relative;
+}
+
+.winImage {
+    width: 80px;
+    height: 80px;
+}
+
+.image {
+    width: 50px;
+    height: 50px;
+}
+
+.pitcher, .batter {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-right: 3px;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 5;
+    background-color: white;
+}
+
+.batter {
+    align-items: flex-start;
+    padding-right: 0;
+    padding-left: 3px;
+}
+
+.imageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.actionType {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.ballImage {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+.batImage {
+    position: absolute;
+    opacity: 70%;
+    width: 200px;
+    height: 39px;
+    z-index: 3;
+}

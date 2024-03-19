@@ -22,7 +22,7 @@ export const fetchOwnedBLBTokens = async ({
     return [];
   }
   try {
-    const { tokenContract } = getContracts(web3ctx);
+    const { tokenContract } = getContracts();
     const balanceOf = await tokenContract.methods.balanceOf(web3ctx.account).call();
     const tokensQueries = [];
     for (let i = 0; i < balanceOf; i += 1) {
@@ -32,14 +32,8 @@ export const fetchOwnedBLBTokens = async ({
       });
     }
 
-    const [tokens] = await getMulticallResults(
-      web3ctx,
-      TokenABI,
-      ["tokenOfOwnerByIndex"],
-      tokensQueries,
-    );
+    const [tokens] = await getMulticallResults(TokenABI, ["tokenOfOwnerByIndex"], tokensQueries);
     return await getTokensData({
-      web3ctx,
       tokens: tokens.map((t) => ({ id: t, address: TOKEN_CONTRACT })),
       tokensSource: "BLBContract",
     });
@@ -50,21 +44,23 @@ export const fetchOwnedBLBTokens = async ({
 };
 
 export const getTokensData = async ({
-  web3ctx,
   tokens,
   tokensSource,
 }: {
-  web3ctx: MoonstreamWeb3ProviderInterface;
   tokens: TokenId[];
   tokensSource: TokenSource;
 }) => {
-  const { tokenContract, gameContract } = getContracts(web3ctx);
+
+  if (tokens.length < 1) {
+    return [];
+  }
+
+  const { tokenContract, gameContract } = getContracts();
   const stakedQueries = tokens.map((t) => ({
     target: gameContract.options.address,
     callData: gameContract.methods.StakedSession(t.address, t.id).encodeABI(),
   }));
   const [stakedSessions] = await getMulticallResults(
-    web3ctx,
     FullcountABI,
     ["StakedSession"],
     stakedQueries,
@@ -76,7 +72,6 @@ export const getTokensData = async ({
   }));
 
   const [progresses] = await getMulticallResults(
-    web3ctx,
     FullcountABI,
     ["sessionProgress"],
     progressQueries,
@@ -87,7 +82,7 @@ export const getTokensData = async ({
     callData: tokenContract.methods.tokenURI(t.id).encodeABI(),
   }));
 
-  const [uris] = await getMulticallResults(web3ctx, TokenABI, ["tokenURI"], uriQueries);
+  const [uris] = await getMulticallResults(TokenABI, ["tokenURI"], uriQueries);
 
   const promises = uris.map(async (uri, idx) => {
     const { name, image } = await getTokenMetadata(uri);
@@ -95,8 +90,7 @@ export const getTokensData = async ({
       id: tokens[idx].id,
       name: name.split(` - ${tokens[idx].id}`)[0],
       image: image,
-      address: tokenContract.options.address,
-      staker: tokensSource === "BLBContract" ? web3ctx.account : "",
+      address: tokens[idx].address,
       isStaked: stakedSessions[idx] !== "0",
       stakedSessionID: Number(stakedSessions[idx]),
       tokenProgress: Number(progresses[idx]),
@@ -118,7 +112,7 @@ export const startSessionBLB = ({
   role: number;
   requireSignature: boolean;
 }): Promise<{ sessionID: string; sign: string | undefined }> => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
 
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -146,7 +140,7 @@ export const joinSessionBLB = ({
   sessionID: number;
   inviteCode: string | undefined;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.joinSession(
@@ -164,7 +158,7 @@ export const unstakeBLBToken = ({
   web3ctx: MoonstreamWeb3ProviderInterface;
   token: OwnedToken;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
 
   if (token.tokenProgress === 2 && token.stakedSessionID) {
     return sendTransactionWithEstimate(
@@ -189,7 +183,7 @@ export const commitSwingBLBToken = ({
   sign: string;
   sessionID: number;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
 
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -212,7 +206,7 @@ export const revealSwingBLBToken = ({
   horizontal: number;
   sessionID: number;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.revealSwing(sessionID, nonce, actionChoice, vertical, horizontal),
@@ -228,7 +222,7 @@ export const commitPitchBLBToken = ({
   sign: string;
   sessionID: number;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
 
   return sendTransactionWithEstimate(
     web3ctx.account,
@@ -251,7 +245,7 @@ export const revealPitchBLBToken = ({
   horizontal: number;
   sessionID: number;
 }) => {
-  const { gameContract } = getContracts(web3ctx);
+  const { gameContract } = getContracts();
   return sendTransactionWithEstimate(
     web3ctx.account,
     gameContract.methods.revealPitch(sessionID, nonce, actionChoice, vertical, horizontal),
@@ -267,6 +261,6 @@ export const mintBLBToken = ({
   name: string;
   imageIndex: number;
 }) => {
-  const { tokenContract } = getContracts(web3ctx);
+  const { tokenContract } = getContracts();
   return sendTransactionWithEstimate(web3ctx.account, tokenContract.methods.mint(name, imageIndex));
 };

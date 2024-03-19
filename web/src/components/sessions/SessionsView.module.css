@@ -62,4 +62,22 @@
     line-height: 100%; /* 24px */
 }
 
+.suspend {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.suspendImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.fadeOut {
+    opacity: 0;
+    transition: opacity 1s ease-out;
+}
+
 
