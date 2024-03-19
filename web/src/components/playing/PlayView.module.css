@@ -70,13 +70,13 @@
 }
 
 .pitcherGrid {
-    cursor: url("https://static.simiotics.com/fullcount/ball4.png"), pointer;
+    cursor: url("https://static.simiotics.com/fullcount/ball.png"), pointer;
 }
 .pitcherGridSelected {
     cursor: pointer;
 }
 .batterGrid {
-    cursor: url("https://static.simiotics.com/fullcount/bat-cursor.png"), pointer;
+    /*cursor: url("https://static.simiotics.com/fullcount/bat-cursor.png"), pointer;*/
 }
 
 .moveMouseTip {
@@ -122,4 +122,24 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+}
+
+.gridBox {
+    /*backdrop-filter: blur(3px);*/
+    /*background: rgba(255, 255, 255, 0.70);*/
+    /*transform: translateZ(0);*/
+    /*backface-visibility: hidden;*/
+    opacity: 0.7;
+}
+
+.batImage {
+    position: absolute;
+    opacity: 70%;
+    width: 200px;
+    height: 39px;
+    z-index: 1;
+    /*right: 50%;*/
+    /*width: auto;*/
+    /*height: auto;*/
+    /*transform: translateX(50%);*/
 }

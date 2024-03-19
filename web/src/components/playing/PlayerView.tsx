@@ -5,13 +5,14 @@ import globalStyles from "../GlobalStyles.module.css";
 import styles from "./PlayView.module.css";
 import { getPitchDescription, getSwingDescription } from "../../utils/messages";
 import { getRowCol, SessionStatus } from "./PlayView";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { signPitch, signSwing } from "../../utils/signing";
 import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStorage";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
 import AnimatedMessage from "../AnimatedMessage";
 import { OwnedToken } from "../../types";
+import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -119,6 +120,9 @@ const PlayerView = ({
     }
   }, [sessionStatus.progress, isRevealed, token.source]);
 
+  const columnCenters = [9.5, 36.5, 69.5, 102.5, 129.5].map((x) => x + 85);
+  const rowCenters = [9.5, 40.0, 80.0, 120.0, 150.5];
+
   return (
     <Flex
       direction={"column"}
@@ -128,14 +132,28 @@ const PlayerView = ({
       mb={"15px"}
       height={"100%"}
       justifyContent={"end"}
+      width="100%"
     >
-      <GridComponent
-        selectedIndex={gridIndex}
-        isPitcher={isPitcher}
-        setSelectedIndex={
-          isCommitted || (!isPitcher && actionChoice === 2) ? undefined : setGridIndex
-        }
-      />
+      <div
+        style={{ width: "100%", display: "flex", justifyContent: "center", position: "relative" }}
+      >
+        <GridComponent
+          selectedIndex={gridIndex}
+          isPitcher={isPitcher}
+          setSelectedIndex={
+            isCommitted || (!isPitcher && actionChoice === 2) ? undefined : setGridIndex
+          }
+        />
+        {!isPitcher && actionChoice !== 2 && (
+          <Image
+            src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
+            alt={"o"}
+            left={`${columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]] - 143}px`}
+            top={`${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 19}px`}
+            className={styles.batImage}
+          />
+        )}
+      </div>
       <ActionTypeSelector
         types={isPitcher ? pitchSpeeds : swingKinds}
         isDisabled={isCommitted}

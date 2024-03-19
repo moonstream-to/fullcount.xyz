@@ -48,23 +48,25 @@ const GridComponent = ({
       alignItems="center"
       justifyContent="center"
       border={"0.5px solid #262019"}
-      cursor={
-        selectedIndex === index && !isDragging && setSelectedIndex
-          ? "pointer"
-          : selectedIndex === -1 || isDragging
-          ? "inherit"
-          : "default"
-      }
+      // cursor={
+      //   selectedIndex === index && !isDragging && setSelectedIndex
+      //     ? "pointer"
+      //     : selectedIndex === -1 || isDragging
+      //     ? "inherit"
+      //     : "default"
+      // }
       fontSize={index === selectedIndex ? "22px" : "16px"}
       onMouseUp={() => handleMouseUp(index)}
       onMouseDown={() => handleMouseDown(index)}
       position={"relative"}
+      className={styles.gridBox}
+      zIndex={selectedIndex === index ? 1 : 2}
     >
-      {index === selectedIndex && !isDragging && (
+      {index === selectedIndex && !isDragging && isPitcher && (
         <Image
-          h={"32px"}
-          w={"32px"}
-          src={isPitcher ? `${assets}/ball2.png` : `${assets}/bat2.png`}
+          h={isPitcher ? "22px" : "11px"}
+          // w={"32px"}
+          src={isPitcher ? `${assets}/ball.png` : `${assets}/bat.png`}
           alt={"ball"}
           draggable={false}
           userSelect={"none"}
