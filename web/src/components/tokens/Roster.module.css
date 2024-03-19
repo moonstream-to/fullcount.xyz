@@ -96,6 +96,7 @@
     font-weight: 400;
     line-height: 100%; /* 18px */
     min-width: 62.5px;
+    cursor: pointer;
 }
 
 .tokenCards {
