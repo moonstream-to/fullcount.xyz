@@ -42,8 +42,8 @@ const GridComponent = ({
   return (
     <Flex position={"relative"} mb={"5px"}>
       <Grid
-        templateColumns="19px 31px 31px 31px 19px"
-        templateRows={"19px 38px 38px 38px 19px"}
+        templateColumns={"3.91vh 6.38vh 6.38vh 6.38vh 3.91vh"}
+        templateRows={"3.91vh 7.82vh 7.82vh 7.82vh 3.91vh"}
         w={"fit-content"}
         gap={"2px"}
       >

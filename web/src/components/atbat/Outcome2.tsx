@@ -24,8 +24,8 @@ export const sessionOutcomeType = (
 
 const kinds = ["Contact", "Power", "Take"];
 const speeds = ["Fast", "Slow"];
-const columnCenters = [9.5, 36.5, 69.5, 102.5, 129.5].map((x) => x + 85);
-const rowCenters = [9.5, 40.0, 80.0, 120.0, 150.5];
+const columnCenters = [1.955, 7.1, 13.48, 19.86, 25.01];
+const rowCenters = [1.955, 7.82, 15.64, 23.46, 29.33];
 
 const Outcome2 = ({
   atBat,
@@ -40,7 +40,7 @@ const Outcome2 = ({
   return (
     <div className={styles.container}>
       <div className={styles.contentWrap}>
-        <div className={styles.whiteSpace} />
+        {/*<div className={styles.whiteSpace} />*/}
         <div className={styles.content}>
           <div className={styles.pitcher}>
             <div className={styles.imageContainer}>
@@ -64,19 +64,27 @@ const Outcome2 = ({
             <Image
               src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
               alt={"o"}
-              opacity={"0.7"}
-              left={`${columnCenters[Number(sessionStatus.batterReveal.horizontal)] - 145}px`}
-              top={`${rowCenters[Number(sessionStatus.batterReveal.vertical)] - 20}px`}
+              left={`calc((100vw - 26.96vh) / 2 - 4px - 29.9vh + ${
+                columnCenters[Number(sessionStatus.batterReveal.horizontal)]
+              }vh + ${Number(sessionStatus.batterReveal.horizontal) * 2}px)`}
+              top={`calc(${rowCenters[Number(sessionStatus.batterReveal.vertical)] - 3.91}vh + ${
+                Number(sessionStatus.batterReveal.vertical) * 2
+              }px)`}
               className={styles.batImage}
             />
           )}
           <Image
             src={`${FULLCOUNT_ASSETS_PATH}/ball.png`}
-            alt={"o"}
+            left={`calc((100vw - 26.96vh) / 2 - 4px + ${
+              columnCenters[Number(sessionStatus.pitcherReveal.horizontal)]
+            }vh - 2.25vh + ${Number(sessionStatus.pitcherReveal.horizontal) * 2}px)`}
+            top={`calc(${rowCenters[Number(sessionStatus.pitcherReveal.vertical)] - 2.25}vh + ${
+              Number(sessionStatus.pitcherReveal.vertical) * 2
+            }px)`}
             className={styles.ballImage}
-            left={`${columnCenters[Number(sessionStatus.pitcherReveal.horizontal)] + 5}px`}
-            top={`${rowCenters[Number(sessionStatus.pitcherReveal.vertical)]}px`}
-            zIndex={2}
+            alt={"o"}
+            draggable={false}
+            userSelect={"none"}
           />
           <OutcomeGrid
             pitchReveal={sessionStatus.pitcherReveal}
@@ -101,7 +109,7 @@ const Outcome2 = ({
             </div>
           </div>
         </div>
-        <div className={styles.whiteSpace} />
+        {/*<div className={styles.whiteSpace} />*/}
       </div>
       <div className={styles.homeButton}>Go to home page</div>
     </div>
