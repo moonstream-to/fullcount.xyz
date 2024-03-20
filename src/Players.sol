@@ -10,14 +10,14 @@ import { ITerminus } from "../lib/web3/contracts/interfaces/ITerminus.sol";
 
 contract BeerLeagueBallers is ERC721Enumerable {
     string[] public ProfileImages = [
-        "https://badges.moonstream.to/blb/p0.png",
-        "https://badges.moonstream.to/blb/p1.png",
-        "https://badges.moonstream.to/blb/p2.png",
-        "https://badges.moonstream.to/blb/p3.png",
-        "https://badges.moonstream.to/blb/p4.png",
-        "https://badges.moonstream.to/blb/p5.png",
-        "https://badges.moonstream.to/blb/p6.png",
-        "https://badges.moonstream.to/blb/p7.png"
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p0.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p1.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p2.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p3.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p4.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p5.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p6.png",
+        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p7.png"
     ];
 
     mapping(uint256 => string) public Name;
