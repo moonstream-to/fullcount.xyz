@@ -22,7 +22,7 @@ export async function fetchFullcountPlayerTokens() {
     const headers = getHeaders();
     const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
       params: {
-        limit: 10,
+        limit: 15,
         offset: 0,
       }, //TODO context vars
       headers,
