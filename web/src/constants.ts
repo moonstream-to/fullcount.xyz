@@ -65,8 +65,8 @@ export const getChainImage = (identifier: string | number): string | undefined =
 
 export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
 export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
-export const GAME_CONTRACT = "0x3a1Ad54d12b1f39805Ea77aFe7DeeFf2F32C97f5"; //TODO env
-export const TOKEN_CONTRACT = "0x0b9299858d7E5d20c54629587D960b634A96D823"; //TODO env
+export const GAME_CONTRACT = "0x7Be10D395617438b78500b003d5a1D201B150D6b"; //TODO env
+export const TOKEN_CONTRACT = "0x80CE79d51625a13b40a3569595559D5312F752e4"; //TODO env
 // export const CHAIN_ID = 322; //TODO env
 export const CHAIN_ID = 421614;
 export const RPC = "https://sepolia-rollup.arbitrum.io/rpc";
