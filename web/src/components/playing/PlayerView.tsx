@@ -201,8 +201,16 @@ const PlayerView = ({
             onClick={handleCommit}
             disabled={isCommitted}
           >
-            {commitMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Commit</Text>}
-            {showTooltip && <div className={globalStyles.tooltip}>Choose where to swing first</div>}
+            {commitMutation.isLoading ? (
+              <Spinner h={"14px"} w={"14px"} />
+            ) : (
+              <Text>{isPitcher ? "Pitch!" : "Swing!"}</Text>
+            )}
+            {showTooltip && (
+              <div className={globalStyles.tooltip}>{`Choose where to ${
+                isPitcher ? "pitch" : "swing"
+              } first`}</div>
+            )}
           </button>
         )}
         {(token.source === "BLBContract" || isRevealFailed) &&
