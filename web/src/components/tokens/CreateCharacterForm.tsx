@@ -7,6 +7,7 @@ import { TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
+import { blbImage } from "../../constants";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -59,12 +60,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       <div className={styles.header}>Create character</div>
 
       <div className={styles.content}>
-        <Image
-          width={"161"}
-          height={"161"}
-          src={`https://badges.moonstream.to/blb/p${imageIndex}.png`}
-          alt={""}
-        />
+        <Image width={"161"} height={"161"} src={blbImage(imageIndex)} alt={""} />
         <div className={styles.images}>
           {images.map((_, idx: number) => (
             <Image
@@ -72,7 +68,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
               width={"50"}
               height={"50"}
               alt={`img${idx}`}
-              src={`https://badges.moonstream.to/blb/p${idx}.png`}
+              src={blbImage(idx)}
               className={imageIndex === idx ? styles.selectedImage : styles.image}
               onClick={() => setImageIndex(idx)}
             />

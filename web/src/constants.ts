@@ -1,4 +1,4 @@
-export const GAME_CONTRACT_VERSION = "0.1.0"; //TODO fetch from contract
+export const GAME_CONTRACT_VERSION = "0.1.1"; //TODO fetch from contract
 export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
 
 export const FEEDBACK_FORM_URL =
@@ -70,3 +70,5 @@ export const TOKEN_CONTRACT = "0x80CE79d51625a13b40a3569595559D5312F752e4"; //TO
 // export const CHAIN_ID = 322; //TODO env
 export const CHAIN_ID = 421614;
 export const RPC = "https://sepolia-rollup.arbitrum.io/rpc";
+export const blbImage = (idx: number) =>
+  `https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
