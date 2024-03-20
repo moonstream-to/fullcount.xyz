@@ -130,8 +130,8 @@ const PlayerView = ({
     }
   }, [sessionStatus.progress, sessionStatus.didBatterReveal, sessionStatus.didPitcherReveal]);
 
-  const columnCenters = [9.5, 36.5, 69.5, 102.5, 129.5].map((x) => x + 85);
-  const rowCenters = [9.5, 40.0, 80.0, 120.0, 150.5];
+  const columnCenters = [1.955, 7.1, 13.48, 19.86, 25.01];
+  const rowCenters = [1.955, 7.82, 15.64, 23.46, 29.33];
 
   return (
     <Flex
@@ -145,7 +145,12 @@ const PlayerView = ({
       width="100%"
     >
       <div
-        style={{ width: "320px", display: "flex", justifyContent: "center", position: "relative" }}
+        style={{
+          width: "66vh",
+          display: "flex",
+          justifyContent: "center",
+          position: "relative",
+        }}
       >
         <GridComponent
           selectedIndex={gridIndex}
@@ -158,18 +163,24 @@ const PlayerView = ({
           <Image
             src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
             alt={"o"}
-            left={`${columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]] - 143}px`}
-            top={`${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 19}px`}
+            left={`calc(19.52vh - 4px - 29.9vh + ${
+              columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]]
+            }vh + ${getRowCol(gridIndex)[1] * 2}px)`}
+            top={`calc(${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 3.91}vh + ${
+              getRowCol(gridIndex)[0] * 2
+            }px)`}
             className={styles.batImage}
           />
         )}
         {isPitcher && gridIndex !== -1 && (
           <Image
-            h={"22px"}
-            w={"22px"}
             src={`${FULLCOUNT_ASSETS_PATH}/ball.png`}
-            left={`${columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]] - 5}px`}
-            top={`${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 11}px`}
+            left={`calc(19.52vh - 4px - 2.25vh + ${
+              columnCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[1]]
+            }vh + ${getRowCol(gridIndex)[1] * 2}px)`}
+            top={`calc(${rowCenters[gridIndex === -1 ? 0 : getRowCol(gridIndex)[0]] - 2.25}vh + ${
+              getRowCol(gridIndex)[0] * 2
+            }px)`}
             className={styles.ballImage}
             alt={"o"}
             draggable={false}

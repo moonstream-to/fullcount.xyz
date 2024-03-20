@@ -4,6 +4,8 @@
     justify-content: space-between;
     width: 100vw;
     height: 100vh;
+    max-height: 100vh;
+    overflow-y: clip;
     background: #FFF;
     position: relative;
 }
@@ -124,5 +126,5 @@
 
 .playerView {
     display: flex;
-    margin-top: 27%;
+    margin-bottom: -15px;
 }

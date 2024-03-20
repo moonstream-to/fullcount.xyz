@@ -87,26 +87,26 @@ const GridComponent = ({
         position={"absolute"}
         top={"0"}
         right={"50%"}
-        minW={"165px"}
         transform={"translateX(0) translateY(-33.3%)"}
         alt={""}
-        h={"395px"}
+        h={"81.28vh"}
+        minW={"33.95vh"}
         zIndex={"0"}
       />
       <Image
         src={`${assets}/pitcher.png`}
         position={"absolute"}
-        top={"-7vh"}
+        top={"0"}
         right={"50%"}
-        transform={"translateX(50%) translateY(-10px)"}
+        transform={"translateX(50%) translateY(-10vh)"}
         alt={""}
-        w={"60px"}
-        h={"80px"}
+        w={"12.3"}
+        h={"16.4vh"}
         zIndex={"0"}
       />
       <Grid
-        templateColumns="19px 31px 31px 31px 19px"
-        templateRows={"19px 38px 38px 38px 19px"}
+        templateColumns={"3.91vh 6.38vh 6.38vh 6.38vh 3.91vh"}
+        templateRows={"3.91vh 7.82vh 7.82vh 7.82vh 3.91vh"}
         w={"fit-content"}
         gap={"2px"}
       >

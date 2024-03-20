@@ -135,8 +135,8 @@
 .batImage {
     position: absolute;
     opacity: 70%;
-    width: 200px;
-    height: 39px;
+    width: auto;
+    height: 7.82vh;
     z-index: 1;
 }
 
@@ -144,7 +144,7 @@
 .ballImage {
     position: absolute;
     opacity: 100%;
-    width: 200px;
-    height: 39px;
+    width: 4.5vh;
+    height: 4.5vh;
     z-index: 3;
 }

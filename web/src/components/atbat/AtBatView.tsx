@@ -60,6 +60,10 @@ const AtBatView: React.FC = () => {
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
     if (router.query.id && typeof router.query.id === "string") {
       setAtBatId(router.query.id);
     }
@@ -125,7 +129,7 @@ const AtBatView: React.FC = () => {
       </div>
       <Image
         minW={"441px"}
-        h={"25vh"}
+        h={"calc(25vh - 27px)"}
         position={"absolute"}
         src={`${FULLCOUNT_ASSETS_PATH}/stadium.png`}
         right={"50%"}
@@ -205,7 +209,10 @@ const AtBatView: React.FC = () => {
         !showPitchOutcome &&
         atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
         atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
-          <div className={styles.playerView}>
+          <div
+            id={"player_container"}
+            style={{ display: "flex", flexGrow: "2", alignItems: "flex-end" }}
+          >
             {selectedToken &&
               isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
               atBatState.data && (
