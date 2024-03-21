@@ -2,9 +2,7 @@
 pragma solidity ^0.8.13;
 
 import { Test } from "../lib/forge-std/src/Test.sol";
-import { console2 as console } from "../lib/forge-std/src/console2.sol";
 import { BeerLeagueBallers } from "../src/Players.sol";
-// import { TerminusFacet } from "../lib/web3/contracts/terminus/TerminusFacet.sol";
 import "@openzeppelin-contracts/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
 
 contract MockERC1155 is ERC1155Burnable {
@@ -19,20 +17,18 @@ contract MockERC1155 is ERC1155Burnable {
     }
 }
 
-// contract MockTerminus is TerminusFacet {
-//     constructor() { }
-// }
-
 contract PlayersTestBase is Test {
     BeerLeagueBallers players;
     MockERC1155 terminus;
 
     uint256 adminPrivateKey = 0x1;
-    uint256 playerPrivateKey = 0x2;
-    uint256 randomPersonPrivateKey = 0x77;
+    uint256 player1PrivateKey = 0x101;
+    uint256 player2PrivateKey = 0x102;
+    uint256 randomPersonPrivateKey = 0x201;
 
     address admin = vm.addr(adminPrivateKey);
-    address player = vm.addr(playerPrivateKey);
+    address player1 = vm.addr(player1PrivateKey);
+    address player2 = vm.addr(player2PrivateKey);
     address randomPerson = vm.addr(randomPersonPrivateKey);
 
     uint256 adminPoolID = 1;
@@ -47,22 +43,22 @@ contract PlayersTestBase is Test {
 
 contract PlayersTestAdmin is PlayersTestBase {
     function test_admin_can_add_profile_image() public {
-        uint256 initialImageCount = players.getProfileImageCount();
+        uint256 initialImageCount = players.NumProfileImages();
 
         vm.prank(admin);
         players.addProfileImage("http://www.example.com");
 
-        assertEq(players.getProfileImageCount(), initialImageCount + 1);
+        assertEq(players.NumProfileImages(), initialImageCount + 1);
     }
 
     function test_non_admin_cannot_add_profile_image() public {
-        uint256 initialImageCount = players.getProfileImageCount();
+        uint256 initialImageCount = players.NumProfileImages();
 
         vm.prank(randomPerson);
         vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
         players.addProfileImage("http://www.example.com");
 
-        assertEq(players.getProfileImageCount(), initialImageCount);
+        assertEq(players.NumProfileImages(), initialImageCount);
     }
 
     function test_admin_can_set_profile_image() public {
@@ -70,7 +66,7 @@ contract PlayersTestAdmin is PlayersTestBase {
         string memory initialImage = players.ProfileImages(index);
 
         vm.prank(admin);
-        players.setProfileImage(index, "http://www.example.com");
+        players.updateProfileImage(index, "http://www.example.com");
 
         assertEq(players.ProfileImages(index), "http://www.example.com");
         assertNotEq(players.ProfileImages(index), initialImage);
@@ -82,42 +78,103 @@ contract PlayersTestAdmin is PlayersTestBase {
 
         vm.prank(randomPerson);
         vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
-        players.setProfileImage(index, "http://www.example.com");
+        players.updateProfileImage(index, "http://www.example.com");
 
         assertEq(players.ProfileImages(index), initialImage);
         assertNotEq(players.ProfileImages(index), "http://www.example.com");
     }
 
-    function test_admin_can_set_token_name() public {
-        string memory playerName = "Offensive Bunny";
+    function test_admin_can_set_token_name_and_images() public {
+        string memory firstOffensiveName = "Offensive Bunny";
+        string memory secondOffensiveName = "Explitive Bunny";
+        uint256 firstTokenImageIndex = 0;
+        uint256 secondTokenImageIndex = 5;
 
-        vm.prank(player);
-        uint256 tokenID = players.mint(playerName, 0);
+        vm.prank(player1);
+        uint256 firstTokenID = players.mint(firstOffensiveName, firstTokenImageIndex);
 
-        assertEq(players.Name(tokenID), playerName);
+        vm.prank(player2);
+        uint256 secondTokenID = players.mint(secondOffensiveName, secondTokenImageIndex);
+
+        assertEq(players.Name(firstTokenID), firstOffensiveName);
+        assertEq(players.Name(secondTokenID), secondOffensiveName);
+        assertEq(players.ImageIndex(firstTokenID), firstTokenImageIndex);
+        assertEq(players.ImageIndex(secondTokenID), secondTokenImageIndex);
 
         string memory adminName = "Fluffy Bunny";
+        uint256 adminImageIndex = 2;
 
-        vm.prank(admin);
-        players.setTokenName(tokenID, adminName);
+        uint256[] memory tokenList = new uint256[](2);
+        tokenList[0] = firstTokenID;
+        tokenList[1] = secondTokenID;
 
-        assertEq(players.Name(tokenID), adminName);
+        string[] memory nameList = new string[](2);
+        nameList[0] = adminName;
+        nameList[1] = adminName;
+
+        uint256[] memory imageIndexList = new uint256[](2);
+        imageIndexList[0] = adminImageIndex;
+        imageIndexList[1] = adminImageIndex;
+
+        vm.startPrank(admin);
+
+        players.setTokenNames(tokenList, nameList);
+
+        players.setTokenImages(tokenList, imageIndexList);
+
+        vm.stopPrank();
+
+        assertEq(players.Name(firstTokenID), adminName);
+        assertEq(players.Name(secondTokenID), adminName);
+        assertEq(players.ImageIndex(firstTokenID), adminImageIndex);
+        assertEq(players.ImageIndex(secondTokenID), adminImageIndex);
     }
 
-    function test_non_admin_cannot_set_token_name() public {
-        string memory playerName = "Offensive Bunny";
+    function test_non_admin_cannot_set_token_name_or_images() public {
+        string memory firstOffensiveName = "Offensive Bunny";
+        string memory secondOffensiveName = "Explitive Bunny";
+        uint256 firstTokenImageIndex = 1;
+        uint256 secondTokenImageIndex = 3;
 
-        vm.prank(player);
-        uint256 tokenID = players.mint(playerName, 0);
+        vm.prank(player1);
+        uint256 firstTokenID = players.mint(firstOffensiveName, firstTokenImageIndex);
 
-        assertEq(players.Name(tokenID), playerName);
+        vm.prank(player2);
+        uint256 secondTokenID = players.mint(secondOffensiveName, secondTokenImageIndex);
+
+        assertEq(players.Name(firstTokenID), firstOffensiveName);
+        assertEq(players.Name(secondTokenID), secondOffensiveName);
+        assertEq(players.ImageIndex(firstTokenID), firstTokenImageIndex);
+        assertEq(players.ImageIndex(secondTokenID), secondTokenImageIndex);
 
         string memory randomName = "Random Bunny";
+        uint256 randomImageIndex = 7;
 
-        vm.prank(randomPerson);
+        uint256[] memory tokenList = new uint256[](2);
+        tokenList[0] = firstTokenID;
+        tokenList[1] = secondTokenID;
+
+        string[] memory nameList = new string[](2);
+        nameList[0] = randomName;
+        nameList[1] = randomName;
+
+        uint256[] memory imageIndexList = new uint256[](2);
+        imageIndexList[0] = randomImageIndex;
+        imageIndexList[1] = randomImageIndex;
+
+        vm.startPrank(randomPerson);
+
         vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
-        players.setTokenName(tokenID, randomName);
+        players.setTokenNames(tokenList, nameList);
 
-        assertEq(players.Name(tokenID), playerName);
+        vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
+        players.setTokenImages(tokenList, imageIndexList);
+
+        vm.stopPrank();
+
+        assertEq(players.Name(firstTokenID), firstOffensiveName);
+        assertEq(players.Name(secondTokenID), secondOffensiveName);
+        assertEq(players.ImageIndex(firstTokenID), firstTokenImageIndex);
+        assertEq(players.ImageIndex(secondTokenID), secondTokenImageIndex);
     }
 }

@@ -9,16 +9,8 @@ import { Strings } from "../lib/openzeppelin-contracts/contracts/utils/Strings.s
 import { ITerminus } from "../lib/web3/contracts/interfaces/ITerminus.sol";
 
 contract BeerLeagueBallers is ERC721Enumerable {
-    string[] public ProfileImages = [
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p0.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p1.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p2.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p3.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p4.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p5.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p6.png",
-        "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p7.png"
-    ];
+    mapping(uint256 => string) public ProfileImages;
+    uint256 public NumProfileImages;
 
     mapping(uint256 => string) public Name;
     mapping(uint256 => uint256) public ImageIndex;
@@ -29,6 +21,16 @@ contract BeerLeagueBallers is ERC721Enumerable {
     constructor(address _adminTerminus, uint256 _adminPoolID) ERC721("Beer League Ballers", "BLB") {
         adminTerminus = _adminTerminus;
         adminPoolID = _adminPoolID;
+
+        ProfileImages[0] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p0.png";
+        ProfileImages[1] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p1.png";
+        ProfileImages[2] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p2.png";
+        ProfileImages[3] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p3.png";
+        ProfileImages[4] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p4.png";
+        ProfileImages[5] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p5.png";
+        ProfileImages[6] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p6.png";
+        ProfileImages[7] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p7.png";
+        NumProfileImages = 8;
     }
 
     function _enforceIsAdmin() internal view {
@@ -36,30 +38,47 @@ contract BeerLeagueBallers is ERC721Enumerable {
         require(terminus.balanceOf(msg.sender, adminPoolID) > 0, "BeerLeagueBallers._enforceIsAdmin: not admin");
     }
 
-    function getProfileImageCount() external view returns (uint256) {
-        return ProfileImages.length;
-    }
-
     function addProfileImage(string memory newImage) public {
         _enforceIsAdmin();
 
-        ProfileImages.push(newImage);
+        ProfileImages[NumProfileImages] = newImage;
+        NumProfileImages++;
     }
 
-    function setProfileImage(uint256 index, string memory newImage) public {
+    function updateProfileImage(uint256 index, string memory newImage) public {
         _enforceIsAdmin();
 
         ProfileImages[index] = newImage;
     }
 
-    function setTokenName(uint256 tokenID, string memory newName) public {
+    function setTokenNames(uint256[] memory tokenIDList, string[] memory newNameList) public {
         _enforceIsAdmin();
 
-        Name[tokenID] = newName;
+        require(
+            tokenIDList.length == newNameList.length,
+            "BeerLeagueBallers.setTokenNames: tokenIDList and newNameList length mismatch"
+        );
+
+        for (uint256 i = 0; i < tokenIDList.length; i++) {
+            Name[tokenIDList[i]] = newNameList[i];
+        }
+    }
+
+    function setTokenImages(uint256[] memory tokenIDList, uint256[] memory imageIndexList) public {
+        _enforceIsAdmin();
+
+        require(
+            tokenIDList.length == imageIndexList.length,
+            "BeerLeagueBallers.setTokenImages: tokenIDList and imageIndexList length mismatch"
+        );
+
+        for (uint256 i = 0; i < tokenIDList.length; i++) {
+            ImageIndex[tokenIDList[i]] = imageIndexList[i];
+        }
     }
 
     function mint(string memory name, uint256 imageIndex) public returns (uint256) {
-        require(imageIndex < ProfileImages.length, "BLB.mint: invalid image index");
+        require(imageIndex < NumProfileImages, "BLB.mint: invalid image index");
         uint256 tokenId = totalSupply() + 1;
         Name[tokenId] = name;
         ImageIndex[tokenId] = imageIndex;

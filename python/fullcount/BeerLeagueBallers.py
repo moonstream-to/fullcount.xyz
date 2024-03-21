@@ -128,6 +128,12 @@ class BeerLeagueBallers:
         self.assert_contract_is_instantiated()
         return self.contract.Name.call(arg1, block_identifier=block_number)
 
+    def num_profile_images(
+        self, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.NumProfileImages.call(block_identifier=block_number)
+
     def profile_images(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -157,12 +163,6 @@ class BeerLeagueBallers:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.getApproved.call(token_id, block_identifier=block_number)
-
-    def get_profile_image_count(
-        self, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.getProfileImageCount.call(block_identifier=block_number)
 
     def is_approved_for_all(
         self,
@@ -224,13 +224,21 @@ class BeerLeagueBallers:
         self.assert_contract_is_instantiated()
         return self.contract.setApprovalForAll(operator, approved, transaction_config)
 
-    def set_profile_image(self, index: int, new_image: str, transaction_config) -> Any:
+    def set_token_images(
+        self, token_id_list: List, image_index_list: List, transaction_config
+    ) -> Any:
         self.assert_contract_is_instantiated()
-        return self.contract.setProfileImage(index, new_image, transaction_config)
+        return self.contract.setTokenImages(
+            token_id_list, image_index_list, transaction_config
+        )
 
-    def set_token_name(self, token_id: int, new_name: str, transaction_config) -> Any:
+    def set_token_names(
+        self, token_id_list: List, new_name_list: List, transaction_config
+    ) -> Any:
         self.assert_contract_is_instantiated()
-        return self.contract.setTokenName(token_id, new_name, transaction_config)
+        return self.contract.setTokenNames(
+            token_id_list, new_name_list, transaction_config
+        )
 
     def supports_interface(
         self, interface_id: bytes, block_number: Optional[Union[str, int]] = "latest"
@@ -280,6 +288,12 @@ class BeerLeagueBallers:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.transferFrom(from_, to, token_id, transaction_config)
+
+    def update_profile_image(
+        self, index: int, new_image: str, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.updateProfileImage(index, new_image, transaction_config)
 
 
 def get_transaction_config(args: argparse.Namespace) -> Dict[str, Any]:
@@ -384,6 +398,13 @@ def handle_name(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_num_profile_images(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    result = contract.num_profile_images(block_number=args.block_number)
+    print(result)
+
+
 def handle_profile_images(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = BeerLeagueBallers(args.address)
@@ -440,13 +461,6 @@ def handle_get_approved(args: argparse.Namespace) -> None:
     result = contract.get_approved(
         token_id=args.token_id, block_number=args.block_number
     )
-    print(result)
-
-
-def handle_get_profile_image_count(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = BeerLeagueBallers(args.address)
-    result = contract.get_profile_image_count(block_number=args.block_number)
     print(result)
 
 
@@ -541,13 +555,13 @@ def handle_set_approval_for_all(args: argparse.Namespace) -> None:
         print(result.info())
 
 
-def handle_set_profile_image(args: argparse.Namespace) -> None:
+def handle_set_token_images(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = BeerLeagueBallers(args.address)
     transaction_config = get_transaction_config(args)
-    result = contract.set_profile_image(
-        index=args.index,
-        new_image=args.new_image,
+    result = contract.set_token_images(
+        token_id_list=args.token_id_list,
+        image_index_list=args.image_index_list,
         transaction_config=transaction_config,
     )
     print(result)
@@ -555,13 +569,13 @@ def handle_set_profile_image(args: argparse.Namespace) -> None:
         print(result.info())
 
 
-def handle_set_token_name(args: argparse.Namespace) -> None:
+def handle_set_token_names(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = BeerLeagueBallers(args.address)
     transaction_config = get_transaction_config(args)
-    result = contract.set_token_name(
-        token_id=args.token_id,
-        new_name=args.new_name,
+    result = contract.set_token_names(
+        token_id_list=args.token_id_list,
+        new_name_list=args.new_name_list,
         transaction_config=transaction_config,
     )
     print(result)
@@ -630,6 +644,20 @@ def handle_transfer_from(args: argparse.Namespace) -> None:
         print(result.info())
 
 
+def handle_update_profile_image(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.update_profile_image(
+        index=args.index,
+        new_image=args.new_image,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def generate_cli() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="CLI for BeerLeagueBallers")
     parser.set_defaults(func=lambda _: parser.print_help())
@@ -660,6 +688,10 @@ def generate_cli() -> argparse.ArgumentParser:
     add_default_arguments(name_parser, False)
     name_parser.add_argument("--arg1", required=True, help="Type: uint256", type=int)
     name_parser.set_defaults(func=handle_name)
+
+    num_profile_images_parser = subcommands.add_parser("num-profile-images")
+    add_default_arguments(num_profile_images_parser, False)
+    num_profile_images_parser.set_defaults(func=handle_num_profile_images)
 
     profile_images_parser = subcommands.add_parser("profile-images")
     add_default_arguments(profile_images_parser, False)
@@ -701,10 +733,6 @@ def generate_cli() -> argparse.ArgumentParser:
         "--token-id", required=True, help="Type: uint256", type=int
     )
     get_approved_parser.set_defaults(func=handle_get_approved)
-
-    get_profile_image_count_parser = subcommands.add_parser("get-profile-image-count")
-    add_default_arguments(get_profile_image_count_parser, False)
-    get_profile_image_count_parser.set_defaults(func=handle_get_profile_image_count)
 
     is_approved_for_all_parser = subcommands.add_parser("is-approved-for-all")
     add_default_arguments(is_approved_for_all_parser, False)
@@ -789,25 +817,25 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     set_approval_for_all_parser.set_defaults(func=handle_set_approval_for_all)
 
-    set_profile_image_parser = subcommands.add_parser("set-profile-image")
-    add_default_arguments(set_profile_image_parser, True)
-    set_profile_image_parser.add_argument(
-        "--index", required=True, help="Type: uint256", type=int
+    set_token_images_parser = subcommands.add_parser("set-token-images")
+    add_default_arguments(set_token_images_parser, True)
+    set_token_images_parser.add_argument(
+        "--token-id-list", required=True, help="Type: uint256[]", nargs="+"
     )
-    set_profile_image_parser.add_argument(
-        "--new-image", required=True, help="Type: string", type=str
+    set_token_images_parser.add_argument(
+        "--image-index-list", required=True, help="Type: uint256[]", nargs="+"
     )
-    set_profile_image_parser.set_defaults(func=handle_set_profile_image)
+    set_token_images_parser.set_defaults(func=handle_set_token_images)
 
-    set_token_name_parser = subcommands.add_parser("set-token-name")
-    add_default_arguments(set_token_name_parser, True)
-    set_token_name_parser.add_argument(
-        "--token-id", required=True, help="Type: uint256", type=int
+    set_token_names_parser = subcommands.add_parser("set-token-names")
+    add_default_arguments(set_token_names_parser, True)
+    set_token_names_parser.add_argument(
+        "--token-id-list", required=True, help="Type: uint256[]", nargs="+"
     )
-    set_token_name_parser.add_argument(
-        "--new-name", required=True, help="Type: string", type=str
+    set_token_names_parser.add_argument(
+        "--new-name-list", required=True, help="Type: string[]", nargs="+"
     )
-    set_token_name_parser.set_defaults(func=handle_set_token_name)
+    set_token_names_parser.set_defaults(func=handle_set_token_names)
 
     supports_interface_parser = subcommands.add_parser("supports-interface")
     add_default_arguments(supports_interface_parser, False)
@@ -856,6 +884,16 @@ def generate_cli() -> argparse.ArgumentParser:
         "--token-id", required=True, help="Type: uint256", type=int
     )
     transfer_from_parser.set_defaults(func=handle_transfer_from)
+
+    update_profile_image_parser = subcommands.add_parser("update-profile-image")
+    add_default_arguments(update_profile_image_parser, True)
+    update_profile_image_parser.add_argument(
+        "--index", required=True, help="Type: uint256", type=int
+    )
+    update_profile_image_parser.add_argument(
+        "--new-image", required=True, help="Type: string", type=str
+    )
+    update_profile_image_parser.set_defaults(func=handle_update_profile_image)
 
     return parser
 
