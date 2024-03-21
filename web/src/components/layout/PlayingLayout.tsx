@@ -25,6 +25,7 @@ const PlayingLayout = ({ children }: { children: ReactNode }) => {
       placeSelf={"center"}
       w={"100%"}
       background={"#FCECD9"}
+      maxW={"1440px"}
     >
       <Navbar />
       <audio id="heartbeat" src={sounds.heartbeat} preload={"auto"} />
