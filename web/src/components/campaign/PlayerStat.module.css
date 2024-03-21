@@ -8,7 +8,9 @@
 
     border: 1px solid #7E8E7F;
     background: #EBE4DC;
-place-self: stretch}
+    place-self: center;
+    width: 300px;
+}
 
 .tokenInfo {
     display: flex;
