@@ -2,7 +2,7 @@ import { Flex, Spinner } from "@chakra-ui/react";
 import Image from "next/image";
 
 import styles from "./CreateNewCharacter.module.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
@@ -45,10 +45,10 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
     },
   );
 
-  // useEffect(() => {
-  //   setName("");
-  //   setImageIndex(-1);
-  // }, []);
+  useEffect(() => {
+    setName("");
+    setImageIndex(0);
+  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
