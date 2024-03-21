@@ -18,7 +18,7 @@ const HeatMapSmall = ({ rates, size }: { rates: number[]; size?: string }) => {
   );
 
   return (
-    <Flex direction={"column"} alignItems={"center"} gap={"10px"} minH={{ base: "", lg: "150px" }}>
+    <Flex direction={"column"} alignItems={"center"} gap={"10px"}>
       <Grid
         templateColumns="repeat(5, 1fr)"
         w={"fit-content"}
