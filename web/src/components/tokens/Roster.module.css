@@ -128,6 +128,17 @@
     height: 130px;
 }
 
+.tokenImageFallback {
+    width: 50px;
+    height: 50px;
+}
+
+.bigTokenImageFallback {
+    width: 130px;
+    height: 130px;
+}
+
+
 @media (min-width: 768px) {
     .container {
         margin-bottom: 20px;
@@ -144,6 +155,15 @@
     }
 
     .bigTokenImage {
+        width: 150px;
+        height: 150px;
+    }
+    .tokenImageFallback {
+        width: 70px;
+        height: 70px;
+    }
+
+    .bigTokenImageFallback {
         width: 150px;
         height: 150px;
     }
