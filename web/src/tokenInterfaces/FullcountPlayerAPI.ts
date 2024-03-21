@@ -1,5 +1,5 @@
 import { OwnedToken, Token } from "../types";
-import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC } from "../constants";
+import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC, TOKEN_CONTRACT } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
 import Web3 from "web3";
@@ -27,10 +27,12 @@ export async function fetchFullcountPlayerTokens() {
       }, //TODO context vars
       headers,
     });
-    const tokens = res.data.nfts.map((nft: { erc721_address: string; token_id: string }) => ({
-      id: nft.token_id,
-      address: nft.erc721_address,
-    }));
+    const tokens = res.data.nfts
+      .map((nft: { erc721_address: string; token_id: string }) => ({
+        id: nft.token_id,
+        address: nft.erc721_address,
+      }))
+      .filter((nft: { address: string }) => nft.address === TOKEN_CONTRACT);
 
     const tokensData = await getTokensData({
       tokens,
