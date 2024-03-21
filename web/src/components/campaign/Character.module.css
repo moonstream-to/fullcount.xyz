@@ -43,6 +43,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    min-height: 25px;
 }
 
 .continueButton, .startButton {
@@ -62,6 +63,7 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    min-height: 29.5px;
 }
 .startButton {
     color: #FFF;

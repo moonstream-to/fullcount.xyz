@@ -7,6 +7,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import router from "next/router";
 import { useGameContext } from "../../contexts/GameContext";
+import { Spinner } from "@chakra-ui/react";
 
 const Character = ({
   character,
@@ -116,7 +117,13 @@ const Character = ({
         style={{ backgroundColor: color }}
         onClick={() => handlePlay(atBat)}
       >
-        start game
+        {joinSession.isLoading ? (
+          <Spinner h={4} w={4} />
+        ) : joinSession.isSuccess ? (
+          "Success"
+        ) : (
+          "start game"
+        )}
       </div>
     </div>
   );
