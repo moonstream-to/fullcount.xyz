@@ -1,0 +1,14 @@
+.container {
+    display: flex;
+
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: 30px;
+    position: relative;
+
+    background: #FCECD9;
+    transition: opacity 3s ease-out;
+}
