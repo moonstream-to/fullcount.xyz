@@ -23,7 +23,6 @@ export const getContracts = () => {
   const gameContract = new web3.eth.Contract(FullcountABI) as unknown as FullcountContract;
   gameContract.options.address = GAME_CONTRACT;
   const tokenContract = new web3.eth.Contract(TokenABI);
-  tokenContract.options.address = TOKEN_CONTRACT;
 
   const MULTICALL2_CONTRACT_ADDRESS =
     MULTICALL2_CONTRACT_ADDRESSES[String(CHAIN_ID) as keyof typeof MULTICALL2_CONTRACT_ADDRESSES];
