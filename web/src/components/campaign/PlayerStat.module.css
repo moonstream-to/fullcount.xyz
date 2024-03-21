@@ -1,0 +1,114 @@
+.container {
+    display: flex;
+    padding: 10px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+
+    border: 1px solid #7E8E7F;
+    background: #EBE4DC;
+place-self: stretch}
+
+.tokenInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: Bangers, cursive;
+    width: 100%;
+    justify-content: center;
+}
+
+.tokenImage {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+
+.tokenNameId {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+.tokenName {
+    color: #262019;
+    text-align: center;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 18px */
+}
+
+.tokenId {
+    color: #8EAB8F;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+}
+
+.tokenStatList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    justify-self: stretch;
+}
+
+.tokenStatItem {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    align-self: stretch;
+}
+
+.statHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+
+.completion {
+    color: #665D53;
+    text-align: center;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.label {
+    color: #7E8E7F;
+    text-align: center;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.notFinishedBar {
+    display: flex;
+    height: 6px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border: 0.5px solid #7E8E7F;
+    background: #665D53;
+    position: relative;
+}
+
+.finishedBar {
+    background: #FFF;
+    position: absolute;
+    display: flex;
+    height: 6px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    left: 0;
+}
+
