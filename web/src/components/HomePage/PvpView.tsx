@@ -140,7 +140,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
       {atBats && selectedView === 0 && (
         <div className={styles.listsContainer}>
           <div className={styles.list}>
-            PITCHERS
+            <div className={styles.listHeader}>PITCHERS</div>
             {atBats
               .filter((a) => a.progress === 2 && a.pitcher && a.pitcher?.address !== ZERO_ADDRESS)
               .map((openAtBat, idx) => {
@@ -161,7 +161,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
               })}
           </div>
           <div className={styles.list}>
-            BATTERS
+            <div className={styles.listHeader}>batters</div>
             {atBats
               .filter((a) => a.progress === 2 && a.batter && a.batter?.address !== ZERO_ADDRESS)
               .map((openAtBat, idx) => {
