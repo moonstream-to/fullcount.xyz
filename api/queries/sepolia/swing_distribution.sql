@@ -3,8 +3,7 @@ with  dedup_events as (
         DISTINCT ON(transaction_hash, log_index) *
     FROM arbitrum_sepolia_labels
     WHERE label='moonworm-alpha'
-        AND (address='0x3a1Ad54d12b1f39805Ea77aFe7DeeFf2F32C97f5' 
-            OR address='0x7Be10D395617438b78500b003d5a1D201B150D6b')
+        AND address='0x7Be10D395617438b78500b003d5a1D201B150D6b'
         AND log_index IS NOT NULL
 ), SessionResolved as (
     SELECT
