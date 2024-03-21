@@ -29,3 +29,10 @@
     background: rgba(50, 132, 73, 0.15);
     cursor: pointer;
 }
+
+@media (min-width: 768px) {
+    .containerSmall {
+        width: 70px;
+        height: 70px;
+    }
+}
