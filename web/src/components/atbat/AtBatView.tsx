@@ -63,6 +63,17 @@ const AtBatView: React.FC = () => {
     window.scrollTo(0, 0);
   }, []);
 
+  const [windowHeight, setWindowHeight] = useState<number | undefined>(undefined);
+
+  const updateHeight = () => {
+    setWindowHeight(window.innerHeight);
+  };
+
+  useEffect(() => {
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
   useEffect(() => {
     if (router.query.id && typeof router.query.id === "string") {
       setAtBatId(router.query.id);
@@ -123,7 +134,10 @@ const AtBatView: React.FC = () => {
   };
 
   return (
-    <div className={styles.container}>
+    <div
+      className={styles.container}
+      style={{ maxHeight: windowHeight ? `${windowHeight}px` : "100vh" }}
+    >
       <div className={styles.exitButton} onClick={() => router.push("/")}>
         <ExitIcon onClick={() => router.push("/")} />
       </div>
