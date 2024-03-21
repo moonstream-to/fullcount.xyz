@@ -1,0 +1,32 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.roleSelector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    align-self: stretch;
+
+}
+
+
+
+.selectedRole, .role {
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    color: #7E8E7F;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.selectedRole {
+    color: #262019;
+
+}
