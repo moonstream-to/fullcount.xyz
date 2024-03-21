@@ -96,7 +96,7 @@ const TokenToPlay = ({
   }
 
   return (
-    <div className={styles.container}>
+    <div className={onClick ? styles.container : styles.containerSmall}>
       <Image
         src={token.image}
         alt={""}
@@ -115,7 +115,9 @@ const TokenToPlay = ({
           </div>
         )}
         <div className={styles.info}>
-          <div className={styles.name}>{token.name}</div>
+          <div className={styles.name} title={token.name}>
+            {token.name}
+          </div>
           <div className={styles.id}>{token.id}</div>
         </div>
         {onClick && (

@@ -1,17 +1,21 @@
-.container {
+.container, .containerSmall {
     display: flex;
     flex-direction: column;
     align-items: center;
-
     border: 1px solid #7E8E7F;
     background: #262019;
-    width: fit-content;
+    width: 130px;
+
+}
+
+.containerSmall {
+    width: 100px;
 }
 
 .content {
     position: relative;
     display: flex;
-    padding: 10px;
+    padding: 5px;
     flex-direction: column;
     align-items: center;
     gap: 10px;
@@ -27,14 +31,20 @@
 }
 
 .name {
+    max-width: 100%;
+    padding-left: 2px;
+    padding-right: 2px;
+    overflow: hidden;
     color: #FFF;
     text-overflow: ellipsis;
     font-family: Bangers, cursive;
-    font-size: 18px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
-    line-height: 100%; /* 18px */
+    line-height: 100%;
     min-height: 18px;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .id {
