@@ -4,7 +4,6 @@
     flex-direction: column;
     gap: 10px;
     align-self: stretch;
-
     border: 1px solid #262019;
     background: #EBE4DC;
     margin-bottom: 10px;
@@ -113,9 +112,46 @@
 .tokenImage {
     border: 0.5px solid #7E8E7F;
     cursor: pointer;
+    width: 50px;
+    height: 50px;
 }
 
 .selectedTokenImage {
     border: 3px solid #328449;
     cursor: pointer;
+    width: 50px;
+    height: 50px;
+}
+
+.bigTokenImage {
+    width: 130px;
+    height: 130px;
+}
+
+@media (min-width: 768px) {
+    .container {
+        margin-bottom: 20px;
+        padding: 15px;
+        gap: 20px;
+    }
+    .tokens {
+        gap: 30px;
+    }
+
+    .tokenImage, .selectedTokenImage {
+        width: 70px;
+        height: 70px;
+    }
+
+    .bigTokenImage {
+        width: 150px;
+        height: 150px;
+    }
+
+    .tokenInfo {
+        max-width: 150px;
+    }
+    .buttonsContainer {
+        width: 150px;
+    }
 }

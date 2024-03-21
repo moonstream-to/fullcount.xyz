@@ -1,7 +1,7 @@
 import styles from "./Roster.module.css";
 import { OwnedToken } from "../../types";
 import { useEffect, useState } from "react";
-import Image from "next/image";
+import { Image } from "@chakra-ui/react";
 import NewCharacterButton from "./NewCharacterButton";
 import PlayButtons from "./PlayButtons";
 import { useGameContext } from "../../contexts/GameContext";
@@ -18,7 +18,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
       <div className={styles.header}>roster</div>
       <div className={styles.tokens}>
         <div className={styles.selectedTokenContainer}>
-          <Image src={tokens[selectedTokenIdx].image} alt={""} width={"130"} height={"130"} />
+          <Image src={tokens[selectedTokenIdx].image} alt={""} className={styles.bigTokenImage} />
           <div className={styles.tokenInfo}>
             <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
             <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
@@ -31,8 +31,6 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
               key={idx}
               src={t.image}
               alt={""}
-              width={"50"}
-              height={"50"}
               className={selectedTokenIdx === idx ? styles.selectedTokenImage : styles.tokenImage}
               onClick={() => setSelectedTokenIdx(idx)}
             />
