@@ -12,6 +12,18 @@
     line-height: normal;
     text-transform: uppercase;
     z-index: 2;
+    position: relative;
+}
+
+.pitches {
+    display: flex;
+    padding: 5px 10px;
+    align-items: center;
+    gap: 5px;
+    align-self: stretch;
+    border-right: 1px solid #262019;
+    background: #328449;
+    cursor: pointer;
 }
 
 
@@ -22,8 +34,6 @@
     gap: 5px;
     align-self: stretch;
 
-    border-right: 1px solid #262019;
-    background: #328449;
 }
 
 .score {
