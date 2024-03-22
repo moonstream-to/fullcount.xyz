@@ -98,12 +98,12 @@ const TokenToPlay = ({
   }
 
   return (
-    <div className={onClick ? styles.container : styles.containerSmall}>
+    <div className={onClick || !showId ? styles.container : styles.containerSmall}>
       <Image
         src={token.image}
         alt={""}
-        height={onClick ? "130" : "100"}
-        width={onClick ? "130" : "100"}
+        height={onClick || !showId ? "130" : "100"}
+        width={onClick || !showId ? "130" : "100"}
       />
       <div className={styles.content}>
         {isPitcher && pitchDistributions.data && (
