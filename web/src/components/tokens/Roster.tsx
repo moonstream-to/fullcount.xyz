@@ -30,7 +30,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             <Image
               key={idx}
               src={t.image}
-              fallback={<div />}
+              fallback={<div className={styles.tokenImageFallback} />}
               alt={""}
               className={selectedTokenIdx === idx ? styles.selectedTokenImage : styles.tokenImage}
               onClick={() => setSelectedTokenIdx(idx)}

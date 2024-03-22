@@ -6,7 +6,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import router from "next/router";
 import { useGameContext } from "../../contexts/GameContext";
-import { Spinner } from "@chakra-ui/react";
+import { Spinner, Image } from "@chakra-ui/react";
 import { Character } from "./teams";
 
 const CharacterCard = ({
@@ -107,7 +107,12 @@ const CharacterCard = ({
   }
   return (
     <div className={styles.container}>
-      <img className={styles.image} alt={""} src={atBat.pitcher?.image ?? atBat.batter?.image} />
+      <Image
+        fallback={<div className={styles.tokenImageFallback} />}
+        className={styles.image}
+        alt={""}
+        src={atBat.pitcher?.image ?? atBat.batter?.image}
+      />
       <div className={styles.header}>
         <div className={styles.name}>{character?.character?.name}</div>
         <div className={styles.quote}>{character?.character?.quote}</div>

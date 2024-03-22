@@ -68,3 +68,8 @@
 .startButton {
     color: #FFF;
 }
+
+.tokenImageFallback {
+    width: 178px;
+    height: 180px;
+}
