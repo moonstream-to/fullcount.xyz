@@ -1,5 +1,5 @@
 import styles from "./PitchHistory.module.css";
-import { AtBat, AtBatStatus, SessionStatus } from "../../types";
+import { AtBatStatus } from "../../types";
 import BallIcon from "../icons/BallIcon";
 import HistoryGrid from "./HistoryGrid";
 import BatIcon from "../icons/BatIcon";

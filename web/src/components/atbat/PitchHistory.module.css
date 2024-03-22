@@ -8,7 +8,7 @@
     border: 0.5px solid #262019;
     background: rgba(255, 255, 255, 0.70);
     backdrop-filter: blur(15px);
-    z-index: 5;
+    z-index: 10;
     position: absolute;
     left: 10px;
     top: calc(100% + 10px);
@@ -35,7 +35,7 @@
 .total {
     color: #262019;
     text-align: center;
-    font-family: Pangolin;
+    font-family: Pangolin, cursive;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -45,7 +45,7 @@
 
 .list {
     display: flex;
-    padding: 10px 0px;
+    padding: 10px 0;
     flex-direction: column;
     align-items: center;
     gap: 10px;
@@ -63,7 +63,7 @@
 
 .itemText {
     color: #262019;
-    font-family: Pangolin;
+    font-family: Pangolin, cursive;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;

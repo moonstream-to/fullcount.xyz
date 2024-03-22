@@ -11,7 +11,7 @@
     font-weight: 400;
     line-height: normal;
     text-transform: uppercase;
-    z-index: 2;
+    z-index: 4;
     position: relative;
 }
 
@@ -33,7 +33,7 @@
     align-items: center;
     gap: 5px;
     align-self: stretch;
-
+    white-space: nowrap;
 }
 
 .score {
