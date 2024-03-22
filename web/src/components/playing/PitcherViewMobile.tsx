@@ -106,7 +106,7 @@ const PitcherViewMobile = ({
       },
       onError: (e: Error) => {
         setIsRevealFailed(true);
-        toast("Reveal failed: " + e?.message, "error");
+        console.log("Reveal failed: " + e?.message);
       },
     },
   );
@@ -114,7 +114,7 @@ const PitcherViewMobile = ({
   useEffect(() => {
     setIsRevealed(sessionStatus.didPitcherReveal);
     setIsCommitted(sessionStatus.didPitcherCommit);
-  }, [sessionStatus.didPitcherReveal, sessionStatus.didPitcherCommit]);
+  }, [sessionStatus]);
 
   return (
     <PlayerView

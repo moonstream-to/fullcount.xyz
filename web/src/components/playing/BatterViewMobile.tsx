@@ -107,14 +107,14 @@ const BatterViewMobile = ({
       },
       onError: (e: Error) => {
         setIsRevealFailed(true);
-        toast("Reveal failed: " + e?.message, "error");
+        console.log("Reveal failed: " + e?.message);
       },
     },
   );
   useEffect(() => {
     setIsRevealed(sessionStatus.didBatterReveal);
     setIsCommitted(sessionStatus.didBatterCommit);
-  }, [sessionStatus.didBatterCommit, sessionStatus.didBatterReveal]);
+  }, [sessionStatus]);
 
   return (
     <PlayerView
