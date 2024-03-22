@@ -17,6 +17,15 @@
     background: #FFF;
 }
 
+.bossesTitle {
+    color: #C9904D;
+    font-family: Bangers, cursive;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
 .teamTitle {
     color: #262019;
     font-family: Bangers, cursive;

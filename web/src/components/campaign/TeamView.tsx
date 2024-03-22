@@ -1,7 +1,7 @@
 import styles from "./TeamsView.module.css";
 import { AtBat } from "../../types";
-import { Team } from "./TeamsView";
-import Character from "./Character";
+import CharacterCard from "./CharacterCard";
+import { Team } from "./teams";
 
 const TeamView = ({
   team,
@@ -16,8 +16,13 @@ const TeamView = ({
     return <></>;
   }
   return (
-    <div className={styles.team}>
-      <div className={styles.teamTitle}>{team.title}</div>
+    <div className={styles.team} style={{ backgroundColor: team.isBosses ? "#382D1D" : "#FFF" }}>
+      {isPitching && team.isBosses && <div className={styles.bossesTitle}>PITCHING BOSS</div>}
+      {!isPitching && team.isBosses && <div className={styles.bossesTitle}>BATTING BOSS</div>}
+
+      <div className={styles.teamTitle} style={{ color: team.isBosses ? "#FFF" : "#262019" }}>
+        {team.title}
+      </div>
       <div className={styles.teamMotto} style={{ color: team.color }}>
         {team.motto}
       </div>
@@ -37,7 +42,7 @@ const TeamView = ({
             };
           })
           .map((character, idx) => (
-            <Character
+            <CharacterCard
               key={idx}
               color={team.color}
               character={character}

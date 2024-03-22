@@ -1,5 +1,4 @@
 import styles from "./Character.module.css";
-import { Character } from "./TeamsView";
 import { AtBat, OwnedToken, Token } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import useUser from "../../contexts/UserContext";
@@ -8,8 +7,9 @@ import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlaye
 import router from "next/router";
 import { useGameContext } from "../../contexts/GameContext";
 import { Spinner } from "@chakra-ui/react";
+import { Character } from "./teams";
 
-const Character = ({
+const CharacterCard = ({
   character,
   atBat,
   color,
@@ -129,4 +129,4 @@ const Character = ({
   );
 };
 
-export default Character;
+export default CharacterCard;
