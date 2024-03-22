@@ -33,6 +33,7 @@ export async function getMulticallResults(
       if (result === undefined) {
         return undefined;
       }
+
       const decoded = web3.eth.abi.decodeParameters(outputs, result);
       if (outputs.length === 1 && outputs[0].type !== "tuple") {
         // If the output is a primitive type, return the primitive value
