@@ -204,7 +204,7 @@ const PlayerView = ({
             {commitMutation.isLoading ? (
               <Spinner h={"14px"} w={"14px"} />
             ) : (
-              <Text>{isPitcher ? "Pitch!" : "Swing!"}</Text>
+              <Text>{isPitcher ? "Pitch!" : actionChoice === 2 ? "Take" : "Swing!"}</Text>
             )}
             {showTooltip && (
               <div className={globalStyles.tooltip}>{`Choose where to ${
