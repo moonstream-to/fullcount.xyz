@@ -25,6 +25,11 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
           pitching
         </div>
       </div>
+      <div className={styles.hint}>
+        {isPitching
+          ? "To defeat a pitcher, you must hit three home runs against them. Defeat them all to finish the campaign!"
+          : "To defeat a batter, strike them out in only three pitches. Defeat them all to finish the campaign!"}
+      </div>
       <TeamsView atBats={atBats} isPitching={isPitching} />
     </div>
   );

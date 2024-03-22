@@ -30,3 +30,13 @@
     color: #262019;
 
 }
+
+.hint {
+    color: #7E8E7F;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
