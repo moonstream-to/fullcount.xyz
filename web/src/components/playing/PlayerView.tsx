@@ -128,7 +128,7 @@ const PlayerView = ({
     if (!isPitcher && sessionStatus.progress === 4 && !sessionStatus.didBatterReveal) {
       handleReveal();
     }
-  }, [sessionStatus.progress, sessionStatus.didBatterReveal, sessionStatus.didPitcherReveal]);
+  }, [sessionStatus]);
 
   const columnCenters = [1.955, 7.1, 13.48, 19.86, 25.01];
   const rowCenters = [1.955, 7.82, 15.64, 23.46, 29.33];
