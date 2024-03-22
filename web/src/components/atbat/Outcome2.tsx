@@ -15,10 +15,14 @@ export const sessionOutcomeType = (
     return "neutral";
   }
   if (tokens.some((t) => t.address === pitcher?.address && t.id === pitcher.id)) {
-    return sessionStatus.outcome === 0 || atBat.outcome === 7 ? "positive" : "negative";
+    return sessionStatus.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
+      ? "positive"
+      : "negative";
   }
   if (tokens.some((t) => t.address === batter?.address && t.id === batter.id)) {
-    return atBat.outcome === 0 || atBat.outcome === 7 ? "negative" : "positive";
+    return atBat.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
+      ? "negative"
+      : "positive";
   }
 };
 
