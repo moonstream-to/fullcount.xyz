@@ -22,7 +22,7 @@ const useLogin = () => {
     },
     onError: (error: any) => {
       console.log(error);
-      const message = error.response.data?.detail ?? error.message;
+      const message = error.response?.data?.detail ?? error.message;
       toast(message, "error");
     },
   });

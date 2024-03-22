@@ -20,7 +20,7 @@ const useSignUp = () => {
     },
     onError: (error: any) => {
       console.log(error);
-      let message = error.response.data?.detail ?? error.message;
+      let message = error.response?.data?.detail ?? error.message;
       if (error.response?.status === 409) {
         message = "username or email already exists";
       }
