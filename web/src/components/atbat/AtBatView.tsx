@@ -7,7 +7,7 @@ import { useGameContext } from "../../contexts/GameContext";
 import Score from "./Score";
 import AtBatFooter from "./AtBatFooter";
 import PitcherViewMobile from "../playing/PitcherViewMobile";
-import { AtBat, AtBatStatus, OwnedToken, Token } from "../../types";
+import { AtBatStatus, OwnedToken, Token } from "../../types";
 import BatterViewMobile from "../playing/BatterViewMobile";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
@@ -26,7 +26,7 @@ const outcomes = [
   "In Play Out",
 ];
 
-const sessionOutcomes = [
+export const sessionOutcomes = [
   "Strike",
   "Ball",
   "Foul",
