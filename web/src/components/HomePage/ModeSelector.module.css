@@ -2,12 +2,14 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    align-items: center;
 }
 
 .buttons {
     display: flex;
     justify-content: center;
     gap: 10px;
+    align-self: stretch;
 }
 
 .button, .buttonSelected {
@@ -51,4 +53,5 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    max-width: 375px;
 }

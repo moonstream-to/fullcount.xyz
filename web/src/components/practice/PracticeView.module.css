@@ -51,6 +51,7 @@
     /*left: 50%;*/
     bottom: 50px;
     min-height: 36px;
+    cursor: pointer;
     /*transform: translateX(50%) translateY(100%);*/
 
 }

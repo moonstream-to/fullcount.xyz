@@ -3,18 +3,21 @@ import TokenToPlay from "./TokenToPlay";
 import { AtBat, OwnedToken } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import { useRouter } from "next/router";
+import CoachCard from "../practice/CoachCard";
 
-const BOTS_ADDRESS = "0x7cfEd1ae17bf332b604ba7feDD905844a865e7df";
-const ALICE_TEAM = [1, 2, 3];
-const DORIS_TEAM = [4];
-const ALLAN_TEAM = [5];
-const DENNY_TEAM = [6, 7, 8];
+const BOTS_ADDRESS = "0xD3F58aF413b76d754c6cD19266a55475a5a6CA79";
+const rachel = [4, 5, 11];
+const nolan = [9, 13, 16];
+const pitcherDescription =
+  "Like her namesake, Rachel Balkovec, this coach bot will turn you into a batting badass (bat-ass?).";
+const batterDescription =
+  "Named for legendary pitcher Nolan Ryan and legendary contest winner Bryan.";
 const getDefault = (team: number[]) => {
   return String(team[0]);
 };
 
-const pitchers = [ALICE_TEAM, DORIS_TEAM];
-const batters = [ALLAN_TEAM, DENNY_TEAM];
+const pitchers = [rachel];
+const batters = [nolan];
 
 const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
   const router = useRouter();
@@ -26,7 +29,11 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
         return;
       }
       const atBatsForPractice = team
-        .map((t) => atBats.find((atBat) => atBat.pitcher?.id === String(t)))
+        .map((t) =>
+          atBats.find(
+            (atBat) => atBat.pitcher?.id === String(t) && atBat.pitcher.address === BOTS_ADDRESS,
+          ),
+        )
         .filter((atBat) => atBat);
       updateContext({ atBatsForPractice });
       router.push("/practice");
@@ -38,7 +45,11 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
         return;
       }
       const atBatsForPractice = team
-        .map((t) => atBats.find((atBat) => atBat.batter?.id === String(t)))
+        .map((t) =>
+          atBats.find(
+            (atBat) => atBat.batter?.id === String(t) && atBat.batter.address === BOTS_ADDRESS,
+          ),
+        )
         .filter((atBat) => atBat);
       updateContext({ atBatsForPractice });
       router.push("/practice");
@@ -48,9 +59,9 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.listsContainer}>
-        <div className={styles.list}>
-          PITCHERS
+      <div className={styles.listsContainer} style={{ justifyContent: "center" }}>
+        <div className={styles.list} style={{ maxWidth: "300px" }}>
+          <div className={styles.listHeader}>BATTING COACH</div>
           {atBats
             .filter(
               (a) =>
@@ -61,10 +72,11 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
             )
             .map((openAtBat, idx) => {
               return openAtBat.pitcher ? (
-                <TokenToPlay
+                <CoachCard
                   token={openAtBat.pitcher}
-                  isPitcher={true}
                   onClick={() => handlePlay(openAtBat)}
+                  description={pitcherDescription}
+                  isPitcher={true}
                   key={idx}
                 />
               ) : (
@@ -72,8 +84,8 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
               );
             })}
         </div>
-        <div className={styles.list}>
-          BATTERS
+        <div className={styles.list} style={{ maxWidth: "300px" }}>
+          <div className={styles.listHeader}>Pitching coach</div>
           {atBats
             .filter(
               (a) =>
@@ -84,10 +96,11 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
             )
             .map((openAtBat, idx) => {
               return openAtBat.batter ? (
-                <TokenToPlay
+                <CoachCard
                   token={openAtBat.batter}
-                  isPitcher={false}
                   onClick={() => handlePlay(openAtBat)}
+                  description={batterDescription}
+                  isPitcher={false}
                   key={idx}
                 />
               ) : (

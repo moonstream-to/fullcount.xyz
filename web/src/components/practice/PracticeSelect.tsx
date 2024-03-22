@@ -126,6 +126,7 @@ const PracticeSelect = () => {
         <TokenToPlay
           token={getSelectedToken(atBatsForPractice[selectedLevel]).token}
           isPitcher={getSelectedToken(atBatsForPractice[selectedLevel]).isPitcher}
+          showId={false}
         />
       )}
       <div className={parentStyles.viewSelector}>

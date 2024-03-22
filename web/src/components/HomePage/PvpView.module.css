@@ -71,6 +71,7 @@
     font-weight: 400;
     line-height: normal;
     text-align: center;
+    text-transform: uppercase;
 }
 
 @media (min-width: 768px) {

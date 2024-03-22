@@ -12,12 +12,14 @@ const TokenToPlay = ({
   onClick,
   isLoading,
   isForGame,
+  showId = true,
 }: {
   token: Token | undefined;
   isPitcher: boolean;
   onClick?: () => void;
   isLoading?: boolean;
   isForGame?: boolean;
+  showId?: boolean;
 }) => {
   const pitchDistributions = useQuery(
     ["pitch_distribution", token?.address, token?.id],
@@ -118,7 +120,7 @@ const TokenToPlay = ({
           <div className={styles.name} title={token.name}>
             {token.name}
           </div>
-          <div className={styles.id}>{token.id}</div>
+          {showId && <div className={styles.id}>{token.id}</div>}
         </div>
         {onClick && (
           <div className={styles.button} onClick={onClick}>
