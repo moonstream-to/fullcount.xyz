@@ -10,7 +10,7 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
   const [isPitching, setIsPitching] = useState(true);
   return (
     <div className={styles.container}>
-      {selectedToken && <PlayerStat token={selectedToken} />}
+      {/*{selectedToken && <PlayerStat token={selectedToken} />}*/}
       <div className={styles.roleSelector}>
         <div
           className={isPitching ? styles.selectedRole : styles.role}
