@@ -12,6 +12,7 @@ import { useGameContext } from "../../contexts/GameContext";
 import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
 import { isCampaignToken } from "../campaign/teams";
+import { isCoach } from "./PracticeView";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
@@ -148,7 +149,8 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                   a.progress === 2 &&
                   a.pitcher &&
                   a.pitcher?.address !== ZERO_ADDRESS &&
-                  !isCampaignToken(a.pitcher.address, a.pitcher.id),
+                  !isCampaignToken(a.pitcher.address, a.pitcher.id) &&
+                  !isCoach(a.pitcher.address, a.pitcher.id),
               )
               .map((openAtBat, idx) => {
                 return openAtBat.pitcher ? (
@@ -175,7 +177,8 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                   a.progress === 2 &&
                   a.batter &&
                   a.batter?.address !== ZERO_ADDRESS &&
-                  !isCampaignToken(a.batter.address, a.batter.id),
+                  !isCampaignToken(a.batter.address, a.batter.id) &&
+                  !isCoach(a.batter.address, a.batter.id),
               )
               .map((openAtBat, idx) => {
                 return openAtBat.batter ? (

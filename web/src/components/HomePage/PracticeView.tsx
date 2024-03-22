@@ -6,18 +6,26 @@ import { useRouter } from "next/router";
 import CoachCard from "../practice/CoachCard";
 
 const BOTS_ADDRESS = "0xD3F58aF413b76d754c6cD19266a55475a5a6CA79";
-const rachel = [4, 5, 11];
-const nolan = [9, 13, 16];
+const rachel = ["4", "5", "11"];
+const nolan = ["9", "13", "16"];
 const pitcherDescription =
   "Like her namesake, Rachel Balkovec, this coach bot will turn you into a batting badass (bat-ass?).";
 const batterDescription =
   "Named for legendary pitcher Nolan Ryan and legendary contest winner Bryan.";
-const getDefault = (team: number[]) => {
-  return String(team[0]);
+const getDefault = (team: string[]) => {
+  return team[0];
 };
 
 const pitchers = [rachel];
 const batters = [nolan];
+export const isCoach = (address: string, id: string): boolean => {
+  if (address !== BOTS_ADDRESS) {
+    return false;
+  }
+  const allPitchers = pitchers.flat();
+  const allBatters = batters.flat();
+  return allPitchers.includes(id) || allBatters.includes(id);
+};
 
 const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
   const router = useRouter();
@@ -30,9 +38,7 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
       }
       const atBatsForPractice = team
         .map((t) =>
-          atBats.find(
-            (atBat) => atBat.pitcher?.id === String(t) && atBat.pitcher.address === BOTS_ADDRESS,
-          ),
+          atBats.find((atBat) => atBat.pitcher?.id === t && atBat.pitcher.address === BOTS_ADDRESS),
         )
         .filter((atBat) => atBat);
       updateContext({ atBatsForPractice });
@@ -46,9 +52,7 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
       }
       const atBatsForPractice = team
         .map((t) =>
-          atBats.find(
-            (atBat) => atBat.batter?.id === String(t) && atBat.batter.address === BOTS_ADDRESS,
-          ),
+          atBats.find((atBat) => atBat.batter?.id === t && atBat.batter.address === BOTS_ADDRESS),
         )
         .filter((atBat) => atBat);
       updateContext({ atBatsForPractice });
