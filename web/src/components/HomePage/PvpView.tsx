@@ -11,6 +11,7 @@ import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlaye
 import { useGameContext } from "../../contexts/GameContext";
 import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
+import { isCampaignToken } from "../campaign/teams";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
@@ -142,7 +143,13 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           <div className={styles.list}>
             <div className={styles.listHeader}>PITCHERS</div>
             {atBats
-              .filter((a) => a.progress === 2 && a.pitcher && a.pitcher?.address !== ZERO_ADDRESS)
+              .filter(
+                (a) =>
+                  a.progress === 2 &&
+                  a.pitcher &&
+                  a.pitcher?.address !== ZERO_ADDRESS &&
+                  !isCampaignToken(a.pitcher.address, a.pitcher.id),
+              )
               .map((openAtBat, idx) => {
                 return openAtBat.pitcher ? (
                   <TokenToPlay
@@ -163,7 +170,13 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           <div className={styles.list}>
             <div className={styles.listHeader}>batters</div>
             {atBats
-              .filter((a) => a.progress === 2 && a.batter && a.batter?.address !== ZERO_ADDRESS)
+              .filter(
+                (a) =>
+                  a.progress === 2 &&
+                  a.batter &&
+                  a.batter?.address !== ZERO_ADDRESS &&
+                  !isCampaignToken(a.batter.address, a.batter.id),
+              )
               .map((openAtBat, idx) => {
                 return openAtBat.batter ? (
                   <TokenToPlay
