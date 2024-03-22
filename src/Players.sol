@@ -22,14 +22,14 @@ contract BeerLeagueBallers is ERC721Enumerable {
         adminTerminus = _adminTerminus;
         adminPoolID = _adminPoolID;
 
-        ProfileImages[0] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p0.png";
-        ProfileImages[1] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p1.png";
-        ProfileImages[2] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p2.png";
-        ProfileImages[3] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p3.png";
-        ProfileImages[4] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p4.png";
-        ProfileImages[5] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p5.png";
-        ProfileImages[6] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p6.png";
-        ProfileImages[7] = "https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p7.png";
+        ProfileImages[0] = "https://static.fullcount.xyz/Beer_League_Ballers/p0.png";
+        ProfileImages[1] = "https://static.fullcount.xyz/Beer_League_Ballers/p1.png";
+        ProfileImages[2] = "https://static.fullcount.xyz/Beer_League_Ballers/p2.png";
+        ProfileImages[3] = "https://static.fullcount.xyz/Beer_League_Ballers/p3.png";
+        ProfileImages[4] = "https://static.fullcount.xyz/Beer_League_Ballers/p4.png";
+        ProfileImages[5] = "https://static.fullcount.xyz/Beer_League_Ballers/p5.png";
+        ProfileImages[6] = "https://static.fullcount.xyz/Beer_League_Ballers/p6.png";
+        ProfileImages[7] = "https://static.fullcount.xyz/Beer_League_Ballers/p7.png";
         NumProfileImages = 8;
     }
 

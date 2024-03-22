@@ -46,7 +46,7 @@ contract PlayersTestAdmin is PlayersTestBase {
         uint256 initialImageCount = players.NumProfileImages();
 
         vm.prank(admin);
-        players.addProfileImage("http://www.example.com");
+        players.addProfileImage("http://www.example.com/test_admin_can_add_profile_image");
 
         assertEq(players.NumProfileImages(), initialImageCount + 1);
     }
@@ -56,7 +56,7 @@ contract PlayersTestAdmin is PlayersTestBase {
 
         vm.prank(randomPerson);
         vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
-        players.addProfileImage("http://www.example.com");
+        players.addProfileImage("http://www.example.com/test_non_admin_cannot_add_profile_image");
 
         assertEq(players.NumProfileImages(), initialImageCount);
     }
@@ -64,24 +64,30 @@ contract PlayersTestAdmin is PlayersTestBase {
     function test_admin_can_set_profile_image() public {
         uint256 index = 1;
         string memory initialImage = players.ProfileImages(index);
+        string memory newImage = "http://www.example.com/test_admin_can_set_profile_image";
+
+        assertNotEq(players.ProfileImages(index), newImage);
 
         vm.prank(admin);
-        players.updateProfileImage(index, "http://www.example.com");
+        players.updateProfileImage(index, newImage);
 
-        assertEq(players.ProfileImages(index), "http://www.example.com");
+        assertEq(players.ProfileImages(index), newImage);
         assertNotEq(players.ProfileImages(index), initialImage);
     }
 
     function test_non_admin_cannot_set_profile_image() public {
         uint256 index = 1;
         string memory initialImage = players.ProfileImages(index);
+        string memory newImage = "http://www.example.com/test_non_admin_cannot_set_profile_image";
+
+        assertNotEq(players.ProfileImages(index), newImage);
 
         vm.prank(randomPerson);
         vm.expectRevert("BeerLeagueBallers._enforceIsAdmin: not admin");
-        players.updateProfileImage(index, "http://www.example.com");
+        players.updateProfileImage(index, newImage);
 
         assertEq(players.ProfileImages(index), initialImage);
-        assertNotEq(players.ProfileImages(index), "http://www.example.com");
+        assertNotEq(players.ProfileImages(index), newImage);
     }
 
     function test_admin_can_set_token_name_and_images() public {
