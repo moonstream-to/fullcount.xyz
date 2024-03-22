@@ -96,9 +96,13 @@ class BeerLeagueBallers:
                 self.contract_name, self.address, self.abi
             )
 
-    def deploy(self, transaction_config):
+    def deploy(
+        self, _admin_terminus: ChecksumAddress, _admin_pool_id: int, transaction_config
+    ):
         contract_class = contract_from_build(self.contract_name)
-        deployed_contract = contract_class.deploy(transaction_config)
+        deployed_contract = contract_class.deploy(
+            _admin_terminus, _admin_pool_id, transaction_config
+        )
         self.address = deployed_contract.address
         self.contract = deployed_contract
         return deployed_contract.tx
@@ -124,11 +128,21 @@ class BeerLeagueBallers:
         self.assert_contract_is_instantiated()
         return self.contract.Name.call(arg1, block_identifier=block_number)
 
+    def num_profile_images(
+        self, block_number: Optional[Union[str, int]] = "latest"
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.NumProfileImages.call(block_identifier=block_number)
+
     def profile_images(
         self, arg1: int, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.ProfileImages.call(arg1, block_identifier=block_number)
+
+    def add_profile_image(self, new_image: str, transaction_config) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.addProfileImage(new_image, transaction_config)
 
     def approve(self, to: ChecksumAddress, token_id: int, transaction_config) -> Any:
         self.assert_contract_is_instantiated()
@@ -210,6 +224,22 @@ class BeerLeagueBallers:
         self.assert_contract_is_instantiated()
         return self.contract.setApprovalForAll(operator, approved, transaction_config)
 
+    def set_token_images(
+        self, token_id_list: List, image_index_list: List, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.setTokenImages(
+            token_id_list, image_index_list, transaction_config
+        )
+
+    def set_token_names(
+        self, token_id_list: List, new_name_list: List, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.setTokenNames(
+            token_id_list, new_name_list, transaction_config
+        )
+
     def supports_interface(
         self, interface_id: bytes, block_number: Optional[Union[str, int]] = "latest"
     ) -> Any:
@@ -258,6 +288,12 @@ class BeerLeagueBallers:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.transferFrom(from_, to, token_id, transaction_config)
+
+    def update_profile_image(
+        self, index: int, new_image: str, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.updateProfileImage(index, new_image, transaction_config)
 
 
 def get_transaction_config(args: argparse.Namespace) -> Dict[str, Any]:
@@ -331,7 +367,11 @@ def handle_deploy(args: argparse.Namespace) -> None:
     network.connect(args.network)
     transaction_config = get_transaction_config(args)
     contract = BeerLeagueBallers(None)
-    result = contract.deploy(transaction_config=transaction_config)
+    result = contract.deploy(
+        _admin_terminus=args.admin_terminus_arg,
+        _admin_pool_id=args.admin_pool_id_arg,
+        transaction_config=transaction_config,
+    )
     print(result)
     if args.verbose:
         print(result.info())
@@ -358,11 +398,30 @@ def handle_name(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_num_profile_images(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    result = contract.num_profile_images(block_number=args.block_number)
+    print(result)
+
+
 def handle_profile_images(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = BeerLeagueBallers(args.address)
     result = contract.profile_images(arg1=args.arg1, block_number=args.block_number)
     print(result)
+
+
+def handle_add_profile_image(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.add_profile_image(
+        new_image=args.new_image, transaction_config=transaction_config
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
 
 
 def handle_approve(args: argparse.Namespace) -> None:
@@ -496,6 +555,34 @@ def handle_set_approval_for_all(args: argparse.Namespace) -> None:
         print(result.info())
 
 
+def handle_set_token_images(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.set_token_images(
+        token_id_list=args.token_id_list,
+        image_index_list=args.image_index_list,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
+def handle_set_token_names(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.set_token_names(
+        token_id_list=args.token_id_list,
+        new_name_list=args.new_name_list,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def handle_supports_interface(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = BeerLeagueBallers(args.address)
@@ -557,6 +644,20 @@ def handle_transfer_from(args: argparse.Namespace) -> None:
         print(result.info())
 
 
+def handle_update_profile_image(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = BeerLeagueBallers(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.update_profile_image(
+        index=args.index,
+        new_image=args.new_image,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def generate_cli() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="CLI for BeerLeagueBallers")
     parser.set_defaults(func=lambda _: parser.print_help())
@@ -564,6 +665,12 @@ def generate_cli() -> argparse.ArgumentParser:
 
     deploy_parser = subcommands.add_parser("deploy")
     add_default_arguments(deploy_parser, True)
+    deploy_parser.add_argument(
+        "--admin-terminus-arg", required=True, help="Type: address"
+    )
+    deploy_parser.add_argument(
+        "--admin-pool-id-arg", required=True, help="Type: uint256", type=int
+    )
     deploy_parser.set_defaults(func=handle_deploy)
 
     verify_contract_parser = subcommands.add_parser("verify-contract")
@@ -582,12 +689,23 @@ def generate_cli() -> argparse.ArgumentParser:
     name_parser.add_argument("--arg1", required=True, help="Type: uint256", type=int)
     name_parser.set_defaults(func=handle_name)
 
+    num_profile_images_parser = subcommands.add_parser("num-profile-images")
+    add_default_arguments(num_profile_images_parser, False)
+    num_profile_images_parser.set_defaults(func=handle_num_profile_images)
+
     profile_images_parser = subcommands.add_parser("profile-images")
     add_default_arguments(profile_images_parser, False)
     profile_images_parser.add_argument(
         "--arg1", required=True, help="Type: uint256", type=int
     )
     profile_images_parser.set_defaults(func=handle_profile_images)
+
+    add_profile_image_parser = subcommands.add_parser("add-profile-image")
+    add_default_arguments(add_profile_image_parser, True)
+    add_profile_image_parser.add_argument(
+        "--new-image", required=True, help="Type: string", type=str
+    )
+    add_profile_image_parser.set_defaults(func=handle_add_profile_image)
 
     approve_parser = subcommands.add_parser("approve")
     add_default_arguments(approve_parser, True)
@@ -699,6 +817,26 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     set_approval_for_all_parser.set_defaults(func=handle_set_approval_for_all)
 
+    set_token_images_parser = subcommands.add_parser("set-token-images")
+    add_default_arguments(set_token_images_parser, True)
+    set_token_images_parser.add_argument(
+        "--token-id-list", required=True, help="Type: uint256[]", nargs="+"
+    )
+    set_token_images_parser.add_argument(
+        "--image-index-list", required=True, help="Type: uint256[]", nargs="+"
+    )
+    set_token_images_parser.set_defaults(func=handle_set_token_images)
+
+    set_token_names_parser = subcommands.add_parser("set-token-names")
+    add_default_arguments(set_token_names_parser, True)
+    set_token_names_parser.add_argument(
+        "--token-id-list", required=True, help="Type: uint256[]", nargs="+"
+    )
+    set_token_names_parser.add_argument(
+        "--new-name-list", required=True, help="Type: string[]", nargs="+"
+    )
+    set_token_names_parser.set_defaults(func=handle_set_token_names)
+
     supports_interface_parser = subcommands.add_parser("supports-interface")
     add_default_arguments(supports_interface_parser, False)
     supports_interface_parser.add_argument(
@@ -746,6 +884,16 @@ def generate_cli() -> argparse.ArgumentParser:
         "--token-id", required=True, help="Type: uint256", type=int
     )
     transfer_from_parser.set_defaults(func=handle_transfer_from)
+
+    update_profile_image_parser = subcommands.add_parser("update-profile-image")
+    add_default_arguments(update_profile_image_parser, True)
+    update_profile_image_parser.add_argument(
+        "--index", required=True, help="Type: uint256", type=int
+    )
+    update_profile_image_parser.add_argument(
+        "--new-image", required=True, help="Type: string", type=str
+    )
+    update_profile_image_parser.set_defaults(func=handle_update_profile_image)
 
     return parser
 
