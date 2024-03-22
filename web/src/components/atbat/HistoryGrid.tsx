@@ -14,11 +14,7 @@ const HistoryGrid = ({ vertical, horizontal }: { vertical: string; horizontal: s
   };
 
   const generateCell = (index: number) => (
-    <Box
-      key={index}
-      border={"0.1px solid #627865"}
-      backgroundColor={getCellColor(index, vertical, horizontal)}
-    ></Box>
+    <Box key={index} backgroundColor={getCellColor(index, vertical, horizontal)}></Box>
   );
 
   return (
@@ -26,6 +22,9 @@ const HistoryGrid = ({ vertical, horizontal }: { vertical: string; horizontal: s
       <Grid
         templateColumns={"3px 4px 4px 4px 3px"}
         templateRows={"3px 5px 5px 5px 3px"}
+        gap={"0.5px"}
+        backgroundColor={"#627865"}
+        border={"0.5px solid #627865"}
         w={"fit-content"}
       >
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
