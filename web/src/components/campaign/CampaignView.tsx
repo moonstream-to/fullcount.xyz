@@ -16,13 +16,13 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
           className={isPitching ? styles.selectedRole : styles.role}
           onClick={() => setIsPitching(true)}
         >
-          pitching
+          batting
         </div>
         <div
           className={!isPitching ? styles.selectedRole : styles.role}
           onClick={() => setIsPitching(false)}
         >
-          batting
+          pitching
         </div>
       </div>
       <TeamsView atBats={atBats} isPitching={isPitching} />
