@@ -1,4 +1,4 @@
-import { useMediaQuery, useDisclosure } from "@chakra-ui/react";
+import { useMediaQuery, useDisclosure, Image } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Navbar.module.css";
 import useUser from "../../contexts/UserContext";
@@ -7,6 +7,7 @@ import AccountMobile from "../icons/AccountMobile";
 import VolumeOn from "../icons/VolumeOn";
 import MoreHorizontal from "../icons/MoreHorizontal";
 import useLogout from "../../hooks/useLogout";
+import { FEEDBACK_FORM_URL, FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -38,15 +39,20 @@ const Navbar = () => {
 
   return (
     <div className={styles.container}>
-      <FullcountLogoSmall />
+      <Image
+        w={"30px"}
+        h={"31px"}
+        alt={""}
+        src={`${FULLCOUNT_ASSETS_PATH}/logo/fullcount-mini.png`}
+      />
       <div className={styles.rightSide}>
         <div className={styles.account}>
           <AccountMobile />
           <div className={styles.username}>{user.username}</div>
         </div>
-        <div className={styles.menuButton}>
-          <VolumeOn />
-        </div>
+        {/*<div className={styles.menuButton}>*/}
+        {/*  <VolumeOn />*/}
+        {/*</div>*/}
         <div className={styles.menu}>
           <div className={styles.menuButton} onClick={() => setIsMenuOpen(!isMenuOpen)}>
             <MoreHorizontal />
@@ -54,10 +60,17 @@ const Navbar = () => {
           {isMenuOpen && <div className={styles.overlay}></div>}
           {isMenuOpen && (
             <div ref={menuRef} className={styles.menuList}>
-              <div className={styles.menuItem}>About</div>
-              <div className={styles.menuItem}>Achievements</div>
-              <div className={styles.menuItem}>Leaderboards</div>
-              <div className={styles.menuItem}>Leave feedback</div>
+              {/*<div className={styles.menuItem}>About</div>*/}
+              {/*<div className={styles.menuItem}>Achievements</div>*/}
+              {/*<div className={styles.menuItem}>Leaderboards</div>*/}
+              <div
+                className={styles.menuItem}
+                onClick={() => {
+                  window.open(FEEDBACK_FORM_URL, "_blank", "noopener,noreferrer");
+                }}
+              >
+                Leave feedback
+              </div>
               <div className={styles.divider} />
               <div
                 className={styles.menuItem}

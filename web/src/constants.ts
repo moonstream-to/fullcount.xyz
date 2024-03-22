@@ -2,7 +2,7 @@ export const GAME_CONTRACT_VERSION = "0.1.1"; //TODO fetch from contract
 export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
 
 export const FEEDBACK_FORM_URL =
-  "https://docs.google.com/forms/d/1ZsWoXlYgL6XkAdA2BLyM6phJOfyg7Jo1EZiMMBeir4M";
+  "https://docs.google.com/forms/d/e/1FAIpQLSd07GHBQ4BN5MiMfLhjKm-Y_s8_SZ_zAOD3OhavDlm974kotg/viewform";
 
 export const GET_CONNECTED_URL = "https://forms.gle/Nk1bT1iLBYRDdyND9";
 
