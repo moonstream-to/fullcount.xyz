@@ -5,9 +5,12 @@ import { useGameContext } from "../../contexts/GameContext";
 import { useRouter } from "next/router";
 import CoachCard from "../practice/CoachCard";
 
-const BOTS_ADDRESS = "0xD3F58aF413b76d754c6cD19266a55475a5a6CA79";
-const rachel = ["4", "5", "11"];
-const nolan = ["9", "13", "16"];
+const BOTS_ADDRESS = "0xbb1dDc1eB50959c4c59b62F3f6Dbf9CbB6156Bc8";
+const rachel = ["11", "12", "13"];
+const nolan = ["27", "28", "29"];
+const rachel2 = ["14", "15", "16"];
+const nolan2 = ["30", "31", "32"];
+
 const pitcherDescription =
   "Like her namesake, Rachel Balkovec, this coach bot will turn you into a batting badass (bat-ass?).";
 const batterDescription =
@@ -19,12 +22,13 @@ const getDefault = (team: string[]) => {
 const pitchers = [rachel];
 const batters = [nolan];
 export const isCoach = (address: string, id: string): boolean => {
+  const coaches = [...rachel, ...nolan, ...rachel2, ...nolan2];
   if (address !== BOTS_ADDRESS) {
     return false;
   }
   const allPitchers = pitchers.flat();
   const allBatters = batters.flat();
-  return allPitchers.includes(id) || allBatters.includes(id);
+  return allPitchers.includes(id) || allBatters.includes(id) || coaches.includes(id);
 };
 
 const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
