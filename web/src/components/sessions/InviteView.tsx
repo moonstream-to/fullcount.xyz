@@ -32,7 +32,7 @@ const InviteView = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
           <Text
             className={styles.invitationText}
           >{`${invitedBy} is inviting you to play Fullcount.xyz.`}</Text>
-          <OwnedTokens forJoin={true} />
+          {/*<OwnedTokens forJoin={true} />*/}
         </ModalContent>
       </Modal>
     </>

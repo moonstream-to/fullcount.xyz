@@ -20,7 +20,7 @@ const SelectToken = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
           </Text>
           <Text className={globalStyles.gradientText}>Your move</Text>
           <Text className={styles.invitationText}>{`Select character`}</Text>
-          <OwnedTokens forJoin={true} />
+          {/*<OwnedTokens forJoin={true} />*/}
         </ModalContent>
       </Modal>
     </>

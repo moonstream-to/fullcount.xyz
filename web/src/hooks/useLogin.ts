@@ -9,6 +9,7 @@ const useLogin = () => {
   const {
     mutate: login,
     isLoading,
+    isSuccess,
     error,
     data,
   } = useMutation(loginService, {
@@ -21,7 +22,7 @@ const useLogin = () => {
     },
     onError: (error: any) => {
       console.log(error);
-      const message = error.response.data?.detail ?? error.message;
+      const message = error.response?.data?.detail ?? error.message;
       toast(message, "error");
     },
   });
@@ -29,6 +30,7 @@ const useLogin = () => {
   return {
     login,
     isLoading,
+    isSuccess,
     data,
     error,
   };

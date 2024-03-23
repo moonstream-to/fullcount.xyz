@@ -59,8 +59,7 @@ const BatterViewMobile = ({
     {
       onSuccess: () => {
         setIsCommitted(true);
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -104,22 +103,17 @@ const BatterViewMobile = ({
     {
       onSuccess: () => {
         setIsRevealed(true);
-        queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         setIsRevealFailed(true);
-        toast("Reveal failed: " + e?.message, "error");
+        console.log("Reveal failed: " + e?.message);
       },
     },
   );
   useEffect(() => {
-    if (sessionStatus.didBatterReveal) {
-      setIsRevealed(true);
-    }
-    if (sessionStatus.didBatterCommit) {
-      setIsCommitted(true);
-    }
+    setIsRevealed(sessionStatus.didBatterReveal);
+    setIsCommitted(sessionStatus.didBatterCommit);
   }, [sessionStatus]);
 
   return (

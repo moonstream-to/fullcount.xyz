@@ -1,63 +1,92 @@
-import { Flex, useMediaQuery, Text, Link, useDisclosure } from "@chakra-ui/react";
-import Web3Context from "../../contexts/Web3Context/context";
-import { useContext } from "react";
-import styles from "../GlobalStyles.module.css";
-import SoundFxSlider from "./SoundFxSlider";
-import { FEEDBACK_FORM_URL } from "../../constants";
-import About from "./About";
-import Account from "../account/Account";
+import { useMediaQuery, useDisclosure, Image } from "@chakra-ui/react";
+import { useEffect, useRef, useState } from "react";
+import styles from "./Navbar.module.css";
 import useUser from "../../contexts/UserContext";
+import FullcountLogoSmall from "../icons/FullcountLogoSmall";
+import AccountMobile from "../icons/AccountMobile";
+import VolumeOn from "../icons/VolumeOn";
+import MoreHorizontal from "../icons/MoreHorizontal";
+import useLogout from "../../hooks/useLogout";
+import { FEEDBACK_FORM_URL, FULLCOUNT_ASSETS_PATH } from "../../constants";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
     "(max-width: 767px)",
     "(min-width: 1024px)",
   ]);
-  const { account } = useContext(Web3Context);
   const { user } = useUser();
 
-  const address = !isMediumScreen ? `${account.slice(0, 6)}...${account.slice(-4)}` : account;
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null); // Ref for the menu element, typed as HTMLDivElement
+
+  const handleClickOutside = (event: MouseEvent) => {
+    if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      setIsMenuOpen(false);
+      event.stopPropagation();
+    }
+  };
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.addEventListener("click", handleClickOutside, true);
+    }
+    return () => {
+      document.removeEventListener("click", handleClickOutside, true);
+    };
+  }, [isMenuOpen]);
+
+  const { logout, isLoading: isLoggingOut } = useLogout();
+
   return (
-    <Flex
-      direction={{ base: "column", sm: "row" }}
-      alignItems="center"
-      justifyContent={"space-between"}
-      pt={{ base: "15px", sm: "5px" }}
-      gap={"15px"}
-      fontSize={{ sm: "16px", base: "10px" }}
-    >
-      <Flex gap={"20px"} alignItems={"center"}>
-        <Text className={styles.gradientText} fontSize={"14px"}>
-          Fullcount
-        </Text>
-        <Link isExternal href={FEEDBACK_FORM_URL} _hover={{ textDecoration: "none" }}>
-          <Text className={styles.navbarButton}>Give feedback</Text>
-        </Link>
-        <Text className={styles.navbarButton} onClick={onOpen}>
-          About
-        </Text>
-        <About isOpen={isOpen} onClose={onClose} />
-      </Flex>
-      <Flex gap={"10px"}>
-        <SoundFxSlider />
-        {address && !user && (
-          <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            w={{ base: "100%", sm: "fit-content" }}
-            gap={{ base: "auto", sm: "30px" }}
-            border={"1px solid #4D4D4D"}
-            p={"10px"}
-          >
-            <Text lineHeight={"100%"} letterSpacing={"0.7px"}>
-              {address}
-            </Text>
-          </Flex>
-        )}
-      </Flex>
-      <Account />
-    </Flex>
+    <div className={styles.container}>
+      <Image
+        w={"30px"}
+        h={"31px"}
+        alt={""}
+        src={`${FULLCOUNT_ASSETS_PATH}/logo/fullcount-mini.png`}
+      />
+      <div className={styles.rightSide}>
+        <div className={styles.account}>
+          <AccountMobile />
+          <div className={styles.username}>{user.username}</div>
+        </div>
+        {/*<div className={styles.menuButton}>*/}
+        {/*  <VolumeOn />*/}
+        {/*</div>*/}
+        <div className={styles.menu}>
+          <div className={styles.menuButton} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <MoreHorizontal />
+          </div>
+          {isMenuOpen && <div className={styles.overlay}></div>}
+          {isMenuOpen && (
+            <div ref={menuRef} className={styles.menuList}>
+              {/*<div className={styles.menuItem}>About</div>*/}
+              {/*<div className={styles.menuItem}>Achievements</div>*/}
+              {/*<div className={styles.menuItem}>Leaderboards</div>*/}
+              <div
+                className={styles.menuItem}
+                onClick={() => {
+                  window.open(FEEDBACK_FORM_URL, "_blank", "noopener,noreferrer");
+                }}
+              >
+                Leave feedback
+              </div>
+              <div className={styles.divider} />
+              <div
+                className={styles.menuItem}
+                onClick={() => {
+                  if (!isLoggingOut) {
+                    logout();
+                  }
+                }}
+              >
+                {isLoggingOut ? "logging out..." : "Log out"}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

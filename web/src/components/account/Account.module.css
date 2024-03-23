@@ -1,84 +1,59 @@
-.loginButton {
+
+.container {
     display: flex;
-    padding: 5px 10px;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    border-radius: 20px;
-    background: #353535;
-    color: #FFF;
-    font-family: Space Grotesk, sans-serif;
-    font-size: 12px;
+    gap: 0;
+    width: 100%;
+    max-width: 350px;
+}
+
+.header {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive, fantasy;
+    font-size: 30px;
     font-style: normal;
     font-weight: 400;
-    line-height: 1;
-    white-space: nowrap;
+    line-height: 100%;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+    }
+
+.label {
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: start;
+    place-self: start;
+    margin-bottom: 5px;
 }
 
-.signUpButton {
+.button {
+    margin-top: 10px;
     display: flex;
-    padding: 5px 10px;
+    height: 50px;
+    padding: 10px 20px;
     justify-content: center;
     align-items: center;
     gap: 10px;
-    border-radius: 20px;
-    background: #F56646;
-    color: #FFF;
-    font-family: Space Grotesk, sans-serif;
-    font-size: 12px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: 100%;
-    white-space: nowrap;
-}
-
-.portalButton {
-    display: flex;
-    padding: 4px 9px;
-    align-items: center;
-    gap: 10px;
-    border-radius: 30px;
-    border: 1px solid #FFF;
-    background-color: transparent;
+    width: 100%;
+    border: 1px solid #262019;
+    background: #328449;
     color: #FFF;
     text-align: center;
-    font-family: Space Grotesk, sans-serif;
-    font-size: 12px;
+    font-family: Bangers, cursive, fantasy;
+    font-size: 24px;
     font-style: normal;
     font-weight: 400;
-    line-height: 100%; /* 12px */
+    line-height: normal;
+    letter-spacing: 1.2px;
 }
 
-.divider {
-    background-color: #8F8F8F;
-    height: 3px;
-    width: 3px;
-    border-radius: 50%;
-}
-
-@media (min-width: 768px) {
-    .portalButton {
-        padding: 9px 14px;
-        height: 36px;
-        font-size: 16px;
-    }
-
-    .loginButton, .signUpButton {
-        padding: 5px 15px;
-        font-size: 16px;
-        height: 36px;
-
-    }
-}
-
-.portalButton:hover {
-    background-color: #FFF;
-    color: black;
-}
-
-
-.portalButtonText:hover {
-    background: -webkit-linear-gradient(0deg, #F56646, #f89a85);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.fadeOut {
+    opacity: 0;
+    transition: opacity 1s ease-out;
 }

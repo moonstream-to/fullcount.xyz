@@ -33,9 +33,9 @@ export default function Layout({
       </Head>
       <Flex
         minH="100vh"
-        bg="#1B1B1B"
+        bg="#FCECD9"
         alignItems={"center"}
-        fontFamily="Inter, serif"
+        fontFamily="Pangolin, cursive"
         direction={"column"}
       >
         {children}

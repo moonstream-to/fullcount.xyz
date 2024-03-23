@@ -70,13 +70,13 @@
 }
 
 .pitcherGrid {
-    cursor: url("https://static.simiotics.com/fullcount/ball4.png"), pointer;
+    /*cursor: url("https://static.simiotics.com/fullcount/ball.png"), pointer;*/
 }
 .pitcherGridSelected {
     cursor: pointer;
 }
 .batterGrid {
-    cursor: url("https://static.simiotics.com/fullcount/bat-cursor.png"), pointer;
+    /*cursor: url("https://static.simiotics.com/fullcount/bat-cursor.png"), pointer;*/
 }
 
 .moveMouseTip {
@@ -106,11 +106,13 @@
 .waitingMessage {
     color: #BFBFBF;
     text-align: center;
-    font-family: Inter, sans-serif;
-    font-size: 14px;
+    font-family: Bangers;
+    font-size: 12px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    line-height: 100%; /* 12px */
+    letter-spacing: 0.6px;
+    white-space: nowrap;
 }
 
 .pitchTitle {
@@ -120,4 +122,29 @@
     font-style: normal;
     font-weight: 700;
     line-height: normal;
+}
+
+.gridBox {
+    /*backdrop-filter: blur(3px);*/
+    /*background: rgba(255, 255, 255, 0.70);*/
+    /*transform: translateZ(0);*/
+    /*backface-visibility: hidden;*/
+    opacity: 0.7;
+}
+
+.batImage {
+    position: absolute;
+    opacity: 70%;
+    width: auto;
+    height: 7.82vh;
+    z-index: 1;
+}
+
+
+.ballImage {
+    position: absolute;
+    opacity: 100%;
+    width: 4.5vh;
+    height: 4.5vh;
+    z-index: 3;
 }
