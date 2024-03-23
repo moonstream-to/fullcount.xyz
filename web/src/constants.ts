@@ -17,6 +17,7 @@ export const MULTICALL2_CONTRACT_ADDRESSES = {
   "80001": MULTICALL2_MUMBAI_CONTRACT_ADDRESS,
   "322": MULTICALL2_WYRM_CONTRACT_ADDRESS,
   "421614": MULTICALL3_SEPOLIA_CONTRACT_ADDRESS,
+  "42170": MULTICALL3_SEPOLIA_CONTRACT_ADDRESS,
 };
 
 export const MAX_INT =
@@ -65,10 +66,9 @@ export const getChainImage = (identifier: string | number): string | undefined =
 
 export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
 export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
-export const GAME_CONTRACT = "0x7Be10D395617438b78500b003d5a1D201B150D6b"; //TODO env
-export const TOKEN_CONTRACT = "0x80CE79d51625a13b40a3569595559D5312F752e4"; //TODO env
-// export const CHAIN_ID = 322; //TODO env
-export const CHAIN_ID = 421614;
-export const RPC = "https://sepolia-rollup.arbitrum.io/rpc";
+export const GAME_CONTRACT = "0xDfE251B4F12547867ff839bcacec4d159DD68E47"; //TODO env
+export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TODO env
+export const CHAIN_ID = 42170;
+export const RPC = "https://nova.arbitrum.io/rpc";
 export const blbImage = (idx: number) =>
-  `https://s3.amazonaws.com/static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
+  `https://static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;

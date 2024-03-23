@@ -27,12 +27,11 @@ export async function fetchFullcountPlayerTokens() {
       }, //TODO context vars
       headers,
     });
-    const tokens = res.data.nfts
-      .map((nft: { erc721_address: string; token_id: string }) => ({
-        id: nft.token_id,
-        address: nft.erc721_address,
-      }))
-      .filter((nft: { address: string }) => nft.address === TOKEN_CONTRACT);
+    const tokens = res.data.nfts.map((nft: { erc721_address: string; token_id: string }) => ({
+      id: nft.token_id,
+      address: nft.erc721_address,
+    }));
+    // .filter((nft: { address: string }) => nft.address === TOKEN_CONTRACT);
 
     const tokensData = await getTokensData({
       tokens,
