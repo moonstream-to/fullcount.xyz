@@ -1,6 +1,9 @@
 const colors: string[] = ["#2f38c0", "#5f64cf", "#8c91dc", "#e38b87", "#d65c5a"];
 
 function interpolateColor(color1: string, color2: string, factor = 0.5): string {
+  if (!color1 || !color2) {
+    return colors[0];
+  }
   const color1Match = color1.slice(1).match(/.{2}/g);
   const color2Match = color2.slice(1).match(/.{2}/g);
 
