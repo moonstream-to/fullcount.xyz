@@ -8,7 +8,7 @@ import { useGameContext } from "../../contexts/GameContext";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const [selectedTokenIdx, setSelectedTokenIdx] = useState(0);
-  const { updateContext } = useGameContext();
+  const { updateContext, selectedMode, selectedToken } = useGameContext();
   useEffect(() => {
     updateContext({ selectedToken: { ...tokens[selectedTokenIdx] } });
   }, [selectedTokenIdx, tokens]);
@@ -23,7 +23,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
             <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
           </div>
-          <PlayButtons token={tokens[selectedTokenIdx]} />
+          {selectedMode === 0 && <PlayButtons token={tokens[selectedTokenIdx]} />}
         </div>
         <div className={styles.tokenCards}>
           {tokens.map((t, idx) => (
