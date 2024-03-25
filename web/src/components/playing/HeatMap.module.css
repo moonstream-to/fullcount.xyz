@@ -1,0 +1,37 @@
+.total {
+    display: flex;
+    padding: 5px 0px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+
+    border-top: 0.5px solid #262019;
+    border-right: 0.5px solid #262019;
+    border-left: 0.5px solid #262019;
+    background: #FFF;
+    color: #262019;
+    font-variant-numeric: lining-nums proportional-nums;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 12px */
+}
+
+.heatLegend {
+    margin-top: 5px;
+    width: 130px;
+    height: 15px;
+    background: linear-gradient(90deg, #3039C0 0%, #5E65CE 16.88%, #8C91DC 27.41%, #D1D3F1 38.44%, rgba(255, 255, 255, 0.10) 49.98%, #F4D1CF 61.27%, #E38B88 72.64%, #D75C59 83.84%, #CC2E29 100%), #FFF;
+}
+
+.modeDescription {
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 12px */
+    text-transform: uppercase;
+}

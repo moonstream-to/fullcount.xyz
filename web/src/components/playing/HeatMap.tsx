@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Flex, Grid, Text } from "@chakra-ui/react";
 import { valueToColor } from "../../utils/colors";
+import styles from "./HeatMap.module.css";
 
 const leftBorder = [6, 11, 16];
 const topBorder = [6, 7, 8];
@@ -32,8 +33,8 @@ const HeatMap = ({
       borderBottomStyle={bottomBorder.includes(index) && showStrikeZone ? "solid" : "none"}
     >
       <Box
-        height={{ base: "10px", lg: "20px" }}
-        width={{ base: "10px", lg: "20px" }}
+        height={"26px"}
+        width={"26px"}
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -42,7 +43,7 @@ const HeatMap = ({
         onClick={() => setShowMode(showMode === 2 ? 0 : showMode + 1)}
       >
         {showMode !== 0 && (
-          <Text fontSize={"6px"} color={"black"} fontWeight={"400"}>
+          <Text fontSize={"9px"} color={"black"} fontWeight={"400"}>
             {showMode === 1 ? (rates[index] * 100).toFixed(2) : counts[index]}
           </Text>
         )}
@@ -51,18 +52,22 @@ const HeatMap = ({
   );
 
   return (
-    <Flex direction={"column"} alignItems={"center"} gap={"10px"} minH={{ base: "", lg: "150px" }}>
+    <Flex direction={"column"} alignItems={"center"} gap={"0px"}>
+      <div className={styles.total}>
+        {counts.reduce((acc, c) => acc + c)}
+        {isPitcher ? " pitches" : " swings"}
+      </div>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>
-
-      <Text fontSize={"10px"}>
-        Total: {counts.reduce((acc, c) => acc + c)}
-        {isPitcher ? " pitches" : " swings"}
-      </Text>
-      {!isPitcher && (takes || takes === 0) && (
-        <Text mt="-10px" fontSize={"10px"}>{`+ ${takes} take${takes === 1 ? "" : "s"}`}</Text>
-      )}
+      <div className={styles.heatLegend} />
+      {/*<Text fontSize={"10px"}>*/}
+      {/*  Total: {counts.reduce((acc, c) => acc + c)}*/}
+      {/*  {isPitcher ? " pitches" : " swings"}*/}
+      {/*</Text>*/}
+      {/*{!isPitcher && (takes || takes === 0) && (*/}
+      {/*  <Text mt="-10px" fontSize={"10px"}>{`+ ${takes} take${takes === 1 ? "" : "s"}`}</Text>*/}
+      {/*)}*/}
     </Flex>
   );
 };
