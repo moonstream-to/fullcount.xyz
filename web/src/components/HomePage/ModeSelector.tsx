@@ -1,4 +1,5 @@
 import styles from "./ModeSelector.module.css";
+import { useGameContext } from "../../contexts/GameContext";
 
 const modes = [
   {
@@ -15,13 +16,8 @@ const modes = [
   },
 ];
 
-const ModeSelector = ({
-  selectedMode,
-  setSelectedMode,
-}: {
-  selectedMode: number;
-  setSelectedMode: (arg0: number) => void;
-}) => {
+const ModeSelector = () => {
+  const { selectedMode, updateContext } = useGameContext();
   return (
     <div className={styles.container}>
       <div className={styles.buttons}>
@@ -29,7 +25,7 @@ const ModeSelector = ({
           <div
             key={idx}
             className={selectedMode === idx ? styles.buttonSelected : styles.button}
-            onClick={() => setSelectedMode(idx)}
+            onClick={() => updateContext({ selectedMode: idx })}
           >
             {m.title}
           </div>
