@@ -182,10 +182,12 @@ export const commitOrRevealPitchFullcountPlayer = ({
   token,
   commit,
   isCommit,
+  sessionID,
 }: {
   commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
   token: OwnedToken;
   isCommit: boolean;
+  sessionID: number;
 }) => {
   const { nonce, vertical, horizontal, actionChoice: speed } = commit;
   const postData = {
@@ -206,22 +208,41 @@ export const commitOrRevealPitchFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        console.log("Transaction failed. Try again, please");
+        throw new Error("FCPlayerAPI success, but transactions isn't minted");
       }
       const { gameContract } = getContracts();
-      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
-      if (!isCommit && !sessionState.didPitcherReveal) {
-        console.log("Revealing error. Try again, please");
-        // throw new Error("Revealing error. Try again, please");
+      let isSuccess = false;
+      if (!isCommit) {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didPitcherReveal) {
+            isSuccess = true;
+            break;
+          } else {
+            console.log(sessionState, response.data);
+          }
+          console.log("checking sessionState after reveal, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
+      } else {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didPitcherCommit) {
+            isSuccess = true;
+            break;
+          } else {
+            console.log(sessionState, response.data);
+          }
+          console.log("checking sessionState after commit, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
       }
-      if (isCommit && !sessionState.didPitcherCommit) {
-        console.log("Committing error. Try again, please");
-      }
-      console.log({
-        isCommit,
-        didCommit: sessionState.didPitcherCommit,
-        didReveal: sessionState.didPitcherReveal,
-      });
       console.log("Success:", response.data);
       return response.data;
     });
@@ -231,10 +252,12 @@ export const commitOrRevealSwingFullcountPlayer = ({
   token,
   commit,
   isCommit,
+  sessionID,
 }: {
   commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
   token: OwnedToken;
   isCommit: boolean;
+  sessionID: number;
 }) => {
   const { nonce, vertical, horizontal, actionChoice: kind } = commit;
   const postData = {
@@ -255,25 +278,40 @@ export const commitOrRevealSwingFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        console.log("Transaction failed. Try again, please");
+        throw new Error("FCPlayerAPI success, but transactions isn't minted");
       }
       const { gameContract } = getContracts();
-      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
-      if (!isCommit && !sessionState.didBatterReveal) {
-        console.log("Revealing error. Try again, please");
+      let isSuccess = false;
+      if (!isCommit) {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didBatterReveal) {
+            isSuccess = true;
+            break;
+          }
+          console.log("checking sessionState after reveal, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
+      } else {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didBatterCommit) {
+            isSuccess = true;
+            break;
+          }
+          console.log("checking sessionState after commit, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
       }
-      if (isCommit && !sessionState.didBatterCommit) {
-        console.log("Committing error. Try again, please");
-      }
-      console.log({
-        isCommit,
-        didCommit: sessionState.didBatterCommit,
-        didReveal: sessionState.didBatterReveal,
-      });
       console.log("Success:", response.data);
       return response.data;
-    })
-    .catch((e) => console.log(e));
+    });
 };
 
 export const mintFullcountPlayerToken = ({

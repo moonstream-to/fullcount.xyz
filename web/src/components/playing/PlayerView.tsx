@@ -65,7 +65,9 @@ const PlayerView = ({
   const handleReveal = async () => {
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getLocalStorageItem(localStorageKey);
-    revealMutation.mutate(reveal);
+    if (!revealMutation.isLoading) {
+      revealMutation.mutate(reveal);
+    }
   };
 
   const handleCommit = async () => {

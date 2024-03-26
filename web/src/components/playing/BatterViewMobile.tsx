@@ -51,7 +51,12 @@ const BatterViewMobile = ({
           if (!commit) {
             return Promise.reject(new Error("FulcountPlayerAPI commit doesn't have commit data"));
           }
-          return commitOrRevealSwingFullcountPlayer({ token, commit, isCommit: true });
+          return commitOrRevealSwingFullcountPlayer({
+            token,
+            commit,
+            isCommit: true,
+            sessionID: sessionStatus.sessionID,
+          });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
@@ -95,6 +100,7 @@ const BatterViewMobile = ({
             commit: { nonce, vertical, horizontal, actionChoice },
             isCommit: false,
             token,
+            sessionID: sessionStatus.sessionID,
           });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));

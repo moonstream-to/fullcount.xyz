@@ -50,7 +50,12 @@ const PitcherViewMobile = ({
           if (!commit) {
             return Promise.reject(new Error("FulcountPlayerAPI commit doesn't have commit data"));
           }
-          return commitOrRevealPitchFullcountPlayer({ token, commit, isCommit: true });
+          return commitOrRevealPitchFullcountPlayer({
+            token,
+            commit,
+            isCommit: true,
+            sessionID: sessionStatus.sessionID,
+          });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
@@ -94,6 +99,7 @@ const PitcherViewMobile = ({
             commit: { nonce, vertical, horizontal, actionChoice },
             isCommit: false,
             token,
+            sessionID: sessionStatus.sessionID,
           });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
