@@ -22,6 +22,7 @@ const Playing = () => {
   const {
     selectedSession,
     selectedToken,
+    selectedTokenIdx,
     watchingToken,
     updateContext,
     invitedTo,
@@ -35,8 +36,10 @@ const Playing = () => {
     async () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
-      // updateContext({ ownedTokens: [...ownedTokens.slice(0, 3)] }); //check if something changed
-      return ownedTokens; //.slice(0, 3); //TODO TURN  THIS OFFFFF!!!
+      if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
+        updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
+      }
+      return ownedTokens;
     },
     {
       ...queryCacheProps,

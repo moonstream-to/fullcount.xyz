@@ -98,7 +98,8 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
           onClick={() => {
             if (
               token.activeSession?.batterNFT.nftAddress === token.address &&
-              token.activeSession?.batterNFT.tokenID === token.id
+              token.activeSession?.batterNFT.tokenID === token.id &&
+              token.tokenProgress !== 6
             ) {
               router.push(`atbats/?session_id=${token.stakedSessionID}`);
               return;
@@ -126,7 +127,8 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
           onClick={() => {
             if (
               token.activeSession?.pitcherNFT.nftAddress === token.address &&
-              token.activeSession?.pitcherNFT.tokenID === token.id
+              token.activeSession?.pitcherNFT.tokenID === token.id &&
+              token.tokenProgress !== 6
             ) {
               router.push(`atbats/?session_id=${token.stakedSessionID}`);
               return;

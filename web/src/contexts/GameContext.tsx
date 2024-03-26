@@ -29,6 +29,7 @@ interface GameContextProps {
   isCreateCharacter: boolean;
   atBatsForPractice: (AtBat | undefined)[] | undefined;
   selectedMode: number;
+  selectedTokenIdx: number;
 }
 
 interface GameContextType extends GameContextProps {
@@ -70,6 +71,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     isCreateCharacter: false,
     atBatsForPractice: undefined,
     selectedMode: 1,
+    selectedTokenIdx: 0,
   });
 
   useEffect(() => {

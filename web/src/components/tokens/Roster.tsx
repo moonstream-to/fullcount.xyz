@@ -7,11 +7,11 @@ import PlayButtons from "./PlayButtons";
 import { useGameContext } from "../../contexts/GameContext";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
-  const [selectedTokenIdx, setSelectedTokenIdx] = useState(0);
-  const { updateContext, selectedMode, selectedToken } = useGameContext();
-  useEffect(() => {
-    updateContext({ selectedToken: { ...tokens[selectedTokenIdx] } });
-  }, [selectedTokenIdx, tokens]);
+  const { updateContext, selectedMode, selectedTokenIdx } = useGameContext();
+
+  const handleClick = (idx: number) => {
+    updateContext({ selectedToken: { ...tokens[selectedTokenIdx] }, selectedTokenIdx: idx });
+  };
 
   return (
     <div className={styles.container}>
@@ -33,7 +33,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
               fallback={<div className={styles.tokenImageFallback} />}
               alt={""}
               className={selectedTokenIdx === idx ? styles.selectedTokenImage : styles.tokenImage}
-              onClick={() => setSelectedTokenIdx(idx)}
+              onClick={() => handleClick(idx)}
             />
           ))}
           <NewCharacterButton small={true} />
