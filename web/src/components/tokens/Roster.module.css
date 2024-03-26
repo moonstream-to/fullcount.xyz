@@ -126,6 +126,8 @@
 .bigTokenImage {
     width: 130px;
     height: 130px;
+    min-height: 130px;
+    min-width: 130px;
 }
 
 .tokenImageFallback {

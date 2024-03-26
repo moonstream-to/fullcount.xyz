@@ -1,6 +1,5 @@
 import styles from "./Roster.module.css";
 import { OwnedToken } from "../../types";
-import { useEffect, useState } from "react";
 import { Image } from "@chakra-ui/react";
 import NewCharacterButton from "./NewCharacterButton";
 import PlayButtons from "./PlayButtons";
@@ -10,7 +9,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const { updateContext, selectedMode, selectedTokenIdx } = useGameContext();
 
   const handleClick = (idx: number) => {
-    updateContext({ selectedToken: { ...tokens[selectedTokenIdx] }, selectedTokenIdx: idx });
+    updateContext({ selectedToken: { ...tokens[idx] }, selectedTokenIdx: idx });
   };
 
   return (
