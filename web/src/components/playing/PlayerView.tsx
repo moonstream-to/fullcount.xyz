@@ -213,7 +213,7 @@ const PlayerView = ({
             )}
           </button>
         )}
-        {(token.source === "BLBContract" || isRevealFailed) &&
+        {token.source === "BLBContract" &&
           sessionStatus.didBatterCommit &&
           sessionStatus.didPitcherCommit &&
           !isRevealed && (
