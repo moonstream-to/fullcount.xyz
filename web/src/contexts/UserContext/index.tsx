@@ -18,12 +18,12 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return setUser(null);
     }
     setIsLoading(true);
-    console.log(token);
     const headers = { Authorization: `Bearer ${token}` };
     http
       .get(`${AUTH_URL}/user`, { headers })
       .then(
         (response) => {
+          localStorage.setItem("FULLCOUNT_USER_ID", response.data.user_id);
           setUser(response.data);
         },
         (reason) => {
