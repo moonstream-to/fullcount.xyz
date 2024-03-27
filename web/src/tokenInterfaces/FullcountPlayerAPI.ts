@@ -7,6 +7,7 @@ import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
+import { sendReport } from "../utils/humbug";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const parseActiveSession = (s: any) => {
@@ -49,7 +50,6 @@ export async function fetchFullcountPlayerTokens() {
       ["SessionState"],
       activeSessionsQueries,
     );
-
     return tokensData.map((t) => {
       const sessionIdx = activeSessionsIds.indexOf(t.stakedSessionID);
       return sessionIdx === -1
@@ -59,8 +59,9 @@ export async function fetchFullcountPlayerTokens() {
             activeSession: { ...activeSessions.map((s) => parseActiveSession(s))[sessionIdx] },
           };
     });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
+    sendReport("Error fetching FCPlayer tokens", e.message, []);
     return [];
   }
 }
@@ -94,6 +95,10 @@ export async function startSessionFullcountPlayer({
       console.log("Success:", response.data);
       return response.data;
     });
+  sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
+    `token_address: ${token.address}`,
+    `token_id: ${token.id}`,
+  ]);
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
@@ -143,7 +148,18 @@ export async function joinSessionFullcountPlayer({
         throw new Error("Transaction failed. Try again, please");
       }
       console.log("Success:", response.data);
+      sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
+        `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+      ]);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(
+        "Joining failed",
+        `${e.message} Token #${token.id} joining session #${sessionID}`,
+        [`token_address: ${token.address}`, `token_id: ${token.id}`],
+      );
+      throw e;
     });
 }
 
@@ -171,6 +187,13 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
       }
       console.log("Success:", response.data);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
+      throw e;
     });
 };
 
@@ -182,10 +205,12 @@ export const commitOrRevealPitchFullcountPlayer = ({
   token,
   commit,
   isCommit,
+  sessionID,
 }: {
   commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
   token: OwnedToken;
   isCommit: boolean;
+  sessionID: number;
 }) => {
   const { nonce, vertical, horizontal, actionChoice: speed } = commit;
   const postData = {
@@ -206,24 +231,54 @@ export const commitOrRevealPitchFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        console.log("Transaction failed. Try again, please");
+        throw new Error("FCPlayerAPI success, but transactions isn't minted");
       }
       const { gameContract } = getContracts();
-      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
-      if (!isCommit && !sessionState.didPitcherReveal) {
-        console.log("Revealing error. Try again, please");
-        // throw new Error("Revealing error. Try again, please");
+      let isSuccess = false;
+      if (!isCommit) {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didPitcherReveal) {
+            isSuccess = true;
+            break;
+          } else {
+            console.log(sessionState, response.data);
+          }
+          console.log("checking sessionState after reveal, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
+      } else {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didPitcherCommit) {
+            isSuccess = true;
+            break;
+          } else {
+            console.log(sessionState, response.data);
+          }
+          console.log("checking sessionState after commit, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
       }
-      if (isCommit && !sessionState.didPitcherCommit) {
-        console.log("Committing error. Try again, please");
-      }
-      console.log({
-        isCommit,
-        didCommit: sessionState.didPitcherCommit,
-        didReveal: sessionState.didPitcherReveal,
-      });
       console.log("Success:", response.data);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
+      throw e;
     });
 };
 
@@ -231,10 +286,12 @@ export const commitOrRevealSwingFullcountPlayer = ({
   token,
   commit,
   isCommit,
+  sessionID,
 }: {
   commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
   token: OwnedToken;
   isCommit: boolean;
+  sessionID: number;
 }) => {
   const { nonce, vertical, horizontal, actionChoice: kind } = commit;
   const postData = {
@@ -255,25 +312,51 @@ export const commitOrRevealSwingFullcountPlayer = ({
     .then(async (response) => {
       const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
       if (!isTransactionMinted) {
-        console.log("Transaction failed. Try again, please");
+        throw new Error("FCPlayerAPI success, but transactions isn't minted");
       }
       const { gameContract } = getContracts();
-      const sessionState = await gameContract.methods.SessionState(token.stakedSessionID).call();
-      if (!isCommit && !sessionState.didBatterReveal) {
-        console.log("Revealing error. Try again, please");
+      let isSuccess = false;
+      if (!isCommit) {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didBatterReveal) {
+            isSuccess = true;
+            break;
+          }
+          console.log("checking sessionState after reveal, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
+      } else {
+        for (let attempt = 1; attempt <= 5; attempt++) {
+          const sessionState = await gameContract.methods.SessionState(sessionID).call();
+          if (sessionState.didBatterCommit) {
+            isSuccess = true;
+            break;
+          }
+          console.log("checking sessionState after commit, attempt: ", attempt);
+          await delay(2 * 1000);
+        }
+        if (!isSuccess) {
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+        }
       }
-      if (isCommit && !sessionState.didBatterCommit) {
-        console.log("Committing error. Try again, please");
-      }
-      console.log({
-        isCommit,
-        didCommit: sessionState.didBatterCommit,
-        didReveal: sessionState.didBatterReveal,
-      });
       console.log("Success:", response.data);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       return response.data;
     })
-    .catch((e) => console.log(e));
+    .catch((e: any) => {
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
+      throw e;
+    });
 };
 
 export const mintFullcountPlayerToken = ({
@@ -298,7 +381,12 @@ export const mintFullcountPlayerToken = ({
         throw new Error("Transaction failed. Try again, please");
       }
       console.log("Success:", response.data);
+      sendReport(`Token minted`, `Token #${response.data.token_id} minted`, []);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(`minting failed`, `${e.message} ${name}`, []);
+      throw e;
     });
 };
 

@@ -72,3 +72,4 @@ export const CHAIN_ID = 42170;
 export const RPC = "https://nova.arbitrum.io/rpc";
 export const blbImage = (idx: number) =>
   `https://static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
+export const HUMBUG_REPORT_VERSION = "0.0.1";
