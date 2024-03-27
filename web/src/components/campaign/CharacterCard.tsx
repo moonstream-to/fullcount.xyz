@@ -8,6 +8,7 @@ import router from "next/router";
 import { useGameContext } from "../../contexts/GameContext";
 import { Spinner, Image } from "@chakra-ui/react";
 import { Character } from "./teams";
+import CharacterProgress from "./CharacterProgress";
 
 const CharacterCard = ({
   character,
@@ -114,9 +115,21 @@ const CharacterCard = ({
         src={atBat.pitcher?.image ?? atBat.batter?.image}
       />
       <div className={styles.header}>
-        <div className={styles.name}>{character?.character?.name}</div>
+        <div className={styles.name}>{`${character?.character?.name} - ${
+          atBat.pitcher ? atBat.pitcher.id : atBat.batter?.id
+        }`}</div>
         <div className={styles.quote}>{character?.character?.quote}</div>
       </div>
+      {(character.character?.wins || character.character?.wins === 0) && (
+        <CharacterProgress
+          stat={{
+            label: atBat.pitcher ? "Score a strikeout in 3 pitches" : "Score 3 HR",
+            finished: character.character.wins,
+            total: 3,
+          }}
+          color={color}
+        />
+      )}
       <div
         className={styles.startButton}
         style={{ backgroundColor: color }}

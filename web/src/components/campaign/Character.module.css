@@ -73,3 +73,72 @@
     width: 178px;
     height: 180px;
 }
+
+.characterStat {
+
+}
+
+.statLabel {
+
+}
+
+.statData {
+
+}
+
+.tokenStatItem {
+    display: flex;
+    padding: 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+    align-self: stretch;
+    border: 1px solid #75382F;
+}
+
+.statHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    align-self: stretch;
+}
+
+.completion {
+    color: #FFF;
+    text-align: right;
+    font-family: Pangolin, cursive;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.label {
+    color: #E4DDD4;
+    font-family: Pangolin, cursive;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.notFinishedBar {
+    display: flex;
+    height: 6px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    border: 0.5px solid #75382F;
+    position: relative;
+}
+
+.finishedBar {
+    background: #FFF;
+    position: absolute;
+    display: flex;
+    height: 6px;
+    justify-content: center;
+    align-items: center;
+    align-self: stretch;
+    left: 0;
+}

@@ -8,6 +8,7 @@ export interface Character {
   quote: string;
   tokens: Token[];
   isPitcher: boolean;
+  wins?: number;
 }
 
 export interface Team {
@@ -157,4 +158,47 @@ export const getPitchersOfTeam = (teamTitle: string) => {
   return team.roster
     .filter((character) => character.isPitcher)
     .flatMap((character) => character.tokens.map((token) => token.id));
+};
+
+export const getAllPitchersIds = () => {
+  const teams = getTeams();
+  return teams.flatMap((team) =>
+    team.roster
+      .filter((character) => character.isPitcher)
+      .flatMap((character) => character.tokens.map((token) => token.id)),
+  );
+};
+
+export const getAllBattersIds = () => {
+  const teams = getTeams();
+  return teams.flatMap((team) =>
+    team.roster
+      .filter((character) => !character.isPitcher)
+      .flatMap((character) => character.tokens.map((token) => token.id)),
+  );
+};
+
+export const getAllPitchers = () => {
+  const teams = getTeams();
+  const allPitchers = teams.flatMap((team) => team.roster.filter((player) => player.isPitcher));
+  return allPitchers;
+};
+
+export const getAllBatters = () => {
+  const teams = getTeams();
+  const allBatters = teams.flatMap((team) => team.roster.filter((player) => !player.isPitcher));
+  return allBatters;
+};
+
+export const getCharacterName = (id: string): string | undefined => {
+  const teams = getTeams();
+  for (const team of teams) {
+    for (const character of team.roster) {
+      const token = character.tokens.find((token) => token.id === id);
+      if (token) {
+        return character.name;
+      }
+    }
+  }
+  return undefined; // Return undefined if no character with the given token id is found
 };
