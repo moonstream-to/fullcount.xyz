@@ -19,6 +19,7 @@ const useLogin = () => {
         return;
       }
       localStorage.setItem("FULLCOUNT_ACCESS_TOKEN", data.data.id);
+      localStorage.setItem("FULLCOUNT_USER_ID", data.data.user_id);
       sendReport("logged in", variables.username, [`user_token: ${data.data.id}`]);
       getUser(data.data.user_id);
     },

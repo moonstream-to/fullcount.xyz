@@ -17,6 +17,7 @@ const useSignUp = () => {
   } = useMutation(registerService(), {
     onSuccess: (response, variables) => {
       localStorage.setItem("FULLCOUNT_ACCESS_TOKEN", response.data.id);
+      localStorage.setItem("FULLCOUNT_USER_ID", response.data.user_id);
       sendReport("signed up", `${variables.username} - ${variables.email}`, [
         `user_token: ${response.data.id}`,
       ]);

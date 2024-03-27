@@ -96,8 +96,8 @@ export async function startSessionFullcountPlayer({
       return response.data;
     });
   sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
-    `token_address: ${token.address}`,
-    `token_id: ${token.id}`,
+    `token_address:${token.address}`,
+    `token_id:${token.id}`,
   ]);
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
@@ -157,7 +157,7 @@ export async function joinSessionFullcountPlayer({
       sendReport(
         "Joining failed",
         `${e.message} Token #${token.id} joining session #${sessionID}`,
-        [`token_address: ${token.address}`, `token_id: ${token.id}`],
+        [`token_address:${token.address}`, `token_id:${token.id}`],
       );
       throw e;
     });
@@ -190,8 +190,8 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
     })
     .catch((e: any) => {
       sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, [
-        `token_address: ${token.address}`,
-        `token_id: ${token.id}`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       throw e;
     });
@@ -268,15 +268,15 @@ export const commitOrRevealPitchFullcountPlayer = ({
       }
       console.log("Success:", response.data);
       sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
-        `token_address: ${token.address}`,
-        `token_id: ${token.id}`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       return response.data;
     })
     .catch((e: any) => {
       sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
-        `token_address: ${token.address}`,
-        `token_id: ${token.id}`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       throw e;
     });
@@ -345,15 +345,15 @@ export const commitOrRevealSwingFullcountPlayer = ({
       }
       console.log("Success:", response.data);
       sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
-        `token_address: ${token.address}`,
-        `token_id: ${token.id}`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       return response.data;
     })
     .catch((e: any) => {
       sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
-        `token_address: ${token.address}`,
-        `token_id: ${token.id}`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       throw e;
     });
