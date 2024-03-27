@@ -61,9 +61,7 @@ export async function fetchFullcountPlayerTokens() {
     });
   } catch (e: any) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
-    sendReport("Error fetching FCPlayer tokens", e.message, [
-      `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
-    ]);
+    sendReport("Error fetching FCPlayer tokens", e.message, []);
     return [];
   }
 }
@@ -97,7 +95,10 @@ export async function startSessionFullcountPlayer({
       console.log("Success:", response.data);
       return response.data;
     });
-  sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, []);
+  sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
+    `token_address: ${token.address}`,
+    `token_id: ${token.id}`,
+  ]);
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
@@ -156,7 +157,7 @@ export async function joinSessionFullcountPlayer({
       sendReport(
         "Joining failed",
         `${e.message} Token #${token.id} joining session #${sessionID}`,
-        [],
+        [`token_address: ${token.address}`, `token_id: ${token.id}`],
       );
       throw e;
     });
@@ -188,7 +189,10 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
       return response.data;
     })
     .catch((e: any) => {
-      sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, []);
+      sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       throw e;
     });
 };
@@ -263,11 +267,17 @@ export const commitOrRevealPitchFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
-      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, []);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, []);
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       throw e;
     });
 };
@@ -334,11 +344,17 @@ export const commitOrRevealSwingFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
-      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, []);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, []);
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+        `token_address: ${token.address}`,
+        `token_id: ${token.id}`,
+      ]);
       throw e;
     });
 };
@@ -365,9 +381,7 @@ export const mintFullcountPlayerToken = ({
         throw new Error("Transaction failed. Try again, please");
       }
       console.log("Success:", response.data);
-      sendReport(`Token minted`, `Token #${response.data.token_id} minted`, [
-        `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
-      ]);
+      sendReport(`Token minted`, `Token #${response.data.token_id} minted`, []);
       return response.data;
     })
     .catch((e: any) => {
