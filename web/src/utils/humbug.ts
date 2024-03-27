@@ -39,7 +39,7 @@ const info = () => {
 
 const defaultTags = () => {
   return [
-    `client_id: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
-    `report_version: ${HUMBUG_REPORT_VERSION}`,
+    `client_id:${localStorage.getItem("FULLCOUNT_USER_ID") ?? ""}`,
+    `report_version:${HUMBUG_REPORT_VERSION}`,
   ];
 };
