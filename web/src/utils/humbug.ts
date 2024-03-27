@@ -1,4 +1,5 @@
 import axios from "axios";
+import { HUMBUG_REPORT_VERSION } from "../constants";
 
 export const sendReport = async (title: string, content: string, tags: string[]): Promise<void> => {
   if (!process.env.NEXT_PUBLIC_HUMBUG_TOKEN) {
@@ -37,5 +38,8 @@ const info = () => {
 };
 
 const defaultTags = () => {
-  return [`user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`];
+  return [
+    `client_id: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+    `report_version: ${HUMBUG_REPORT_VERSION}`,
+  ];
 };
