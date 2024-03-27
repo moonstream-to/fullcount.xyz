@@ -7,6 +7,7 @@ import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
+import { sendReport } from "../utils/humbug";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const parseActiveSession = (s: any) => {
@@ -49,7 +50,6 @@ export async function fetchFullcountPlayerTokens() {
       ["SessionState"],
       activeSessionsQueries,
     );
-
     return tokensData.map((t) => {
       const sessionIdx = activeSessionsIds.indexOf(t.stakedSessionID);
       return sessionIdx === -1
@@ -59,8 +59,11 @@ export async function fetchFullcountPlayerTokens() {
             activeSession: { ...activeSessions.map((s) => parseActiveSession(s))[sessionIdx] },
           };
     });
-  } catch (e) {
+  } catch (e: any) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
+    sendReport("Error fetching FCPlayer tokens", e.message, [
+      `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+    ]);
     return [];
   }
 }
@@ -94,6 +97,7 @@ export async function startSessionFullcountPlayer({
       console.log("Success:", response.data);
       return response.data;
     });
+  sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, []);
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
@@ -143,7 +147,18 @@ export async function joinSessionFullcountPlayer({
         throw new Error("Transaction failed. Try again, please");
       }
       console.log("Success:", response.data);
+      sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
+        `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+      ]);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(
+        "Joining failed",
+        `${e.message} Token #${token.id} joining session #${sessionID}`,
+        [],
+      );
+      throw e;
     });
 }
 
@@ -171,6 +186,10 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
       }
       console.log("Success:", response.data);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, []);
+      throw e;
     });
 };
 
@@ -244,7 +263,12 @@ export const commitOrRevealPitchFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, []);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, []);
+      throw e;
     });
 };
 
@@ -310,7 +334,12 @@ export const commitOrRevealSwingFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, []);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, []);
+      throw e;
     });
 };
 
@@ -336,7 +365,14 @@ export const mintFullcountPlayerToken = ({
         throw new Error("Transaction failed. Try again, please");
       }
       console.log("Success:", response.data);
+      sendReport(`Token minted`, `Token #${response.data.token_id} minted`, [
+        `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+      ]);
       return response.data;
+    })
+    .catch((e: any) => {
+      sendReport(`minting failed`, `${e.message} ${name}`, []);
+      throw e;
     });
 };
 
