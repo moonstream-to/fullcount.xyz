@@ -25,10 +25,7 @@ export default function Layout({
         <title>{title ?? "Fullcount"}</title>
         <meta name="description" content="Baseball game" />
         <meta name="og:title" content={siteTitle} />
-        <meta
-          name="keywords"
-          content="NFT gaming, smart contracts, web3, smart contract, ethereum, polygon, matic, transactions, defi, decentralized, mempool, NFT, NFTs, DAO, DAOs, cryptocurrency, cryptocurrencies, bitcoin, blockchain economy, blockchain game, marketplace, blockchain security, loyalty program, Ethereum bridge, Ethereum bridges, NFT game, NFT games"
-        />
+        <meta name="keywords" content="baseball, games, fullcount, home run" />
         <meta name="og:image" content={`${assetsPath}/fullcount-og-image.png`} />
       </Head>
       <Flex
