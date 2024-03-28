@@ -51,7 +51,7 @@ const overrides = {
   styles: {
     global: () => ({
       body: {
-        bg: "#1A1D22",
+        bg: "#FCECD9",
         color: "white",
       },
       a: {

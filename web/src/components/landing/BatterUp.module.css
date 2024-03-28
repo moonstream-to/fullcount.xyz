@@ -1,48 +1,17 @@
 .container {
-    background: #FCECD9;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    justify-content: space-between;
-}
-
-
-
-.limitedContainer {
-    max-width: 1440px;
-}
-
-.bannerContainer {
-    border: 1px solid #262019;
-    border-bottom: none;
-
-}
-
-
-
-.title {
-    color: #262019;
-    text-align: center;
-    font-family: Bangers;
-    font-size: 30px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 100%; /* 30px */
-}
-
-.text {
-    color: #262019;
-    text-align: center;
-    font-family: Pangolin, cursive;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 100%; /* 16px */
+    padding: 0;
 }
 
 .heroContainer {
     display: flex;
     flex-direction: column;
+}
+
+.bannerContainer {
+    border: 1px solid #262019;
+    border-bottom: none;
 }
 
 .heroInnerContainer {
@@ -88,40 +57,7 @@
     align-self: stretch;
     border: 1px solid #262019;
     background: #328449;
-    cursor: pointer;
-    color: #FFF;
-    text-align: center;
-    font-family: Bangers;
-    font-size: 24px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    letter-spacing: 1.2px;
 }
-
-.secondBlockContainer {
-    display: flex;
-    padding: 40px 7%;
-    flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    align-self: stretch;
-}
-
-.secondBlockTextContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    align-self: stretch;
-}
-
-
-.secondBlockImage {
-    width: 275px;
-}
-
-
 
 @media (min-width: 768px) {
     .button {
@@ -130,7 +66,6 @@
     }
     .heroInnerContainer {
         padding: 40px 7% 60px 7%;
-        gap: 30px;
     }
 
     .heroTextTitle {
@@ -138,45 +73,31 @@
         max-width: 425px;
         line-height: 110%;
     }
-
-    .heroInnerContainer {
-        gap: 60px;
-    }
-    .secondBlockContainer {
-        padding: 60px 7%;
-    }
-    .secondBlockImage {
-        width: 500px;
-    }
 }
 
 @media (min-width: 1024px) {
+    .container {
+        padding: 40px 7%;
+    }
     .heroContainer {
-        padding: 40px 71.68px;
+        /*padding: 40px 71.68px;*/
     }
     .heroInnerContainer {
         border: 1px solid #262019;
         background: #EBE4DC;
         display: flex;
-        padding: 40px 71.68px;
+        padding: 40px 7%px;
         flex-direction: column;
         align-items: center;
         gap: 30px;
         align-self: stretch;
         border-top: 1px solid #262019;
     }
-    .secondBlockImage {
-        width: 700px;
-    }
+
 }
 
 @media (min-width: 1440px) {
-    .heroTextTitle {
+    .heroTitle {
         font-size: 50px;
-        max-width: 532px;
     }
-        .title {
-            font-size: 40px;
-        }
-
 }
