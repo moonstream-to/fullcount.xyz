@@ -61,7 +61,11 @@ export async function fetchFullcountPlayerTokens() {
     });
   } catch (e: any) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
-    sendReport("Error fetching FCPlayer tokens", e.message, []);
+    sendReport("Error fetching FCPlayer tokens", e.message, [
+      "type:error",
+      "error_domain:fcplayer",
+      `error:fcplayer-tokens`,
+    ]);
     return [];
   }
 }
@@ -96,6 +100,9 @@ export async function startSessionFullcountPlayer({
       return response.data;
     });
   sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
+    "type:error",
+    "error_domain:fcplayer",
+    `error:fcplayer-starting`,
     `token_address:${token.address}`,
     `token_id:${token.id}`,
   ]);
@@ -157,7 +164,13 @@ export async function joinSessionFullcountPlayer({
       sendReport(
         "Joining failed",
         `${e.message} Token #${token.id} joining session #${sessionID}`,
-        [`token_address:${token.address}`, `token_id:${token.id}`],
+        [
+          "type:error",
+          "error_domain:fcplayer",
+          `error:fcplayer-joining`,
+          `token_address:${token.address}`,
+          `token_id:${token.id}`,
+        ],
       );
       throw e;
     });
@@ -190,6 +203,9 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
     })
     .catch((e: any) => {
       sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, [
+        "type:error",
+        "error_domain:fcplayer",
+        `error:fcplayer-unstaking`,
         `token_address:${token.address}`,
         `token_id:${token.id}`,
       ]);
@@ -275,6 +291,9 @@ export const commitOrRevealPitchFullcountPlayer = ({
     })
     .catch((e: any) => {
       sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+        "type:error",
+        "error_domain:fcplayer",
+        `error:fcplayer-${isCommit ? "commit" : "reveal"}`,
         `token_address:${token.address}`,
         `token_id:${token.id}`,
       ]);
@@ -354,6 +373,9 @@ export const commitOrRevealSwingFullcountPlayer = ({
       sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
         `token_address:${token.address}`,
         `token_id:${token.id}`,
+        `type:error`,
+        "error_domain:fcplayer",
+        `error:fcplayer-${isCommit ? "commit" : "reveal"}`,
       ]);
       throw e;
     });
@@ -385,7 +407,11 @@ export const mintFullcountPlayerToken = ({
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`minting failed`, `${e.message} ${name}`, []);
+      sendReport(`minting failed`, `${e.message} ${name}`, [
+        "type:error",
+        "error_domain:fcplayer",
+        `error:fcplayer-mint`,
+      ]);
       throw e;
     });
 };
