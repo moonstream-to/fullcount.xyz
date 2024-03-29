@@ -26,7 +26,12 @@ const useLogin = () => {
     onError: (error: any, variables) => {
       console.log(error);
       const message = error.response?.data?.detail ?? error.message;
-      sendReport("Error logging in", `${variables.username} - ${message}`, []);
+      sendReport("Error logging in", `${variables.username} - ${message}`, [
+        "type:error",
+        "error_domain:account",
+        `error:account-login`,
+        `user:${variables.username}`,
+      ]);
       toast(message, "error");
     },
   });

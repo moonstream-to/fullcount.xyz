@@ -27,7 +27,12 @@ const useSignUp = () => {
     onError: (error: any, variables) => {
       console.log(error);
       let message = error.response?.data?.detail ?? error.message;
-      sendReport("Error signing up", `${variables.username} - ${variables.email} - ${message}`, []);
+      sendReport("Error signing up", `${variables.username} - ${variables.email} - ${message}`, [
+        "type:error",
+        "error_domain:account",
+        `error:account-signup`,
+        `user:${variables.username}`,
+      ]);
 
       if (error.response?.status === 409) {
         message = "username or email already exists";
