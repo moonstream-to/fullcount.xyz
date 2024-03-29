@@ -1,0 +1,83 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    place-self: center;
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    z-index: 2;
+}
+
+.contentWrap {
+    display: flex;
+    justify-content: center;
+}
+.whiteSpace {
+    background-color: white;
+    flex: 1;
+    z-index: 2;
+}
+.content {
+    flex: 1;
+    min-width: 100vw;
+    max-width: 100vw;
+    display: flex;
+    justify-content: space-between;
+    gap: 2px;
+    /*padding: 5px;*/
+    position: relative;
+}
+
+.winImage {
+}
+
+.image {
+}
+
+.pitcher, .batter {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-right: 3px;
+    padding-left: 3px;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 5;
+    background-color: white;
+}
+
+.batter {
+    align-items: flex-start;
+}
+
+.imageContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 80px;
+}
+
+.actionType {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.ballImage {
+    position: absolute;
+    width: 4.5vh;
+    height: 4.5vh;
+    z-index: 1;
+}
+
+.batImage {
+    position: absolute;
+    opacity: 70%;
+    width: auto;
+    height: 7.82vh;
+    z-index: 3;
+}

@@ -1,32 +1,72 @@
-import { useContext, useEffect } from "react";
-import { useQueryClient } from "react-query";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
-import ConnectingView from "./ConnectingView";
-import Web3Context from "../contexts/Web3Context/context";
-import TitleScreenLayout from "./layout/TitleScreenLayout";
-import PlayingLayout from "./layout/PlayingLayout";
+import styles from "./TitleScreen.module.css";
+import useUser from "../contexts/UserContext";
 import Playing from "./Playing";
-import { useGameContext } from "../contexts/GameContext";
+import SignUpForm from "./account/SignUpForm";
+import LoginForm from "./account/LoginForm";
 
+import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../constants";
+import LoadingView from "./HomePage/LoadingView";
 const TitleScreen = () => {
-  const web3ctx = useContext(Web3Context);
-
-  const { chainId } = useGameContext();
-
-  const queryClient = useQueryClient();
+  const { user, isLoading } = useUser();
+  const [isLogging, setIsLogging] = useState(false); // login or signUp
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isFirstSeconds, setIsFirstSeconds] = useState(true);
 
   useEffect(() => {
-    queryClient.invalidateQueries();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [web3ctx.chainId, web3ctx.account]);
+    setTimeout(() => setIsFirstSeconds(false), 2000);
+  }, []);
 
   return (
     <>
-      <>
-        <PlayingLayout>
-          <Playing />
-        </PlayingLayout>
-      </>
+      {user ? (
+        <Playing />
+      ) : (
+        <>
+          {isFirstSeconds || isLoading ? (
+            <LoadingView />
+          ) : (
+            <div className={styles.loginContainer}>
+              {/*<Image*/}
+              {/*  alt={""}*/}
+              {/*  className={styles.logo}*/}
+              {/*  height={"84"}*/}
+              {/*  width={"158"}*/}
+              {/*  priority*/}
+              {/*  src={`${FULLCOUNT_ASSETS_PATH}/logo-4-no-stroke.png`}*/}
+              {/*/>*/}
+              <div className={styles.content}>
+                <img
+                  className={styles.banner}
+                  src={`${FULLCOUNT_ASSETS}/landing/banner.png`}
+                  alt={""}
+                />
+
+                {!isLogging ? (
+                  <SignUpForm setIsSuccess={(value) => setIsSuccess(value)} />
+                ) : (
+                  <LoginForm setIsSuccess={(value) => setIsSuccess(value)} />
+                )}
+                {!isSuccess && (
+                  <div className={styles.footer}>
+                    <div className={styles.footerText}>
+                      {isLogging ? "New to Fullcount?" : "Already have an account?"}
+                    </div>
+                    <div
+                      className={styles.footerButton}
+                      onClick={() => setIsLogging((prev) => !prev)}
+                    >
+                      {isLogging ? "Create an account" : "Log in"}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </>
   );
 };

@@ -1,12 +1,12 @@
 .container {
     display: flex;
-    padding: 40px 7%;
+    padding: 40px;
     flex-direction: column;
     align-items: center;
     gap: 40px;
     align-self: stretch;
     border-top: 1px solid #4D4D4D;
-    background: #1B1B1B;
+    /*background: #1B1B1B;*/
 }
 
 .socialsContainer {
@@ -17,9 +17,9 @@
 }
 
 .socialsTitle {
-    color: #FFF;
+    color: #000;
     font-feature-settings: 'case' on;
-    font-family: Inter;
+    font-family: Pangolin, cursive;
     font-size: 16px;
     font-style: normal;
     font-weight: 700;
@@ -49,12 +49,16 @@
 
 .legalText {
     text-align: center;
-    color: #FFF;
-    font-family: Inter;
+    color: #000;
+    font-family: Pangolin, cursive;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+}
+
+.image {
+    height: 30px;
 }
 
 @media (min-width: 768px) {
@@ -70,10 +74,10 @@
 
 @media (min-width: 1440px) {
 .container {
-    max-width: 1238px;
+    /*max-width: 1238px;*/
     width: 100%;
     place-self: center;
-    padding: 40px 0;
+    padding: 40px 7%;
 }
 }
 

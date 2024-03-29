@@ -1,13 +1,116 @@
+.container {
+    background: #FCECD9;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: space-between;
+    min-width: 100vw;
+    align-items: center;
+}
+
+
+
+.limitedContainer {
+    max-width: 1440px;
+}
+
+.bannerContainer {
+    border: 1px solid #262019;
+    border-bottom: none;
+
+}
+
+
+
+.title {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 30px */
+}
+
+.text {
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 16px */
+}
+
 .heroContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.heroInnerContainer {
     display: flex;
     padding: 20px 7% 40px 7%;
     flex-direction: column;
     align-items: center;
-    gap: 40px;
+    gap: 30px;
     align-self: stretch;
 }
 
-.heroTextContainer {
+.heroTitle {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 110%; /* 33px */
+    max-width: 247px;
+}
+
+.heroText {
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.heroText {
+    margin-top: -10px;
+}
+
+.button {
+    display: flex;
+    padding: 9px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    border: 1px solid #262019;
+    background: #328449;
+    cursor: pointer;
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 1.2px;
+}
+
+.secondBlockContainer {
+    display: flex;
+    padding: 40px 7%;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    align-self: stretch;
+}
+
+.secondBlockTextContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -15,66 +118,21 @@
     align-self: stretch;
 }
 
-.heroTextTitle {
-    color: #FFF;
-    text-align: center;
-    font-family: Inter;
-    font-size: 30px;
-    font-style: normal;
-    font-weight: 700;
-    line-height: normal;
-    max-width: 247px;
+
+.secondBlockImage {
+    width: 275px;
 }
 
-.heroTextText {
-    color: #FFF;
-    text-align: center;
-    font-family: Inter;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-}
 
-.button {
-    display: flex;
-    padding: 11px 40px;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    align-self: stretch;
-
-    border: 1px solid #F1E3BF;
-    background: #00A341;
-    white-space: nowrap;
-    color: #FFF;
-
-    font-family: Inter;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 500;
-    line-height: normal;
-}
-
-.button:hover {
-    background: #008033;
-}
-
-.heroInnerContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-    align-items: center;
-}
 
 @media (min-width: 768px) {
     .button {
         align-self: center;
-        padding: 11px 80px;
+        padding: 9px 80px;
     }
-    .heroContainer {
-        padding: 40px 7% 80px 7%;
-        gap: 60px;
+    .heroInnerContainer {
+        padding: 40px 7% 60px 7%;
+        gap: 30px;
     }
 
     .heroTextTitle {
@@ -86,19 +144,31 @@
     .heroInnerContainer {
         gap: 60px;
     }
-
-    .heroTextContainer {
-        gap: 40px;
+    .secondBlockContainer {
+        padding: 60px 7%;
+    }
+    .secondBlockImage {
+        width: 500px;
     }
 }
 
 @media (min-width: 1024px) {
+    .heroContainer {
+        padding: 40px 71.68px;
+    }
     .heroInnerContainer {
-        margin-top: -20px;
-        padding: 40px;
-        border: 1px solid #4D4D4D;
-        background: #232323;
-        place-self: stretch;
+        border: 1px solid #262019;
+        background: #EBE4DC;
+        display: flex;
+        padding: 40px 71.68px;
+        flex-direction: column;
+        align-items: center;
+        gap: 30px;
+        align-self: stretch;
+        border-top: 1px solid #262019;
+    }
+    .secondBlockImage {
+        width: 700px;
     }
 }
 
@@ -107,4 +177,8 @@
         font-size: 50px;
         max-width: 532px;
     }
+        .title {
+            font-size: 40px;
+        }
+
 }

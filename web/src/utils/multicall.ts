@@ -20,6 +20,7 @@ export async function getMulticallResults(
   const response = await multicallContract.methods.tryAggregate(false, queries).call();
   const splitResponses = splitArray(response, functionNames.length);
   const web3 = new Web3();
+
   for (let i = 0; i < functionNames.length; i++) {
     const functionName = functionNames[i];
     const functionABI = ABI.find((item) => item.name === functionName && item.type === "function");
@@ -38,7 +39,7 @@ export async function getMulticallResults(
         // If the output is a primitive type, return the primitive value
         return decoded[Object.keys(decoded)[0]]; // Extract the first (and only) parameter
       } else {
-        return decoded[0]; //decodeParameters returns [object with access by index or name, length]
+        return decoded; //decodeParameters returns [object with access by index or name, length]
       }
     });
     result.push(decodedResults);

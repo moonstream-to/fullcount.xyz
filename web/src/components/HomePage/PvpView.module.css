@@ -1,0 +1,93 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.viewSelector {
+    display: flex;
+    gap: 5px;
+    z-index: 1;
+    justify-content: center;
+}
+
+.buttonSelected, .button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 0 0;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    max-width: 150px;
+
+}
+.buttonSelected {
+    color: #FFF;
+    border: 1px solid #328449;
+    background: #669568;
+    padding: 4px 9px;
+}
+
+.button {
+    color: #FFF;
+    padding: 5px 10px;
+    background: #8EAB8F;
+}
+
+.listsContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    align-self: stretch;
+    gap: 20px;
+}
+
+.list {
+    display: flex;
+    min-width: 130px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    flex: 1 0 0;
+}
+
+.listHeader {
+    width: 100%;
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+    .buttonSelected {
+        color: #FFF;
+        border: 2px solid #328449;
+        background: #669568;
+        padding: 6px 8px;
+    }
+    .button {
+        padding: 8px 10px;
+    }
+}
+
+@media (min-width: 1440px) {
+    .listsContainer {
+        gap: 40px;
+    }
+}

@@ -396,7 +396,7 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                 balls={atBatStatus.data?.balls ?? 3}
                 strikes={atBatStatus.data?.strikes ?? 2}
                 start={Number(sessionStatus.data?.phaseStartTimestamp)}
-                delay={secondsPerPhase ?? 300}
+                delay={secondsPerPhase ?? 120}
                 isActive={
                   sessionStatus.data?.progress === 3 ||
                   sessionStatus.data?.progress === 4 ||

@@ -1,8 +1,8 @@
-export const GAME_CONTRACT_VERSION = "0.1.0"; //TODO fetch from contract
+export const GAME_CONTRACT_VERSION = "0.1.1"; //TODO fetch from contract
 export const SECOND_REVEAL_PRICE_MULTIPLIER = 3;
 
 export const FEEDBACK_FORM_URL =
-  "https://docs.google.com/forms/d/1ZsWoXlYgL6XkAdA2BLyM6phJOfyg7Jo1EZiMMBeir4M";
+  "https://docs.google.com/forms/d/e/1FAIpQLSd07GHBQ4BN5MiMfLhjKm-Y_s8_SZ_zAOD3OhavDlm974kotg/viewform";
 
 export const GET_CONNECTED_URL = "https://forms.gle/Nk1bT1iLBYRDdyND9";
 
@@ -17,6 +17,7 @@ export const MULTICALL2_CONTRACT_ADDRESSES = {
   "80001": MULTICALL2_MUMBAI_CONTRACT_ADDRESS,
   "322": MULTICALL2_WYRM_CONTRACT_ADDRESS,
   "421614": MULTICALL3_SEPOLIA_CONTRACT_ADDRESS,
+  "42170": MULTICALL3_SEPOLIA_CONTRACT_ADDRESS,
 };
 
 export const MAX_INT =
@@ -27,6 +28,7 @@ export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 export const AWS_STATIC_ASSETS_PATH = "https://static.simiotics.com/moonstream/assets";
 
 export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
+export const FULLCOUNT_ASSETS = "https://static.fullcount.xyz/web";
 export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
 
 export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
@@ -65,8 +67,10 @@ export const getChainImage = (identifier: string | number): string | undefined =
 
 export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
 export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
-export const GAME_CONTRACT = "0x3a1Ad54d12b1f39805Ea77aFe7DeeFf2F32C97f5"; //TODO env
-export const TOKEN_CONTRACT = "0x0b9299858d7E5d20c54629587D960b634A96D823"; //TODO env
-// export const CHAIN_ID = 322; //TODO env
-export const CHAIN_ID = 421614;
-export const RPC = "https://sepolia-rollup.arbitrum.io/rpc";
+export const GAME_CONTRACT = "0xDfE251B4F12547867ff839bcacec4d159DD68E47"; //TODO env
+export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TODO env
+export const CHAIN_ID = 42170;
+export const RPC = "https://nova.arbitrum.io/rpc";
+export const blbImage = (idx: number) =>
+  `https://static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
+export const HUMBUG_REPORT_VERSION = "0.0.1";

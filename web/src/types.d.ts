@@ -51,29 +51,70 @@ interface TokenMetadata {
 
 type TokenSource = "BLBContract" | "FullcountPlayerAPI";
 
-type TokenId = {
+interface TokenId {
   id: string;
   address: string;
-};
+}
 
 interface Token {
   address: string;
   id: string;
   name: string;
   image: string;
-  staker: string;
+  staker?: string;
   source?: TokenSource;
+}
+
+interface NFT {
+  nftAddress: string;
+  tokenID: string;
 }
 
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
   tokenProgress: number;
+  activeSession?: { batterNFT: NFT; pitcherNFT: NFT };
 }
 
 interface Pair {
   pitcher: Token | undefined;
   batter: Token | undefined;
+}
+
+interface SessionState {
+  didBatterCommit: boolean;
+  didBatterReveal: boolean;
+  didPitcherCommit: boolean;
+  didPitcherReveal: boolean;
+  phaseStartTimestamp: string;
+}
+
+interface PitcherReveal {
+  nonce: string;
+  speed: string;
+  vertical: string;
+  horizontal: string;
+}
+
+interface BatterReveal {
+  nonce: string;
+  kind: string;
+  vertical: string;
+  horizontal: string;
+}
+
+export interface SessionStatus {
+  progress: number;
+  outcome: number;
+  sessionID: number;
+  didPitcherCommit: boolean;
+  didBatterCommit: boolean;
+  didPitcherReveal: boolean;
+  didBatterReveal: boolean;
+  pitcherReveal: PitcherReveal;
+  batterReveal: BatterReveal;
+  phaseStartTimestamp: string;
 }
 
 interface AtBat {
@@ -82,6 +123,22 @@ interface AtBat {
   balls: number;
   strikes: number;
   outcome: number;
+  lastSessionId?: number;
+  id?: number;
+  numberOfSessions?: number;
+  lastSession?: SessionState;
+  progress: number;
+}
+
+interface AtBatStatus {
+  pitcher: Token | undefined;
+  batter: Token | undefined;
+  balls: number;
+  strikes: number;
+  outcome: number;
+  id: number;
+  pitches: SessionStatus[];
+  numberOfSessions: number;
 }
 
 interface Session {

@@ -51,16 +51,28 @@ const BatterViewMobile = ({
           if (!commit) {
             return Promise.reject(new Error("FulcountPlayerAPI commit doesn't have commit data"));
           }
-          return commitOrRevealSwingFullcountPlayer({ token, commit, isCommit: true });
+          return commitOrRevealSwingFullcountPlayer({
+            token,
+            commit,
+            isCommit: true,
+            sessionID: sessionStatus.sessionID,
+          });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
     },
     {
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount, error) => {
+        console.log(error);
+        if (failureCount < 6) {
+          console.log("Will retry in 5, maybe 10 seconds");
+        }
+        return failureCount < 6;
+      },
       onSuccess: () => {
         setIsCommitted(true);
-        queryClient.refetchQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         toast("Commmit failed." + e?.message, "error");
@@ -96,30 +108,34 @@ const BatterViewMobile = ({
             commit: { nonce, vertical, horizontal, actionChoice },
             isCommit: false,
             token,
+            sessionID: sessionStatus.sessionID,
           });
         default:
           return Promise.reject(new Error(`Unknown or unsupported token source: ${token.source}`));
       }
     },
     {
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount, error) => {
+        console.log(error);
+        if (failureCount < 6) {
+          console.log("Will retry in 5, maybe 10 seconds");
+        }
+        return failureCount < 6;
+      },
       onSuccess: () => {
         setIsRevealed(true);
-        queryClient.invalidateQueries("sessions");
-        queryClient.refetchQueries("session");
+        queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
         setIsRevealFailed(true);
-        toast("Reveal failed: " + e?.message, "error");
+        console.log("Reveal failed: " + e?.message);
       },
     },
   );
   useEffect(() => {
-    if (sessionStatus.didBatterReveal) {
-      setIsRevealed(true);
-    }
-    if (sessionStatus.didBatterCommit) {
-      setIsCommitted(true);
-    }
+    setIsRevealed(sessionStatus.didBatterReveal);
+    setIsCommitted(sessionStatus.didBatterCommit);
   }, [sessionStatus]);
 
   return (

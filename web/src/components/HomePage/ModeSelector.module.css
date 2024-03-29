@@ -1,0 +1,57 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.button, .buttonSelected {
+    display: flex;
+    padding: 9px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 18px */
+    cursor: pointer;
+    max-width: 200px;
+}
+
+.buttonSelected {
+    border: 1px solid #262019;
+    background: #FFF;
+    color: #262019;
+}
+
+.button {
+    display: flex;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    background: rgba(38, 32, 25, 0.70);
+    color: #FFF;
+}
+
+.hint {
+    color: #7E8E7F;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    max-width: 375px;
+}

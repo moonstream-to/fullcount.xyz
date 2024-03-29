@@ -3,6 +3,7 @@ import styles from "./CreateNewCharacter.module.css";
 import { useEffect, useState } from "react";
 import { TokenSource } from "../../types";
 import useUser from "../../contexts/UserContext";
+import { blbImage } from "../../constants";
 const NUMBER_OF_IMAGES = 24;
 
 const images: number[] = [];
@@ -75,7 +76,7 @@ const CreateNewCharacter = ({
               h={{ base: "40px", lg: "100px" }}
               w={{ base: "40px", lg: "100px" }}
               alt={`img${idx}`}
-              src={`https://badges.moonstream.to/blb/p${idx}.png`}
+              src={blbImage(imageIndex)}
               cursor={"pointer"}
               onClick={() => setImageIndex(idx)}
               border={imageIndex === idx ? "2px solid white" : "1px solid #4D4D4D"}
