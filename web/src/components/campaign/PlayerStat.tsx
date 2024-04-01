@@ -1,15 +1,22 @@
 import { Token } from "../../types";
 import styles from "./PlayerStat.module.css";
-import { useQuery } from "react-query";
 
-const PlayerStat = ({ token }: { token: Token }) => {
-  const stats = useQuery(["stats", token.id, token.address], async () => {
+const PlayerStat = ({
+  token,
+  pitchingCompleted,
+  battingCompleted,
+}: {
+  token: Token;
+  pitchingCompleted: number;
+  battingCompleted: number;
+}) => {
+  const stats = (pitching: number, batting: number) => {
     return [
-      { label: "Pitching", finished: 1, total: 5 },
-      { label: "Batting", finished: 0, total: 5 },
-      { label: "Total at-bats", finished: 89 },
+      { label: "Pitching", finished: pitching, total: 5 },
+      { label: "Batting", finished: batting, total: 5 },
     ];
-  });
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.tokenInfo}>
@@ -20,25 +27,24 @@ const PlayerStat = ({ token }: { token: Token }) => {
         </div>
       </div>
       <div className={styles.tokenStatList}>
-        {stats.data &&
-          stats.data.map((stat, idx) => (
-            <div key={idx} className={styles.tokenStatItem}>
-              <div className={styles.statHeader}>
-                <div className={styles.label}>{stat.label}</div>
-                <div className={styles.completion}>{`${stat.finished}${stat.total ? "/" : ""}${
-                  stat.total ? stat.total : ""
-                }`}</div>
-              </div>
-              {stat.total && (
-                <div className={styles.notFinishedBar}>
-                  <div
-                    className={styles.finishedBar}
-                    style={{ width: `${(100 * stat.finished) / stat.total}%` }}
-                  />
-                </div>
-              )}
+        {stats(pitchingCompleted, battingCompleted).map((stat, idx) => (
+          <div key={idx} className={styles.tokenStatItem}>
+            <div className={styles.statHeader}>
+              <div className={styles.label}>{stat.label}</div>
+              <div className={styles.completion}>{`${stat.finished}${stat.total ? "/" : ""}${
+                stat.total ? stat.total : ""
+              }`}</div>
             </div>
-          ))}
+            {stat.total && (
+              <div className={styles.notFinishedBar}>
+                <div
+                  className={styles.finishedBar}
+                  style={{ width: `${(100 * stat.finished) / stat.total}%` }}
+                />
+              </div>
+            )}
+          </div>
+        ))}
         <div className={styles.statHeader}>
           <div className={styles.label}></div>
         </div>

@@ -7,10 +7,12 @@ const TeamView = ({
   team,
   isPitching,
   atBats,
+  stats,
 }: {
   team: Team;
   isPitching: boolean;
   atBats: AtBat[];
+  stats: Record<string, number> | undefined;
 }) => {
   if (atBats.length < 1) {
     return <></>;
@@ -30,15 +32,27 @@ const TeamView = ({
         {team.roster
           .filter((c) => c.isPitcher === isPitching)
           .map((character) => {
-            return {
-              token: character.tokens.find((token) =>
-                atBats.some(
-                  (atBat) =>
+            const charAtBats = atBats
+              .filter((atBat) =>
+                character.tokens.some(
+                  (token) =>
                     (atBat.batter?.id === token.id && atBat.batter.address === token.address) ||
                     (atBat.pitcher?.id === token.id && atBat.pitcher.address === token.address),
                 ),
+              )
+              .reverse();
+            return {
+              token: character.tokens.find(
+                (token) =>
+                  (charAtBats[0].batter?.id === token.id &&
+                    charAtBats[0].batter.address === token.address) ||
+                  (charAtBats[0].pitcher?.id === token.id &&
+                    charAtBats[0].pitcher.address === token.address),
               ),
-              character,
+              character: {
+                ...character,
+                wins: stats && stats[character.name] ? stats[character.name] : 0,
+              },
             };
           })
           .map((character, idx) => (
