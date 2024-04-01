@@ -115,9 +115,7 @@ const CharacterCard = ({
         src={atBat.pitcher?.image ?? atBat.batter?.image}
       />
       <div className={styles.header}>
-        <div className={styles.name}>{`${character?.character?.name} - ${
-          atBat.pitcher ? atBat.pitcher.id : atBat.batter?.id
-        }`}</div>
+        <div className={styles.name}>{`${character?.character?.name}`}</div>
         <div className={styles.quote}>{character?.character?.quote}</div>
       </div>
       {(character.character?.wins || character.character?.wins === 0) && (
