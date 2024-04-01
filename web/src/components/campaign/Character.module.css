@@ -25,10 +25,8 @@
 }
 
 .name {
-    /*overflow: hidden;*/
     color: #FFF;
     text-align: center;
-    /*text-overflow: ellipsis;*/
     font-family: Bangers, cursive;
     font-size: 18px;
     font-style: normal;
@@ -72,18 +70,6 @@
 .tokenImageFallback {
     width: 178px;
     height: 180px;
-}
-
-.characterStat {
-
-}
-
-.statLabel {
-
-}
-
-.statData {
-
 }
 
 .tokenStatItem {
