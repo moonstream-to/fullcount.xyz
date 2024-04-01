@@ -92,6 +92,26 @@ export async function startSessionFullcountPlayer({
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
     .then(async (response) => {
+      const { gameContract } = getContracts();
+      let isSuccess = false;
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        console.log("checking sessionState after start, attempt: ", attempt);
+        const sessionProgress = await gameContract.methods
+          .sessionProgress(response.data.session_id)
+          .call();
+        if (Number(sessionProgress) === 2) {
+          isSuccess = true;
+          break;
+        } else {
+          console.log(sessionProgress, response.data);
+        }
+        await delay(2 * 1000);
+      }
+      if (!isSuccess) {
+        throw new Error(
+          "Starting session: FCPlayerAPI success, sessionProgress unchanged in 20sec",
+        );
+      }
       console.log("Success:", response.data);
       return response.data;
     });
@@ -129,6 +149,22 @@ export async function joinSessionFullcountPlayer({
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/join`, postData, { headers })
     .then(async (response) => {
+      const { gameContract } = getContracts();
+      let isSuccess = false;
+      for (let attempt = 1; attempt <= 5; attempt++) {
+        console.log("checking sessionState after join, attempt: ", attempt);
+        const sessionProgress = await gameContract.methods.sessionProgress(sessionID).call();
+        if (Number(sessionProgress) !== 2) {
+          isSuccess = true;
+          break;
+        } else {
+          console.log(sessionProgress, response.data);
+        }
+        await delay(2 * 1000);
+      }
+      if (!isSuccess) {
+        throw new Error("Joining: FCPlayerAPI success, sessionProgress unchanged in 20sec");
+      }
       console.log("Success:", response.data);
       sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
         `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
