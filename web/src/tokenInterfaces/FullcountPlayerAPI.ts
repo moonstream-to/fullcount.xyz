@@ -92,17 +92,10 @@ export async function startSessionFullcountPlayer({
   const data = await axios
     .post(`${FULLCOUNT_PLAYER_API}/game/atbat`, postData, { headers })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
-      }
       console.log("Success:", response.data);
       return response.data;
     });
   sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
-    "type:error",
-    "error_domain:fcplayer",
-    `error:fcplayer-starting`,
     `token_address:${token.address}`,
     `token_id:${token.id}`,
   ]);
@@ -111,20 +104,6 @@ export async function startSessionFullcountPlayer({
 
 const delay = (delayInms: number) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
-};
-
-const getTransaction = async (transactionHash: string) => {
-  for (let attempt = 1; attempt <= 10; attempt++) {
-    const web3 = new Web3(RPC);
-    const transaction = await web3.eth.getTransaction(transactionHash);
-    if (transaction) return transaction;
-    await delay(2 * 1000);
-  }
-  throw new Error(`Failed to receive transaction from getTransaction("${transactionHash}")`);
-};
-
-export const checkTransaction = async (transactionHash: string) => {
-  return await getTransaction(transactionHash);
 };
 
 export async function joinSessionFullcountPlayer({
@@ -150,10 +129,6 @@ export async function joinSessionFullcountPlayer({
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/join`, postData, { headers })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
-      }
       console.log("Success:", response.data);
       sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
         `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
@@ -194,10 +169,6 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/${action}`, postData, { headers })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
-      }
       console.log("Success:", response.data);
       return response.data;
     })
@@ -245,10 +216,6 @@ export const commitOrRevealPitchFullcountPlayer = ({
       headers,
     })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("FCPlayerAPI success, but transactions isn't minted");
-      }
       const { gameContract } = getContracts();
       let isSuccess = false;
       if (!isCommit) {
@@ -329,10 +296,6 @@ export const commitOrRevealSwingFullcountPlayer = ({
       headers,
     })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("FCPlayerAPI success, but transactions isn't minted");
-      }
       const { gameContract } = getContracts();
       let isSuccess = false;
       if (!isCommit) {
@@ -398,10 +361,6 @@ export const mintFullcountPlayerToken = ({
       headers,
     })
     .then(async (response) => {
-      const isTransactionMinted = await checkTransaction(response.data.transaction_hash);
-      if (!isTransactionMinted) {
-        throw new Error("Transaction failed. Try again, please");
-      }
       console.log("Success:", response.data);
       sendReport(`Token minted`, `Token #${response.data.token_id} minted`, []);
       return response.data;
