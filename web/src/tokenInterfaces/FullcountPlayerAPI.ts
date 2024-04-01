@@ -94,7 +94,7 @@ export async function startSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 5; attempt++) {
+      for (let attempt = 1; attempt <= 10; attempt++) {
         console.log("checking sessionState after start, attempt: ", attempt);
         const sessionProgress = await gameContract.methods
           .sessionProgress(response.data.session_id)
@@ -151,7 +151,7 @@ export async function joinSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 5; attempt++) {
+      for (let attempt = 1; attempt <= 10; attempt++) {
         console.log("checking sessionState after join, attempt: ", attempt);
         const sessionProgress = await gameContract.methods.sessionProgress(sessionID).call();
         if (Number(sessionProgress) !== 2) {
