@@ -8,7 +8,9 @@ import { useQuery } from "react-query";
 import { GAME_CONTRACT } from "../../constants";
 import {
   CAMPAIGN_BOTS_ADDRESS,
+  getAllBatters,
   getAllBattersIds,
+  getAllPitchers,
   getAllPitchersIds,
   getCharacterName,
 } from "./teams";
@@ -41,7 +43,7 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
     const batterCampaignWins = await axios
       .get(batterUrl)
       .then((response) => {
-        console.log(response.data);
+        return response.data.wins_against_token_id;
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -49,47 +51,63 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
     const pitcherCampaignWins = await axios
       .get(pitcherUrl)
       .then((response) => {
-        console.log(response.data);
+        return response.data.wins_against_token_id;
       })
       .catch((error) => {
         console.error("Error:", error);
       });
-
-    console.log(batterCampaignWins, pitcherCampaignWins);
+    const data = [...batterCampaignWins, ...pitcherCampaignWins].reduce((acc, curr) => {
+      acc[curr.token_id] = curr.wins;
+      return acc;
+    }, {});
     const stats: Record<string, number> = {};
-    const data: Record<string, number> = { "1": 0, "2": 1, "3": 2, "4": 3, "5": 0 };
-    Object.keys(data).forEach((c) => (stats[getCharacterName(c) ?? "error"] = data[c]));
-    return stats;
-    // return [
-    //   { label: "Pitching", finished: 1, total: 5 },
-    //   { label: "Batting", finished: 0, total: 5 },
-    //   { label: "Total at-bats", finished: 89 },
-    // ];
+    Object.keys(data).forEach((c) => {
+      const stat = stats[getCharacterName(c) ?? "error"];
+      if (!stat) {
+        stats[getCharacterName(c) ?? "error"] = data[c];
+      } else {
+        stats[getCharacterName(c) ?? "error"] = stats[getCharacterName(c) ?? "error"] + data[c];
+      }
+    });
+    const pitchersCompleted = getAllPitchers().filter(
+      (p) => stats[p.name] && stats[p.name] >= 3,
+    ).length;
+    const battersCompleted = getAllBatters().filter(
+      (p) => stats[p.name] && stats[p.name] >= 3,
+    ).length;
+
+    return { stats, pitchersCompleted, battersCompleted };
   });
 
   return (
     <div className={styles.container}>
-      {/*{selectedToken && <PlayerStat token={selectedToken} />}*/}
+      {selectedToken && (
+        <PlayerStat
+          pitchingCompleted={stats.data?.battersCompleted ?? 0}
+          battingCompleted={stats.data?.pitchersCompleted ?? 0}
+          token={selectedToken}
+        />
+      )}
       <div className={styles.roleSelector}>
         <div
           className={isPitching ? styles.selectedRole : styles.role}
           onClick={() => setIsPitching(true)}
         >
-          batting
+          pitchers
         </div>
         <div
           className={!isPitching ? styles.selectedRole : styles.role}
           onClick={() => setIsPitching(false)}
         >
-          pitching
+          batters
         </div>
       </div>
       <div className={styles.hint}>
         {isPitching
           ? "To defeat a pitcher, you must hit three home runs against them. Defeat them all to finish the campaign!"
-          : "To defeat a batter, strike them out in only three pitches. Defeat them all to finish the campaign!"}
+          : "To defeat a batter, you must strike them out in only three pitches three times. Defeat them all to finish the campaign!"}
       </div>
-      <TeamsView stats={stats.data} atBats={atBats} isPitching={isPitching} />
+      <TeamsView stats={stats.data?.stats} atBats={atBats} isPitching={isPitching} />
     </div>
   );
 };
