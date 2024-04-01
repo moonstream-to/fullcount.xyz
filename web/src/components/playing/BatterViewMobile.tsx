@@ -62,6 +62,14 @@ const BatterViewMobile = ({
       }
     },
     {
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount, error) => {
+        console.log(error);
+        if (failureCount < 6) {
+          console.log("Will retry in 5, maybe 10 seconds");
+        }
+        return failureCount < 6;
+      },
       onSuccess: () => {
         setIsCommitted(true);
         queryClient.refetchQueries("atBat");
