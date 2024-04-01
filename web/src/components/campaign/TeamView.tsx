@@ -49,7 +49,10 @@ const TeamView = ({
                   (charAtBats[0].pitcher?.id === token.id &&
                     charAtBats[0].pitcher.address === token.address),
               ),
-              character: { ...character, wins: stats ? stats[character.name] : undefined },
+              character: {
+                ...character,
+                wins: stats && stats[character.name] ? stats[character.name] : 0,
+              },
             };
           })
           .map((character, idx) => (
