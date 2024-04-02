@@ -21,8 +21,8 @@ export default function Layout({
       <Head>
         <link rel="icon" href="/favicon.png?v1" />
         <title>{title ?? "Fullcount"}</title>
-        <meta name="og:title" content={"Fullcount - a baseball strategy game"} />
-        <meta name="description" content="Baseball strategy game" />
+        <meta name="og:title" content={"Fullcount"} />
+        <meta name="description" content="A baseball strategy game" />
         <meta name="keywords" content="baseball, strategy, games, fullcount, home run" />
         <meta
           name="og:image"
