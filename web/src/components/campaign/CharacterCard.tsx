@@ -14,6 +14,7 @@ const CharacterCard = ({
   character,
   atBat,
   color,
+  isStatsLoading,
 }: {
   character?: {
     token: { address: string; id: string } | undefined;
@@ -21,6 +22,7 @@ const CharacterCard = ({
   };
   atBat?: AtBat;
   color: string;
+  isStatsLoading: boolean;
 }) => {
   const { selectedToken } = useGameContext();
   const queryClient = useQueryClient();
@@ -120,6 +122,7 @@ const CharacterCard = ({
       </div>
       {(character.character?.wins || character.character?.wins === 0) && (
         <CharacterProgress
+          isStatsLoading={isStatsLoading}
           stat={{
             label: atBat.pitcher ? "Score a strikeout in 3 pitches" : "Score 3 HR",
             finished: character.character.wins,

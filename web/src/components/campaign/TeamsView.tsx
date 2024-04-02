@@ -7,10 +7,12 @@ const TeamsView = ({
   atBats,
   isPitching,
   stats,
+  isStatsLoading,
 }: {
   atBats: AtBat[];
   isPitching: boolean;
   stats: Record<string, number> | undefined;
+  isStatsLoading: boolean;
 }) => {
   const teams = getTeams();
 
@@ -18,6 +20,7 @@ const TeamsView = ({
     <div className={styles.container}>
       {teams.map((team, idx) => (
         <TeamView
+          isStatsLoading={isStatsLoading}
           stats={stats}
           key={idx}
           isPitching={isPitching}

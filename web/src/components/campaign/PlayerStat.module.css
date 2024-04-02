@@ -114,3 +114,40 @@
     left: 0;
 }
 
+@keyframes loadingAnimation1 {
+    0%, 100% {
+        left: 0;
+        width: 10%;
+    }
+    25%, 75% {
+        width: 72px;
+    }
+    50% {
+        left: 90%;
+        width: 10%;
+    }
+}
+
+.loadingBar1 {
+    animation: loadingAnimation1 2s ease-in-out infinite;
+}
+
+@keyframes loadingAnimation2 {
+    0%, 100% {
+        left: 90%;
+        width: 10%;
+    }
+    25%, 75% {
+        width: 72px;
+    }
+    50% {
+        left: 0;
+        width: 10%;
+    }
+}
+
+.loadingBar2 {
+    animation: loadingAnimation2 2s ease-in-out infinite;
+}
+
+
