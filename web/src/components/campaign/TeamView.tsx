@@ -8,11 +8,13 @@ const TeamView = ({
   isPitching,
   atBats,
   stats,
+  isStatsLoading,
 }: {
   team: Team;
   isPitching: boolean;
   atBats: AtBat[];
   stats: Record<string, number> | undefined;
+  isStatsLoading: boolean;
 }) => {
   if (atBats.length < 1) {
     return <></>;
@@ -57,6 +59,7 @@ const TeamView = ({
           })
           .map((character, idx) => (
             <CharacterCard
+              isStatsLoading={isStatsLoading}
               key={idx}
               color={team.color}
               character={character}

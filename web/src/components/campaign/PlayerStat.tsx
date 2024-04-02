@@ -5,10 +5,12 @@ const PlayerStat = ({
   token,
   pitchingCompleted,
   battingCompleted,
+  isStatsLoading,
 }: {
   token: Token;
   pitchingCompleted: number;
   battingCompleted: number;
+  isStatsLoading: boolean;
 }) => {
   const stats = (pitching: number, batting: number) => {
     return [
@@ -31,15 +33,19 @@ const PlayerStat = ({
           <div key={idx} className={styles.tokenStatItem}>
             <div className={styles.statHeader}>
               <div className={styles.label}>{stat.label}</div>
-              <div className={styles.completion}>{`${stat.finished}${stat.total ? "/" : ""}${
-                stat.total ? stat.total : ""
-              }`}</div>
+              {!isStatsLoading && (
+                <div className={styles.completion}>{`${stat.finished}${stat.total ? "/" : ""}${
+                  stat.total ? stat.total : ""
+                }`}</div>
+              )}
             </div>
             {stat.total && (
               <div className={styles.notFinishedBar}>
                 <div
-                  className={styles.finishedBar}
-                  style={{ width: `${(100 * stat.finished) / stat.total}%` }}
+                  className={`${styles.finishedBar} ${
+                    !isStatsLoading ? "" : idx === 0 ? styles.loadingBar1 : styles.loadingBar2
+                  }`}
+                  style={isStatsLoading ? {} : { width: `${(100 * stat.finished) / stat.total}%` }}
                 />
               </div>
             )}
