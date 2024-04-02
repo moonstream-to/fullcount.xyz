@@ -105,7 +105,7 @@ with  dedup_events as (
             'hits', singles + doubles + triples + home_runs,
             'runs_batted_in', walks + 1.5 * singles + 2.5 * doubles + 3 * triples + 4 * home_runs,
             'batting_average', 1.0 * (singles + doubles + triples + home_runs) / NULLIF(total_batter_events - walks, 0),
-            'on-base', 1.0 * (walks + singles + doubles + triples + home_runs) / NULLIF(total_batter_events, 0),
+            'on_base', 1.0 * (walks + singles + doubles + triples + home_runs) / NULLIF(total_batter_events, 0),
             'slugging', (1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs) / NULLIF(total_batter_events - walks, 0),
             'ops', COALESCE(1.0 * (walks + singles + doubles + triples + home_runs) / NULLIF(total_batter_events, 0), 0) +
                 COALESCE((1.0 * singles + 2.0 * doubles + 3.0 * triples + 4.0 * home_runs) / NULLIF(total_batter_events - walks, 0), 0)
