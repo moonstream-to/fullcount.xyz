@@ -1,6 +1,6 @@
 .container {
     display: flex;
-    padding: 10px;
+    padding: 10px 5px;
     justify-content: center;
     gap: 10px;
     border: 0.5px solid #262019;
@@ -22,7 +22,7 @@
     color: #262019;
     font-variant-numeric: lining-nums proportional-nums;
     font-family: Pangolin, cursive;
-    font-size: 12px;
+    font-size: 11px;
     font-style: normal;
     font-weight: 400;
     line-height: 120%; /* 19.2px */
@@ -37,7 +37,7 @@
     color: #4D4D4D;
     font-variant-numeric: lining-nums proportional-nums;
     font-family: Pangolin, cursive;
-    font-size: 10px;
+    font-size: 8px;
     font-style: normal;
     font-weight: 400;
     line-height: 120%; /* 12px */

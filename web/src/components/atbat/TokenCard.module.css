@@ -2,7 +2,7 @@
     display: flex;
     padding: 15px;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 10px;
     border: 1px solid #262019;
     background: #EBE4DC;
@@ -22,6 +22,7 @@
 .tokenInfo {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 

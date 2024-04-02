@@ -17,6 +17,7 @@ const pitcherRecord = (stats: PlayerStats): string => {
   const wins =
     stats.points_data.pitching_data.strikeouts + stats.points_data.pitching_data.in_play_outs;
   const losses =
+    stats.points_data.pitching_data.walks +
     stats.points_data.pitching_data.singles +
     stats.points_data.pitching_data.doubles +
     stats.points_data.pitching_data.triples +

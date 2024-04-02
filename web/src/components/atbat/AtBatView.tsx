@@ -59,7 +59,7 @@ const AtBatView: React.FC = () => {
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
-  const [isBigView] = useMediaQuery("(min-width: 1024px)");
+  const [isBigView] = useMediaQuery("(min-width: 1440px)");
 
   useEffect(() => {
     window.scrollTo(0, 0);
