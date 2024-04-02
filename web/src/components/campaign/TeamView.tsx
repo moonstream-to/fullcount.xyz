@@ -43,19 +43,21 @@ const TeamView = ({
                 ),
               )
               .reverse();
-            return {
-              token: character.tokens.find(
-                (token) =>
-                  (charAtBats[0].batter?.id === token.id &&
-                    charAtBats[0].batter.address === token.address) ||
-                  (charAtBats[0].pitcher?.id === token.id &&
-                    charAtBats[0].pitcher.address === token.address),
-              ),
-              character: {
-                ...character,
-                wins: stats && stats[character.name] ? stats[character.name] : 0,
-              },
-            };
+            return charAtBats.length === 0
+              ? undefined
+              : {
+                  token: character.tokens.find(
+                    (token) =>
+                      (charAtBats[0].batter?.id === token.id &&
+                        charAtBats[0].batter.address === token.address) ||
+                      (charAtBats[0].pitcher?.id === token.id &&
+                        charAtBats[0].pitcher.address === token.address),
+                  ),
+                  character: {
+                    ...character,
+                    wins: stats && stats[character.name] ? stats[character.name] : 0,
+                  },
+                };
           })
           .map((character, idx) => (
             <CharacterCard
