@@ -255,7 +255,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
       const { gameContract } = getContracts();
       let isSuccess = false;
       if (!isCommit) {
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        for (let attempt = 1; attempt <= 10; attempt++) {
           const sessionState = await gameContract.methods.SessionState(sessionID).call();
           if (sessionState.didPitcherReveal) {
             isSuccess = true;
@@ -270,7 +270,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
           throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
         }
       } else {
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        for (let attempt = 1; attempt <= 10; attempt++) {
           const sessionState = await gameContract.methods.SessionState(sessionID).call();
           if (sessionState.didPitcherCommit) {
             isSuccess = true;
@@ -335,7 +335,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
       const { gameContract } = getContracts();
       let isSuccess = false;
       if (!isCommit) {
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        for (let attempt = 1; attempt <= 10; attempt++) {
           const sessionState = await gameContract.methods.SessionState(sessionID).call();
           if (sessionState.didBatterReveal) {
             isSuccess = true;
@@ -348,7 +348,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
           throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
         }
       } else {
-        for (let attempt = 1; attempt <= 5; attempt++) {
+        for (let attempt = 1; attempt <= 10; attempt++) {
           const sessionState = await gameContract.methods.SessionState(sessionID).call();
           if (sessionState.didBatterCommit) {
             isSuccess = true;
