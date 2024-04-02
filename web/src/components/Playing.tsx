@@ -5,7 +5,7 @@ import SessionsView from "./sessions/SessionsView";
 import PlayView from "./playing/PlayView";
 import styles from "./Playing.module.css";
 import { useQuery } from "react-query";
-import { OwnedToken } from "../types";
+import { AtBat, OwnedToken } from "../types";
 import { fetchOwnedBLBTokens } from "../tokenInterfaces/BLBTokenAPI";
 import { fetchFullcountPlayerTokens } from "../tokenInterfaces/FullcountPlayerAPI";
 import queryCacheProps from "../hooks/hookCommon";
@@ -15,8 +15,9 @@ import PlayingLayout from "./layout/PlayingLayout";
 import ChooseToken from "./tokens/ChooseToken";
 import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
+import { showNotification } from "../utils/notifications";
 
 const Playing = () => {
   const {
@@ -30,6 +31,7 @@ const Playing = () => {
     tokensCache,
   } = useGameContext();
   const { user } = useUser();
+  const [ownedAtBatsSnapshot, setOwnedAtBatsSnapshot] = useState<AtBat[] | undefined>(undefined);
 
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
@@ -56,6 +58,35 @@ const Playing = () => {
       refetchInterval: 5000,
       onSuccess: (data: any) => {
         console.log(data);
+        const ownedAtBats: AtBat[] = data.atBats.filter(
+          (a: AtBat) =>
+            a.progress !== 6 &&
+            ownedTokens.data?.some(
+              (t) =>
+                (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
+                (t.address === a.batter?.address && t.id === a.batter.id),
+            ),
+        );
+        if (ownedAtBatsSnapshot) {
+          console.log(
+            ownedAtBatsSnapshot.filter((atBat) => atBat.progress === 2),
+            ownedAtBats.filter((atBat) => atBat.progress === 3),
+          );
+          ownedAtBatsSnapshot
+            .filter((atBat) => atBat.progress === 2)
+            .forEach((atBat) => {
+              console.log(atBat);
+              if (
+                ownedAtBats.some(
+                  (ownedAtBat) => ownedAtBat.id === atBat.id && ownedAtBat.progress === 3,
+                )
+              ) {
+                console.log("joined");
+                showNotification("Your at-bat is joined", "");
+              }
+            });
+        }
+        setOwnedAtBatsSnapshot(ownedAtBats);
         if (data.tokens.length !== tokensCache.length) {
           updateContext({ tokensCache: [...data.tokens] });
         }
