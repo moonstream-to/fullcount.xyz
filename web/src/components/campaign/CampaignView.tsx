@@ -83,6 +83,7 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
     <div className={styles.container}>
       {selectedToken && (
         <PlayerStat
+          isStatsLoading={stats.isLoading}
           pitchingCompleted={stats.data?.battersCompleted ?? 0}
           battingCompleted={stats.data?.pitchersCompleted ?? 0}
           token={selectedToken}
@@ -107,7 +108,12 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
           ? "To defeat a pitcher, you must hit three home runs against them. Defeat them all to finish the campaign!"
           : "To defeat a batter, you must strike them out in only three pitches three times. Defeat them all to finish the campaign!"}
       </div>
-      <TeamsView stats={stats.data?.stats} atBats={atBats} isPitching={isPitching} />
+      <TeamsView
+        isStatsLoading={stats.isLoading}
+        stats={stats.data?.stats}
+        atBats={atBats}
+        isPitching={isPitching}
+      />
     </div>
   );
 };

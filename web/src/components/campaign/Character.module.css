@@ -128,3 +128,21 @@
     align-self: stretch;
     left: 0;
 }
+
+@keyframes loadingAnimation {
+    0%, 100% {
+        left: 0;
+        width: 10%;
+    }
+    25%, 75% {
+        width: 42px;
+    }
+    50% {
+        left: 90%;
+        width: 10%;
+    }
+}
+
+.loadingBar {
+    animation: loadingAnimation 2s ease-in-out infinite;
+}
