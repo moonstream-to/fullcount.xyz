@@ -124,7 +124,7 @@ const CharacterCard = ({
         <CharacterProgress
           isStatsLoading={isStatsLoading}
           stat={{
-            label: atBat.pitcher ? "Score a strikeout in 3 pitches" : "Score 3 HR",
+            label: atBat.pitcher ? "Score 3 HR" : "Score a strikeout in 3 pitches",
             finished: character.character.wins,
             total: 3,
           }}
