@@ -205,6 +205,22 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
   return axios
     .post(`${FULLCOUNT_PLAYER_API}/game/${action}`, postData, { headers })
     .then(async (response) => {
+      const { gameContract } = getContracts();
+      let isSuccess = false;
+      for (let attempt = 1; attempt <= 10; attempt++) {
+        console.log("checking token state after unstake, attempt: ", attempt);
+        const session = await gameContract.methods.StakedSession(token.address, token.id).call();
+        if (Number(session) === 0) {
+          isSuccess = true;
+          break;
+        } else {
+          console.log(session, response.data);
+        }
+        await delay(3 * 1000);
+      }
+      if (!isSuccess) {
+        throw new Error("Unstaking: FCPlayerAPI success, sessionProgress unchanged in 20sec");
+      }
       console.log("Success:", response.data);
       return response.data;
     })
