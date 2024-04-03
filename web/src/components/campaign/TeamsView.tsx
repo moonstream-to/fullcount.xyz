@@ -3,18 +3,29 @@ import styles from "./TeamsView.module.css";
 import TeamView from "./TeamView";
 import { getTeams } from "./teams";
 
-const TeamsView = ({ atBats, isPitching }: { atBats: AtBat[]; isPitching: boolean }) => {
+const TeamsView = ({
+  atBats,
+  isPitching,
+  stats,
+  isStatsLoading,
+}: {
+  atBats: AtBat[];
+  isPitching: boolean;
+  stats: Record<string, number> | undefined;
+  isStatsLoading: boolean;
+}) => {
   const teams = getTeams();
 
   return (
     <div className={styles.container}>
       {teams.map((team, idx) => (
         <TeamView
+          isStatsLoading={isStatsLoading}
+          stats={stats}
           key={idx}
           isPitching={isPitching}
-          atBats={atBats.filter(
-            (atBat) =>
-              atBat.progress === 2 &&
+          atBats={atBats
+            .filter((atBat) =>
               team.roster.some(
                 (token) =>
                   token.isPitcher === isPitching &&
@@ -24,7 +35,8 @@ const TeamsView = ({ atBats, isPitching }: { atBats: AtBat[]; isPitching: boolea
                       (t.address === atBat.batter?.address && t.id === atBat.batter.id),
                   ),
               ),
-          )}
+            )
+            .filter((atBat) => atBat.progress === 2)}
           team={team}
         />
       ))}
