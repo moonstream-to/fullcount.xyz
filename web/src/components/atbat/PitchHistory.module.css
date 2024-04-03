@@ -98,3 +98,11 @@
 .negativeOutcome {
     color: #CD7676;
 }
+
+@media (min-width: 1024px) {
+    .container {
+        left: calc(100% + 10px);
+        top: 0;
+
+    }
+}
