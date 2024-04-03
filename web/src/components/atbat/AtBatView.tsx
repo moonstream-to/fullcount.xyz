@@ -15,6 +15,7 @@ import { Image, useMediaQuery } from "@chakra-ui/react";
 import Outcome2, { sessionOutcomeType } from "./Outcome2";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
+import ScoreForDesktop from "./ScoreForDesktop";
 
 const outcomes = [
   "In Progress",
@@ -59,7 +60,7 @@ const AtBatView: React.FC = () => {
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
-  const [isBigView] = useMediaQuery("(min-width: 1440px)");
+  const [isBigView] = useMediaQuery("(min-width: 1024px)");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -167,6 +168,12 @@ const AtBatView: React.FC = () => {
           pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
         />
       )}
+      {atBatState.data && isBigView && (
+        <ScoreForDesktop
+          atBat={atBatState.data.atBat}
+          pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
+        />
+      )}
       {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
         <div
           className={
@@ -221,37 +228,35 @@ const AtBatView: React.FC = () => {
             : "you lose!"}
         </div>
       )}
-      {!(
-        atBatState.data?.atBat.outcome === 0 &&
+      {atBatState.data?.atBat.outcome === 0 &&
         !showPitchOutcome &&
         atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
-        atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6
-      ) && (
-        <div className={styles.playerView}>
-          {isBigView && atBatState.data?.atBat.pitcher && (
-            <TokenCard token={atBatState.data?.atBat.pitcher} isPitcher={true} />
-          )}
-          {selectedToken &&
-            isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
-            atBatState.data && (
-              <PitcherViewMobile
-                sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
-                token={selectedToken as OwnedToken}
-              />
+        atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
+          <div className={styles.playerView}>
+            {isBigView && atBatState.data?.atBat.pitcher && (
+              <TokenCard token={atBatState.data?.atBat.pitcher} isPitcher={true} />
             )}
-          {selectedToken &&
-            isSameToken(selectedToken, atBatState.data?.atBat.batter) &&
-            atBatState.data && (
-              <BatterViewMobile
-                sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
-                token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
-              />
+            {selectedToken &&
+              isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
+              atBatState.data && (
+                <PitcherViewMobile
+                  sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
+                  token={selectedToken as OwnedToken}
+                />
+              )}
+            {selectedToken &&
+              isSameToken(selectedToken, atBatState.data?.atBat.batter) &&
+              atBatState.data && (
+                <BatterViewMobile
+                  sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
+                  token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
+                />
+              )}
+            {isBigView && atBatState.data?.atBat.batter && (
+              <TokenCard token={atBatState.data?.atBat.batter} isPitcher={false} />
             )}
-          {isBigView && atBatState.data?.atBat.batter && (
-            <TokenCard token={atBatState.data?.atBat.batter} isPitcher={false} />
-          )}
-        </div>
-      )}
+          </div>
+        )}
       {atBatState.data?.atBat && showPitchOutcome && atBatState.data.atBat.pitches.length > 0 && (
         <>
           {atBatState.data?.atBat && (
