@@ -55,8 +55,13 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
         (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
       );
       const total = counts.reduce((acc, value) => acc + value);
+      const fast = res.data.pitch_distribution.reduce(
+        (acc: number, value: { pitch_speed: 0 | 1; count: number }) =>
+          acc + (value.pitch_speed === 0 ? value.count : 0),
+        0,
+      );
       const rates = counts.map((value) => value / total);
-      return { rates, counts };
+      return { rates, counts, fast };
     },
     {
       enabled: !!token && isPitcher,
@@ -104,6 +109,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       <div className={styles.detailedStat}>
         {isPitcher && pitchDistributions.data && (
           <HeatMap
+            fast={pitchDistributions.data.fast}
             rates={pitchDistributions.data.rates}
             counts={pitchDistributions.data.counts}
             isPitcher
@@ -111,9 +117,10 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
         )}
         {!isPitcher && swingDistributions.data && (
           <HeatMap
+            takes={swingDistributions.data.takes}
             rates={swingDistributions.data.rates}
             counts={swingDistributions.data.counts}
-            isPitcher
+            isPitcher={false}
           />
         )}
         {((isPitcher && pitcherStats.data) || (!isPitcher && batterStats.data)) && (

@@ -1,23 +1,28 @@
 import React, { useState } from "react";
-import { Box, Flex, Grid, Text } from "@chakra-ui/react";
+import { Box, Flex, Grid, Text, Image } from "@chakra-ui/react";
 import { valueToColor } from "../../utils/colors";
 import styles from "./HeatMap.module.css";
+import { FULLCOUNT_ASSETS } from "../../constants";
 
 const leftBorder = [6, 11, 16];
 const topBorder = [6, 7, 8];
 const rightBorder = [8, 13, 18];
 const bottomBorder = [16, 17, 18];
+const modes = ["COLOR ONLY", "AMOUNT", "PERCENTAGE"];
+const icons = ["color-only", "amount", "percentage"];
 
 const HeatMap = ({
   rates,
   counts,
   takes,
+  fast,
   isPitcher,
   showStrikeZone = false,
 }: {
   rates: number[];
   counts: number[];
   takes?: number;
+  fast?: number;
   showStrikeZone?: boolean;
   isPitcher: boolean;
 }) => {
@@ -56,18 +61,28 @@ const HeatMap = ({
       <div className={styles.total}>
         {counts.reduce((acc, c) => acc + c)}
         {isPitcher ? " pitches" : " swings"}
+        {isPitcher && fast ? ` (${fast} fast)` : !isPitcher && takes ? ` + ${takes} takes` : ""}
       </div>
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>
       <div className={styles.heatLegend} />
-      {/*<Text fontSize={"10px"}>*/}
-      {/*  Total: {counts.reduce((acc, c) => acc + c)}*/}
-      {/*  {isPitcher ? " pitches" : " swings"}*/}
-      {/*</Text>*/}
-      {/*{!isPitcher && (takes || takes === 0) && (*/}
-      {/*  <Text mt="-10px" fontSize={"10px"}>{`+ ${takes} take${takes === 1 ? "" : "s"}`}</Text>*/}
-      {/*)}*/}
+      <div className={styles.modeSelector}>
+        <div className={styles.modeDescription}>{modes[showMode]}</div>
+        <div className={styles.icons}>
+          {icons.map((fileName, idx) => (
+            <Image
+              key={idx}
+              alt={""}
+              w={"16px"}
+              h={"16px"}
+              src={`${FULLCOUNT_ASSETS}/icons/${fileName}${idx === showMode ? "-active" : ""}.svg`}
+              onClick={() => setShowMode(idx)}
+              cursor={"pointer"}
+            />
+          ))}
+        </div>
+      </div>
     </Flex>
   );
 };
