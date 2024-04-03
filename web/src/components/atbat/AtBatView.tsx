@@ -168,12 +168,15 @@ const AtBatView: React.FC = () => {
           pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
         />
       )}
-      {atBatState.data && isBigView && (
-        <ScoreForDesktop
-          atBat={atBatState.data.atBat}
-          pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
-        />
-      )}
+      {atBatState.data &&
+        isBigView &&
+        atBatState.data?.atBat.outcome === 0 &&
+        !showPitchOutcome && (
+          <ScoreForDesktop
+            atBat={atBatState.data.atBat}
+            pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
+          />
+        )}
       {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
         <div
           className={
