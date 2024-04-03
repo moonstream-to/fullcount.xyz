@@ -92,7 +92,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
     },
   );
   return (
-    <div className={styles.container}>
+    <div className={isPitcher ? styles.pitcherContainer : styles.batterContainer}>
       <Image className={styles.image} alt={""} src={token.image} />
       <div className={styles.tokenInfo}>
         {isPitcher ? (
