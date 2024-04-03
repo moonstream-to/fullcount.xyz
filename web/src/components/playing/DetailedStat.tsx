@@ -82,9 +82,9 @@ const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boo
             <DataRow label={"record"} data={pitcherRecord(stats)} />
             <DataRow
               label={"era"}
-              data={String(stats.points_data.pitching_data.earned_run_average)}
+              data={formatDecimal(stats.points_data.pitching_data.earned_run_average)}
             />
-            <DataRow label={"whip"} data={String(stats.points_data.pitching_data.whip)} />
+            <DataRow label={"whip"} data={formatDecimal(stats.points_data.pitching_data.whip)} />
             <DataRow
               label={"strikeouts"}
               data={String(stats.points_data.pitching_data.strikeouts)}
