@@ -1,0 +1,50 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    justify-content: center;
+    z-index: 5;
+    flex-grow: 0;
+    align-self: stretch;
+    width: fit-content;
+    place-self: center;
+    position: absolute;
+    top: 20px;
+}
+
+.pitches {
+    display: flex;
+    padding: 5px 10px;
+    align-items: center;
+    gap: 5px;
+    align-self: center;
+    cursor: pointer;
+}
+
+.pitchNumber {
+    color: #FFF;
+    text-align: center;
+    -webkit-text-stroke-width: thin;
+    -webkit-text-stroke-color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 32px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 32px */
+    letter-spacing: 1.6px;
+}
+
+.content {
+    display: flex;
+    justify-content: center;
+    border: 1px solid #262019;
+}
+
+.score {
+    display: flex;
+    padding: 10px 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    background: #328449;
+}

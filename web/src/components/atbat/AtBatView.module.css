@@ -126,5 +126,19 @@
 
 .playerView {
     display: flex;
-    margin-bottom: -15px;
+    flex-grow: 2;
+    align-items: flex-end;
+}
+
+@media (min-width: 1024px) {
+    .playerView {
+        padding-right: 15px;
+        padding-left: 15px;
+        flex-grow: 0;
+        position: relative;
+        min-height: 643px;
+    }
+    .container {
+        justify-content: center;
+    }
 }

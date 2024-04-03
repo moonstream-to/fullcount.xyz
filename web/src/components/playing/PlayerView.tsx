@@ -141,7 +141,6 @@ const PlayerView = ({
       gap={"10px"}
       alignItems={"center"}
       mx={"auto"}
-      mb={"15px"}
       height={"100%"}
       justifyContent={"end"}
       width="100%"
