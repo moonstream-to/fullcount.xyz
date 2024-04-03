@@ -33,6 +33,16 @@ export default function Document() {
         <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet" />
       </Head>
       <body>
+        {/*<!-- Google Tag Manager (noscript) -->*/}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-KSQM8K8K"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          ></iframe>
+        </noscript>
+        {/*<!-- End Google Tag Manager (noscript) -->*/}
         <Main />
         <NextScript />
       </body>

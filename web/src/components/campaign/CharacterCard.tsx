@@ -8,11 +8,13 @@ import router from "next/router";
 import { useGameContext } from "../../contexts/GameContext";
 import { Spinner, Image } from "@chakra-ui/react";
 import { Character } from "./teams";
+import CharacterProgress from "./CharacterProgress";
 
 const CharacterCard = ({
   character,
   atBat,
   color,
+  isStatsLoading,
 }: {
   character?: {
     token: { address: string; id: string } | undefined;
@@ -20,6 +22,7 @@ const CharacterCard = ({
   };
   atBat?: AtBat;
   color: string;
+  isStatsLoading: boolean;
 }) => {
   const { selectedToken } = useGameContext();
   const queryClient = useQueryClient();
@@ -114,9 +117,20 @@ const CharacterCard = ({
         src={atBat.pitcher?.image ?? atBat.batter?.image}
       />
       <div className={styles.header}>
-        <div className={styles.name}>{character?.character?.name}</div>
+        <div className={styles.name}>{`${character?.character?.name}`}</div>
         <div className={styles.quote}>{character?.character?.quote}</div>
       </div>
+      {(character.character?.wins || character.character?.wins === 0) && (
+        <CharacterProgress
+          isStatsLoading={isStatsLoading}
+          stat={{
+            label: atBat.pitcher ? "Score 3 HR" : "Score a strikeout in 3 pitches",
+            finished: character.character.wins,
+            total: 3,
+          }}
+          color={color}
+        />
+      )}
       <div
         className={styles.startButton}
         style={{ backgroundColor: color }}
