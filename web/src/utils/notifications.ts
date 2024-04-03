@@ -14,3 +14,11 @@ export function showNotification(title: string, body: string) {
     });
   }
 }
+
+export const playSound = (sound: string) => {
+  const soundElement = document.getElementById(sound) as HTMLAudioElement;
+  if (!soundElement) {
+    return;
+  }
+  soundElement.play();
+};

@@ -30,6 +30,7 @@ interface GameContextProps {
   atBatsForPractice: (AtBat | undefined)[] | undefined;
   selectedMode: number;
   selectedTokenIdx: number;
+  joinedNotification: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -72,6 +73,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     atBatsForPractice: undefined,
     selectedMode: 1,
     selectedTokenIdx: 0,
+    joinedNotification: false,
   });
 
   useEffect(() => {

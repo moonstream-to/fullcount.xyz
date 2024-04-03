@@ -8,6 +8,8 @@ import VolumeOn from "../icons/VolumeOn";
 import MoreHorizontal from "../icons/MoreHorizontal";
 import useLogout from "../../hooks/useLogout";
 import { FEEDBACK_FORM_URL, FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { setLocalStorageItem } from "../../utils/localStorage";
+import { useGameContext } from "../../contexts/GameContext";
 
 const Navbar = () => {
   const [isSmallScreen, isMediumScreen] = useMediaQuery([
@@ -24,6 +26,12 @@ const Navbar = () => {
       setIsMenuOpen(false);
       event.stopPropagation();
     }
+  };
+
+  const { joinedNotification, updateContext } = useGameContext();
+  const handleNotificationClick = () => {
+    setLocalStorageItem("joinedNotification", !joinedNotification);
+    updateContext({ joinedNotification: !joinedNotification });
   };
 
   useEffect(() => {
@@ -63,6 +71,10 @@ const Navbar = () => {
               {/*<div className={styles.menuItem}>About</div>*/}
               {/*<div className={styles.menuItem}>Achievements</div>*/}
               {/*<div className={styles.menuItem}>Leaderboards</div>*/}
+              <div
+                className={styles.menuItem}
+                onClick={handleNotificationClick}
+              >{`Notifications - ${joinedNotification ? "on" : "off"}`}</div>
               <div
                 className={styles.menuItem}
                 onClick={() => {

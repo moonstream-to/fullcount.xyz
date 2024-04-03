@@ -17,7 +17,7 @@ import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
 import React, { useEffect, useState } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
-import { showNotification } from "../utils/notifications";
+import { playSound, showNotification } from "../utils/notifications";
 
 const Playing = () => {
   const {
@@ -29,6 +29,7 @@ const Playing = () => {
     invitedTo,
     isCreateCharacter,
     tokensCache,
+    joinedNotification,
   } = useGameContext();
   const { user } = useUser();
   const [ownedAtBatsSnapshot, setOwnedAtBatsSnapshot] = useState<AtBat[] | undefined>(undefined);
@@ -81,8 +82,10 @@ const Playing = () => {
                   (ownedAtBat) => ownedAtBat.id === atBat.id && ownedAtBat.progress === 3,
                 )
               ) {
-                console.log("joined");
-                showNotification("Your at-bat is joined", "");
+                if (joinedNotification) {
+                  playSound("clapping");
+                  showNotification("Your at-bat is joined", "");
+                }
               }
             });
         }
