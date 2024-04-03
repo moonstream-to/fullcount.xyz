@@ -1,0 +1,62 @@
+.pitcherContainer, .batterContainer {
+    display: flex;
+    padding: 14px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    border: 1px solid #262019;
+    background: #EBE4DC;
+    min-height: 643px;
+    z-index: 2;
+    position: absolute;
+    max-width: 290px;
+    left: calc((100vw - 66vh) / 4);
+    transform: translateX(-35%);
+
+}
+
+.batterContainer {
+    left: calc(100vw - (100vw - 66vh) / 4);
+    transform: translateX(-65%);
+}
+
+.image {
+    width: 260px;
+    min-width: 260px;
+
+    height: 260px;
+    border: 1px solid #262019;
+    background-color: white;
+}
+
+.tokenInfo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tokenName {
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%; /* 28.8px */
+}
+
+.tokenId {
+    color: #8EAB8F;
+    font-family: Bangers, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+}
+
+.detailedStat {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    align-self: stretch;
+}

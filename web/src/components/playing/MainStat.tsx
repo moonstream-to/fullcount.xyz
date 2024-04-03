@@ -1,6 +1,7 @@
 import styles from "./MainStat.module.css";
 import { PlayerStats } from "../../types";
 import { Box, Flex, Text } from "@chakra-ui/react";
+import { useEffect } from "react";
 
 const formatDecimal = (value: number) => {
   if (!value) {
@@ -16,6 +17,7 @@ const pitcherRecord = (stats: PlayerStats): string => {
   const wins =
     stats.points_data.pitching_data.strikeouts + stats.points_data.pitching_data.in_play_outs;
   const losses =
+    stats.points_data.pitching_data.walks +
     stats.points_data.pitching_data.singles +
     stats.points_data.pitching_data.doubles +
     stats.points_data.pitching_data.triples +
@@ -24,6 +26,9 @@ const pitcherRecord = (stats: PlayerStats): string => {
 };
 
 const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
+  useEffect(() => {
+    console.log(stats, isPitcher);
+  }, []);
   return (
     <>
       {isPitcher && stats.points_data?.pitching_data && (

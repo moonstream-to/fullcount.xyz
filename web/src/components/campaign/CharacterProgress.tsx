@@ -23,7 +23,11 @@ const CharacterProgress = ({
         <div className={styles.notFinishedBar} style={{ borderColor: color }}>
           <div
             className={`${styles.finishedBar} ${isStatsLoading ? styles.loadingBar : ""}`}
-            style={!isStatsLoading ? {} : { width: `${(100 * stat.finished) / stat.total}%` }}
+            style={
+              isStatsLoading
+                ? {}
+                : { width: `${(100 * Math.min(stat.finished, stat.total)) / stat.total}%` }
+            }
           />
         </div>
       )}
