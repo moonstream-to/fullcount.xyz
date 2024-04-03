@@ -76,7 +76,7 @@ const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boo
     <div className={styles.container}>
       <div className={styles.header}>season statistics</div>
       <div className={styles.dataTable}>
-        {isPitcher && (
+        {isPitcher && stats.points_data.pitching_data && (
           <>
             <DataRow label={"at bats"} data={String(pitcherAtBatsCount(stats))} />
             <DataRow label={"record"} data={pitcherRecord(stats)} />
@@ -97,7 +97,7 @@ const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boo
             />
           </>
         )}
-        {!isPitcher && (
+        {!isPitcher && stats.points_data.batting_data && (
           <>
             <DataRow label={"at bats"} data={String(stats.points_data.batting_data.at_bats)} />
             <DataRow label={"record"} data={batterRecord(stats)} />
