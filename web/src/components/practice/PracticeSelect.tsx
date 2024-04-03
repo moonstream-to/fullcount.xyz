@@ -3,15 +3,15 @@ import parentStyles from "../HomePage/PvpView.module.css";
 import { useState } from "react";
 import { AtBat, OwnedToken, Token } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import TokenToPlay from "../HomePage/TokenToPlay";
 import { useMutation, useQueryClient } from "react-query";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import router from "next/router";
 import useUser from "../../contexts/UserContext";
-import { Image, Spinner, useToast } from "@chakra-ui/react";
+import { Image, Spinner } from "@chakra-ui/react";
 import useMoonToast from "../../hooks/useMoonToast";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import ExitIcon from "../icons/ExitIcon";
+import TokenCardSmall from "../atbat/TokenCardSmall";
 
 const levels = ["Easy", "Medium", "Hard"];
 
@@ -123,7 +123,7 @@ const PracticeSelect = () => {
         transform={"translateX(50%) translateY(50%)"}
       />
       {getSelectedToken(atBatsForPractice[selectedLevel]).token && (
-        <TokenToPlay
+        <TokenCardSmall
           token={getSelectedToken(atBatsForPractice[selectedLevel]).token}
           isPitcher={getSelectedToken(atBatsForPractice[selectedLevel]).isPitcher}
           showId={false}
