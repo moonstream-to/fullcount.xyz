@@ -95,7 +95,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
     <div className={isPitcher ? styles.pitcherContainer : styles.batterContainer}>
       <Image className={styles.image} alt={""} src={token.image} />
       <div className={styles.tokenInfo}>
-        {isPitcher ? (
+        {!isPitcher ? (
           <BatIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} />
         ) : (
           <BallIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} />
