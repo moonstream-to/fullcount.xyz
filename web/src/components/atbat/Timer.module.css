@@ -14,3 +14,9 @@
     font-weight: 400;
     line-height: normal;
 }
+
+@media (min-width: 1024px) {
+    .container {
+        font-size: 26px;
+    }
+}
