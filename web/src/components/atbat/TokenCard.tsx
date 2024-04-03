@@ -107,22 +107,24 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
         <MainStat stats={isPitcher ? pitcherStats.data : batterStats.data} isPitcher={isPitcher} />
       )}
       <div className={styles.detailedStat}>
-        {isPitcher && pitchDistributions.data && (
-          <HeatMap
-            fast={pitchDistributions.data.fast}
-            rates={pitchDistributions.data.rates}
-            counts={pitchDistributions.data.counts}
-            isPitcher
-          />
-        )}
-        {!isPitcher && swingDistributions.data && (
-          <HeatMap
-            takes={swingDistributions.data.takes}
-            rates={swingDistributions.data.rates}
-            counts={swingDistributions.data.counts}
-            isPitcher={false}
-          />
-        )}
+        <div style={{ minWidth: "130px" }}>
+          {isPitcher && pitchDistributions.data && (
+            <HeatMap
+              fast={pitchDistributions.data.fast}
+              rates={pitchDistributions.data.rates}
+              counts={pitchDistributions.data.counts}
+              isPitcher
+            />
+          )}
+          {!isPitcher && swingDistributions.data && (
+            <HeatMap
+              takes={swingDistributions.data.takes}
+              rates={swingDistributions.data.rates}
+              counts={swingDistributions.data.counts}
+              isPitcher={false}
+            />
+          )}
+        </div>
         {((isPitcher && pitcherStats.data) || (!isPitcher && batterStats.data)) && (
           <DetailedStat
             stats={isPitcher ? pitcherStats.data : batterStats.data}
