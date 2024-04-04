@@ -43,7 +43,6 @@ const Playing = () => {
     async () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
-      // const waitingTokens = ownedTokens.map((t) => t.tokenProgress === 2);
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
       }

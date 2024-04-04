@@ -142,7 +142,6 @@ const AtBatView: React.FC = () => {
       }
       const { gameContract } = getContracts();
       const progress = await gameContract.methods.sessionProgress(currentSessionId).call();
-      console.log(currentSessionProgress.data, progress);
       if (Number(currentSessionProgress.data) === 2 && Number(progress) === 3) {
         playSound("joinedNotification");
       }
@@ -154,10 +153,6 @@ const AtBatView: React.FC = () => {
       enabled: !!currentSessionId && joinedNotification,
     },
   );
-
-  useEffect(() => {
-    console.log(selectedToken, atBatState.data?.atBat.batter);
-  }, [atBatState.data?.atBat.batter, selectedToken]);
 
   const isSameToken = (a: Token | undefined, b: Token | undefined) => {
     if (!a || !b) return false;
