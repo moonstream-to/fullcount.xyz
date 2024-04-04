@@ -49,7 +49,7 @@ const HeatMap = ({
       >
         {showMode !== 0 && (
           <Text fontSize={"9px"} color={"black"} fontWeight={"400"}>
-            {showMode === 1 ? (rates[index] * 100).toFixed(2) : counts[index]}
+            {showMode === 2 ? (rates[index] * 100).toFixed(2) : counts[index]}
           </Text>
         )}
       </Box>

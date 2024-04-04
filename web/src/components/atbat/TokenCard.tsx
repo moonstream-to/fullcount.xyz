@@ -51,9 +51,10 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       const API_URL = "https://api.fullcount.xyz/pitch_distribution";
       const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
       const counts = new Array(25).fill(0);
-      res.data.pitch_distribution.forEach(
-        (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
-      );
+      res.data.pitch_distribution.forEach((l: PitchLocation) => {
+        counts[l.pitch_vertical * 5 + l.pitch_horizontal] =
+          counts[l.pitch_vertical * 5 + l.pitch_horizontal] + l.count;
+      });
       const total = counts.reduce((acc, value) => acc + value);
       const fast = res.data.pitch_distribution.reduce(
         (acc: number, value: { pitch_speed: 0 | 1; count: number }) =>
