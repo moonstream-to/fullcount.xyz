@@ -6,7 +6,6 @@ import PlayView from "./playing/PlayView";
 import styles from "./Playing.module.css";
 import { useQuery } from "react-query";
 import { AtBat, OwnedToken } from "../types";
-import { fetchOwnedBLBTokens } from "../tokenInterfaces/BLBTokenAPI";
 import { fetchFullcountPlayerTokens } from "../tokenInterfaces/FullcountPlayerAPI";
 import queryCacheProps from "../hooks/hookCommon";
 import useUser from "../contexts/UserContext";
@@ -17,7 +16,13 @@ import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
 import React, { useEffect, useState } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
-import { playSound, showNotification } from "../utils/notifications";
+import { playSound } from "../utils/notifications";
+import { getContracts } from "../utils/getWeb3Contracts";
+import { getMulticallResults } from "../utils/multicall";
+
+import { AbiItem } from "web3-utils";
+import FullcountABIImported from "../web3/abi/FullcountABI.json";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
   const {
@@ -32,13 +37,13 @@ const Playing = () => {
     joinedNotification,
   } = useGameContext();
   const { user } = useUser();
-  const [ownedAtBatsSnapshot, setOwnedAtBatsSnapshot] = useState<AtBat[] | undefined>(undefined);
 
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
     async () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
+      // const waitingTokens = ownedTokens.map((t) => t.tokenProgress === 2);
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
       }
@@ -50,6 +55,63 @@ const Playing = () => {
     },
   );
 
+  const tokenStatuses = useQuery(
+    ["token_statuses", ownedTokens.data, joinedNotification],
+    async () => {
+      if (!ownedTokens.data || ownedTokens.data.length < 1 || !joinedNotification) {
+        return;
+      }
+      const { gameContract } = getContracts();
+      const queries: { target: string; callData: string }[] = [];
+      ownedTokens.data.forEach((ownedToken) => {
+        queries.push({
+          target: gameContract.options.address,
+          callData: gameContract.methods
+            .StakedSession(ownedToken.address, ownedToken.id)
+            .encodeABI(),
+        });
+        let stakedSession;
+        if (tokenStatuses.data) {
+          stakedSession = tokenStatuses.data.find(
+            (t) => t.address === ownedToken.address && t.id === ownedToken.id,
+          )?.stakedSessionID;
+        }
+        queries.push({
+          target: gameContract.options.address,
+          callData: gameContract.methods.sessionProgress(stakedSession ?? 0).encodeABI(),
+        });
+      });
+
+      const [stakedSessions, progresses] = await getMulticallResults(
+        FullcountABI,
+        ["StakedSession", "sessionProgress"],
+        queries,
+      );
+      const result = ownedTokens.data.map((t, idx) => ({
+        ...t,
+        stakedSession: stakedSessions[idx],
+        progress: progresses[idx],
+      }));
+      if (
+        tokenStatuses.data &&
+        tokenStatuses.data.some(
+          (ts) =>
+            ts.progress === "2" &&
+            result.some((t) => t.address === ts.address && t.id === ts.id && t.progress === "3"),
+        )
+      ) {
+        playSound("clapping");
+      }
+
+      return result;
+    },
+    {
+      enabled: !!ownedTokens.data && joinedNotification,
+      refetchIntervalInBackground: true,
+      refetchInterval: 10000,
+    },
+  );
+
   const atBats = useQuery(
     ["atBats"],
     async () => {
@@ -58,38 +120,6 @@ const Playing = () => {
     {
       refetchInterval: 5000,
       onSuccess: (data: any) => {
-        console.log(data);
-        const ownedAtBats: AtBat[] = data.atBats.filter(
-          (a: AtBat) =>
-            a.progress !== 6 &&
-            ownedTokens.data?.some(
-              (t) =>
-                (t.address === a.pitcher?.address && t.id === a.pitcher.id) ||
-                (t.address === a.batter?.address && t.id === a.batter.id),
-            ),
-        );
-        if (ownedAtBatsSnapshot) {
-          console.log(
-            ownedAtBatsSnapshot.filter((atBat) => atBat.progress === 2),
-            ownedAtBats.filter((atBat) => atBat.progress === 3),
-          );
-          ownedAtBatsSnapshot
-            .filter((atBat) => atBat.progress === 2)
-            .forEach((atBat) => {
-              console.log(atBat);
-              if (
-                ownedAtBats.some(
-                  (ownedAtBat) => ownedAtBat.id === atBat.id && ownedAtBat.progress === 3,
-                )
-              ) {
-                if (joinedNotification) {
-                  playSound("clapping");
-                  showNotification("Your at-bat is joined", "");
-                }
-              }
-            });
-        }
-        setOwnedAtBatsSnapshot(ownedAtBats);
         if (data.tokens.length !== tokensCache.length) {
           updateContext({ tokensCache: [...data.tokens] });
         }
@@ -154,7 +184,9 @@ const Playing = () => {
         <CreateCharacterForm onClose={() => updateContext({ isCreateCharacter: false })} />
       )}
 
-      {ownedTokens.data && ownedTokens.data.length < 1 && <CreateCharacterForm />}
+      {ownedTokens.data && ownedTokens.data.length < 1 && !ownedTokens.error && (
+        <CreateCharacterForm />
+      )}
 
       {!selectedSession &&
         ownedTokens.data &&
