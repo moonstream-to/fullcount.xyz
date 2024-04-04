@@ -81,6 +81,14 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
         });
         router.push(`atbats/?session_id=${data.sessionID}`);
       },
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount, error) => {
+        console.log(error);
+        if (failureCount < 3) {
+          console.log("Will retry in 5, maybe 10 seconds");
+        }
+        return failureCount < 3;
+      },
       onError: (e: Error) => {
         toast("Start failed: " + e?.message, "error");
       },
