@@ -94,7 +94,7 @@ export async function startSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 10; attempt++) {
+      for (let attempt = 1; attempt <= 20; attempt++) {
         console.log("checking sessionState after start, attempt: ", attempt);
         const sessionProgress = await gameContract.methods
           .sessionProgress(response.data.session_id)
@@ -108,9 +108,7 @@ export async function startSessionFullcountPlayer({
         await delay(3 * 1000);
       }
       if (!isSuccess) {
-        throw new Error(
-          "Starting session: FCPlayerAPI success, sessionProgress unchanged in 20sec",
-        );
+        throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
       return response.data;
@@ -151,7 +149,7 @@ export async function joinSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 10; attempt++) {
+      for (let attempt = 1; attempt <= 20; attempt++) {
         console.log("checking sessionState after join, attempt: ", attempt);
         const sessionProgress = await gameContract.methods.sessionProgress(sessionID).call();
         if (Number(sessionProgress) !== 2) {
@@ -163,7 +161,7 @@ export async function joinSessionFullcountPlayer({
         await delay(3 * 1000);
       }
       if (!isSuccess) {
-        throw new Error("Joining: FCPlayerAPI success, sessionProgress unchanged in 20sec");
+        throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
       sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
@@ -207,7 +205,7 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 10; attempt++) {
+      for (let attempt = 1; attempt <= 20; attempt++) {
         console.log("checking token state after unstake, attempt: ", attempt);
         const session = await gameContract.methods.StakedSession(token.address, token.id).call();
         if (Number(session) === 0) {
@@ -219,7 +217,7 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
         await delay(3 * 1000);
       }
       if (!isSuccess) {
-        throw new Error("Unstaking: FCPlayerAPI success, sessionProgress unchanged in 20sec");
+        throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
       return response.data;
