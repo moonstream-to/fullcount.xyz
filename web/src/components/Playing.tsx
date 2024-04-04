@@ -5,8 +5,7 @@ import SessionsView from "./sessions/SessionsView";
 import PlayView from "./playing/PlayView";
 import styles from "./Playing.module.css";
 import { useQuery } from "react-query";
-import { OwnedToken } from "../types";
-import { fetchOwnedBLBTokens } from "../tokenInterfaces/BLBTokenAPI";
+import { AtBat, OwnedToken } from "../types";
 import { fetchFullcountPlayerTokens } from "../tokenInterfaces/FullcountPlayerAPI";
 import queryCacheProps from "../hooks/hookCommon";
 import useUser from "../contexts/UserContext";
@@ -15,8 +14,15 @@ import PlayingLayout from "./layout/PlayingLayout";
 import ChooseToken from "./tokens/ChooseToken";
 import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
+import { playSound } from "../utils/notifications";
+import { getContracts } from "../utils/getWeb3Contracts";
+import { getMulticallResults } from "../utils/multicall";
+
+import { AbiItem } from "web3-utils";
+import FullcountABIImported from "../web3/abi/FullcountABI.json";
+const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
   const {
@@ -28,6 +34,7 @@ const Playing = () => {
     invitedTo,
     isCreateCharacter,
     tokensCache,
+    joinedNotification,
   } = useGameContext();
   const { user } = useUser();
 
@@ -47,6 +54,63 @@ const Playing = () => {
     },
   );
 
+  const tokenStatuses = useQuery(
+    ["token_statuses", ownedTokens.data, joinedNotification],
+    async () => {
+      if (!ownedTokens.data || ownedTokens.data.length < 1 || !joinedNotification) {
+        return;
+      }
+      const { gameContract } = getContracts();
+      const queries: { target: string; callData: string }[] = [];
+      ownedTokens.data.forEach((ownedToken) => {
+        queries.push({
+          target: gameContract.options.address,
+          callData: gameContract.methods
+            .StakedSession(ownedToken.address, ownedToken.id)
+            .encodeABI(),
+        });
+        let stakedSession;
+        if (tokenStatuses.data) {
+          stakedSession = tokenStatuses.data.find(
+            (t) => t.address === ownedToken.address && t.id === ownedToken.id,
+          )?.stakedSessionID;
+        }
+        queries.push({
+          target: gameContract.options.address,
+          callData: gameContract.methods.sessionProgress(stakedSession ?? 0).encodeABI(),
+        });
+      });
+
+      const [stakedSessions, progresses] = await getMulticallResults(
+        FullcountABI,
+        ["StakedSession", "sessionProgress"],
+        queries,
+      );
+      const result = ownedTokens.data.map((t, idx) => ({
+        ...t,
+        stakedSession: stakedSessions[idx],
+        progress: progresses[idx],
+      }));
+      if (
+        tokenStatuses.data &&
+        tokenStatuses.data.some(
+          (ts) =>
+            ts.progress === "2" &&
+            result.some((t) => t.address === ts.address && t.id === ts.id && t.progress === "3"),
+        )
+      ) {
+        playSound("clapping");
+      }
+
+      return result;
+    },
+    {
+      enabled: !!ownedTokens.data && joinedNotification,
+      refetchIntervalInBackground: true,
+      refetchInterval: 10000,
+    },
+  );
+
   const atBats = useQuery(
     ["atBats"],
     async () => {
@@ -55,7 +119,6 @@ const Playing = () => {
     {
       refetchInterval: 5000,
       onSuccess: (data: any) => {
-        console.log(data);
         if (data.tokens.length !== tokensCache.length) {
           updateContext({ tokensCache: [...data.tokens] });
         }
@@ -120,7 +183,9 @@ const Playing = () => {
         <CreateCharacterForm onClose={() => updateContext({ isCreateCharacter: false })} />
       )}
 
-      {ownedTokens.data && ownedTokens.data.length < 1 && <CreateCharacterForm />}
+      {ownedTokens.data && ownedTokens.data.length < 1 && !ownedTokens.error && (
+        <CreateCharacterForm />
+      )}
 
       {!selectedSession &&
         ownedTokens.data &&

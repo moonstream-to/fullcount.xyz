@@ -17,6 +17,7 @@ import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
 import { sendReport } from "../../utils/humbug";
+import { playSound } from "../../utils/notifications";
 
 const outcomes = [
   "In Progress",
@@ -57,7 +58,7 @@ const AtBatView: React.FC = () => {
   const router = useRouter();
   const [atBatId, setAtBatId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { tokensCache, updateContext, selectedToken } = useGameContext();
+  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
@@ -128,9 +129,30 @@ const AtBatView: React.FC = () => {
     },
   );
 
-  useEffect(() => {
-    console.log(selectedToken, atBatState.data?.atBat.batter);
-  }, [atBatState.data?.atBat.batter, selectedToken]);
+  const currentSessionProgress = useQuery(
+    ["currentSessionProgress", currentSessionId, joinedNotification],
+    async () => {
+      if (
+        !currentSessionId ||
+        !joinedNotification ||
+        !atBatState.data ||
+        atBatState.data?.atBat.pitches.length > 1
+      ) {
+        return;
+      }
+      const { gameContract } = getContracts();
+      const progress = await gameContract.methods.sessionProgress(currentSessionId).call();
+      if (Number(currentSessionProgress.data) === 2 && Number(progress) === 3) {
+        playSound("joinedNotification");
+      }
+      return progress;
+    },
+    {
+      refetchIntervalInBackground: true,
+      refetchInterval: 10000,
+      enabled: !!currentSessionId && joinedNotification,
+    },
+  );
 
   const isSameToken = (a: Token | undefined, b: Token | undefined) => {
     if (!a || !b) return false;

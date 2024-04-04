@@ -2,7 +2,8 @@ import Head from "next/head";
 
 import { Flex } from "@chakra-ui/react";
 
-import { FULLCOUNT_ASSETS } from "../../constants";
+import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../../constants";
+import React from "react";
 
 export const siteTitle = "Fullcount - baseball game";
 
@@ -36,6 +37,11 @@ export default function Layout({
         fontFamily="Pangolin, cursive"
         direction={"column"}
       >
+        <audio
+          id="joinedNotification"
+          src={`${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`}
+          preload={"auto"}
+        />
         {children}
       </Flex>
     </div>
