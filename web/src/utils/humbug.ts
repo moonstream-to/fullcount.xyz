@@ -12,7 +12,7 @@ export const sendReport = async (title: string, content: string, tags: string[])
       "https://spire.bugout.dev/humbug/reports?sync=true",
       {
         title: title,
-        content: `${info()} - ${content}`,
+        content: info(content),
         tags: [...tags, ...defaultTags()],
       },
       {
@@ -31,10 +31,20 @@ export const sendReport = async (title: string, content: string, tags: string[])
   }
 };
 
-const info = () => {
-  const currentDateTime = new Date();
-  const usDateTimeFormat = currentDateTime.toLocaleString("en-US");
-  return usDateTimeFormat;
+const info = (content: string) => {
+  const now = new Date();
+  const UTC = now.toUTCString();
+  try {
+    if (content) {
+      const contentObject = JSON.parse(content);
+      if (contentObject) {
+        return JSON.stringify({ ...contentObject, UTC });
+      }
+    }
+    return JSON.stringify({ UTC });
+  } catch (error) {
+    return JSON.stringify({ UTC, internalError: "can't parse content", error });
+  }
 };
 
 const defaultTags = () => {
