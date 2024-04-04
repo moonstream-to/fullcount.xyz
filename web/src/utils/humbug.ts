@@ -12,7 +12,7 @@ export const sendReport = async (title: string, content: string, tags: string[])
       "https://spire.bugout.dev/humbug/reports?sync=true",
       {
         title: title,
-        content: info(content),
+        content: content,
         tags: [...tags, ...defaultTags()],
       },
       {
