@@ -94,7 +94,7 @@ export async function startSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 20; attempt++) {
+      for (let attempt = 1; attempt <= 30; attempt++) {
         console.log("checking sessionState after start, attempt: ", attempt);
         const sessionProgress = await gameContract.methods
           .sessionProgress(response.data.session_id)
@@ -149,7 +149,7 @@ export async function joinSessionFullcountPlayer({
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 20; attempt++) {
+      for (let attempt = 1; attempt <= 30; attempt++) {
         console.log("checking sessionState after join, attempt: ", attempt);
         const sessionProgress = await gameContract.methods.sessionProgress(sessionID).call();
         if (Number(sessionProgress) !== 2) {
@@ -205,7 +205,7 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
     .then(async (response) => {
       const { gameContract } = getContracts();
       let isSuccess = false;
-      for (let attempt = 1; attempt <= 20; attempt++) {
+      for (let attempt = 1; attempt <= 30; attempt++) {
         console.log("checking token state after unstake, attempt: ", attempt);
         const session = await gameContract.methods.StakedSession(token.address, token.id).call();
         if (Number(session) === 0) {
@@ -281,7 +281,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
           await delay(3 * 1000);
         }
         if (!isSuccess) {
-          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 30sec");
         }
       } else {
         for (let attempt = 1; attempt <= 10; attempt++) {
@@ -296,7 +296,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
           await delay(3 * 1000);
         }
         if (!isSuccess) {
-          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 30sec");
         }
       }
       console.log("Success:", response.data);
@@ -359,7 +359,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
           await delay(3 * 1000);
         }
         if (!isSuccess) {
-          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
+          throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 30sec");
         }
       } else {
         for (let attempt = 1; attempt <= 10; attempt++) {
@@ -372,7 +372,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
           await delay(3 * 1000);
         }
         if (!isSuccess) {
-          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
+          throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 30sec");
         }
       }
       console.log("Success:", response.data);
