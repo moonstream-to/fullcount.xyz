@@ -74,7 +74,7 @@ const PitcherViewMobile = ({
         queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
-        toast("Commmit failed." + e?.message, "error");
+        console.log("Commmit failed." + e?.message);
       },
     },
   );
