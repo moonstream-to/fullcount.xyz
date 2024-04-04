@@ -1,5 +1,4 @@
 import styles from "./PvpView.module.css";
-import TokenToPlay from "./TokenToPlay";
 import { AtBat, OwnedToken } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import { useRouter } from "next/router";

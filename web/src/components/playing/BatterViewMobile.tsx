@@ -75,7 +75,7 @@ const BatterViewMobile = ({
         queryClient.refetchQueries("atBat");
       },
       onError: (e: Error) => {
-        toast("Commmit failed." + e?.message, "error");
+        console.log("Commit failed." + e?.message);
       },
     },
   );

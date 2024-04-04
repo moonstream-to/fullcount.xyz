@@ -105,7 +105,7 @@ export async function startSessionFullcountPlayer({
         } else {
           console.log(sessionProgress, response.data);
         }
-        await delay(2 * 1000);
+        await delay(3 * 1000);
       }
       if (!isSuccess) {
         throw new Error(
@@ -160,7 +160,7 @@ export async function joinSessionFullcountPlayer({
         } else {
           console.log(sessionProgress, response.data);
         }
-        await delay(2 * 1000);
+        await delay(3 * 1000);
       }
       if (!isSuccess) {
         throw new Error("Joining: FCPlayerAPI success, sessionProgress unchanged in 20sec");
@@ -280,7 +280,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
             console.log(sessionState, response.data);
           }
           console.log("checking sessionState after reveal, attempt: ", attempt);
-          await delay(2 * 1000);
+          await delay(3 * 1000);
         }
         if (!isSuccess) {
           throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
@@ -295,7 +295,7 @@ export const commitOrRevealPitchFullcountPlayer = ({
             console.log(sessionState, response.data);
           }
           console.log("checking sessionState after commit, attempt: ", attempt);
-          await delay(2 * 1000);
+          await delay(3 * 1000);
         }
         if (!isSuccess) {
           throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");
@@ -358,7 +358,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
             break;
           }
           console.log("checking sessionState after reveal, attempt: ", attempt);
-          await delay(2 * 1000);
+          await delay(3 * 1000);
         }
         if (!isSuccess) {
           throw new Error("Reveal: FCPlayerAPI success, sessionState unchanged in 20sec");
@@ -371,7 +371,7 @@ export const commitOrRevealSwingFullcountPlayer = ({
             break;
           }
           console.log("checking sessionState after commit, attempt: ", attempt);
-          await delay(2 * 1000);
+          await delay(3 * 1000);
         }
         if (!isSuccess) {
           throw new Error("Commit: FCPlayerAPI success, sessionState unchanged in 20sec");

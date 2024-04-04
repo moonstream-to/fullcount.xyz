@@ -16,6 +16,7 @@ import Outcome2, { sessionOutcomeType } from "./Outcome2";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
+import { sendReport } from "../../utils/humbug";
 
 const outcomes = [
   "In Progress",
@@ -136,13 +137,18 @@ const AtBatView: React.FC = () => {
     return a.id === b.id && a.address === b.address;
   };
 
+  const handleExitClick = () => {
+    sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
+    router.push("/");
+  };
+
   return (
     <div
       className={styles.container}
       style={{ maxHeight: windowHeight ? `${windowHeight}px` : "100vh" }}
     >
-      <div className={styles.exitButton} onClick={() => router.push("/")}>
-        <ExitIcon onClick={() => router.push("/")} />
+      <div className={styles.exitButton} onClick={handleExitClick}>
+        <ExitIcon />
       </div>
       <Image
         minW={"441px"}
@@ -157,7 +163,7 @@ const AtBatView: React.FC = () => {
         showPitchOutcome &&
         atBatState.data.atBat.outcome !== 0 &&
         atBatState.data.atBat.pitches.length > 0 && (
-          <div className={styles.homeButton} onClick={() => router.push("/")}>
+          <div className={styles.homeButton} onClick={handleExitClick}>
             Go to home page
           </div>
         )}
