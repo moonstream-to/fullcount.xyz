@@ -81,6 +81,14 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           router.push(`atbats/?id=${atBatId}`);
         }
       },
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount, error) => {
+        console.log(error);
+        if (failureCount < 3) {
+          console.log("Will retry in 5, maybe 10 seconds");
+        }
+        return failureCount < 3;
+      },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
       },
