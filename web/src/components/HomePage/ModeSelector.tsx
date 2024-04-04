@@ -1,5 +1,6 @@
 import styles from "./ModeSelector.module.css";
 import { useGameContext } from "../../contexts/GameContext";
+import { sendReport } from "../../utils/humbug";
 
 const modes = [
   {
@@ -18,6 +19,13 @@ const modes = [
 
 const ModeSelector = () => {
   const { selectedMode, updateContext } = useGameContext();
+  const handleClick = (modeIdx: number) => {
+    sendReport(`Mode selected: ${modes[modeIdx].title}`, "", [
+      "type:click",
+      `click:${modes[modeIdx].title}`,
+    ]);
+    updateContext({ selectedMode: modeIdx });
+  };
   return (
     <div className={styles.container}>
       <div className={styles.buttons}>
@@ -25,7 +33,7 @@ const ModeSelector = () => {
           <div
             key={idx}
             className={selectedMode === idx ? styles.buttonSelected : styles.button}
-            onClick={() => updateContext({ selectedMode: idx })}
+            onClick={() => handleClick(idx)}
           >
             {m.title}
           </div>
