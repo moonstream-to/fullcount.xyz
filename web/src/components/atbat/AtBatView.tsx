@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useDebugValue } from "react";
 import styles from "./AtBatView.module.css";
 import { useQuery, useQueryClient, UseQueryResult } from "react-query";
 import { getAtBat } from "../../services/fullcounts";
@@ -11,13 +11,14 @@ import { AtBatStatus, OwnedToken, Token } from "../../types";
 import BatterViewMobile from "../playing/BatterViewMobile";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { Image, useMediaQuery } from "@chakra-ui/react";
+import { Image, useDisclosure, useMediaQuery } from "@chakra-ui/react";
 import Outcome2, { sessionOutcomeType } from "./Outcome2";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
 import { sendReport } from "../../utils/humbug";
 import { playSound } from "../../utils/notifications";
+import ExitDialog from "./ExitDialog";
 
 const outcomes = [
   "In Progress",
@@ -63,6 +64,7 @@ const AtBatView: React.FC = () => {
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -160,8 +162,15 @@ const AtBatView: React.FC = () => {
   };
 
   const handleExitClick = () => {
-    sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
-    router.push("/");
+    if (
+      atBatState.data?.atBat.pitches.length === 1 &&
+      atBatState.data.atBat.pitches[0].progress == 2
+    ) {
+      onOpen();
+    } else {
+      sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
+      router.push("/");
+    }
   };
 
   return (
@@ -171,6 +180,9 @@ const AtBatView: React.FC = () => {
     >
       <div className={styles.exitButton} onClick={handleExitClick}>
         <ExitIcon />
+        {isOpen && selectedToken && (
+          <ExitDialog token={selectedToken} sessionId={currentSessionId} onClose={onClose} />
+        )}
       </div>
       <Image
         minW={"441px"}
