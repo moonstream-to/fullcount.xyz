@@ -1,5 +1,6 @@
-import { Box, useToast } from "@chakra-ui/react";
+import { Box, Flex, useToast } from "@chakra-ui/react";
 import { useCallback } from "react";
+import ErrorIcon from "../components/icons/ErrorIcon";
 
 const useMoonToast = () => {
   const chakraToast = useToast();
@@ -13,10 +14,17 @@ const useMoonToast = () => {
     ) => {
       const colors = {
         info: "white",
-        warning: "yellow",
+        warning: "white",
         success: "white",
-        error: "#F56646",
+        error: "#262019",
         loading: "white",
+      };
+      const bgColors = {
+        info: "#7E8E7F",
+        warning: "#7E8E7F",
+        success: "#7E8E7F",
+        error: "#d99c9c",
+        loading: "#7E8E7F",
       };
       const userTitle = title ?? message?.response?.statusText ?? type;
 
@@ -33,18 +41,19 @@ const useMoonToast = () => {
           position: "top",
           duration,
           render: () => (
-            <Box
-              borderRadius="15px"
-              border="2px solid #F56646"
+            <Flex
+              border="1px solid #262019"
               textAlign="center"
               color={type ? colors[type] : "white"}
-              borderColor={type ? colors[type] : "white"}
-              py={3}
-              px={5}
-              bg="#353535"
+              backgroundColor={type ? bgColors[type] : "white"}
+              padding="10px"
+              gap="10px"
+              fontSize={"14px"}
+              width={"300px"}
             >
+              {type === "error" && <ErrorIcon />}
               {message}
-            </Box>
+            </Flex>
           ),
         });
       }
