@@ -37,7 +37,6 @@
     max-height: 36px;
     z-index: 2;
     white-space: nowrap;
-
 }
 .positiveOutcome {
     color: #328449;
@@ -46,7 +45,6 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-
 }
 
 .negativeOutcome {
@@ -58,54 +56,56 @@
     line-height: normal;
 }
 
-.negativeOutcome2 {
+
+.positiveOutcome2, .negativeOutcome2 {
     display: flex;
     align-items: center;
-    padding-top: 5px;
+    padding-top: 7px;
     justify-content: center;
     position: absolute;
     right: 50%;
-    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
     transform: translateX(50%);
-    height: 49px;
-    width: 81px;
-    background-image: url(https://static.simiotics.com/fullcount/outcome-bubble-loss.svg);
     z-index: 3;
-    color: #CD7676;
     text-align: center;
     font-family: Bangers, cursive;
-    font-size: 16px;
     font-style: normal;
     font-weight: 400;
     line-height: normal;
     fill: rgba(255, 255, 255, 0.70);
     stroke-width: 1px;
+
+    top: 35.5px;
+    font-size: 32px;
+    width: 162px;
+    height: 98px;
+}
+
+.negativeOutcome2 {
     stroke: #CD7676;
+    color: #CD7676;
+    background-image: url(https://static.fullcount.xyz/web/elements/outcome-bubble-loss-medium.svg);
 }
 
 .positiveOutcome2 {
-    display: flex;
-    align-items: center;
-    padding-top: 5px;
-    justify-content: center;
-    position: absolute;
-    right: 50%;
-    top: calc(12% + 25px); /*35.5 + 13.5 + x*/
-    transform: translateX(50%);
-    height: 49px;
-    width: 81px;
-    background-image: url(https://static.simiotics.com/fullcount/outcome-bubble-victory.svg);
-    z-index: 3;
     color: #669568;
-    text-align: center;
-    font-family: Bangers, cursive;
-    font-size: 16px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-    fill: rgba(255, 255, 255, 0.70);
-    stroke-width: 1px;
+    background-image: url(https://static.fullcount.xyz/web/elements/outcome-bubble-victory-medium.svg);
     stroke: #CD7676;
+}
+
+@media (min-width: 1024px) {
+    .positiveOutcome2, .negativeOutcome2 {
+        font-size: 64px;
+        height: 196px;
+        width: 324px;
+        top: 0;
+        padding-top: 0;
+    }
+    .positiveOutcome2 {
+        background-image: url(https://static.fullcount.xyz/web/elements/outcome-bubble-victory-big.svg);
+    }
+    .negativeOutcome2 {
+        background-image: url(https://static.fullcount.xyz/web/elements/outcome-bubble-loss-big.svg);
+    }
 }
 
 

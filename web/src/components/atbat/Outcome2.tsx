@@ -4,6 +4,8 @@ import { AtBatStatus, SessionStatus, Token } from "../../types";
 import OutcomeGrid from "./OutcomeGrid";
 import React, { useEffect } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { useGameContext } from "../../contexts/GameContext";
+import { outcomes, outcomeType } from "./AtBatView";
 
 export const sessionOutcomeType = (
   tokens: Token[],
@@ -38,6 +40,7 @@ const Outcome2 = ({
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
 }) => {
+  const { selectedToken } = useGameContext();
   useEffect(() => {
     console.log(sessionStatus);
   }, [sessionStatus]);
@@ -46,6 +49,19 @@ const Outcome2 = ({
       <div className={styles.contentWrap}>
         {/*<div className={styles.whiteSpace} />*/}
         <div className={styles.content}>
+          {atBat && atBat.outcome !== 0 && selectedToken && (
+            <div
+              className={
+                !outcomeType([selectedToken], atBat)
+                  ? styles.othersOutcome
+                  : outcomeType([selectedToken], atBat) === "positive"
+                  ? styles.positiveOutcome
+                  : styles.negativeOutcome
+              }
+            >
+              {outcomes[atBat.outcome]}!
+            </div>
+          )}
           <div className={styles.pitcher}>
             <div className={styles.imageContainer}>
               {atBat?.pitcher && (

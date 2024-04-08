@@ -22,7 +22,7 @@ import ExitDialog from "./ExitDialog";
 import useUser from "../../contexts/UserContext";
 import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 
-const outcomes = [
+export const outcomes = [
   "In Progress",
   "Strikeout",
   "Walk",
@@ -238,19 +238,6 @@ const AtBatView: React.FC = () => {
             pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
           />
         )}
-      {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
-        <div
-          className={
-            !outcomeType([selectedToken], atBatState.data.atBat)
-              ? styles.othersOutcome
-              : outcomeType([selectedToken], atBatState.data.atBat) === "positive"
-              ? styles.positiveOutcome
-              : styles.negativeOutcome
-          }
-        >
-          {outcomes[atBatState.data.atBat.outcome]}!
-        </div>
-      )}
       {atBatState.data?.atBat &&
         showPitchOutcome &&
         atBatState.data.atBat.pitches.length > 0 &&
