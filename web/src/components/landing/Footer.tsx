@@ -2,7 +2,8 @@ import styles from "./Footer.module.css";
 import DiscordLogo from "../icons/DiscordLogo";
 import FullcountLogo from "../icons/FullcountLogo";
 import { Flex, useMediaQuery, Image } from "@chakra-ui/react";
-import { DISCORD_LINK, FULLCOUNT_ASSETS } from "../../constants";
+import { DISCORD_LINK, FULLCOUNT_ASSETS, TWITTER_LINK } from "../../constants";
+import TwitterLogoSmall from "../icons/TwitterLogoSmall";
 
 const Footer = () => {
   const [is768View, is1024View] = useMediaQuery(["(min-width: 768px)", "(min-width: 1024px)"]);
@@ -21,9 +22,6 @@ const Footer = () => {
                 <a>
                   <div className={styles.legalText}>Privacy Policy</div>
                 </a>
-                <a>
-                  <div className={styles.legalText}>Terms of Service</div>
-                </a>
               </div>
             </Flex>
             {is1024View && (
@@ -35,6 +33,10 @@ const Footer = () => {
                 <DiscordLogo
                   cursor={"pointer"}
                   onClick={() => window.open(DISCORD_LINK, "_blank", "noopener,noreferrer")}
+                />
+                <TwitterLogoSmall
+                  cursor={"pointer"}
+                  onClick={() => window.open(TWITTER_LINK, "_blank", "noopener,noreferrer")}
                 />
               </div>
             </div>
@@ -57,15 +59,16 @@ const Footer = () => {
                 cursor={"pointer"}
                 onClick={() => window.open(DISCORD_LINK, "_blank", "noopener,noreferrer")}
               />
+              <TwitterLogoSmall
+                cursor={"pointer"}
+                onClick={() => window.open(TWITTER_LINK, "_blank", "noopener,noreferrer")}
+              />
             </div>
           </div>
           <div className={styles.legalContainer}>
             <div className={styles.legalHeaderContainer}>
               <a>
                 <div className={styles.legalText}>Privacy Policy</div>
-              </a>
-              <a>
-                <div className={styles.legalText}>Terms of Service</div>
               </a>
             </div>
             <div className={styles.legalText}>© 2024 Moonstream.to. All rights reserved</div>

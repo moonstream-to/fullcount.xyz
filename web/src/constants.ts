@@ -32,6 +32,7 @@ export const FULLCOUNT_ASSETS = "https://static.fullcount.xyz/web";
 export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
 
 export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
+export const TWITTER_LINK = "https://twitter.com/fullcount_xyz";
 
 export type ChainName = "ethereum" | "localhost" | "mumbai" | "polygon" | "wyrm" | "gnosis";
 export type ChainId = 1 | 1337 | 80001 | 137 | 322 | 100;
