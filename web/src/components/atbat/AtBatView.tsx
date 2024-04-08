@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect, useDebugValue } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AtBatView.module.css";
 import { useQuery, useQueryClient, UseQueryResult } from "react-query";
 import { getAtBat } from "../../services/fullcounts";
@@ -19,6 +19,8 @@ import ScoreForDesktop from "./ScoreForDesktop";
 import { sendReport } from "../../utils/humbug";
 import { playSound } from "../../utils/notifications";
 import ExitDialog from "./ExitDialog";
+import useUser from "../../contexts/UserContext";
+import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 
 const outcomes = [
   "In Progress",
@@ -57,14 +59,15 @@ export const outcomeType = (
 
 const AtBatView: React.FC = () => {
   const router = useRouter();
+  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
   const [atBatId, setAtBatId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = useUser();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -88,7 +91,7 @@ const AtBatView: React.FC = () => {
     if (router.query.session_id && typeof router.query.session_id === "string") {
       setSessionId(router.query.session_id);
     }
-  }, [router.query.id]);
+  }, [router.query.id, router.query.session_id]);
 
   const queryClient = useQueryClient();
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
@@ -110,6 +113,14 @@ const AtBatView: React.FC = () => {
     {
       onSuccess: (data) => {
         console.log(data);
+        if (data && !selectedToken && ownedTokens.data) {
+          const token = ownedTokens.data.find(
+            (t) => isSameToken(t, data.atBat.batter) || isSameToken(t, data.atBat.pitcher),
+          );
+          if (token) {
+            updateContext({ selectedToken: { ...token } });
+          }
+        }
         if (data && currentSessionId === 0) {
           setCurrentSessionId(data.atBat.pitches[data.atBat.numberOfSessions - 1].sessionID);
         }
@@ -172,6 +183,16 @@ const AtBatView: React.FC = () => {
       router.push("/");
     }
   };
+
+  const ownedTokens = useQuery(
+    ["ownedTokensAfterRefresh", user],
+    async () => {
+      return user ? await fetchFullcountPlayerTokens() : [];
+    },
+    {
+      enabled: !selectedToken,
+    },
+  );
 
   return (
     <div
