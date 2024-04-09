@@ -26,9 +26,6 @@ const pitcherRecord = (stats: PlayerStats): string => {
 };
 
 const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
-  useEffect(() => {
-    console.log(stats, isPitcher);
-  }, []);
   return (
     <>
       {isPitcher && stats.points_data?.pitching_data && (

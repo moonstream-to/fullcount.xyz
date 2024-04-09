@@ -68,10 +68,6 @@ const DataRow = ({ label, data }: { label: string; data: string }) => {
 };
 
 const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
-  useEffect(() => {
-    console.log(stats);
-  }, []);
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>season statistics</div>

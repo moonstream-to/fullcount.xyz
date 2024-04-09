@@ -18,7 +18,6 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       }
       const API_URL = "https://api.fullcount.xyz/stats";
       const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-      console.log(stat.data);
       return stat.data;
     },
     {
@@ -34,7 +33,6 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       }
       const API_URL = "https://api.fullcount.xyz/stats";
       const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-      console.log(stat.data);
       return stat.data;
     },
     {
