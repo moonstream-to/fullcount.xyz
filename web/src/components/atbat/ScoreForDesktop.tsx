@@ -8,9 +8,17 @@ import ChevronUpLarge from "../icons/ChevronUpLarge";
 import ChevronDownLarge from "../icons/ChevronDownLarge";
 import DotsCounterLarge from "../sessions/DotsCounterLarge";
 
-const ScoreForDesktop = ({ atBat, pitch }: { atBat: AtBatStatus; pitch: SessionStatus }) => {
+const ScoreForDesktop = ({
+  atBat,
+  pitch,
+  openHistory = false,
+}: {
+  atBat: AtBatStatus;
+  pitch: SessionStatus;
+  openHistory?: boolean;
+}) => {
   const { secondsPerPhase } = useGameContext();
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(openHistory);
 
   return (
     <div className={styles.container}>
