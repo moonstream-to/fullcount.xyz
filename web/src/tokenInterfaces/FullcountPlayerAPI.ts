@@ -121,7 +121,7 @@ export async function startSessionFullcountPlayer({
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
-const delay = (delayInms: number) => {
+export const delay = (delayInms: number) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
 };
 
