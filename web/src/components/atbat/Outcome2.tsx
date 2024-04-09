@@ -36,9 +36,11 @@ const rowCenters = [1.955, 7.82, 15.64, 23.46, 29.33];
 const Outcome2 = ({
   atBat,
   sessionStatus,
+  forToken,
 }: {
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
+  forToken: Token | undefined;
 }) => {
   const { selectedToken } = useGameContext();
   useEffect(() => {
@@ -49,12 +51,12 @@ const Outcome2 = ({
       <div className={styles.contentWrap}>
         {/*<div className={styles.whiteSpace} />*/}
         <div className={styles.content}>
-          {atBat && atBat.outcome !== 0 && selectedToken && (
+          {atBat && atBat.outcome !== 0 && forToken && (
             <div
               className={
-                !outcomeType([selectedToken], atBat)
+                !outcomeType([forToken], atBat)
                   ? styles.othersOutcome
-                  : outcomeType([selectedToken], atBat) === "positive"
+                  : outcomeType([forToken], atBat) === "positive"
                   ? styles.positiveOutcome
                   : styles.negativeOutcome
               }

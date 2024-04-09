@@ -313,6 +313,7 @@ const AtBatView: React.FC = () => {
           {atBatState.data?.atBat && (
             <Outcome2
               atBat={atBatState.data?.atBat}
+              forToken={selectedToken}
               sessionStatus={
                 atBatState.data.atBat.outcome === 0
                   ? atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2]
