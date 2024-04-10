@@ -102,7 +102,7 @@ const ExitDialog = ({
   };
   return (
     <div className={styles.container} ref={dialogRef}>
-      <div className={styles.prompt}>Do you want to close At-Bat?</div>
+      <div className={styles.prompt}>Do you want to end At-Bat?</div>
       <div className={styles.explanation}>
         You are returning to the home page. You can keep the At-Bat open though.
       </div>
@@ -113,7 +113,7 @@ const ExitDialog = ({
           className={styles.leftButton}
           onClick={handleCloseClick}
         >
-          {closeAtBat.isLoading ? <Spinner h={4} w={4} /> : "Close at-bat"}
+          {closeAtBat.isLoading ? <Spinner h={4} w={4} /> : "End at-bat"}
         </button>
         <button
           disabled={closeAtBat.isLoading}

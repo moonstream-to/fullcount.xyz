@@ -13,16 +13,13 @@ export const sessionOutcomeType = (
   sessionStatus: SessionStatus,
 ): "positive" | "negative" | "neutral" | undefined => {
   const { pitcher, batter } = atBat;
-  if (sessionStatus.outcome === 3) {
-    return "neutral";
-  }
   if (tokens.some((t) => t.address === pitcher?.address && t.id === pitcher.id)) {
     return sessionStatus.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
       ? "positive"
       : "negative";
   }
   if (tokens.some((t) => t.address === batter?.address && t.id === batter.id)) {
-    return atBat.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
+    return sessionStatus.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
       ? "negative"
       : "positive";
   }

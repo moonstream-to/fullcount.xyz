@@ -7,6 +7,9 @@ import { useGameContext } from "../../contexts/GameContext";
 import { sessionOutcomeType } from "./Outcome2";
 import { sessionOutcomes } from "./AtBatView";
 
+const completedPitchesNumber = (atBat: AtBatStatus) =>
+  atBat.pitches.filter((p) => p.progress === 5).length;
+
 const PitchHistory = ({ atBat }: { atBat: AtBatStatus }) => {
   const { selectedToken } = useGameContext();
 
@@ -14,7 +17,11 @@ const PitchHistory = ({ atBat }: { atBat: AtBatStatus }) => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div className={styles.title}>PITCH HISTORY</div>
-        <div className={styles.total}>{`${atBat.pitches.length} PITCHES`}</div>
+        {completedPitchesNumber(atBat) > 0 && (
+          <div className={styles.total}>{`${completedPitchesNumber(atBat)} PITCH${
+            completedPitchesNumber(atBat) === 1 ? "" : "ES"
+          }`}</div>
+        )}
       </div>
       <div className={styles.list}>
         {atBat.pitches
