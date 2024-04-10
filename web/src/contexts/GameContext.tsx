@@ -31,6 +31,8 @@ interface GameContextProps {
   selectedMode: number;
   selectedTokenIdx: number;
   joinedNotification: boolean;
+  onboardingName: string;
+  onboardingImageIdx: number;
 }
 
 interface GameContextType extends GameContextProps {
@@ -74,6 +76,8 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     selectedMode: 1,
     selectedTokenIdx: 0,
     joinedNotification: false,
+    onboardingName: "",
+    onboardingImageIdx: 0,
   });
 
   useEffect(() => {
