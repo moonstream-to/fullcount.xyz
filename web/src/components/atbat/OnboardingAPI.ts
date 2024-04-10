@@ -98,8 +98,8 @@ const getPitch = (swing: BatterReveal, pitchNumber: number) => {
       return {
         nonce: "0",
         speed: "0",
-        vertical: "2",
-        horizontal: "2",
+        vertical: String(Math.floor(Math.random() * 3) + 1),
+        horizontal: String(Math.floor(Math.random() * 3) + 1),
       };
     }
     const [horizontal, vertical] = findDistantCell([
