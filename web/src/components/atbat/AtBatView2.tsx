@@ -5,7 +5,7 @@ import Score from "./Score";
 import AtBatFooter from "./AtBatFooter";
 import PitcherViewMobile from "../playing/PitcherViewMobile";
 import { AtBatStatus, BatterReveal, OwnedToken, Token } from "../../types";
-import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { blbImage, FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image, useMediaQuery } from "@chakra-ui/react";
 import Outcome2, { sessionOutcomeType } from "./Outcome2";
 import TokenCard from "./TokenCard";
@@ -13,6 +13,7 @@ import ScoreForDesktop from "./ScoreForDesktop";
 import BatterViewMobile2 from "./BatterViewMobile2";
 import { getAtBat, initialAtBatState, selectedToken } from "./OnboardingAPI";
 import { outcomeType, sessionOutcomes } from "./AtBatView";
+import OnboardingCharacter from "./OnboardingCharacter";
 
 const AtBatView2: React.FC = () => {
   const router = useRouter();
@@ -21,6 +22,9 @@ const AtBatView2: React.FC = () => {
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
   const [swings, setSwings] = useState<BatterReveal[]>([]);
   const [atBat, setAtBat] = useState<AtBatStatus>(initialAtBatState);
+  const [isCharacterSelectOpen, setIsCharacterSelectOpen] = useState(true);
+  const [name, setName] = useState("Guest_0420");
+  const [image, setImage] = useState(blbImage(7));
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -31,6 +35,17 @@ const AtBatView2: React.FC = () => {
   const updateHeight = () => {
     setWindowHeight(window.innerHeight);
   };
+
+  useEffect(() => {
+    const newAtBat = initialAtBatState;
+    setAtBat({
+      ...newAtBat,
+      batter: { ...selectedToken, name, image },
+      pitches: [
+        { ...newAtBat.pitches[0], phaseStartTimestamp: String(Math.floor(Date.now() / 1000)) },
+      ],
+    });
+  }, [name, image, isCharacterSelectOpen]);
 
   useEffect(() => {
     window.addEventListener("resize", updateHeight);
@@ -64,6 +79,15 @@ const AtBatView2: React.FC = () => {
       className={styles.container}
       style={{ maxHeight: windowHeight ? `${windowHeight}px` : "100vh" }}
     >
+      {isCharacterSelectOpen && (
+        <OnboardingCharacter
+          onClose={() => setIsCharacterSelectOpen(false)}
+          onChange={(name, image) => {
+            setName(name);
+            setImage(image);
+          }}
+        />
+      )}
       <Image
         minW={"441px"}
         h={"calc(25vh - 27px)"}
