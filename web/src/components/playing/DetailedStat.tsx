@@ -1,6 +1,6 @@
 import styles from "./DetailedStat.module.css";
 import { PlayerStats } from "../../types";
-import { useEffect } from "react";
+import AnimatedMessage from "../AnimatedMessage";
 const formatDecimal = (value: number) => {
   if (!value) {
     return ".000";
@@ -67,12 +67,20 @@ const DataRow = ({ label, data }: { label: string; data: string }) => {
   );
 };
 
-const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
+const DetailedStat = ({
+  stats,
+  isPitcher,
+}: {
+  stats: PlayerStats | undefined;
+  isPitcher: boolean;
+}) => {
   return (
     <div className={styles.container}>
-      <div className={styles.header}>season statistics</div>
+      <div className={styles.header}>
+        {stats !== undefined ? "season statistics" : <AnimatedMessage message={"loading"} />}
+      </div>
       <div className={styles.dataTable}>
-        {isPitcher && stats.points_data.pitching_data && (
+        {isPitcher && stats?.points_data.pitching_data && (
           <>
             <DataRow label={"at bats"} data={String(pitcherAtBatsCount(stats))} />
             <DataRow label={"record"} data={pitcherRecord(stats)} />
@@ -93,7 +101,7 @@ const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boo
             />
           </>
         )}
-        {!isPitcher && stats.points_data.batting_data && (
+        {!isPitcher && stats?.points_data.batting_data && (
           <>
             <DataRow label={"at bats"} data={String(stats.points_data.batting_data.at_bats)} />
             <DataRow label={"record"} data={batterRecord(stats)} />
@@ -112,6 +120,30 @@ const DetailedStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boo
             />
             <DataRow label={"OPS"} data={formatDecimal(stats.points_data.batting_data.ops)} />
             <DataRow label={"Walks"} data={String(stats.points_data.batting_data.walks)} />
+          </>
+        )}
+        {isPitcher && !stats?.points_data.pitching_data && (
+          <>
+            <DataRow label={"at bats"} data={"-"} />
+            <DataRow label={"record"} data={"-"} />
+            <DataRow label={"era"} data={"-"} />
+            <DataRow label={"whip"} data={"-"} />
+            <DataRow label={"strikeouts"} data={"-"} />
+            <DataRow label={"walks"} data={"-"} />
+            <DataRow label={"Hits Allowed"} data={"-"} />
+            <DataRow label={"HR Allowed"} data={"-"} />
+          </>
+        )}
+        {!isPitcher && !stats?.points_data.batting_data && (
+          <>
+            <DataRow label={"at bats"} data={"-"} />
+            <DataRow label={"record"} data={"-"} />
+            <DataRow label={"Average"} data={"-"} />
+            <DataRow label={"On-Base %"} data={"-"} />
+            <DataRow label={"Home Runs"} data={"-"} />
+            <DataRow label={"Strikeouts"} data={"-"} />
+            <DataRow label={"OPS"} data={"-"} />
+            <DataRow label={"Walks"} data={"-"} />
           </>
         )}
       </div>

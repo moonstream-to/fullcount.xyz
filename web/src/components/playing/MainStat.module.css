@@ -1,4 +1,4 @@
-.container {
+.container, .emptyStatContainer {
     display: flex;
     padding: 10px 5px;
     justify-content: center;
@@ -6,6 +6,11 @@
     border: 0.5px solid #262019;
     background: #FFF;
     align-items: baseline;
+}
+
+.emptyStatContainer {
+    justify-content: space-between;
+    padding: 10px 15px;
 }
 
 .divider {

@@ -1,0 +1,43 @@
+.container {
+    display: flex;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 20px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    /*max-width: 525px;*/
+    position: absolute;
+    left: 50%;
+    z-index: 20;
+    transform: translateX(-50%);
+    background-color: #fcecd9;
+}
+
+.input {
+    width: 245px;
+    place-self: center;
+}
+
+.button, .inactiveButton {
+    display: flex;
+    padding: 4px 19px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #262019;
+    background: #328449;
+    flex: 1 0 0;
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 1.2px;
+    min-height: 35.5px;
+    max-width: 245px;
+
+}

@@ -1,7 +1,6 @@
 import styles from "./MainStat.module.css";
 import { PlayerStats } from "../../types";
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { useEffect } from "react";
 
 const formatDecimal = (value: number) => {
   if (!value) {
@@ -28,7 +27,7 @@ const pitcherRecord = (stats: PlayerStats): string => {
 const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
   return (
     <>
-      {isPitcher && stats.points_data?.pitching_data && (
+      {isPitcher && stats && stats.points_data?.pitching_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>{pitcherRecord(stats)}</Text>
           <Text className={styles.label}>W-L</Text>
@@ -45,7 +44,7 @@ const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean
           <Text className={styles.label}>WHIP</Text>
         </Flex>
       )}
-      {!isPitcher && stats.points_data?.batting_data && (
+      {!isPitcher && stats && stats.points_data?.batting_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>
             {formatDecimal(stats.points_data.batting_data.batting_average)}
@@ -61,6 +60,36 @@ const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean
           <Text className={styles.label}>RBI</Text>
           <Box className={styles.divider} my={"auto"} />
           <Text className={styles.data}>{formatDecimal(stats.points_data.batting_data.ops)}</Text>
+          <Text className={styles.label}>OPS</Text>
+        </Flex>
+      )}
+      {isPitcher && (!stats || !stats.points_data.pitching_data) && (
+        <Flex className={styles.emptyStatContainer}>
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>W-L</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>ERA</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>SO</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>WHIP</Text>
+        </Flex>
+      )}
+      {!isPitcher && (!stats || !stats.points_data.batting_data) && (
+        <Flex className={styles.emptyStatContainer}>
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>AVG</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>HR</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
+          <Text className={styles.label}>RBI</Text>
+          <Box className={styles.divider} my={"auto"} />
+          <Text className={styles.data}>-</Text>
           <Text className={styles.label}>OPS</Text>
         </Flex>
       )}
