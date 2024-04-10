@@ -22,7 +22,11 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
             <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
           </div>
-          {selectedMode === 0 && <PlayButtons token={tokens[selectedTokenIdx]} />}
+          {(selectedMode === 0 ||
+            (!!tokens[selectedTokenIdx].stakedSessionID &&
+              tokens[selectedTokenIdx].tokenProgress !== 6)) && (
+            <PlayButtons token={tokens[selectedTokenIdx]} />
+          )}
         </div>
         <div className={styles.tokenCards}>
           {tokens.map((t, idx) => (

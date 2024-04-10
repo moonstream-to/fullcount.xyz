@@ -8,9 +8,17 @@ import ChevronUp from "../icons/ChevronUp";
 import ChevronDown from "../icons/ChevronDown";
 import PitchHistory from "./PitchHistory";
 
-const Score = ({ atBat, pitch }: { atBat: AtBatStatus; pitch: SessionStatus }) => {
+const Score = ({
+  atBat,
+  pitch,
+  openHistory = false,
+}: {
+  atBat: AtBatStatus;
+  pitch: SessionStatus;
+  openHistory?: boolean;
+}) => {
   const { secondsPerPhase } = useGameContext();
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(openHistory);
 
   return (
     <div className={styles.container}>

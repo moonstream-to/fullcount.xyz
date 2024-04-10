@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import styles from "./AtBatView.module.css";
 import { useQuery, useQueryClient, UseQueryResult } from "react-query";
 import { getAtBat } from "../../services/fullcounts";
@@ -11,15 +11,18 @@ import { AtBatStatus, OwnedToken, Token } from "../../types";
 import BatterViewMobile from "../playing/BatterViewMobile";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { Image, useMediaQuery } from "@chakra-ui/react";
+import { Image, useDisclosure, useMediaQuery } from "@chakra-ui/react";
 import Outcome2, { sessionOutcomeType } from "./Outcome2";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
 import { sendReport } from "../../utils/humbug";
 import { playSound } from "../../utils/notifications";
+import ExitDialog from "./ExitDialog";
+import useUser from "../../contexts/UserContext";
+import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 
-const outcomes = [
+export const outcomes = [
   "In Progress",
   "Strikeout",
   "Walk",
@@ -56,13 +59,15 @@ export const outcomeType = (
 
 const AtBatView: React.FC = () => {
   const router = useRouter();
+  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
   const [atBatId, setAtBatId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
   const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { user } = useUser();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -86,7 +91,7 @@ const AtBatView: React.FC = () => {
     if (router.query.session_id && typeof router.query.session_id === "string") {
       setSessionId(router.query.session_id);
     }
-  }, [router.query.id]);
+  }, [router.query.id, router.query.session_id]);
 
   const queryClient = useQueryClient();
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
@@ -108,6 +113,14 @@ const AtBatView: React.FC = () => {
     {
       onSuccess: (data) => {
         console.log(data);
+        if (data && !selectedToken && ownedTokens.data) {
+          const token = ownedTokens.data.find(
+            (t) => isSameToken(t, data.atBat.batter) || isSameToken(t, data.atBat.pitcher),
+          );
+          if (token) {
+            updateContext({ selectedToken: { ...token } });
+          }
+        }
         if (data && currentSessionId === 0) {
           setCurrentSessionId(data.atBat.pitches[data.atBat.numberOfSessions - 1].sessionID);
         }
@@ -160,9 +173,26 @@ const AtBatView: React.FC = () => {
   };
 
   const handleExitClick = () => {
-    sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
-    router.push("/");
+    if (
+      atBatState.data?.atBat.pitches.length === 1 &&
+      atBatState.data.atBat.pitches[0].progress == 2
+    ) {
+      onOpen();
+    } else {
+      sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
+      router.push("/");
+    }
   };
+
+  const ownedTokens = useQuery(
+    ["ownedTokensAfterRefresh", user],
+    async () => {
+      return user ? await fetchFullcountPlayerTokens() : [];
+    },
+    {
+      enabled: !selectedToken,
+    },
+  );
 
   return (
     <div
@@ -171,6 +201,9 @@ const AtBatView: React.FC = () => {
     >
       <div className={styles.exitButton} onClick={handleExitClick}>
         <ExitIcon />
+        {isOpen && selectedToken && (
+          <ExitDialog token={selectedToken} sessionId={currentSessionId} onClose={onClose} />
+        )}
       </div>
       <Image
         minW={"441px"}
@@ -205,19 +238,6 @@ const AtBatView: React.FC = () => {
             pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
           />
         )}
-      {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
-        <div
-          className={
-            !outcomeType([selectedToken], atBatState.data.atBat)
-              ? styles.othersOutcome
-              : outcomeType([selectedToken], atBatState.data.atBat) === "positive"
-              ? styles.positiveOutcome
-              : styles.negativeOutcome
-          }
-        >
-          {outcomes[atBatState.data.atBat.outcome]}!
-        </div>
-      )}
       {atBatState.data?.atBat &&
         showPitchOutcome &&
         atBatState.data.atBat.pitches.length > 0 &&
@@ -293,6 +313,7 @@ const AtBatView: React.FC = () => {
           {atBatState.data?.atBat && (
             <Outcome2
               atBat={atBatState.data?.atBat}
+              forToken={selectedToken}
               sessionStatus={
                 atBatState.data.atBat.outcome === 0
                   ? atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2]

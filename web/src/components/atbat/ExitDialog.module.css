@@ -1,0 +1,88 @@
+.container {
+    display: flex;
+    width: 400px;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #262019;
+    background: #FCECD9;
+    position: absolute;
+    z-index: 10;
+    left: 100%;
+    top: 0;
+    transform: translateX(-100%);
+}
+
+.prompt {
+    align-self: stretch;
+
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.explanation {
+    align-self: stretch;
+
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    /*align-items: flex-start;*/
+    gap: 10px;
+    /*align-self: stretch;*/
+}
+
+.leftButton, .rightButton {
+    width: 120px;
+}
+
+.leftButton {
+    display: flex;
+    padding: 10px 40px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    border: 1px solid #262019;
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    white-space: nowrap;
+}
+
+.rightButton {
+    display: flex;
+    padding: 10px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    border: 1px solid #262019;
+    background: #7E8E7F;
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    white-space: nowrap;
+}
+

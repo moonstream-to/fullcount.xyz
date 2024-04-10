@@ -8,6 +8,7 @@ import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import { sendReport } from "../utils/humbug";
+import { CANT_ABORT_SESSION_MSG } from "../messages";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const parseActiveSession = (s: any) => {
@@ -120,7 +121,7 @@ export async function startSessionFullcountPlayer({
   return { sessionID: data.session_id, sign: "0x" + data.signature };
 }
 
-const delay = (delayInms: number) => {
+export const delay = (delayInms: number) => {
   return new Promise((resolve) => setTimeout(resolve, delayInms));
 };
 
@@ -184,6 +185,59 @@ export async function joinSessionFullcountPlayer({
       throw e;
     });
 }
+
+export const abortFullcountPlayerSession = async ({
+  token,
+  sessionId,
+}: {
+  token: Token;
+  sessionId: number;
+}) => {
+  const postData = {
+    fullcount_address: GAME_CONTRACT,
+    erc721_address: token.address,
+    token_id: token.id,
+  };
+  const headers = getHeaders();
+  const { gameContract } = getContracts();
+  const progress = await gameContract.methods.sessionProgress(sessionId).call();
+  if (Number(progress) !== 2) {
+    throw new Error(CANT_ABORT_SESSION_MSG);
+  }
+  console.log("closing...", { sessionId, progress });
+  return axios
+    .post(`${FULLCOUNT_PLAYER_API}/game/abort`, postData, { headers })
+    .then(async (response) => {
+      const { gameContract } = getContracts();
+      let isSuccess = false;
+      for (let attempt = 1; attempt <= 30; attempt++) {
+        console.log("checking token state after closing at-bat, attempt: ", attempt);
+        const session = await gameContract.methods.StakedSession(token.address, token.id).call();
+        if (Number(session) === 0) {
+          isSuccess = true;
+          break;
+        } else {
+          console.log(session, response.data);
+        }
+        await delay(3 * 1000);
+      }
+      if (!isSuccess) {
+        throw new Error("Time out. Something with server. Sorry. ");
+      }
+      console.log("Success:", response.data);
+      return response.data;
+    })
+    .catch((e: any) => {
+      sendReport("Closing at-bat failed", "", [
+        "type:error",
+        "error_domain:fcplayer",
+        `error:fcplayer-unstaking`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
+      ]);
+      throw e;
+    });
+};
 
 export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
   const postData = {

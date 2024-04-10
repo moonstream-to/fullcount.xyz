@@ -4,6 +4,8 @@ import { AtBatStatus, SessionStatus, Token } from "../../types";
 import OutcomeGrid from "./OutcomeGrid";
 import React, { useEffect } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { useGameContext } from "../../contexts/GameContext";
+import { outcomes, outcomeType } from "./AtBatView";
 
 export const sessionOutcomeType = (
   tokens: Token[],
@@ -11,16 +13,13 @@ export const sessionOutcomeType = (
   sessionStatus: SessionStatus,
 ): "positive" | "negative" | "neutral" | undefined => {
   const { pitcher, batter } = atBat;
-  if (sessionStatus.outcome === 3) {
-    return "neutral";
-  }
   if (tokens.some((t) => t.address === pitcher?.address && t.id === pitcher.id)) {
     return sessionStatus.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
       ? "positive"
       : "negative";
   }
   if (tokens.some((t) => t.address === batter?.address && t.id === batter.id)) {
-    return atBat.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
+    return sessionStatus.outcome === 0 || sessionStatus.outcome === 2 || atBat.outcome === 7
       ? "negative"
       : "positive";
   }
@@ -34,10 +33,13 @@ const rowCenters = [1.955, 7.82, 15.64, 23.46, 29.33];
 const Outcome2 = ({
   atBat,
   sessionStatus,
+  forToken,
 }: {
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
+  forToken: Token | undefined;
 }) => {
+  const { selectedToken } = useGameContext();
   useEffect(() => {
     console.log(sessionStatus);
   }, [sessionStatus]);
@@ -46,6 +48,19 @@ const Outcome2 = ({
       <div className={styles.contentWrap}>
         {/*<div className={styles.whiteSpace} />*/}
         <div className={styles.content}>
+          {atBat && atBat.outcome !== 0 && forToken && (
+            <div
+              className={
+                !outcomeType([forToken], atBat)
+                  ? styles.othersOutcome
+                  : outcomeType([forToken], atBat) === "positive"
+                  ? styles.positiveOutcome
+                  : styles.negativeOutcome
+              }
+            >
+              {outcomes[atBat.outcome]}!
+            </div>
+          )}
           <div className={styles.pitcher}>
             <div className={styles.imageContainer}>
               {atBat?.pitcher && (
