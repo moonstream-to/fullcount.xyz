@@ -3,6 +3,7 @@ import { Box, Flex, Grid, Text, Image } from "@chakra-ui/react";
 import { valueToColor } from "../../utils/colors";
 import styles from "./HeatMap.module.css";
 import { FULLCOUNT_ASSETS } from "../../constants";
+import AnimatedMessage from "../AnimatedMessage";
 
 const leftBorder = [6, 11, 16];
 const topBorder = [6, 7, 8];
@@ -19,10 +20,10 @@ const HeatMap = ({
   isPitcher,
   showStrikeZone = false,
 }: {
-  rates: number[];
-  counts: number[];
-  takes?: number;
-  fast?: number;
+  rates: number[] | undefined;
+  counts: number[] | undefined;
+  takes?: number | undefined;
+  fast?: number | undefined;
   showStrikeZone?: boolean;
   isPitcher: boolean;
 }) => {
@@ -44,10 +45,10 @@ const HeatMap = ({
         alignItems="center"
         justifyContent="center"
         cursor={"pointer"}
-        bg={valueToColor(rates[index], rates)}
+        bg={rates ? valueToColor(rates[index], rates) : valueToColor(0, [0])}
         onClick={() => setShowMode(showMode === 2 ? 0 : showMode + 1)}
       >
-        {showMode !== 0 && (
+        {showMode !== 0 && rates && counts && (
           <Text fontSize={"9px"} color={"black"} fontWeight={"400"}>
             {showMode === 2 ? (rates[index] * 100).toFixed(2) : counts[index]}
           </Text>
@@ -58,11 +59,18 @@ const HeatMap = ({
 
   return (
     <Flex direction={"column"} alignItems={"center"} gap={"0px"}>
-      <div className={styles.total}>
-        {counts.reduce((acc, c) => acc + c)}
-        {isPitcher ? " pitches" : " swings"}
-        {isPitcher && fast ? ` (${fast} fast)` : !isPitcher && takes ? ` + ${takes} takes` : ""}
-      </div>
+      {counts && (
+        <div className={styles.total}>
+          {counts.reduce((acc, c) => acc + c)}
+          {isPitcher ? " pitches" : " swings"}
+          {isPitcher && fast ? ` (${fast} fast)` : !isPitcher && takes ? ` + ${takes} takes` : ""}
+        </div>
+      )}
+      {!counts && (
+        <div className={styles.total}>
+          <AnimatedMessage message={"loading"} />
+        </div>
+      )}
       <Grid templateColumns="repeat(5, 1fr)" w={"fit-content"}>
         {Array.from({ length: 25 }).map((_, i) => generateCell(i))}
       </Grid>
