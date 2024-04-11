@@ -2,12 +2,13 @@ import { Spinner } from "@chakra-ui/react";
 import Image from "next/image";
 
 import styles from "./CreateNewCharacter.module.css";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
-import { blbImageSmall } from "../../constants";
+import { blbImageSmall, ONBOARDING_DEFAULT_NAME } from "../../constants";
+import { useGameContext } from "../../contexts/GameContext";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -16,8 +17,11 @@ for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
 }
 
 const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
-  const [name, setName] = useState("");
-  const [imageIndex, setImageIndex] = useState(0);
+  const { onboardingName, onboardingImageIdx, updateContext } = useGameContext();
+  const [name, setName] = useState(
+    onboardingName !== ONBOARDING_DEFAULT_NAME ? onboardingName : "",
+  );
+  const [imageIndex, setImageIndex] = useState(onboardingImageIdx !== -1 ? onboardingImageIdx : 0);
   const source: TokenSource = "FullcountPlayerAPI";
   const queryClient = useQueryClient();
   const toast = useMoonToast();
@@ -36,6 +40,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
         if (onClose) {
           onClose();
         }
+        updateContext({ onboardingName: ONBOARDING_DEFAULT_NAME, onboardingImageIdx: -1 });
         queryClient.invalidateQueries("owned_tokens"); //TODO data update
       },
       onError: (e: Error) => {
@@ -44,11 +49,6 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       },
     },
   );
-
-  useEffect(() => {
-    setName("");
-    setImageIndex(0);
-  }, []);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
