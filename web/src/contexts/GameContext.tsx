@@ -1,6 +1,12 @@
 import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
 import { AtBat, OwnedToken, Session, Token } from "../types";
-import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
+import {
+  CHAIN_ID,
+  GAME_CONTRACT,
+  ONBOARDING_DEFAULT_IMAGE_IDX,
+  ONBOARDING_DEFAULT_NAME,
+  TOKEN_CONTRACT,
+} from "../constants";
 
 interface GameContextProps {
   nonce: number;
@@ -76,8 +82,8 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     selectedMode: 1,
     selectedTokenIdx: 0,
     joinedNotification: false,
-    onboardingName: "",
-    onboardingImageIdx: 0,
+    onboardingName: ONBOARDING_DEFAULT_NAME,
+    onboardingImageIdx: ONBOARDING_DEFAULT_IMAGE_IDX,
   });
 
   useEffect(() => {

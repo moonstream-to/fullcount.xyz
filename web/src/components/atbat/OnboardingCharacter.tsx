@@ -2,8 +2,9 @@ import Image from "next/image";
 
 import styles from "../tokens/CreateNewCharacter.module.css";
 import localStyles from "./OnboardingCharacter.module.css";
-import React, { useEffect, useState } from "react";
-import { blbImage } from "../../constants";
+import React from "react";
+import { blbImageSmall } from "../../constants";
+import { useGameContext } from "../../contexts/GameContext";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -11,24 +12,8 @@ for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
   images.push(i);
 }
 
-const OnboardingCharacter = ({
-  onClose,
-  onChange,
-}: {
-  onClose: () => void;
-  onChange: (name: string, image: string) => void;
-}) => {
-  const [name, setName] = useState("Guest_0420");
-  const [imageIndex, setImageIndex] = useState(7);
-
-  useEffect(() => {
-    setName("Guest_0420");
-    setImageIndex(7);
-  }, []);
-
-  useEffect(() => {
-    onChange(name, blbImage(imageIndex));
-  }, [imageIndex, name]);
+const OnboardingCharacter = ({ onClose }: { onClose: () => void }) => {
+  const { updateContext, onboardingName, onboardingImageIdx } = useGameContext();
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -38,7 +23,7 @@ const OnboardingCharacter = ({
   return (
     <div className={localStyles.container}>
       <div className={styles.content}>
-        <Image width={"161"} height={"161"} src={blbImage(imageIndex)} alt={""} />
+        <Image width={"161"} height={"161"} src={blbImageSmall(onboardingImageIdx)} alt={""} />
         <div className={styles.images}>
           {images.map((_, idx: number) => (
             <Image
@@ -46,9 +31,9 @@ const OnboardingCharacter = ({
               width={"50"}
               height={"50"}
               alt={`img${idx}`}
-              src={blbImage(idx)}
-              className={imageIndex === idx ? styles.selectedImage : styles.image}
-              onClick={() => setImageIndex(idx)}
+              src={blbImageSmall(idx)}
+              className={onboardingImageIdx === idx ? styles.selectedImage : styles.image}
+              onClick={() => updateContext({ onboardingImageIdx: idx })}
             />
           ))}
         </div>
@@ -57,8 +42,8 @@ const OnboardingCharacter = ({
           type={"text"}
           id={"name"}
           placeholder={"Enter name"}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={onboardingName}
+          onChange={(e) => updateContext({ onboardingName: e.target.value })}
           onKeyDown={handleKeyDown}
           spellCheck={false}
           className={localStyles.input}
@@ -66,8 +51,12 @@ const OnboardingCharacter = ({
       </div>
       <div className={styles.buttonsContainer}>
         <button
-          disabled={!name || imageIndex === -1}
-          className={!name || imageIndex === -1 ? localStyles.inactiveButton : localStyles.button}
+          disabled={!onboardingName || onboardingImageIdx === -1}
+          className={
+            !onboardingName || onboardingImageIdx === -1
+              ? localStyles.inactiveButton
+              : localStyles.button
+          }
           onClick={onClose}
         >
           Bat
