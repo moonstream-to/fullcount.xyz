@@ -1,4 +1,4 @@
-import { Flex, Spinner } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 import Image from "next/image";
 
 import styles from "./CreateNewCharacter.module.css";
@@ -7,7 +7,7 @@ import { TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
-import { blbImage } from "../../constants";
+import { blbImageSmall } from "../../constants";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -60,7 +60,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       <div className={styles.header}>Create character</div>
 
       <div className={styles.content}>
-        <Image width={"161"} height={"161"} src={blbImage(imageIndex)} alt={""} />
+        <Image width={"161"} height={"161"} src={blbImageSmall(imageIndex)} alt={""} />
         <div className={styles.images}>
           {images.map((_, idx: number) => (
             <Image
@@ -68,7 +68,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
               width={"50"}
               height={"50"}
               alt={`img${idx}`}
-              src={blbImage(idx)}
+              src={blbImageSmall(idx)}
               className={imageIndex === idx ? styles.selectedImage : styles.image}
               onClick={() => setImageIndex(idx)}
             />
