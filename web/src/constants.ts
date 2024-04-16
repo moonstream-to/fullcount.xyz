@@ -75,3 +75,9 @@ export const RPC = "https://nova.arbitrum.io/rpc";
 export const blbImage = (idx: number) =>
   `https://static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
 export const HUMBUG_REPORT_VERSION = "0.0.2";
+
+export const LEADERBOARD_HOME_RUNS = "0f061af5-22a7-4449-a4e3-b0efe3a5a3d8";
+export const LEADERBOARD_ON_BASE_PERCENTAGE = "941f5bfb-b6c9-4ff5-8442-8beae42009ee";
+export const LEADERBOARD_TOTAL_AT_BATS = "a715d48c-1155-4821-9898-471ef0aa69aa";
+export const LEADERBOARD_STRIKEOUTS = "7b2fd9a2-98bc-4c5d-acfb-983111d623bb";
+export const LEADERBOARD_PITCHING_OUTS = "1ce582b4-409a-4102-af11-d85d08247029";
