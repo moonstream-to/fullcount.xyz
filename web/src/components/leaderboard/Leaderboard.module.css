@@ -23,7 +23,9 @@
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    max-height: 150px;
+    max-height: 300px;
+    /*flex-grow: 2;*/
+    /*height: 100%;*/
     color: black;
 }
 
