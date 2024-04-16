@@ -1,0 +1,132 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    gap: 5px;
+}
+
+.divider {
+    height: 0.5px;
+    align-self: stretch;
+    background: #8B8B8B;
+}
+
+
+.tableHeader, .tableContent {
+    display: grid;
+    grid-template-columns: 60px auto 60px;
+    gap: 8px;
+    padding: 5px 0;
+}
+
+.dataContainer {
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    max-height: 150px;
+    color: black;
+}
+
+.dataContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.header {
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+}
+
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.rank {
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+}
+
+
+.firstRanks {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+}
+
+.rankFirst {
+    background: #CEA250;
+}
+
+.rankSecond {
+    background: #9CAEAE;
+}
+
+.rankThird {
+    background: #ED7E4C;
+}
+
+.characterContainer {
+    display: flex;
+    gap: 5px;
+}
+
+.characterImage {
+    height: 24px;
+    width: 24px;
+}
+
+.characterInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-grow: 2;
+}
+
+.characterName {
+    /*overflow: hidden;*/
+    color: #262019;
+    text-overflow: ellipsis;
+    font-family: Bangers, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+}
+
+.characterId {
+    color: #8EAB8F;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 10px */
+}
+
+.score {
+    color: #262019;
+    text-align: right;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+
