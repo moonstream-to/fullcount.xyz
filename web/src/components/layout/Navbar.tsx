@@ -54,10 +54,12 @@ const Navbar = () => {
         src={`${FULLCOUNT_ASSETS_PATH}/logo/fullcount-mini.png`}
       />
       <div className={styles.rightSide}>
-        <div className={styles.account}>
-          <AccountMobile />
-          <div className={styles.username}>{user.username}</div>
-        </div>
+        {user && (
+          <div className={styles.account}>
+            <AccountMobile />
+            <div className={styles.username}>{user.username}</div>
+          </div>
+        )}
         {/*<div className={styles.menuButton}>*/}
         {/*  <VolumeOn />*/}
         {/*</div>*/}
