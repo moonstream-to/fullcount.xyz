@@ -34,11 +34,9 @@ const LeaderboardView = () => {
   const leaderboardInfo = useQuery(
     ["fetch_leaderboard_info", selectedId],
     async () => {
-      const data = await fetchLeaderboardInfo(selectedId).then((res) => {
+      return await fetchLeaderboardInfo(selectedId).then((res) => {
         return res.data;
       });
-      console.log(data);
-      return data;
     },
     {
       enabled: !!selectedId,
