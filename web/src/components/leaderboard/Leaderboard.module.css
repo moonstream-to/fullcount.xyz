@@ -17,6 +17,7 @@
     grid-template-columns: 60px auto 60px;
     gap: 8px;
     padding: 5px 0;
+    width: 100%;
 }
 
 .dataContainer {

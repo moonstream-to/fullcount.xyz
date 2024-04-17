@@ -63,7 +63,6 @@ const LeaderboardView = () => {
 
   return (
     <div className={styles.container}>
-      <div className={styles.title}>Fullcount Leaderboards</div>
       <div className={styles.selector}>
         <div className={styles.buttons}>
           {leaderboards.map((l) => (
@@ -76,10 +75,8 @@ const LeaderboardView = () => {
             </div>
           ))}
         </div>
-        {leaderboardInfo.data && (
-          <div className={styles.subtitle}>{leaderboardInfo.data.title}</div>
-        )}
-        {ownedTokens.data && <OwnPositions tokens={ownedTokens.data} leaderboardId={selectedId} />}
+        <div className={styles.subtitle}>{leaderboardInfo.data?.title ?? ""}</div>
+        <OwnPositions tokens={ownedTokens.data} leaderboardId={selectedId} />
         <Leaderboard leaderboardId={selectedId} />
       </div>
     </div>

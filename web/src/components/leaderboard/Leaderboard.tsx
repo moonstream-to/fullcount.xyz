@@ -1,10 +1,9 @@
 import { useInfiniteQuery } from "react-query";
 import React, { useEffect, useRef } from "react";
 import { fetchLeaderboardData, LeaderboardEntry } from "./leaderboards";
-import { LEADERBOARD_HOME_RUNS } from "../../constants";
 import { useGameContext } from "../../contexts/GameContext";
 import styles from "./Leaderboard.module.css";
-import { Image } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 import LeaderboardItem from "./LeaderboardItem";
 import LeaderboardHeader from "./LeaderboardHeader";
 
@@ -54,7 +53,7 @@ function Leaderboard({ leaderboardId }: { leaderboardId: string }) {
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  if (status === "loading") return <p>Loading...</p>;
+  if (status === "loading") return <Spinner color={"#8B8B8B"} />;
   if (status === "error") return <p>Error :(</p>;
 
   return (
@@ -69,7 +68,9 @@ function Leaderboard({ leaderboardId }: { leaderboardId: string }) {
             ))}
           </div>
         ))}
-        {isFetchingNextPage && <p>Loading more...</p>}
+        {isFetchingNextPage && (
+          <p style={{ fontSize: "11px", textAlign: "center" }}>Loading more...</p>
+        )}
       </div>
     </div>
   );
