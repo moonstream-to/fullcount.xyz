@@ -8,6 +8,8 @@
 
     border: 1px solid #262019;
     background: #FFF;
+    transition: height 0.5s ease-in;
+    overflow: clip;
 }
 
 .title {
