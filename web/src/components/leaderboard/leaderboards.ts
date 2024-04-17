@@ -20,7 +20,6 @@ export async function fetchLeaderboardData(
   const response = await axios.get(
     `https://engineapi.moonstream.to/leaderboard/?leaderboard_id=${leaderboardId}&limit=${limit}&offset=${offset}`,
   );
-  console.log(response.data);
   const entries = response.data.map((entry: { address: string }) => {
     const [address, id] = entry.address.split("_");
     return { ...entry, address, id };
