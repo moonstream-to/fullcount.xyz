@@ -118,6 +118,7 @@
 
 .banner {
   border-bottom: 1px solid #262019;
+  min-height: 160px;
 }
 
 

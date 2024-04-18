@@ -36,7 +36,7 @@ const TitleScreen = () => {
               <div className={styles.content} style={{ maxWidth: isLaunching ? "320px" : "400px" }}>
                 <img
                   className={styles.banner}
-                  src={`${FULLCOUNT_ASSETS}/landing/banner.png`}
+                  src={`${FULLCOUNT_ASSETS}/banners/Bl-banner-updated-logo.jpeg`}
                   alt={""}
                 />
                 {isLaunching ? (
