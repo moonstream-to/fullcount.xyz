@@ -5,6 +5,16 @@ import localStyles from "./OnboardingCharacter.module.css";
 import React, { useEffect, useState } from "react";
 import { blbImage } from "../../constants";
 const NUMBER_OF_IMAGES = 8;
+const names = [
+  "Joe Expo",
+  "Playtest Celeste",
+  "Preseason Steven",
+  "Mike Check",
+  "Sample Simon",
+  "Demo Demi",
+  "Trial Kyle",
+  "Drew Preview",
+];
 
 const images: number[] = [];
 for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
@@ -18,27 +28,28 @@ const OnboardingCharacter = ({
   onClose: () => void;
   onChange: (name: string, image: string) => void;
 }) => {
-  const [name, setName] = useState("Guest_0420");
+  const [name, setName] = useState(names[7]);
   const [imageIndex, setImageIndex] = useState(7);
 
   useEffect(() => {
-    setName("Guest_0420");
+    setName(names[7]);
     setImageIndex(7);
   }, []);
 
   useEffect(() => {
-    onChange(name, blbImage(imageIndex));
+    onChange(names[imageIndex], blbImage(imageIndex));
   }, [imageIndex, name]);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      onClose();
-    }
-  };
   return (
     <div className={localStyles.container}>
       <div className={styles.content}>
+        <div className={localStyles.title}>
+          Choose character
+          <br />
+          to play demo
+        </div>
         <Image width={"161"} height={"161"} src={blbImage(imageIndex)} alt={""} />
+        <div className={localStyles.name}>{names[imageIndex]}</div>
         <div className={styles.images}>
           {images.map((_, idx: number) => (
             <Image
@@ -52,17 +63,6 @@ const OnboardingCharacter = ({
             />
           ))}
         </div>
-        <div className={styles.hint}>Choose an image.</div>
-        <input
-          type={"text"}
-          id={"name"}
-          placeholder={"Enter name"}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onKeyDown={handleKeyDown}
-          spellCheck={false}
-          className={localStyles.input}
-        />
       </div>
       <div className={styles.buttonsContainer}>
         <button
