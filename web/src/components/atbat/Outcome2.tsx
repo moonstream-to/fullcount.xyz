@@ -6,6 +6,7 @@ import React, { useEffect } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { useGameContext } from "../../contexts/GameContext";
 import { outcomes, outcomeType } from "./AtBatView";
+import Tip from "./Tip";
 
 export const sessionOutcomeType = (
   tokens: Token[],
@@ -34,10 +35,12 @@ const Outcome2 = ({
   atBat,
   sessionStatus,
   forToken,
+  showTips = false,
 }: {
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
   forToken: Token | undefined;
+  showTips?: boolean;
 }) => {
   const { selectedToken } = useGameContext();
   useEffect(() => {
@@ -128,9 +131,10 @@ const Outcome2 = ({
             </div>
           </div>
         </div>
+
         {/*<div className={styles.whiteSpace} />*/}
       </div>
-      <div className={styles.homeButton}>Go to home page</div>
+      {atBat.outcome === 0 && showTips && <Tip atBat={atBat} />}
     </div>
   );
 };
