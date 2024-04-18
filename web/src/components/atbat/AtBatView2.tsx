@@ -168,6 +168,7 @@ const AtBatView2: React.FC = () => {
         <>
           {atBat && (
             <Outcome2
+              showTips={true}
               atBat={atBat}
               forToken={selectedToken}
               sessionStatus={

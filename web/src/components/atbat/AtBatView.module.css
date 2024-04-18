@@ -131,6 +131,20 @@
     align-items: flex-end;
 }
 
+.tip {
+    width: 144px;
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    max-width: 26.96vh;
+    align-self: center;
+    margin-top: 5px;
+}
+
 @media (min-width: 1024px) {
     .playerView {
         padding-right: 15px;
