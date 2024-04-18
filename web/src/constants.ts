@@ -31,7 +31,7 @@ export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
 export const FULLCOUNT_ASSETS = "https://static.fullcount.xyz/web";
 export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
 
-export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
+export const DISCORD_LINK = "https://discord.com/invite/FEppMCDZsM";
 export const TWITTER_LINK = "https://twitter.com/fullcount_xyz";
 export const HYPERPLAY_LINK =
   "https://fullcount.xyz/landing/?utm_source=hyperplay%20&utm_medium=referral&utm_campaign=fullcount_launch";
