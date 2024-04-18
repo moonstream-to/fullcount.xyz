@@ -114,15 +114,27 @@
     bottom: 0;
     left: 50%;
     transform: translateY(-92px) translateX(-50%);
-    color: #262019;
-    font-family: Pangolin, cursive;
-    font-size: 14px;
+
+    color: #FFF;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 18px;
     font-style: normal;
     font-weight: 400;
-    line-height: normal;
+    line-height: 100%; /* 18px */
+    letter-spacing: 0.9px;
+
     cursor: pointer;
-    text-align: center;
     z-index: 4;
+    display: flex;
+    width: 26.96vh;
+    padding: 10px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    border: 1px solid #262019;
+    background: #328449;
 }
 
 .playerView {
