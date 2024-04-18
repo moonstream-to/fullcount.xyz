@@ -33,6 +33,7 @@ interface GameContextProps {
   joinedNotification: boolean;
   onboardingName: string;
   onboardingImageIdx: number;
+  isLaunching: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -78,6 +79,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     joinedNotification: false,
     onboardingName: "",
     onboardingImageIdx: 0,
+    isLaunching: true,
   });
 
   useEffect(() => {

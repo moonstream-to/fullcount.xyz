@@ -11,12 +11,13 @@ import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../constants";
 import LoadingView from "./HomePage/LoadingView";
 import LaunchForm from "./LaunchForm";
 import MoonstreamLogo2 from "./icons/MoonstreamLogo2";
+import { useGameContext } from "../contexts/GameContext";
 const TitleScreen = () => {
   const { user, isLoading } = useUser();
   const [isLogging, setIsLogging] = useState(false); // login or signUp
-  const [isLaunching, setIsLaunching] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFirstSeconds, setIsFirstSeconds] = useState(true);
+  const { isLaunching, updateContext } = useGameContext();
 
   useEffect(() => {
     setTimeout(() => setIsFirstSeconds(false), 2000);
@@ -39,7 +40,7 @@ const TitleScreen = () => {
                   alt={""}
                 />
                 {isLaunching ? (
-                  <LaunchForm onClose={() => setIsLaunching(false)} />
+                  <LaunchForm onClose={() => updateContext({ isLaunching: false })} />
                 ) : (
                   <>
                     {!isLogging ? (
