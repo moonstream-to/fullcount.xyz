@@ -30,8 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
             }
           : "Error object not available",
       };
-      const errorContent = JSON.stringify(errorInfo);
-      sendReport("Unhandled Runtime Error", errorContent, ["type:error", "error_domain:app"]);
+      sendReport("Unhandled Runtime Error", errorInfo, ["type:error", "error_domain:app"]);
       return false;
     };
   }, []);

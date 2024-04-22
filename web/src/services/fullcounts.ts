@@ -7,7 +7,7 @@ import { getMulticallResults } from "../utils/multicall";
 import { getTokensData } from "../tokenInterfaces/BLBTokenAPI";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
-const AT_BATS_OFFSET = 200;
+const AT_BATS_OFFSET = 400;
 
 export const getAtBat = async ({ tokensCache, id }: { tokensCache: Token[]; id: number }) => {
   console.log("FETCHING ATBAT", id);

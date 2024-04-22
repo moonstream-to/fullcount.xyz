@@ -108,7 +108,20 @@ const AtBatView: React.FC = () => {
       if (!id) {
         return;
       }
-      return getAtBat({ tokensCache, id: Number(id) });
+      const atBat = await getAtBat({ tokensCache, id: Number(id) });
+      if (
+        atBatState.data &&
+        atBatState.data.atBat.outcome === 0 &&
+        atBat &&
+        atBat.atBat.outcome !== 0 &&
+        selectedToken
+      ) {
+        sendReport("At-bat outcome", {}, [
+          "type:outcome",
+          `outcome:${outcomeType([selectedToken], atBat.atBat)}`,
+        ]);
+      }
+      return atBat;
     },
     {
       onSuccess: (data) => {
@@ -179,7 +192,7 @@ const AtBatView: React.FC = () => {
     ) {
       onOpen();
     } else {
-      sendReport("PlayView exit", "", ["type:click", "click:atBatExit"]);
+      sendReport("PlayView exit", {}, ["type:click", "click:atBatExit"]);
       router.push("/");
     }
   };

@@ -8,6 +8,7 @@ import {
 } from "../constants";
 import { useGameContext } from "../contexts/GameContext";
 import router from "next/router";
+import { sendReport } from "../utils/humbug";
 const buttons = ["PVP", "CAMPAIGN", "PRACTICE"];
 
 const LaunchForm = ({ onClose }: { onClose: () => void }) => {
@@ -16,18 +17,27 @@ const LaunchForm = ({ onClose }: { onClose: () => void }) => {
     updateContext({ selectedMode });
     onClose();
   };
+  const handleDemoClick = () => {
+    sendReport("Playing demo", {}, ["type:click", "click:play_demo"]);
+    router.push("/atbat");
+  };
+
+  const handleTrailerClick = () => {
+    sendReport("Playing trailer", {}, ["type:click", "click:play_trailer"]);
+    window.open(TRAILER_LINK, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <div className={styles.container}>
       <div className={styles.demoAndTrailer}>
-        <div className={styles.blackButton} onClick={() => router.push("/atbat")}>
+        <div className={styles.blackButton} onClick={handleDemoClick}>
           PLAY DEMO
         </div>
         <img
           alt={""}
           src={`${FULLCOUNT_ASSETS}/elements/play-trailer-button.jpg`}
           className={styles.trailerButton}
-          onClick={() => window.open(TRAILER_LINK, "_blank", "noopener,noreferrer")}
+          onClick={handleTrailerClick}
         />
       </div>
       {buttons.map((caption, idx) => (

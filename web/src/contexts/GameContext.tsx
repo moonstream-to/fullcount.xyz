@@ -93,7 +93,8 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
         soundVolume: Number(storedVolume),
       }));
     }
-  }, []);
+    localStorage.setItem("FULLCOUNT_USER_SESSION_ID", contextState.userSessionId);
+  }, [contextState.userSessionId]);
 
   const updateContext = (newState: Partial<GameContextProps>) => {
     console.log("updating context: ", { newState });
