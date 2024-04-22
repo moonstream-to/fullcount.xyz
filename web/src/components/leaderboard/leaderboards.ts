@@ -73,14 +73,23 @@ export const fetchWindowsForTokens = async (
     return res.data;
   });
   const response = await Promise.all(promises);
+  console.log(response);
+  const windows = response.map((window: any) =>
+    window.map((entry: { address: string }) => {
+      const [address, id] = entry.address.split("_");
+      return { ...entry, address, id };
+    }),
+  );
 
-  const entries: any = response.map((entry: { address: string }) => {
+  const entries: any = response.flat().map((entry: { address: string }) => {
     const [address, id] = entry.address.split("_");
     return { ...entry, address, id };
   });
   const tokensMetadata = await getTokensMetadata(entries, tokensCache);
-  return entries.map((entry: Token) => {
-    const metadata = tokensMetadata.find((t) => t.id === entry.id && t.address === entry.address);
-    return { ...entry, image: metadata?.image ?? "", name: metadata?.name ?? "" };
-  });
+  return windows.map((window: any) =>
+    window.map((entry: Token) => {
+      const metadata = tokensMetadata.find((t) => t.id === entry.id && t.address === entry.address);
+      return { ...entry, image: metadata?.image ?? "", name: metadata?.name ?? "" };
+    }),
+  );
 };
