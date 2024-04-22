@@ -7,17 +7,18 @@ import { IERC721 } from "../lib/openzeppelin-contracts/contracts/token/ERC721/IE
 import { SignatureChecker } from "../lib/openzeppelin-contracts/contracts/utils/cryptography/SignatureChecker.sol";
 
 import {
-    PlayerType,
-    PitchSpeed,
-    SwingType,
-    VerticalLocation,
-    HorizontalLocation,
-    Session,
     AtBat,
-    Pitch,
-    Swing,
+    AtBatOutcome,
+    HorizontalLocation,
+    NFT,
     Outcome,
-    AtBatOutcome
+    Pitch,
+    PitchSpeed,
+    PlayerType,
+    Session,
+    Swing,
+    SwingType,
+    VerticalLocation
 } from "./data.sol";
 
 /*
@@ -95,7 +96,14 @@ contract Fullcount is EIP712 {
     mapping(uint256 => uint256[]) public AtBatSessions;
     mapping(uint256 => uint256) public SessionAtBat;
 
+    // Player address => executor address => bool. Whether or not the
+    // executor is able to submit at-bats on behalf of the player.
+    mapping(address => mapping(address => bool)) public TrustedExecutors;
+
     event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
+
+    event ExecutorChange(address indexed player, address indexed executor, bool approved);
+
     event SessionStarted(
         uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
     );
@@ -104,28 +112,6 @@ contract Fullcount is EIP712 {
     );
     event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
     event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
-
-    event AtBatStarted(
-        uint256 indexed atBatID,
-        address indexed nftAddress,
-        uint256 indexed tokenID,
-        uint256 firstSessionID,
-        PlayerType role,
-        bool requiresSignature
-    );
-
-    event AtBatJoined(
-        uint256 indexed atBatID,
-        address indexed nftAddress,
-        uint256 indexed tokenID,
-        uint256 firstSessionID,
-        PlayerType role
-    );
-
-    event PitchCommitted(uint256 indexed sessionID);
-    event SwingCommitted(uint256 indexed sessionID);
-    event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
-    event SwingRevealed(uint256 indexed sessionID, Swing swing);
     event SessionResolved(
         uint256 indexed sessionID,
         Outcome indexed outcome,
@@ -135,6 +121,21 @@ contract Fullcount is EIP712 {
         uint256 batterTokenID
     );
 
+    event AtBatStarted(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role,
+        bool requiresSignature
+    );
+    event AtBatJoined(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role
+    );
     event AtBatProgress(
         uint256 indexed atBatID,
         AtBatOutcome indexed outcome,
@@ -145,6 +146,11 @@ contract Fullcount is EIP712 {
         address batterAddress,
         uint256 batterTokenID
     );
+
+    event PitchCommitted(uint256 indexed sessionID);
+    event SwingCommitted(uint256 indexed sessionID);
+    event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
+    event SwingRevealed(uint256 indexed sessionID, Swing swing);
 
     constructor(uint256 secondsPerPhase) EIP712("Fullcount", FullcountVersion) {
         SecondsPerPhase = secondsPerPhase;
@@ -162,6 +168,19 @@ contract Fullcount is EIP712 {
 
     function getNumberOfSessionsInAtBat(uint256 atBatID) external view returns (uint256) {
         return AtBatSessions[atBatID].length;
+    }
+
+    function _isExecutorForPlayer(address executor, address player) internal view returns (bool) {
+        return TrustedExecutors[player][executor];
+    }
+
+    function isExecutorForPlayer(address executor, address player) external view returns (bool) {
+        return _isExecutorForPlayer(executor, player);
+    }
+
+    function setTrustedExecutor(address executor, bool approved) external virtual {
+        TrustedExecutors[msg.sender][executor] = approved;
+        emit ExecutorChange(msg.sender, executor, approved);
     }
 
     /**
@@ -387,7 +406,7 @@ contract Fullcount is EIP712 {
         return NumAtBats;
     }
 
-    function _progressAtBat(uint256 finishedSessionID) internal {
+    function _progressAtBat(uint256 finishedSessionID, bool updateStakedTokens) internal {
         uint256 atBatID = SessionAtBat[finishedSessionID];
         if (atBatID == 0) return;
 
@@ -400,19 +419,36 @@ contract Fullcount is EIP712 {
                 atBat.outcome = AtBatOutcome.Strikeout;
             } else {
                 atBat.strikes++;
-                _startNextAtBatSession(
-                    atBatID,
-                    finishedSession.pitcherNFT.nftAddress,
-                    finishedSession.pitcherNFT.tokenID,
-                    finishedSession.batterNFT.nftAddress,
-                    finishedSession.batterNFT.tokenID
-                );
+                if (updateStakedTokens) {
+                    _startNextAtBatSession(
+                        atBatID,
+                        finishedSession.pitcherNFT.nftAddress,
+                        finishedSession.pitcherNFT.tokenID,
+                        finishedSession.batterNFT.nftAddress,
+                        finishedSession.batterNFT.tokenID
+                    );
+                }
             }
         } else if (finishedSession.outcome == Outcome.Ball) {
             if (atBat.balls >= 3) {
                 atBat.outcome = AtBatOutcome.Walk;
             } else {
                 atBat.balls++;
+                if (updateStakedTokens) {
+                    _startNextAtBatSession(
+                        atBatID,
+                        finishedSession.pitcherNFT.nftAddress,
+                        finishedSession.pitcherNFT.tokenID,
+                        finishedSession.batterNFT.nftAddress,
+                        finishedSession.batterNFT.tokenID
+                    );
+                }
+            }
+        } else if (finishedSession.outcome == Outcome.Foul) {
+            if (atBat.strikes < 2) {
+                atBat.strikes++;
+            }
+            if (updateStakedTokens) {
                 _startNextAtBatSession(
                     atBatID,
                     finishedSession.pitcherNFT.nftAddress,
@@ -421,17 +457,6 @@ contract Fullcount is EIP712 {
                     finishedSession.batterNFT.tokenID
                 );
             }
-        } else if (finishedSession.outcome == Outcome.Foul) {
-            if (atBat.strikes < 2) {
-                atBat.strikes++;
-            }
-            _startNextAtBatSession(
-                atBatID,
-                finishedSession.pitcherNFT.nftAddress,
-                finishedSession.pitcherNFT.tokenID,
-                finishedSession.batterNFT.nftAddress,
-                finishedSession.batterNFT.tokenID
-            );
         } else if (finishedSession.outcome == Outcome.Single) {
             atBat.outcome = AtBatOutcome.Single;
         } else if (finishedSession.outcome == Outcome.Double) {
@@ -826,7 +851,7 @@ contract Fullcount is EIP712 {
             StakedSession[session.pitcherNFT.nftAddress][session.pitcherNFT.tokenID] = 0;
             session.pitcherLeftSession = true;
 
-            _progressAtBat(sessionID);
+            _progressAtBat(sessionID, true);
         }
     }
 
@@ -883,7 +908,70 @@ contract Fullcount is EIP712 {
             StakedSession[session.pitcherNFT.nftAddress][session.pitcherNFT.tokenID] = 0;
             session.pitcherLeftSession = true;
 
-            _progressAtBat(sessionID);
+            _progressAtBat(sessionID, true);
+        }
+    }
+
+    function submitAtBat(
+        NFT memory pitcherNFT,
+        NFT memory batterNFT,
+        Pitch[] memory pitches,
+        Swing[] memory swings,
+        AtBatOutcome expectedOutcome
+    )
+        external
+    {
+        require(
+            pitches.length == swings.length, "Fullcount.submitAtBat: number of pitches does not match number of swings."
+        );
+
+        address pitcherOwner = IERC721(pitcherNFT.nftAddress).ownerOf(pitcherNFT.tokenID);
+        require(
+            _isExecutorForPlayer(msg.sender, pitcherOwner),
+            "Fullcount.submitAtBat: sender is not an executor for pitcher."
+        );
+
+        address batterOwner = IERC721(batterNFT.nftAddress).ownerOf(batterNFT.tokenID);
+        require(
+            _isExecutorForPlayer(msg.sender, batterOwner),
+            "Fullcount.submitAtBat: sender is not an executor for batter."
+        );
+
+        require(
+            expectedOutcome != AtBatOutcome(0),
+            "Fullcount.submitAtBat: cannot submit an at-bat that is still in progress."
+        );
+
+        // Create at-bat
+        NumAtBats++;
+
+        AtBatState[NumAtBats].pitcherNFT = pitcherNFT;
+        AtBatState[NumAtBats].batterNFT = batterNFT;
+
+        uint256[] storage sessionList = AtBatSessions[NumAtBats];
+
+        for (uint256 i = 0; i < pitches.length; i++) {
+            Outcome sessionOutcome = resolve(pitches[i], swings[i]);
+
+            NumSessions++;
+            SessionState[NumSessions].pitcherNFT = pitcherNFT;
+            SessionState[NumSessions].batterNFT = batterNFT;
+            SessionState[NumSessions].outcome = sessionOutcome;
+
+            emit SessionResolved(
+                NumSessions,
+                sessionOutcome,
+                pitcherNFT.nftAddress,
+                pitcherNFT.tokenID,
+                batterNFT.nftAddress,
+                batterNFT.tokenID
+            );
+
+            // Add session to at-bat
+            sessionList.push(NumSessions);
+            SessionAtBat[NumSessions] = NumAtBats;
+
+            _progressAtBat(NumSessions, false);
         }
     }
 }

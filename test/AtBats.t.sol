@@ -44,6 +44,61 @@ contract FullcountAtBatTest is FullcountTestBase {
         address batterAddress,
         uint256 batterTokenID
     );
+
+    function _generateStrike() internal pure returns (Pitch memory, Swing memory) {
+        Pitch memory pitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideStrike);
+
+        Swing memory swing = Swing(1, SwingType.Take, VerticalLocation.Middle, HorizontalLocation.Middle);
+
+        return (pitch, swing);
+    }
+
+    function _generateBall() internal pure returns (Pitch memory, Swing memory) {
+        Pitch memory pitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideBall);
+
+        Swing memory swing = Swing(1, SwingType.Take, VerticalLocation.Middle, HorizontalLocation.Middle);
+
+        return (pitch, swing);
+    }
+
+    function _generateFoul() internal pure returns (Pitch memory, Swing memory) {
+        Pitch memory pitch = Pitch(
+            76_272_677_889_733_487_807_869_088_975_394_561_199_007_238_211_299_295_369_669_345_782_657_832_457_462,
+            PitchSpeed.Slow,
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideStrike
+        );
+
+        Swing memory swing = Swing(5027, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
+
+        return (pitch, swing);
+    }
+
+    function _generateDouble() internal pure returns (Pitch memory, Swing memory) {
+        Pitch memory pitch = Pitch(
+            111_226_050_657_822_924_597_491_446_253_991_213_025_840_145_394_201_015_488_938_793_738_637_304_727_056,
+            PitchSpeed.Slow,
+            VerticalLocation.Middle,
+            HorizontalLocation.InsideStrike
+        );
+
+        Swing memory swing = Swing(5682, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.OutsideStrike);
+
+        return (pitch, swing);
+    }
+
+    function _generateHomeRun() internal pure returns (Pitch memory, Swing memory) {
+        Pitch memory pitch = Pitch(
+            70_742_784_270_056_657_581_884_307_797_108_841_089_344_138_257_779_225_355_304_684_713_507_588_495_343,
+            PitchSpeed.Fast,
+            VerticalLocation.HighBall,
+            HorizontalLocation.OutsideStrike
+        );
+
+        Swing memory swing = Swing(6874, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
+
+        return (pitch, swing);
+    }
 }
 
 contract FullcountTest_startAtBat is FullcountAtBatTest {
@@ -259,44 +314,33 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
     }
 
     function _strikeSession(uint256 sessionID) internal {
-        Pitch memory pitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideStrike);
-        _commitPitch(sessionID, player1, player1PrivateKey, pitch);
+        (Pitch memory strikePitch, Swing memory strikeSwing) = _generateStrike();
 
-        Swing memory swing = Swing(1, SwingType.Take, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitSwing(sessionID, player2, player2PrivateKey, swing);
+        _commitPitch(sessionID, player1, player1PrivateKey, strikePitch);
+        _commitSwing(sessionID, player2, player2PrivateKey, strikeSwing);
 
-        _revealPitch(sessionID, player1, pitch);
-        _revealSwing(sessionID, player2, swing);
+        _revealPitch(sessionID, player1, strikePitch);
+        _revealSwing(sessionID, player2, strikeSwing);
     }
 
     function _ballSession(uint256 sessionID) internal {
-        Pitch memory pitch = Pitch(1, PitchSpeed.Fast, VerticalLocation.Middle, HorizontalLocation.InsideBall);
-        _commitPitch(sessionID, player1, player1PrivateKey, pitch);
+        (Pitch memory ballPitch, Swing memory ballSwing) = _generateBall();
 
-        Swing memory swing = Swing(1, SwingType.Take, VerticalLocation.Middle, HorizontalLocation.Middle);
-        _commitSwing(sessionID, player2, player2PrivateKey, swing);
+        _commitPitch(sessionID, player1, player1PrivateKey, ballPitch);
+        _commitSwing(sessionID, player2, player2PrivateKey, ballSwing);
 
-        _revealSwing(sessionID, player2, swing);
-        _revealPitch(sessionID, player1, pitch);
+        _revealSwing(sessionID, player2, ballSwing);
+        _revealPitch(sessionID, player1, ballPitch);
     }
 
     function _foulSession(uint256 sessionID) internal {
-        // From Resolutinos test file
+        (Pitch memory foulPitch, Swing memory foulSwing) = _generateFoul();
 
-        Pitch memory pitch = Pitch(
-            76_272_677_889_733_487_807_869_088_975_394_561_199_007_238_211_299_295_369_669_345_782_657_832_457_462,
-            PitchSpeed.Slow,
-            VerticalLocation.HighBall,
-            HorizontalLocation.OutsideStrike
-        );
+        _commitPitch(sessionID, player1, player1PrivateKey, foulPitch);
+        _commitSwing(sessionID, player2, player2PrivateKey, foulSwing);
 
-        Swing memory swing = Swing(5027, SwingType.Contact, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
-
-        _commitPitch(sessionID, player1, player1PrivateKey, pitch);
-        _commitSwing(sessionID, player2, player2PrivateKey, swing);
-
-        _revealPitch(sessionID, player1, pitch);
-        _revealSwing(sessionID, player2, swing);
+        _revealPitch(sessionID, player1, foulPitch);
+        _revealSwing(sessionID, player2, foulSwing);
     }
 
     function test_new_session_begins_after_one_strike() public {
@@ -795,21 +839,13 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
         assertEq(atBat.strikes, 2);
         assertEq(uint256(atBat.outcome), uint256(AtBatOutcome.InProgress));
 
-        // Generates a double
-        Pitch memory pitch = Pitch(
-            111_226_050_657_822_924_597_491_446_253_991_213_025_840_145_394_201_015_488_938_793_738_637_304_727_056,
-            PitchSpeed.Slow,
-            VerticalLocation.Middle,
-            HorizontalLocation.InsideStrike
-        );
+        (Pitch memory doublePitch, Swing memory doubleSwing) = _generateDouble();
 
-        Swing memory swing = Swing(5682, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.OutsideStrike);
+        _commitPitch(sixthSessionID, player1, player1PrivateKey, doublePitch);
+        _commitSwing(sixthSessionID, player2, player2PrivateKey, doubleSwing);
 
-        _commitPitch(sixthSessionID, player1, player1PrivateKey, pitch);
-        _commitSwing(sixthSessionID, player2, player2PrivateKey, swing);
-
-        _revealPitch(sixthSessionID, player1, pitch);
-        _revealSwing(sixthSessionID, player2, swing);
+        _revealPitch(sixthSessionID, player1, doublePitch);
+        _revealSwing(sixthSessionID, player2, doubleSwing);
 
         Session memory sixthSession = game.getSession(sixthSessionID);
         assertTrue(sixthSession.didPitcherReveal);
@@ -1029,15 +1065,7 @@ contract FullcountTest_ballsAndStrikes is FullcountAtBatTest {
 
         nextSessionID = game.AtBatSessions(AtBatID, 5);
 
-        // Generates a home run
-        Pitch memory hrPitch = Pitch(
-            70_742_784_270_056_657_581_884_307_797_108_841_089_344_138_257_779_225_355_304_684_713_507_588_495_343,
-            PitchSpeed.Fast,
-            VerticalLocation.HighBall,
-            HorizontalLocation.OutsideStrike
-        );
-
-        Swing memory hrSwing = Swing(6874, SwingType.Power, VerticalLocation.HighBall, HorizontalLocation.OutsideStrike);
+        (Pitch memory hrPitch, Swing memory hrSwing) = _generateHomeRun();
 
         _commitPitch(nextSessionID, player1, player1PrivateKey, hrPitch);
 
