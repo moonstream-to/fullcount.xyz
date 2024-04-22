@@ -25,10 +25,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     this.setState({ errorInfo });
     console.error("Uncaught error:", error, errorInfo);
-    const content = JSON.stringify({
+    const content = {
       error: error.toString(),
       errorInfo: errorInfo.componentStack,
-    });
+    };
     sendReport("React ErrorBoundary Error", content, ["type:error", "error_domain:react"]).catch(
       (reportError) => {
         console.error("Failed to send error report:", reportError);

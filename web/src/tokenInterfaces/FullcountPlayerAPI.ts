@@ -1,8 +1,7 @@
 import { OwnedToken, Token } from "../types";
-import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, RPC, TOKEN_CONTRACT } from "../constants";
+import { FULLCOUNT_PLAYER_API, GAME_CONTRACT } from "../constants";
 import axios from "axios";
 import { getTokensData } from "./BLBTokenAPI";
-import Web3 from "web3";
 import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
@@ -33,7 +32,6 @@ export async function fetchFullcountPlayerTokens() {
       id: nft.token_id,
       address: nft.erc721_address,
     }));
-    // .filter((nft: { address: string }) => nft.address === TOKEN_CONTRACT);
 
     const tokensData = await getTokensData({
       tokens,
@@ -62,7 +60,7 @@ export async function fetchFullcountPlayerTokens() {
     });
   } catch (e: any) {
     console.log("Error fetching FullcountPlayer tokens\n", e);
-    sendReport("Error fetching FCPlayer tokens", e.message, [
+    sendReport("Error fetching FCPlayer tokens", { error: { message: e.message } }, [
       "type:error",
       "error_domain:fcplayer",
       `error:fcplayer-tokens`,
@@ -114,7 +112,9 @@ export async function startSessionFullcountPlayer({
       console.log("Success:", response.data);
       return response.data;
     });
-  sendReport("Session started", `Token #${token.id} started session ${data.session_id}`, [
+  sendReport("Session started", {}, [
+    "type:contract",
+    "contract_method:start",
     `token_address:${token.address}`,
     `token_id:${token.id}`,
   ]);
@@ -165,23 +165,20 @@ export async function joinSessionFullcountPlayer({
         throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
-      sendReport("Session joined", `Token #${token.id} joined session #${sessionID}`, [
-        `user_token: ${localStorage.getItem("FULLCOUNT_ACCESS_TOKEN") ?? ""}`,
+      sendReport("Session joined", {}, [
+        `type:contract', 'contract_method:join', token_address:${token.address}`,
+        `token_id:${token.id}`,
       ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(
-        "Joining failed",
-        `${e.message} Token #${token.id} joining session #${sessionID}`,
-        [
-          "type:error",
-          "error_domain:fcplayer",
-          `error:fcplayer-joining`,
-          `token_address:${token.address}`,
-          `token_id:${token.id}`,
-        ],
-      );
+      sendReport("Joining failed", { error: { message: e.message } }, [
+        "type:error",
+        "error_domain:fcplayer",
+        `error:fcplayer-joining`,
+        `token_address:${token.address}`,
+        `token_id:${token.id}`,
+      ]);
       throw e;
     });
 }
@@ -225,10 +222,11 @@ export const abortFullcountPlayerSession = async ({
         throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
+      sendReport("Aborting session", {}, ["type:contract", "contract_method:abort"]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport("Closing at-bat failed", "", [
+      sendReport("Closing at-bat failed", { error: { message: e.message } }, [
         "type:error",
         "error_domain:fcplayer",
         `error:fcplayer-unstaking`,
@@ -274,16 +272,24 @@ export const unstakeFullcountPlayer = async ({ token }: { token: Token }) => {
         throw new Error("Time out. Something with server. Sorry. ");
       }
       console.log("Success:", response.data);
+      sendReport(`${action === "abort" ? "Aborting" : "Unstaking"}`, {}, [
+        "type:contract",
+        `contract_method:${action}`,
+      ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport("Unstaking failed", `${e.message} unstaking  token #${token.id}`, [
-        "type:error",
-        "error_domain:fcplayer",
-        `error:fcplayer-unstaking`,
-        `token_address:${token.address}`,
-        `token_id:${token.id}`,
-      ]);
+      sendReport(
+        `${action === "abort" ? "Aborting" : "Unstaking"} failed`,
+        { error: { message: e.message } },
+        [
+          "type:error",
+          "error_domain:fcplayer",
+          `error:fcplayer-${action}`,
+          `token_address:${token.address}`,
+          `token_id:${token.id}`,
+        ],
+      );
       throw e;
     });
 };
@@ -354,14 +360,16 @@ export const commitOrRevealPitchFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
-      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, {}, [
+        "type:contract",
+        `contract_method:${isCommit ? "CommitPitch" : "RevealPitch"}`,
         `token_address:${token.address}`,
         `token_id:${token.id}`,
       ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, { error: { message: e.message } }, [
         "type:error",
         "error_domain:fcplayer",
         `error:fcplayer-${isCommit ? "commit" : "reveal"}`,
@@ -430,14 +438,16 @@ export const commitOrRevealSwingFullcountPlayer = ({
         }
       }
       console.log("Success:", response.data);
-      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, `Token #${token.id}`, [
+      sendReport(`Move ${isCommit ? "committed" : "revealed"}`, {}, [
+        "type:contract",
+        `contract_method:${isCommit ? "CommitSwing" : "RevealSwing"}`,
         `token_address:${token.address}`,
         `token_id:${token.id}`,
       ]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`${isCommit ? "commit" : "reveal"} failed`, `${e.message} Token #${token.id}`, [
+      sendReport(`${isCommit ? "commit" : "reveal"} failed`, { error: { message: e.message } }, [
         `token_address:${token.address}`,
         `token_id:${token.id}`,
         `type:error`,
@@ -466,11 +476,11 @@ export const mintFullcountPlayerToken = ({
     })
     .then(async (response) => {
       console.log("Success:", response.data);
-      sendReport(`Token minted`, `Token #${response.data.token_id} minted`, []);
+      sendReport(`Token minted`, {}, ["type:contract", "contract_method:mint"]);
       return response.data;
     })
     .catch((e: any) => {
-      sendReport(`minting failed`, `${e.message} ${name}`, [
+      sendReport(`minting failed`, { error: { message: e.message } }, [
         "type:error",
         "error_domain:fcplayer",
         `error:fcplayer-mint`,

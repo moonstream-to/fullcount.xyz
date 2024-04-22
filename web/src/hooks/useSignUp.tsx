@@ -18,7 +18,7 @@ const useSignUp = () => {
     onSuccess: (response, variables) => {
       localStorage.setItem("FULLCOUNT_ACCESS_TOKEN", response.data.id);
       localStorage.setItem("FULLCOUNT_USER_ID", response.data.user_id);
-      sendReport("signed up", `${variables.username} - ${variables.email}`, [
+      sendReport("signed up", { username: variables.username, email: variables.email }, [
         `user_token: ${response.data.id}`,
       ]);
 
@@ -27,12 +27,16 @@ const useSignUp = () => {
     onError: (error: any, variables) => {
       console.log(error);
       let message = error.response?.data?.detail ?? error.message;
-      sendReport("Error signing up", `${variables.username} - ${variables.email} - ${message}`, [
-        "type:error",
-        "error_domain:account",
-        `error:account-signup`,
-        `user:${variables.username}`,
-      ]);
+      sendReport(
+        "Error signing up",
+        { username: variables.username, email: variables.email, error: { message } },
+        [
+          "type:error",
+          "error_domain:account",
+          `error:account-signup`,
+          `user:${variables.username}`,
+        ],
+      );
 
       if (error.response?.status === 409) {
         message = "username or email already exists";

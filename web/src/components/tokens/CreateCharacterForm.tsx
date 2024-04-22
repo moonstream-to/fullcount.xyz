@@ -8,6 +8,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
 import { blbImage } from "../../constants";
+import { sendReport } from "../../utils/humbug";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -41,6 +42,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       onError: (e: Error) => {
         console.log(e);
         toast("Minting failed: " + e?.message, "error");
+        sendReport("Error toast", { error: e }, ["type:error_toast"]);
       },
     },
   );
