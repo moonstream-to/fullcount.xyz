@@ -917,7 +917,7 @@ contract Fullcount is EIP712 {
         NFT memory batterNFT,
         Pitch[] memory pitches,
         Swing[] memory swings,
-        AtBatOutcome expectedOutcome
+        AtBatOutcome proposedOutcome
     )
         external
     {
@@ -937,11 +937,6 @@ contract Fullcount is EIP712 {
             "Fullcount.submitAtBat: sender is not an executor for batter."
         );
 
-        require(
-            expectedOutcome != AtBatOutcome(0),
-            "Fullcount.submitAtBat: cannot submit an at-bat that is still in progress."
-        );
-
         // Create at-bat
         NumAtBats++;
 
@@ -951,6 +946,10 @@ contract Fullcount is EIP712 {
         uint256[] storage sessionList = AtBatSessions[NumAtBats];
 
         for (uint256 i = 0; i < pitches.length; i++) {
+            if (AtBatState[NumAtBats].outcome != AtBatOutcome.InProgress) {
+                revert("Fullcount.submitAtBat: invalid at-bat - invalid at-bat");
+            }
+
             Outcome sessionOutcome = resolve(pitches[i], swings[i]);
 
             NumSessions++;
@@ -972,6 +971,14 @@ contract Fullcount is EIP712 {
             SessionAtBat[NumSessions] = NumAtBats;
 
             _progressAtBat(NumSessions, false);
+        }
+
+        if (AtBatState[NumAtBats].outcome == AtBatOutcome.InProgress) {
+            revert("Fullcount.submitAtBat: invalid at-bat - inconclusive");
+        }
+
+        if (AtBatState[NumAtBats].outcome != proposedOutcome) {
+            revert("Fullcount.submitAtBat: at-bat outcome does not match executor proposed outcome");
         }
     }
 }

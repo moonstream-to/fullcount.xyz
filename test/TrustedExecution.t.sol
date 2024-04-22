@@ -206,7 +206,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[3], swings[3]) = _generateBall();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Walk);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -248,7 +248,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[3], swings[3]) = _generateDouble();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -331,7 +331,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
             address(otherCharacterNFTs),
             BatterTokenID
         );
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -352,5 +352,100 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
                 assertTrue(session.outcome == Outcome.HomeRun);
             }
         }
+    }
+
+    function test_submit_with_inconclusive_at_bat() public {
+        vm.prank(player1);
+        game.setTrustedExecutor(executor1, true);
+
+        vm.prank(player2);
+        game.setTrustedExecutor(executor1, true);
+
+        uint256 initialNumAtBats = game.NumAtBats();
+        uint256 initialNumSessions = game.NumSessions();
+
+        uint256 atBatLength = 6;
+
+        NFT memory pitcher = NFT({ nftAddress: address(characterNFTs), tokenID: PitcherTokenID });
+        NFT memory batter = NFT({ nftAddress: address(otherCharacterNFTs), tokenID: BatterTokenID });
+        Pitch[] memory pitches = new Pitch[](atBatLength);
+        Swing[] memory swings = new Swing[](atBatLength);
+
+        (pitches[0], swings[0]) = _generateStrike();
+        (pitches[1], swings[1]) = _generateBall();
+        (pitches[2], swings[2]) = _generateStrike();
+        (pitches[3], swings[3]) = _generateBall();
+        (pitches[4], swings[4]) = _generateFoul();
+        (pitches[5], swings[5]) = _generateBall();
+
+        vm.prank(executor1);
+        vm.expectRevert("Fullcount.submitAtBat: invalid at-bat - inconclusive");
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+
+        assertEq(game.NumAtBats(), initialNumAtBats);
+        assertEq(game.NumSessions(), initialNumSessions);
+    }
+
+    function test_submit_with_multiple_finalities() public {
+        vm.prank(player1);
+        game.setTrustedExecutor(executor1, true);
+
+        vm.prank(player2);
+        game.setTrustedExecutor(executor1, true);
+
+        uint256 initialNumAtBats = game.NumAtBats();
+        uint256 initialNumSessions = game.NumSessions();
+
+        uint256 atBatLength = 4;
+
+        NFT memory pitcher = NFT({ nftAddress: address(characterNFTs), tokenID: PitcherTokenID });
+        NFT memory batter = NFT({ nftAddress: address(otherCharacterNFTs), tokenID: BatterTokenID });
+        Pitch[] memory pitches = new Pitch[](atBatLength);
+        Swing[] memory swings = new Swing[](atBatLength);
+
+        (pitches[0], swings[0]) = _generateFoul();
+        (pitches[1], swings[1]) = _generateStrike();
+        (pitches[2], swings[2]) = _generateStrike();
+        (pitches[3], swings[3]) = _generateDouble();
+
+        vm.prank(executor1);
+        vm.expectRevert("Fullcount.submitAtBat: invalid at-bat - invalid at-bat");
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
+
+        assertEq(game.NumAtBats(), initialNumAtBats);
+        assertEq(game.NumSessions(), initialNumSessions);
+    }
+
+    function test_at_bat_outcome_must_match_executor_proposed_outcome() public {
+        vm.prank(player1);
+        game.setTrustedExecutor(executor1, true);
+
+        vm.prank(player2);
+        game.setTrustedExecutor(executor1, true);
+
+        uint256 initialNumAtBats = game.NumAtBats();
+        uint256 initialNumSessions = game.NumSessions();
+
+        uint256 atBatLength = 7;
+
+        NFT memory pitcher = NFT({ nftAddress: address(characterNFTs), tokenID: PitcherTokenID });
+        NFT memory batter = NFT({ nftAddress: address(otherCharacterNFTs), tokenID: BatterTokenID });
+        Pitch[] memory pitches = new Pitch[](atBatLength);
+        Swing[] memory swings = new Swing[](atBatLength);
+
+        (pitches[0], swings[0]) = _generateFoul();
+        (pitches[1], swings[1]) = _generateFoul();
+        (pitches[2], swings[2]) = _generateFoul();
+        (pitches[3], swings[3]) = _generateBall();
+        (pitches[4], swings[4]) = _generateBall();
+        (pitches[5], swings[5]) = _generateBall();
+        (pitches[6], swings[6]) = _generateBall();
+
+        vm.prank(executor1);
+        vm.expectRevert("Fullcount.submitAtBat: at-bat outcome does not match executor proposed outcome");
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+
+        assertEq(game.NumAtBats(), initialNumAtBats);
+        assertEq(game.NumSessions(), initialNumSessions);
     }
 }
