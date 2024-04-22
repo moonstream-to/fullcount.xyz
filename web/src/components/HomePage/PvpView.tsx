@@ -13,6 +13,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
 import { isCampaignToken } from "../campaign/teams";
 import { isCoach } from "./PracticeView";
+import { sendReport } from "../../utils/humbug";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
@@ -91,6 +92,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
+        sendReport("Error toast", { error: e }, ["type:error_toast"]);
       },
     },
   );
