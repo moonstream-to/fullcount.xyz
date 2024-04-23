@@ -8,3 +8,18 @@
     padding: 20px 20px 5px 20px;
     margin-bottom: 30px;
 }
+
+@media (min-width: 768px) {
+    .container {
+        display: flex;
+        height: 100vh;
+        padding: 0 100px 40px 100px;
+        flex-direction: column;
+        gap: 40px;
+        background: #FCECD9;
+    }
+
+    .navbarContainer {
+        margin-bottom: -10px;
+    }
+}
