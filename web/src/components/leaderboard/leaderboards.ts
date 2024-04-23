@@ -63,7 +63,7 @@ export const fetchWindowsForTokens = async (
   tokens: TokenId[],
   tokensCache: Token[],
   windowSize: number,
-): Promise<LeaderboardEntry[]> => {
+): Promise<LeaderboardEntry[][]> => {
   const promises = tokens.map(async (t) => {
     const res = await axios.get(
       `https://engineapi.moonstream.to/leaderboard/position/?leaderboard_id=${leaderboardId}&address=${
