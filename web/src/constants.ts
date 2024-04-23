@@ -73,8 +73,8 @@ export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TO
 export const CHAIN_ID = 42170;
 export const RPC = "https://nova.arbitrum.io/rpc";
 export const blbImage = (idx: number) =>
-  `https://static.fullcount.xyz/Beer_League_Ballers/p${idx}.png`;
-export const HUMBUG_REPORT_VERSION = "0.0.2";
+  `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.png`;
+export const HUMBUG_REPORT_VERSION = "0.0.3";
 
 export const LEADERBOARD_HOME_RUNS = "0f061af5-22a7-4449-a4e3-b0efe3a5a3d8";
 export const LEADERBOARD_ON_BASE_PERCENTAGE = "941f5bfb-b6c9-4ff5-8442-8beae42009ee";
