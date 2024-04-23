@@ -100,35 +100,6 @@ contract Fullcount is EIP712 {
     // executor is able to submit at-bats on behalf of the player.
     mapping(address => mapping(address => bool)) public TrustedExecutors;
 
-    event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
-
-    event ExecutorChange(address indexed player, address indexed executor, bool approved);
-
-    event SessionStarted(
-        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
-    );
-    event SessionJoined(
-        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
-    );
-    event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
-    event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
-    event SessionResolved(
-        uint256 indexed sessionID,
-        Outcome indexed outcome,
-        address pitcherAddress,
-        uint256 pitcherTokenID,
-        address batterAddress,
-        uint256 batterTokenID
-    );
-
-    event AtBatStarted(
-        uint256 indexed atBatID,
-        address indexed nftAddress,
-        uint256 indexed tokenID,
-        uint256 firstSessionID,
-        PlayerType role,
-        bool requiresSignature
-    );
     event AtBatJoined(
         uint256 indexed atBatID,
         address indexed nftAddress,
@@ -146,10 +117,35 @@ contract Fullcount is EIP712 {
         address batterAddress,
         uint256 batterTokenID
     );
-
+    event AtBatStarted(
+        uint256 indexed atBatID,
+        address indexed nftAddress,
+        uint256 indexed tokenID,
+        uint256 firstSessionID,
+        PlayerType role,
+        bool requiresSignature
+    );
+    event ExecutorChange(address indexed player, address indexed executor, bool approved);
+    event FullcountDeployed(string indexed version, uint256 SecondsPerPhase);
     event PitchCommitted(uint256 indexed sessionID);
-    event SwingCommitted(uint256 indexed sessionID);
     event PitchRevealed(uint256 indexed sessionID, Pitch pitch);
+    event SessionAborted(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+    event SessionExited(uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID);
+    event SessionJoined(
+        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
+    );
+    event SessionStarted(
+        uint256 indexed sessionID, address indexed nftAddress, uint256 indexed tokenID, PlayerType role
+    );
+    event SessionResolved(
+        uint256 indexed sessionID,
+        Outcome indexed outcome,
+        address pitcherAddress,
+        uint256 pitcherTokenID,
+        address batterAddress,
+        uint256 batterTokenID
+    );
+    event SwingCommitted(uint256 indexed sessionID);
     event SwingRevealed(uint256 indexed sessionID, Swing swing);
 
     constructor(uint256 secondsPerPhase) EIP712("Fullcount", FullcountVersion) {
@@ -957,6 +953,15 @@ contract Fullcount is EIP712 {
             SessionState[NumSessions].batterNFT = batterNFT;
             SessionState[NumSessions].outcome = sessionOutcome;
 
+            // Add session to at-bat
+            sessionList.push(NumSessions);
+            SessionAtBat[NumSessions] = NumAtBats;
+
+            emit PitchCommitted(NumSessions);
+            emit SwingCommitted(NumSessions);
+            emit PitchRevealed(NumSessions, pitches[i]);
+            emit SwingRevealed(NumSessions, swings[i]);
+
             emit SessionResolved(
                 NumSessions,
                 sessionOutcome,
@@ -965,10 +970,6 @@ contract Fullcount is EIP712 {
                 batterNFT.nftAddress,
                 batterNFT.tokenID
             );
-
-            // Add session to at-bat
-            sessionList.push(NumSessions);
-            SessionAtBat[NumSessions] = NumAtBats;
 
             _progressAtBat(NumSessions, false);
         }

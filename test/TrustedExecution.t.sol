@@ -294,7 +294,15 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[1], swings[1]) = _generateHomeRun();
 
         vm.prank(executor1);
-        vm.expectEmit(true, true, true, true, address(game));
+        vm.expectEmit(address(game));
+        emit PitchCommitted(initialNumSessions + 1);
+        vm.expectEmit(address(game));
+        emit SwingCommitted(initialNumSessions + 1);
+        vm.expectEmit(address(game));
+        emit PitchRevealed(initialNumSessions + 1, pitches[0]);
+        vm.expectEmit(address(game));
+        emit SwingRevealed(initialNumSessions + 1, swings[0]);
+        vm.expectEmit(address(game));
         emit SessionResolved(
             initialNumSessions + 1,
             Outcome.Ball,
@@ -303,6 +311,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
             address(otherCharacterNFTs),
             BatterTokenID
         );
+        vm.expectEmit(address(game));
         emit AtBatProgress(
             initialNumAtBats + 1,
             AtBatOutcome.InProgress,
@@ -313,6 +322,15 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
             address(otherCharacterNFTs),
             BatterTokenID
         );
+        vm.expectEmit(address(game));
+        emit PitchCommitted(initialNumSessions + 2);
+        vm.expectEmit(address(game));
+        emit SwingCommitted(initialNumSessions + 2);
+        vm.expectEmit(address(game));
+        emit PitchRevealed(initialNumSessions + 2, pitches[1]);
+        vm.expectEmit(address(game));
+        emit SwingRevealed(initialNumSessions + 2, swings[1]);
+        vm.expectEmit(address(game));
         emit SessionResolved(
             initialNumSessions + 2,
             Outcome.HomeRun,
@@ -321,6 +339,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
             address(otherCharacterNFTs),
             BatterTokenID
         );
+        vm.expectEmit(address(game));
         emit AtBatProgress(
             initialNumAtBats + 1,
             AtBatOutcome.HomeRun,
@@ -380,7 +399,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
 
         vm.prank(executor1);
         vm.expectRevert("Fullcount.submitAtBat: invalid at-bat - inconclusive");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.InProgress);
 
         assertEq(game.NumAtBats(), initialNumAtBats);
         assertEq(game.NumSessions(), initialNumSessions);
