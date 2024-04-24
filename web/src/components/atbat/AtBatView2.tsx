@@ -14,6 +14,7 @@ import BatterViewMobile2 from "./BatterViewMobile2";
 import { getAtBat, initialAtBatState, selectedToken } from "./OnboardingAPI";
 import { outcomeType, sessionOutcomes } from "./AtBatView";
 import OnboardingCharacter from "./OnboardingCharacter";
+import { useGameContext } from "../../contexts/GameContext";
 
 const AtBatView2: React.FC = () => {
   const router = useRouter();
@@ -25,6 +26,7 @@ const AtBatView2: React.FC = () => {
   const [isCharacterSelectOpen, setIsCharacterSelectOpen] = useState(true);
   const [name, setName] = useState("Guest_0420");
   const [image, setImage] = useState(blbImage(7));
+  const { updateContext } = useGameContext();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -99,8 +101,14 @@ const AtBatView2: React.FC = () => {
         alt={""}
       />
       {atBat && showPitchOutcome && atBat.outcome !== 0 && atBat.pitches.length > 0 && (
-        <div className={styles.homeButton} onClick={() => router.push("/")}>
-          play more
+        <div
+          className={styles.homeButton}
+          onClick={() => {
+            updateContext({ isLaunching: false });
+            router.push("/");
+          }}
+        >
+          JOIN FULLCOUNT
         </div>
       )}
 
@@ -168,6 +176,7 @@ const AtBatView2: React.FC = () => {
         <>
           {atBat && (
             <Outcome2
+              showTips={true}
               atBat={atBat}
               forToken={selectedToken}
               sessionStatus={

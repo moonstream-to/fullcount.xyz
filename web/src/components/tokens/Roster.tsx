@@ -16,18 +16,20 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
     <div className={styles.container}>
       <div className={styles.header}>roster</div>
       <div className={styles.tokens}>
-        <div className={styles.selectedTokenContainer}>
-          <Image src={tokens[selectedTokenIdx].image} alt={""} className={styles.bigTokenImage} />
-          <div className={styles.tokenInfo}>
-            <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
-            <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
+        {tokens[selectedTokenIdx] && (
+          <div className={styles.selectedTokenContainer}>
+            <Image src={tokens[selectedTokenIdx].image} alt={""} className={styles.bigTokenImage} />
+            <div className={styles.tokenInfo}>
+              <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
+              <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
+            </div>
+            {(selectedMode === 0 ||
+              (!!tokens[selectedTokenIdx].stakedSessionID &&
+                tokens[selectedTokenIdx].tokenProgress !== 6)) && (
+              <PlayButtons token={tokens[selectedTokenIdx]} />
+            )}
           </div>
-          {(selectedMode === 0 ||
-            (!!tokens[selectedTokenIdx].stakedSessionID &&
-              tokens[selectedTokenIdx].tokenProgress !== 6)) && (
-            <PlayButtons token={tokens[selectedTokenIdx]} />
-          )}
-        </div>
+        )}
         <div className={styles.tokenCards}>
           {tokens.map((t, idx) => (
             <Image

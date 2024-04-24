@@ -31,8 +31,11 @@ export const FULLCOUNT_ASSETS_PATH = "https://static.simiotics.com/fullcount";
 export const FULLCOUNT_ASSETS = "https://static.fullcount.xyz/web";
 export const TOKEN_IMAGE_FALLBACK = `${FULLCOUNT_ASSETS_PATH}/question.png`;
 
-export const DISCORD_LINK = "https://discord.gg/K56VNUQGvA";
+export const DISCORD_LINK = "https://discord.com/invite/FEppMCDZsM";
 export const TWITTER_LINK = "https://twitter.com/fullcount_xyz";
+export const HYPERPLAY_LINK =
+  "https://fullcount.xyz/landing/?utm_source=hyperplay%20&utm_medium=referral&utm_campaign=fullcount_launch";
+export const TRAILER_LINK = "https://youtu.be/O9t7s75FOF0?si=Vkg6rBdQ9b55Kx4m";
 
 export type ChainName = "ethereum" | "localhost" | "mumbai" | "polygon" | "wyrm" | "gnosis";
 export type ChainId = 1 | 1337 | 80001 | 137 | 322 | 100;
@@ -73,8 +76,6 @@ export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TO
 export const CHAIN_ID = 42170;
 export const RPC = "https://nova.arbitrum.io/rpc";
 export const blbImage = (idx: number) =>
-  `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.png`;
-export const HUMBUG_REPORT_VERSION = "0.0.3";
 
 export const LEADERBOARD_HOME_RUNS = "0f061af5-22a7-4449-a4e3-b0efe3a5a3d8";
 export const LEADERBOARD_ON_BASE_PERCENTAGE = "941f5bfb-b6c9-4ff5-8442-8beae42009ee";
@@ -89,3 +90,6 @@ export const LEADERBOARDS = [
   { id: "941f5bfb-b6c9-4ff5-8442-8beae42009ee", title: "On-base %" },
   { id: "a715d48c-1155-4821-9898-471ef0aa69aa", title: "Appearances" },
 ];
+
+  `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.jpeg`;
+export const HUMBUG_REPORT_VERSION = "0.0.3";

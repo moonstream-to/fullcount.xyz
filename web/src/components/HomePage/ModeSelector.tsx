@@ -20,7 +20,7 @@ const modes = [
 const ModeSelector = () => {
   const { selectedMode, updateContext } = useGameContext();
   const handleClick = (modeIdx: number) => {
-    sendReport(`Mode selected: ${modes[modeIdx].title}`, "", [
+    sendReport(`Mode selected: ${modes[modeIdx].title}`, {}, [
       "type:click",
       `click:${modes[modeIdx].title}`,
     ]);

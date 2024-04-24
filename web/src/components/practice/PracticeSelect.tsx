@@ -12,6 +12,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCardSmall from "../atbat/TokenCardSmall";
+import { sendReport } from "../../utils/humbug";
 
 const levels = ["Easy", "Medium", "Hard"];
 
@@ -99,6 +100,7 @@ const PracticeSelect = () => {
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
+        sendReport("Error toast", { error: e }, ["type:error_toast"]);
       },
     },
   );

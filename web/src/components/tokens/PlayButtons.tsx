@@ -8,6 +8,7 @@ import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlay
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
 import router, { useRouter } from "next/router";
+import { sendReport } from "../../utils/humbug";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
@@ -91,6 +92,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
       },
       onError: (e: Error) => {
         toast("Start failed: " + e?.message, "error");
+        sendReport("Error toast", { error: e }, ["type:error_toast"]);
       },
     },
   );

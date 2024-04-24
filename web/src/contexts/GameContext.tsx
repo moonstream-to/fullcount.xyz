@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, FC, useEffect } from "react";
 import { AtBat, OwnedToken, Session, Token } from "../types";
 import { CHAIN_ID, GAME_CONTRACT, TOKEN_CONTRACT } from "../constants";
+import { v4 as uuidv4 } from "uuid";
 
 interface GameContextProps {
   nonce: number;
@@ -33,6 +34,8 @@ interface GameContextProps {
   joinedNotification: boolean;
   onboardingName: string;
   onboardingImageIdx: number;
+  isLaunching: boolean;
+  userSessionId: string;
 }
 
 interface GameContextType extends GameContextProps {
@@ -78,6 +81,8 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     joinedNotification: false,
     onboardingName: "",
     onboardingImageIdx: 0,
+    isLaunching: true,
+    userSessionId: uuidv4(),
   });
 
   useEffect(() => {
@@ -88,7 +93,8 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
         soundVolume: Number(storedVolume),
       }));
     }
-  }, []);
+    localStorage.setItem("FULLCOUNT_USER_SESSION_ID", contextState.userSessionId);
+  }, [contextState.userSessionId]);
 
   const updateContext = (newState: Partial<GameContextProps>) => {
     console.log("updating context: ", { newState });

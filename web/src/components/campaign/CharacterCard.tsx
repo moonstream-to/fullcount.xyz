@@ -9,6 +9,7 @@ import { useGameContext } from "../../contexts/GameContext";
 import { Spinner, Image } from "@chakra-ui/react";
 import { Character } from "./teams";
 import CharacterProgress from "./CharacterProgress";
+import { sendReport } from "../../utils/humbug";
 
 const CharacterCard = ({
   character,
@@ -99,6 +100,7 @@ const CharacterCard = ({
       },
       onError: (e: Error) => {
         toast("Join failed" + e?.message, "error");
+        sendReport("Error toast", { error: e }, ["type:error_toast"]);
       },
     },
   );
