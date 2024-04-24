@@ -7,6 +7,7 @@ import {
   TWITTER_LINK,
 } from "../constants";
 import { useGameContext } from "../contexts/GameContext";
+import { useEffect, useState } from "react";
 import router from "next/router";
 import { sendReport } from "../utils/humbug";
 const buttons = ["PVP", "CAMPAIGN", "PRACTICE"];
@@ -27,8 +28,29 @@ const LaunchForm = ({ onClose }: { onClose: () => void }) => {
     window.open(TRAILER_LINK, "_blank", "noopener,noreferrer");
   };
 
+  const [tgWebApp, setTgWebApp] = useState<any | null>(null);
+  useEffect(() => {
+    const app = (window as any).Telegram?.WebApp;
+    if (app) {
+      app.ready();
+      setTgWebApp(app);
+    }
+  }, []);
+  const [tgUser, setTgUser] = useState<any | null>(null);
+  useEffect(() => {
+    let user = tgWebApp?.initDataUnsafe?.user;
+    setTgUser(user);
+  }, [tgWebApp]);
+
   return (
     <div className={styles.container}>
+      {tgUser ? (
+        <div className={styles.footerText}>
+          <label>Welcome {tgUser?.username}</label>
+        </div>
+      ) : (
+        <></>
+      )}
       <div className={styles.demoAndTrailer}>
         <div className={styles.blackButton} onClick={handleDemoClick}>
           PLAY DEMO

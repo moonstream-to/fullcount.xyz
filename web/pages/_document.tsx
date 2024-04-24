@@ -31,6 +31,7 @@ export default function Document() {
           rel="stylesheet"
         />
         <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet" />
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
       </Head>
       <body>
         {/*<!-- Google Tag Manager (noscript) -->*/}
