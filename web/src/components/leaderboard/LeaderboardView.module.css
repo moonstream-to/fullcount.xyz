@@ -1,0 +1,76 @@
+.container {
+    display: flex;
+    padding: 10px 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 30px;
+    align-self: stretch;
+    background-color: #EBE4DC;
+}
+
+.title {
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+
+.selector {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    align-self: stretch;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 10px;
+    align-self: stretch;
+    flex-wrap: wrap;
+}
+
+.buttonSelected, .buttonUnselected {
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.buttonSelected {
+    padding: 7px 9px;
+    border: 1px solid #262019;
+    background: #FFF;
+    color: #262019;
+}
+
+.buttonUnselected {
+    padding: 8px 10px;
+    background: #8EAB8F;
+    color: #FFF;
+}
+
+.subtitle {
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    min-height: 17.5px;
+}

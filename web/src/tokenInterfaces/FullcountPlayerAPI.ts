@@ -489,7 +489,7 @@ export const mintFullcountPlayerToken = ({
     });
 };
 
-const getHeaders = () => {
+export const getHeaders = () => {
   const ACCESS_TOKEN = localStorage.getItem("FULLCOUNT_ACCESS_TOKEN");
   return {
     Authorization: `bearer ${ACCESS_TOKEN}`,

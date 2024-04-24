@@ -99,6 +99,33 @@ export const getTokensData = async ({
   return await Promise.all(promises);
 };
 
+export const getTokensMetadata = async (
+  tokens: TokenId[],
+  tokensCache: Token[],
+): Promise<Token[]> => {
+  const { tokenContract } = getContracts();
+  const newTokens = tokens.filter(
+    (t) => !tokensCache.some((tc) => tc.address === t.address && tc.id === t.id),
+  );
+  const uriQueries = newTokens.map((t) => ({
+    target: t.address,
+    callData: tokenContract.methods.tokenURI(t.id).encodeABI(),
+  }));
+  const [uris] = await getMulticallResults(TokenABI, ["tokenURI"], uriQueries);
+  const promises = uris.map(async (uri, idx) => {
+    const { name, image } = await getTokenMetadata(uri);
+    return {
+      id: newTokens[idx].id,
+      name: name.split(` - ${newTokens[idx].id}`)[0],
+      image: image,
+      address: newTokens[idx].address,
+    };
+  });
+
+  const newTokensMetadata = await Promise.all(promises);
+  return [...newTokensMetadata, ...tokensCache];
+};
+
 export const startSessionBLB = ({
   web3ctx,
   token,

@@ -1,21 +1,16 @@
-import { useMediaQuery, useDisclosure, Image } from "@chakra-ui/react";
+import { Image } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Navbar.module.css";
 import useUser from "../../contexts/UserContext";
-import FullcountLogoSmall from "../icons/FullcountLogoSmall";
 import AccountMobile from "../icons/AccountMobile";
-import VolumeOn from "../icons/VolumeOn";
 import MoreHorizontal from "../icons/MoreHorizontal";
 import useLogout from "../../hooks/useLogout";
 import { FEEDBACK_FORM_URL, FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { setLocalStorageItem } from "../../utils/localStorage";
 import { useGameContext } from "../../contexts/GameContext";
+import router from "next/router";
 
 const Navbar = () => {
-  const [isSmallScreen, isMediumScreen] = useMediaQuery([
-    "(max-width: 767px)",
-    "(min-width: 1024px)",
-  ]);
   const { user } = useUser();
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -32,6 +27,11 @@ const Navbar = () => {
   const handleNotificationClick = () => {
     setLocalStorageItem("joinedNotification", !joinedNotification);
     updateContext({ joinedNotification: !joinedNotification });
+  };
+
+  const handleLeaderboardClick = () => {
+    // sendReport('Leaderboards', {}, ["type:click","click:leaderboards"])
+    router.push("/leaderboards");
   };
 
   useEffect(() => {
@@ -54,10 +54,12 @@ const Navbar = () => {
         src={`${FULLCOUNT_ASSETS_PATH}/logo/fullcount-mini.png`}
       />
       <div className={styles.rightSide}>
-        <div className={styles.account}>
-          <AccountMobile />
-          <div className={styles.username}>{user.username}</div>
-        </div>
+        {user && (
+          <div className={styles.account}>
+            <AccountMobile />
+            <div className={styles.username}>{user.username}</div>
+          </div>
+        )}
         {/*<div className={styles.menuButton}>*/}
         {/*  <VolumeOn />*/}
         {/*</div>*/}
@@ -70,7 +72,9 @@ const Navbar = () => {
             <div ref={menuRef} className={styles.menuList}>
               {/*<div className={styles.menuItem}>About</div>*/}
               {/*<div className={styles.menuItem}>Achievements</div>*/}
-              {/*<div className={styles.menuItem}>Leaderboards</div>*/}
+              <div className={styles.menuItem} onClick={handleLeaderboardClick}>
+                Leaderboards
+              </div>
               <div
                 className={styles.menuItem}
                 onClick={handleNotificationClick}
