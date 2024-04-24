@@ -3,6 +3,7 @@
     flex-direction: column;
     width: 100%;
     gap: 5px;
+    margin-bottom: 20px;
 }
 
 .divider {
@@ -24,7 +25,7 @@
     overflow: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    max-height: 75vh;
+    height: 330px;
     color: black;
 }
 
@@ -128,6 +129,12 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+}
+
+@media (min-width: 768px) {
+    .tableHeader, .tableContent {
+        grid-template-columns: 193px auto 60px;
+    }
 }
 
 

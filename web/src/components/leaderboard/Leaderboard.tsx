@@ -8,8 +8,7 @@ import LeaderboardItem from "./LeaderboardItem";
 import LeaderboardHeader from "./LeaderboardHeader";
 
 function Leaderboard({ leaderboardId }: { leaderboardId: string }) {
-  // const leaderboardId = LEADERBOARD_HOME_RUNS; // Ensure you replace this with your actual ID
-  const entriesPerPage = 10; // Adjust the number of items per page as needed
+  const entriesPerPage = 15;
   const listRef = useRef<HTMLDivElement>(null); // Reference to the div that scrolls
   const { tokensCache } = useGameContext();
 
@@ -46,7 +45,6 @@ function Leaderboard({ leaderboardId }: { leaderboardId: string }) {
     }
 
     return () => {
-      // Clean up the event listener
       if (currentList) {
         currentList.removeEventListener("scroll", handleScroll);
       }
