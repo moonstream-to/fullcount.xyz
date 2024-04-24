@@ -38,7 +38,7 @@ const LaunchForm = ({ onClose }: { onClose: () => void }) => {
   }, []);
   const [tgUser, setTgUser] = useState<any | null>(null);
   useEffect(() => {
-    let user = tgWebApp?.initDataUnsafe?.user;
+    const user = tgWebApp?.initDataUnsafe?.user;
     setTgUser(user);
   }, [tgWebApp]);
 

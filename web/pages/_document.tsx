@@ -1,3 +1,4 @@
+import Script from "next/script";
 import { Html, Head, Main, NextScript } from "next/document";
 import { FULLCOUNT_ASSETS_PATH } from "../src/constants";
 
@@ -31,7 +32,7 @@ export default function Document() {
           rel="stylesheet"
         />
         <link href="https://fonts.cdnfonts.com/css/cascadia-code" rel="stylesheet" />
-        <script src="https://telegram.org/js/telegram-web-app.js"></script>
+        <Script src="https://telegram.org/js/telegram-web-app.js"></Script>
       </Head>
       <body>
         {/*<!-- Google Tag Manager (noscript) -->*/}
