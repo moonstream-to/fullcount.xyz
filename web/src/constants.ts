@@ -75,7 +75,10 @@ export const GAME_CONTRACT = "0xDfE251B4F12547867ff839bcacec4d159DD68E47"; //TOD
 export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TODO env
 export const CHAIN_ID = 42170;
 export const RPC = "https://nova.arbitrum.io/rpc";
+
 export const blbImage = (idx: number) =>
+  `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.png`;
+export const HUMBUG_REPORT_VERSION = "0.0.3";
 
 export const LEADERBOARD_HOME_RUNS = "0f061af5-22a7-4449-a4e3-b0efe3a5a3d8";
 export const LEADERBOARD_ON_BASE_PERCENTAGE = "941f5bfb-b6c9-4ff5-8442-8beae42009ee";
@@ -90,6 +93,3 @@ export const LEADERBOARDS = [
   { id: "941f5bfb-b6c9-4ff5-8442-8beae42009ee", title: "On-base %" },
   { id: "a715d48c-1155-4821-9898-471ef0aa69aa", title: "Appearances" },
 ];
-
-  `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.jpeg`;
-export const HUMBUG_REPORT_VERSION = "0.0.3";
