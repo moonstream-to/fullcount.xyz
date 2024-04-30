@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Box, Flex, Grid, Image } from "@chakra-ui/react";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import styles from "./PlayView.module.css";
+import { useSound } from "../../hooks/useSound";
 
 const assets = FULLCOUNT_ASSETS_PATH;
 
@@ -15,8 +16,9 @@ const GridComponent = ({
   isPitcher: boolean;
 }) => {
   const [isDragging, setIsDragging] = useState(false);
-
+  const playSound = useSound();
   const handleMouseDown = (index: number) => {
+    playSound("grid");
     if (!setSelectedIndex) {
       return;
     }

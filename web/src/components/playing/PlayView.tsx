@@ -372,7 +372,13 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       {/*    atBatStatus.data.numSessions,*/}
       {/*  )} pitch`}</Text>*/}
       {/*)}*/}
-      <Flex alignItems={"center"} justifyContent={"space-between"} gap={"10px"} w={"100%"}>
+      <Flex
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        gap={"10px"}
+        w={"100%"}
+        bg={"red"}
+      >
         {!isSmallView && (
           <TokenView
             token={pitcher}

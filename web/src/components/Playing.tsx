@@ -16,12 +16,12 @@ import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
 import React, { useEffect, useState } from "react";
 import { FULLCOUNT_ASSETS_PATH } from "../constants";
-import { playSound } from "../utils/notifications";
 import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
+import { useSound } from "../hooks/useSound";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
@@ -37,6 +37,7 @@ const Playing = () => {
     joinedNotification,
   } = useGameContext();
   const { user } = useUser();
+  const playSound = useSound();
 
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
@@ -99,7 +100,7 @@ const Playing = () => {
             result.some((t) => t.address === ts.address && t.id === ts.id && t.progress === "3"),
         )
       ) {
-        playSound("clapping");
+        playSound("stadium");
       }
 
       return result;

@@ -62,6 +62,13 @@
     margin-top: 5px;
 }
 
+.soundSlider {
+    position: absolute;
+    z-index: 20;
+    right: 0;
+    margin-top: 5px;
+}
+
 .menuItem {
     color: #262019;
     font-family: Pangolin, cursive;

@@ -4,11 +4,14 @@ import { Image } from "@chakra-ui/react";
 import NewCharacterButton from "./NewCharacterButton";
 import PlayButtons from "./PlayButtons";
 import { useGameContext } from "../../contexts/GameContext";
+import { useSound } from "../../hooks/useSound";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const { updateContext, selectedMode, selectedTokenIdx } = useGameContext();
+  const playSound = useSound();
 
   const handleClick = (idx: number) => {
+    playSound("characterSelector");
     updateContext({ selectedToken: { ...tokens[idx] }, selectedTokenIdx: idx });
   };
 
@@ -23,10 +26,12 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
               <div className={styles.tokenName}>{tokens[selectedTokenIdx].name}</div>
               <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
             </div>
-            {(selectedMode === 0 ||
-              (!!tokens[selectedTokenIdx].stakedSessionID &&
-                tokens[selectedTokenIdx].tokenProgress !== 6)) && (
+            {selectedMode === 0 ||
+            (!!tokens[selectedTokenIdx].stakedSessionID &&
+              tokens[selectedTokenIdx].tokenProgress !== 6) ? (
               <PlayButtons token={tokens[selectedTokenIdx]} />
+            ) : (
+              <div style={{ minHeight: "40px" }} />
             )}
           </div>
         )}

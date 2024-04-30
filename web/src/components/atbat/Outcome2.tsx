@@ -7,6 +7,7 @@ import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { useGameContext } from "../../contexts/GameContext";
 import { outcomes, outcomeType } from "./AtBatView";
 import Tip from "./Tip";
+import { useSound } from "../../hooks/useSound";
 
 export const sessionOutcomeType = (
   tokens: Token[],
@@ -43,9 +44,14 @@ const Outcome2 = ({
   showTips?: boolean;
 }) => {
   const { selectedToken } = useGameContext();
+  const playSound = useSound();
+
   useEffect(() => {
-    console.log(sessionStatus);
-  }, [sessionStatus]);
+    if (atBat.outcome !== 0 && forToken) {
+      playSound(outcomeType([forToken], atBat) === "positive" ? "win" : "loss");
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.contentWrap}>

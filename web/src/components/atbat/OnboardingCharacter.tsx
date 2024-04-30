@@ -4,6 +4,7 @@ import styles from "../tokens/CreateNewCharacter.module.css";
 import localStyles from "./OnboardingCharacter.module.css";
 import React, { useEffect, useState } from "react";
 import { blbImage } from "../../constants";
+import { useSound } from "../../hooks/useSound";
 const NUMBER_OF_IMAGES = 8;
 const names = [
   "Joe Expo",
@@ -30,6 +31,7 @@ const OnboardingCharacter = ({
 }) => {
   const [name, setName] = useState(names[7]);
   const [imageIndex, setImageIndex] = useState(7);
+  const playSound = useSound();
 
   useEffect(() => {
     setName(names[7]);
@@ -59,7 +61,10 @@ const OnboardingCharacter = ({
               alt={`img${idx}`}
               src={blbImage(idx)}
               className={imageIndex === idx ? styles.selectedImage : styles.image}
-              onClick={() => setImageIndex(idx)}
+              onClick={() => {
+                playSound("imageSelector");
+                setImageIndex(idx);
+              }}
             />
           ))}
         </div>
@@ -68,7 +73,10 @@ const OnboardingCharacter = ({
         <button
           disabled={!name || imageIndex === -1}
           className={!name || imageIndex === -1 ? localStyles.inactiveButton : localStyles.button}
-          onClick={onClose}
+          onClick={() => {
+            playSound("batButton");
+            onClose();
+          }}
         >
           Bat
         </button>

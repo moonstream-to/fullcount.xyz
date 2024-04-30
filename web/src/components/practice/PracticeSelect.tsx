@@ -13,12 +13,14 @@ import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCardSmall from "../atbat/TokenCardSmall";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 
 const levels = ["Easy", "Medium", "Hard"];
 
 const PracticeSelect = () => {
   const [selectedLevel, setSelectedLevel] = useState(0);
   const { atBatsForPractice, selectedToken } = useGameContext();
+  const playSound = useSound();
 
   const getSelectedToken = (atBat: AtBat | undefined) => {
     if (atBat?.pitcher) return { token: atBat.pitcher, isPitcher: true };
@@ -106,6 +108,7 @@ const PracticeSelect = () => {
   );
 
   const handlePlay = (atBat: AtBat | undefined) => {
+    playSound(atBat?.pitcher ? "batButton" : "pitchButton");
     if (selectedToken && atBat) {
       joinSession.mutate({
         sessionID: atBat.lastSessionId ?? 0,
@@ -120,8 +123,19 @@ const PracticeSelect = () => {
   }
   return (
     <div className={styles.container}>
-      <div className={styles.exitButton} onClick={() => router.push("/")}>
-        <ExitIcon onClick={() => router.push("/")} />
+      <div
+        className={styles.exitButton}
+        onClick={() => {
+          playSound("homeButton");
+          router.push("/");
+        }}
+      >
+        <ExitIcon
+          onClick={() => {
+            playSound("homeButton");
+            router.push("/");
+          }}
+        />
       </div>
       <Image
         minW={"552px"}
@@ -143,7 +157,10 @@ const PracticeSelect = () => {
         {levels.slice(0, atBatsForPractice.length).map((v, idx) => (
           <div
             className={selectedLevel === idx ? styles.buttonSelected : styles.button}
-            onClick={() => setSelectedLevel(idx)}
+            onClick={() => {
+              playSound("modeSelector");
+              setSelectedLevel(idx);
+            }}
             key={idx}
           >
             {v}

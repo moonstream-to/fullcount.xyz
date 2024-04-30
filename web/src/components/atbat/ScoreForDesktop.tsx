@@ -7,6 +7,7 @@ import PitchHistory from "./PitchHistory";
 import ChevronUpLarge from "../icons/ChevronUpLarge";
 import ChevronDownLarge from "../icons/ChevronDownLarge";
 import DotsCounterLarge from "../sessions/DotsCounterLarge";
+import { useSound } from "../../hooks/useSound";
 
 const ScoreForDesktop = ({
   atBat,
@@ -19,11 +20,18 @@ const ScoreForDesktop = ({
 }) => {
   const { secondsPerPhase } = useGameContext();
   const [isHistoryOpen, setIsHistoryOpen] = useState(openHistory);
+  const playSound = useSound();
 
   return (
     <div className={styles.container}>
       {isHistoryOpen && <PitchHistory atBat={atBat} />}
-      <div className={styles.pitches} onClick={() => setIsHistoryOpen(!isHistoryOpen)}>
+      <div
+        className={styles.pitches}
+        onClick={() => {
+          playSound(isHistoryOpen ? "pitchHistoryClose" : "pitchHistoryOpen");
+          setIsHistoryOpen(!isHistoryOpen);
+        }}
+      >
         <div className={styles.pitchNumber}>{`Pitch ${atBat.numberOfSessions}`}</div>
         {isHistoryOpen ? <ChevronUpLarge /> : <ChevronDownLarge />}
       </div>

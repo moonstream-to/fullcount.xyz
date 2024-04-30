@@ -8,6 +8,7 @@ import { CANT_ABORT_SESSION_MSG } from "../../messages";
 import useMoonToast from "../../hooks/useMoonToast";
 import { useEffect, useRef } from "react";
 import useUser from "../../contexts/UserContext";
+import { useSound } from "../../hooks/useSound";
 
 const ExitDialog = ({
   token,
@@ -21,6 +22,8 @@ const ExitDialog = ({
   const toast = useMoonToast();
   const queryClient = useQueryClient();
   const { user } = useUser();
+  const playSound = useSound();
+
   const updateTokenInCache = (token: Token, sessionId: number) => {
     const currentTokens = queryClient.getQueryData<OwnedToken[]>(["owned_tokens", user]);
     const currentAtBats = queryClient.getQueryData<{ tokens: Token[]; atBats: AtBat[] }>([
@@ -95,9 +98,11 @@ const ExitDialog = ({
   }, []);
 
   const handleCloseClick = () => {
+    playSound("homeButton");
     closeAtBat.mutate({ token, sessionId });
   };
   const handleKeepClick = () => {
+    playSound("homeButton");
     router.push("/");
   };
   return (

@@ -9,12 +9,14 @@ import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/l
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
 import router, { useRouter } from "next/router";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
   const toast = useMoonToast();
   const router = useRouter();
   const { user } = useUser();
+  const playSound = useSound();
 
   const startSession = useMutation(
     async ({
@@ -106,6 +108,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
         <div
           className={styles.button}
           onClick={() => {
+            playSound("batButton");
             if (
               token.activeSession?.batterNFT.nftAddress === token.address &&
               token.activeSession?.batterNFT.tokenID === token.id &&
@@ -135,6 +138,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
         <div
           className={styles.button}
           onClick={() => {
+            playSound("pitchButton");
             if (
               token.activeSession?.pitcherNFT.nftAddress === token.address &&
               token.activeSession?.pitcherNFT.tokenID === token.id &&

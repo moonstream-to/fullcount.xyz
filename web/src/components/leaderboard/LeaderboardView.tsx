@@ -14,6 +14,7 @@ import OwnPositions from "./OwnPositions";
 import useUser from "../../contexts/UserContext";
 import { getHeaders } from "../../tokenInterfaces/FullcountPlayerAPI";
 import Leaderboard from "./Leaderboard";
+import { useSound } from "../../hooks/useSound";
 
 const leaderboards = [
   { title: "Home runs", id: LEADERBOARD_HOME_RUNS },
@@ -26,6 +27,7 @@ const leaderboards = [
 const LeaderboardView = () => {
   const [selectedId, setSelectedId] = useState(leaderboards[0].id);
   const { user } = useUser();
+  const playSound = useSound();
 
   const fetchLeaderboardInfo = async (id: string) => {
     return axios.get(`https://engineapi.moonstream.to/leaderboard/info?leaderboard_id=${id}`);
@@ -66,7 +68,10 @@ const LeaderboardView = () => {
           {leaderboards.map((l) => (
             <div
               key={l.id}
-              onClick={() => setSelectedId(l.id)}
+              onClick={() => {
+                playSound("viewSelector");
+                setSelectedId(l.id);
+              }}
               className={l.id === selectedId ? styles.buttonSelected : styles.buttonUnselected}
             >
               {l.title}
