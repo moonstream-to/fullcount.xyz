@@ -4,6 +4,7 @@ import { Flex } from "@chakra-ui/react";
 
 import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../../constants";
 import React from "react";
+import { soundMapping } from "./SoundMapping";
 
 export const siteTitle = "Fullcount - baseball game";
 
@@ -42,6 +43,14 @@ export default function Layout({
           src={`${FULLCOUNT_ASSETS_PATH}/sounds/clapping-male-crowd.wav`}
           preload={"auto"}
         />
+        {Array.from(new Set(Object.values(soundMapping))).map((fileName) => (
+          <audio
+            key={fileName}
+            id={fileName}
+            src={`${FULLCOUNT_ASSETS}/sounds/${fileName}`}
+            preload={"auto"}
+          />
+        ))}
         {children}
       </Flex>
     </div>
