@@ -8,6 +8,7 @@ import { getRowCol, SessionStatus } from "./PlayView";
 import React, { useState } from "react";
 import AnimatedMessage from "../AnimatedMessage";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { useSound } from "../../hooks/useSound";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -28,8 +29,10 @@ const PlayerView2 = ({
   const [actionChoice, setActionChoice] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
   const [showTooltip, setShowTooltip] = useState(false);
+  const playSound = useSound();
 
   const typeChangeHandle = (value: number) => {
+    playSound("typeSelector");
     setActionChoice(value);
     if (isPitcher) {
       return;
@@ -52,6 +55,7 @@ const PlayerView2 = ({
         return;
       }
     }
+    playSound("commitButton");
     const vertical = gridIndex === -1 ? 0 : getRowCol(gridIndex)[0];
     const horizontal = gridIndex === -1 ? 0 : getRowCol(gridIndex)[1];
     const nonce = "";

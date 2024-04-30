@@ -14,12 +14,15 @@ import useUser from "../../contexts/UserContext";
 import { isCampaignToken } from "../campaign/teams";
 import { isCoach } from "./PracticeView";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
   const { selectedToken } = useGameContext();
   const toast = useMoonToast();
   const { user } = useUser();
+  const playSound = useSound();
+
   const queryClient = useQueryClient();
   const joinSession = useMutation(
     async ({
@@ -113,7 +116,10 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
         {views.map((v, idx) => (
           <div
             className={selectedView === idx ? styles.buttonSelected : styles.button}
-            onClick={() => setSelectedView(idx)}
+            onClick={() => {
+              playSound("viewSelector");
+              setSelectedView(idx);
+            }}
             key={idx}
           >
             {v}
@@ -167,7 +173,10 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                   <TokenToPlay
                     token={openAtBat.pitcher}
                     isPitcher={true}
-                    onClick={() => handlePlay(openAtBat)}
+                    onClick={() => {
+                      playSound("batButton");
+                      handlePlay(openAtBat);
+                    }}
                     isLoading={
                       joinSession.variables?.sessionID === openAtBat.lastSessionId &&
                       joinSession.isLoading
@@ -195,7 +204,10 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                   <TokenToPlay
                     token={openAtBat.batter}
                     isPitcher={false}
-                    onClick={() => handlePlay(openAtBat)}
+                    onClick={() => {
+                      playSound("pitchButton");
+                      handlePlay(openAtBat);
+                    }}
                     isLoading={
                       joinSession.variables?.sessionID === openAtBat.lastSessionId &&
                       joinSession.isLoading

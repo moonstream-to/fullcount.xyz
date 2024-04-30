@@ -17,10 +17,10 @@ import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
 import { sendReport } from "../../utils/humbug";
-import { playSound } from "../../utils/notifications";
 import ExitDialog from "./ExitDialog";
 import useUser from "../../contexts/UserContext";
 import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
+import { useSound } from "../../hooks/useSound";
 
 export const outcomes = [
   "In Progress",
@@ -68,6 +68,7 @@ const AtBatView: React.FC = () => {
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { user } = useUser();
+  const playSound = useSound();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -169,7 +170,7 @@ const AtBatView: React.FC = () => {
       const { gameContract } = getContracts();
       const progress = await gameContract.methods.sessionProgress(currentSessionId).call();
       if (Number(currentSessionProgress.data) === 2 && Number(progress) === 3) {
-        playSound("joinedNotification");
+        playSound("stadium");
       }
       return progress;
     },
@@ -186,6 +187,7 @@ const AtBatView: React.FC = () => {
   };
 
   const handleExitClick = () => {
+    playSound("homeButton");
     if (
       atBatState.data?.atBat.pitches.length === 1 &&
       atBatState.data.atBat.pitches[0].progress == 2

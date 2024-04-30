@@ -3,6 +3,7 @@ import { AtBat, OwnedToken } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import { useRouter } from "next/router";
 import CoachCard from "../practice/CoachCard";
+import { useSound } from "../../hooks/useSound";
 
 const BOTS_ADDRESS = "0xbb1dDc1eB50959c4c59b62F3f6Dbf9CbB6156Bc8";
 const rachel = ["11", "12", "13"];
@@ -33,6 +34,8 @@ export const isCoach = (address: string, id: string): boolean => {
 const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
   const router = useRouter();
   const { updateContext } = useGameContext();
+  const playSound = useSound();
+
   const handlePlay = (atBat: AtBat) => {
     if (atBat.pitcher) {
       const team = pitchers.find((t) => getDefault(t) === atBat.pitcher?.id);
@@ -81,7 +84,10 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
               return openAtBat.pitcher ? (
                 <CoachCard
                   token={openAtBat.pitcher}
-                  onClick={() => handlePlay(openAtBat)}
+                  onClick={() => {
+                    playSound("batButton");
+                    handlePlay(openAtBat);
+                  }}
                   description={pitcherDescription}
                   isPitcher={true}
                   key={idx}
@@ -105,7 +111,10 @@ const PvpView = ({ atBats }: { atBats: AtBat[] }) => {
               return openAtBat.batter ? (
                 <CoachCard
                   token={openAtBat.batter}
-                  onClick={() => handlePlay(openAtBat)}
+                  onClick={() => {
+                    playSound("pitchButton");
+                    handlePlay(openAtBat);
+                  }}
                   description={batterDescription}
                   isPitcher={false}
                   key={idx}

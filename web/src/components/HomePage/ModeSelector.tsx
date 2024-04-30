@@ -1,6 +1,7 @@
 import styles from "./ModeSelector.module.css";
 import { useGameContext } from "../../contexts/GameContext";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 
 const modes = [
   {
@@ -19,7 +20,10 @@ const modes = [
 
 const ModeSelector = () => {
   const { selectedMode, updateContext } = useGameContext();
+
+  const playSound = useSound();
   const handleClick = (modeIdx: number) => {
+    playSound("modeSelector");
     sendReport(`Mode selected: ${modes[modeIdx].title}`, {}, [
       "type:click",
       `click:${modes[modeIdx].title}`,

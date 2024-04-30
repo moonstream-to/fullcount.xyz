@@ -10,6 +10,7 @@ import { Spinner, Image } from "@chakra-ui/react";
 import { Character } from "./teams";
 import CharacterProgress from "./CharacterProgress";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 
 const CharacterCard = ({
   character,
@@ -29,6 +30,8 @@ const CharacterCard = ({
   const queryClient = useQueryClient();
   const { user } = useUser();
   const toast = useMoonToast();
+  const playSound = useSound();
+
   const joinSession = useMutation(
     async ({
       sessionID,
@@ -69,7 +72,6 @@ const CharacterCard = ({
           },
         );
         queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
-          console.log(oldData);
           if (!oldData) {
             return [];
           }
@@ -106,6 +108,7 @@ const CharacterCard = ({
   );
 
   const handlePlay = (atBat: AtBat | undefined) => {
+    playSound(atBat?.pitcher ? "batButton" : "pitchButton");
     if (selectedToken && atBat) {
       joinSession.mutate({
         sessionID: atBat.lastSessionId ?? 0,

@@ -15,6 +15,7 @@ import { getAtBat, initialAtBatState, selectedToken } from "./OnboardingAPI";
 import { outcomeType, sessionOutcomes } from "./AtBatView";
 import OnboardingCharacter from "./OnboardingCharacter";
 import { useGameContext } from "../../contexts/GameContext";
+import { useSound } from "../../hooks/useSound";
 
 const AtBatView2: React.FC = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const AtBatView2: React.FC = () => {
   const [name, setName] = useState("Guest_0420");
   const [image, setImage] = useState(blbImage(7));
   const { updateContext } = useGameContext();
+  const playSound = useSound();
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -104,6 +106,7 @@ const AtBatView2: React.FC = () => {
         <div
           className={styles.homeButton}
           onClick={() => {
+            playSound("homeButton");
             updateContext({ isLaunching: false });
             router.push("/");
           }}

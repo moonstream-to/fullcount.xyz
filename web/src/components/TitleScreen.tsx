@@ -12,6 +12,7 @@ import LoadingView from "./HomePage/LoadingView";
 import LaunchForm from "./LaunchForm";
 import MoonstreamLogo2 from "./icons/MoonstreamLogo2";
 import { useGameContext } from "../contexts/GameContext";
+
 const TitleScreen = () => {
   const { user, isLoading } = useUser();
   const [isLogging, setIsLogging] = useState(false); // login or signUp

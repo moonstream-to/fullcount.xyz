@@ -13,6 +13,7 @@ import { useGameContext } from "../../contexts/GameContext";
 import AnimatedMessage from "../AnimatedMessage";
 import { OwnedToken } from "../../types";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
+import { useSound } from "../../hooks/useSound";
 
 const swingKinds = ["Contact", "Power", "Take"];
 const pitchSpeeds = ["Fast", "Slow"];
@@ -41,6 +42,7 @@ const PlayerView = ({
   const [showTooltip, setShowTooltip] = useState(false);
   const { contractAddress, selectedToken } = useGameContext();
   const web3ctx = useContext(Web3Context);
+  const playSound = useSound();
 
   const getActionDescription = () => {
     if (isPitcher) {
@@ -50,6 +52,7 @@ const PlayerView = ({
   };
 
   const typeChangeHandle = (value: number) => {
+    playSound("typeSelector");
     setActionChoice(value);
     if (isPitcher) {
       return;
@@ -80,6 +83,7 @@ const PlayerView = ({
         return;
       }
     }
+    playSound("commitButton");
     const vertical = gridIndex === -1 ? 0 : getRowCol(gridIndex)[0];
     const horizontal = gridIndex === -1 ? 0 : getRowCol(gridIndex)[1];
     const nonce = web3ctx.web3.utils.randomHex(32);

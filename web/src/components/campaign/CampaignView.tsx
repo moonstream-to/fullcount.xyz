@@ -15,10 +15,12 @@ import {
   getCharacterName,
 } from "./teams";
 import axios from "axios";
+import { useSound } from "../../hooks/useSound";
 
 const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
   const { selectedToken } = useGameContext();
   const [isPitching, setIsPitching] = useState(true);
+  const playSound = useSound();
 
   const stats = useQuery(
     ["stats", selectedToken?.id, selectedToken?.address],
@@ -98,13 +100,19 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
       <div className={styles.roleSelector}>
         <div
           className={isPitching ? styles.selectedRole : styles.role}
-          onClick={() => setIsPitching(true)}
+          onClick={() => {
+            playSound("modeSelector");
+            setIsPitching(true);
+          }}
         >
           pitchers
         </div>
         <div
           className={!isPitching ? styles.selectedRole : styles.role}
-          onClick={() => setIsPitching(false)}
+          onClick={() => {
+            playSound("modeSelector");
+            setIsPitching(false);
+          }}
         >
           batters
         </div>

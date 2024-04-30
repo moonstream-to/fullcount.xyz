@@ -9,20 +9,26 @@ import {
 import { useGameContext } from "../contexts/GameContext";
 import router from "next/router";
 import { sendReport } from "../utils/humbug";
+import { useSound } from "../hooks/useSound";
 const buttons = ["PVP", "CAMPAIGN", "PRACTICE"];
 
 const LaunchForm = ({ onClose }: { onClose: () => void }) => {
   const { updateContext } = useGameContext();
+  const playSound = useSound();
+
   const handleClick = (selectedMode: number) => {
+    playSound("launchButton");
     updateContext({ selectedMode });
     onClose();
   };
   const handleDemoClick = () => {
+    playSound("launchButton");
     sendReport("Playing demo", {}, ["type:click", "click:play_demo"]);
     router.push("/atbat");
   };
 
   const handleTrailerClick = () => {
+    playSound("launchButton");
     sendReport("Playing trailer", {}, ["type:click", "click:play_trailer"]);
     window.open(TRAILER_LINK, "_blank", "noopener,noreferrer");
   };

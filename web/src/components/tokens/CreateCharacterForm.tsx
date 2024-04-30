@@ -9,6 +9,7 @@ import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerA
 import useMoonToast from "../../hooks/useMoonToast";
 import { blbImage } from "../../constants";
 import { sendReport } from "../../utils/humbug";
+import { useSound } from "../../hooks/useSound";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -22,6 +23,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
   const source: TokenSource = "FullcountPlayerAPI";
   const queryClient = useQueryClient();
   const toast = useMoonToast();
+  const playSound = useSound();
 
   const mintToken = useMutation(
     async ({ name, imageIndex, source }: { name: string; imageIndex: number; source: string }) => {
@@ -72,7 +74,10 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
               alt={`img${idx}`}
               src={blbImage(idx)}
               className={imageIndex === idx ? styles.selectedImage : styles.image}
-              onClick={() => setImageIndex(idx)}
+              onClick={() => {
+                playSound("imageSelector");
+                setImageIndex(idx);
+              }}
             />
           ))}
         </div>
@@ -90,14 +95,23 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       </div>
       <div className={styles.buttonsContainer}>
         {onClose && (
-          <button className={styles.cancelButton} onClick={onClose}>
+          <button
+            className={styles.cancelButton}
+            onClick={() => {
+              playSound("cancelButton");
+              onClose();
+            }}
+          >
             Cancel
           </button>
         )}
         <button
           disabled={!name || imageIndex === -1}
           className={!name || imageIndex === -1 ? styles.inactiveButton : styles.button}
-          onClick={() => mintToken.mutate({ name, imageIndex, source })}
+          onClick={() => {
+            playSound("createButton");
+            mintToken.mutate({ name, imageIndex, source });
+          }}
         >
           {mintToken.isLoading ? (
             <Spinner h={4} w={4} />

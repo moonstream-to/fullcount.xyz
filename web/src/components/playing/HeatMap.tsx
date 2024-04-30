@@ -4,6 +4,7 @@ import { valueToColor } from "../../utils/colors";
 import styles from "./HeatMap.module.css";
 import { FULLCOUNT_ASSETS } from "../../constants";
 import AnimatedMessage from "../AnimatedMessage";
+import { useSound } from "../../hooks/useSound";
 
 const leftBorder = [6, 11, 16];
 const topBorder = [6, 7, 8];
@@ -28,6 +29,7 @@ const HeatMap = ({
   isPitcher: boolean;
 }) => {
   const [showMode, setShowMode] = useState(0);
+  const playSound = useSound();
 
   const generateCell = (index: number) => (
     <Box
@@ -46,7 +48,10 @@ const HeatMap = ({
         justifyContent="center"
         cursor={"pointer"}
         bg={rates ? valueToColor(rates[index], rates) : valueToColor(0, [0])}
-        onClick={() => setShowMode(showMode === 2 ? 0 : showMode + 1)}
+        onClick={() => {
+          playSound("heatmapClick");
+          setShowMode(showMode === 2 ? 0 : showMode + 1);
+        }}
       >
         {showMode !== 0 && rates && counts && (
           <Text fontSize={"9px"} color={"black"} fontWeight={"400"}>
@@ -85,7 +90,10 @@ const HeatMap = ({
               w={"16px"}
               h={"16px"}
               src={`${FULLCOUNT_ASSETS}/icons/${fileName}${idx === showMode ? "-active" : ""}.svg`}
-              onClick={() => setShowMode(idx)}
+              onClick={() => {
+                playSound("heatmapClick");
+                setShowMode(idx);
+              }}
               cursor={"pointer"}
             />
           ))}

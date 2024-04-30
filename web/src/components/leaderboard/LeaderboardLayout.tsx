@@ -4,16 +4,24 @@ import { ReactNode } from "react";
 import { useMediaQuery } from "@chakra-ui/react";
 import ArrowLeft from "../icons/ArrowLeft";
 import router from "next/router";
+import { useSound } from "../../hooks/useSound";
 
 const LeaderboardLayout = ({ children }: { children: ReactNode }) => {
   const [isWideView] = useMediaQuery(["(min-width: 768px)"]);
+  const playSound = useSound();
   return (
     <div className={styles.container}>
       <div className={styles.innerContainer}>
         <div className={styles.navbarContainer}>
           <Navbar />
         </div>
-        <div className={styles.homeButton} onClick={() => router.push("/")}>
+        <div
+          className={styles.homeButton}
+          onClick={() => {
+            playSound("homeButton");
+            router.push("/");
+          }}
+        >
           <ArrowLeft />
           Home page
         </div>
