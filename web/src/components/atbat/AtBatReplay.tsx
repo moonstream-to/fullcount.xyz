@@ -1,26 +1,23 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import styles from "./AtBatView.module.css";
-import { useQuery, useQueryClient, UseQueryResult } from "react-query";
+import { useQuery, UseQueryResult } from "react-query";
 import { getAtBat } from "../../services/fullcounts";
 import { useGameContext } from "../../contexts/GameContext";
 import Score from "./Score";
 import AtBatFooter from "./AtBatFooter";
-import PitcherViewMobile from "../playing/PitcherViewMobile";
-import { AtBatStatus, OwnedToken, Token } from "../../types";
-import BatterViewMobile from "../playing/BatterViewMobile";
+import { AtBatStatus, Token } from "../../types";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { Image, useDisclosure, useMediaQuery } from "@chakra-ui/react";
-import Outcome2, { outcomeDelay, sessionOutcomeType } from "./Outcome2";
+import { Image, useMediaQuery } from "@chakra-ui/react";
+import { outcomeDelay } from "./Outcome2";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
-import { sendReport } from "../../utils/humbug";
-import ExitDialog from "./ExitDialog";
-import useUser from "../../contexts/UserContext";
-import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { useSound } from "../../hooks/useSound";
+import { InfoIcon } from "@chakra-ui/icons";
+import { emptyPitch } from "./OnboardingAPI";
+import OutcomeForReplay from "./OutcomeForReplay";
 
 export const outcomes = [
   "In Progress",
@@ -58,25 +55,30 @@ export const outcomeType = (
 };
 
 const stateAfterPitch = (atBat: AtBatStatus, pitchIdx: number) => {
-  const pitches = atBat.pitches.slice(0, pitchIdx);
-  const outcome = atBat.pitches.length <= pitchIdx + 1 ? 0 : atBat.outcome;
-  return { ...atBat, outcome, pitches };
-  // const currentAtBatState = {atBat: {...atBat, pitches: atBat.atBat.pitches.slice(0, currentSessionIdx + 1), outcome: currentSessionIdx + 1 === atBat.atBat.pitches.length}}
+  if (!atBat) {
+    return atBat;
+  }
+  if (pitchIdx + 1 === atBat.pitches.length) {
+    return atBat;
+  }
+  const pitches = atBat.pitches.slice(0, pitchIdx + 1);
+  pitches.push({ ...emptyPitch, didPitcherCommit: false });
+  const balls = pitches.filter((p) => p.outcome === 1).length;
+  const strikes = pitches.filter((p) => p.outcome === 0 && p.progress === 5).length;
+  return { ...atBat, outcome: 0, numberOfSessions: pitches.length, pitches, balls, strikes };
 };
 
 const AtBatReplay: React.FC = () => {
   const router = useRouter();
-  const { tokensCache, updateContext, selectedToken, joinedNotification } = useGameContext();
+  const { tokensCache } = useGameContext();
   const [atBatId, setAtBatId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [showPitchOutcome, setShowPitchOutcome] = useState(false);
-  const [currentSessionId, setCurrentSessionId] = useState(0);
   const [currentSessionIdx, setCurrentSessionIdx] = useState(0);
   const [isBigView] = useMediaQuery("(min-width: 1024px)");
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user } = useUser();
   const playSound = useSound();
   const [isPitchOutcomeVisible, setIsPitchOutcomeVisible] = useState(false);
+  const [isReplayOver, setIsReplayOver] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -87,12 +89,10 @@ const AtBatReplay: React.FC = () => {
   const updateHeight = () => {
     setWindowHeight(window.innerHeight);
   };
-
   useEffect(() => {
     window.addEventListener("resize", updateHeight);
     return () => window.removeEventListener("resize", updateHeight);
   }, []);
-
   useEffect(() => {
     if (router.query.id && typeof router.query.id === "string") {
       setAtBatId(router.query.id);
@@ -103,14 +103,12 @@ const AtBatReplay: React.FC = () => {
   }, [router.query.id, router.query.session_id]);
 
   useEffect(() => {
-    if (showPitchOutcome) {
-      setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
-    } else {
-      setIsPitchOutcomeVisible(false);
+    if (!atBatState.data?.atBat) {
+      return;
     }
-  }, [showPitchOutcome]);
+    setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
+  }, [currentSessionIdx]);
 
-  const queryClient = useQueryClient();
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
     ["atBat", atBatId, sessionId],
     async () => {
@@ -125,51 +123,44 @@ const AtBatReplay: React.FC = () => {
       if (!id) {
         return;
       }
-      const atBat = await getAtBat({ tokensCache, id: Number(id) });
-
-      // const currentAtBatState = {atBat: {...atBat, pitches: atBat.atBat.pitches.slice(0, currentSessionIdx + 1), outcome: currentSessionIdx + 1 === atBat.atBat.pitches.length}}
-      return atBat;
+      return await getAtBat({ tokensCache, id: Number(id) });
     },
     {
       onSuccess: (data) => {
-        console.log(data);
-        if (data && currentSessionId === 0) {
-          setCurrentSessionId(data.atBat.pitches[data.atBat.numberOfSessions - 1].sessionID);
+        if (!data) {
+          return;
         }
-        if (data && data.atBat.numberOfSessions - 1 !== currentSessionIdx) {
-          setCurrentSessionIdx(data.atBat.numberOfSessions - 1);
-          setShowPitchOutcome(true);
-          setTimeout(() => setShowPitchOutcome(false), 8000);
-        }
-        if (data && data.atBat.outcome !== 0) {
-          queryClient.refetchQueries("owned_tokens");
-          setShowPitchOutcome(true);
-        }
-        if (tokensCache.length !== data?.tokens.length) {
-          updateContext({ tokensCache: data?.tokens ?? tokensCache });
-        }
+        setShowPitchOutcome(true);
+        setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
       },
-      // enabled: atBatId !== null,
       refetchInterval: false,
     },
   );
 
-  const isSameToken = (a: Token | undefined, b: Token | undefined) => {
-    if (!a || !b) return false;
-    return a.id === b.id && a.address === b.address;
-  };
+  useEffect(() => {
+    if (!atBatState.data) {
+      return;
+    }
+    const intervalId = setInterval(() => {
+      setCurrentSessionIdx(
+        (prev) => prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0),
+      );
+    }, 10000);
+    return () => clearInterval(intervalId);
+  }, [atBatState.data]);
+
+  useEffect(() => {
+    if (atBatState.data && atBatState.data.atBat.numberOfSessions > currentSessionIdx) {
+      setIsPitchOutcomeVisible(false);
+    }
+    if (atBatState.data && atBatState.data.atBat.numberOfSessions <= currentSessionIdx + 1) {
+      setInterval(() => setIsReplayOver(true), outcomeDelay * 4);
+    }
+  }, [currentSessionIdx]);
 
   const handleExitClick = () => {
     playSound("homeButton");
-    if (
-      atBatState.data?.atBat.pitches.length === 1 &&
-      atBatState.data.atBat.pitches[0].progress == 2
-    ) {
-      onOpen();
-    } else {
-      sendReport("PlayView exit", {}, ["type:click", "click:atBatExit"]);
-      router.push("/");
-    }
+    router.push("/");
   };
 
   return (
@@ -179,9 +170,13 @@ const AtBatReplay: React.FC = () => {
     >
       <div className={styles.exitButton} onClick={handleExitClick}>
         <ExitIcon />
-        {isOpen && selectedToken && (
-          <ExitDialog token={selectedToken} sessionId={currentSessionId} onClose={onClose} />
-        )}
+      </div>
+      <div
+        className={styles.exitButton}
+        style={{ right: "50px" }}
+        onClick={() => setCurrentSessionIdx(0)}
+      >
+        <InfoIcon />
       </div>
       <Image
         minW={"441px"}
@@ -192,117 +187,91 @@ const AtBatReplay: React.FC = () => {
         top={"35.5px"}
         transform={"translateX(50%)"}
       />
-      {atBatState.data?.atBat &&
-        showPitchOutcome &&
-        atBatState.data.atBat.outcome !== 0 &&
-        atBatState.data.atBat.pitches.length > 0 && (
-          <div className={styles.homeButton} onClick={handleExitClick}>
-            Go to home page
-          </div>
-        )}
+      {/*{atBatState.data?.atBat &&*/}
+      {/*  showPitchOutcome &&*/}
+      {/*  stateAfterPitch(atBatState.data.atBat, currentSessionIdx).outcome !== 0 &&*/}
+      {/*  stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches.length > 0 && (*/}
+      {/*    <div className={styles.homeButton} onClick={handleExitClick}>*/}
+      {/*      Go to home page*/}
+      {/*    </div>*/}
+      {/*  )}*/}
 
       {atBatState.data && !isBigView && (
         <Score
-          atBat={atBatState.data.atBat}
-          pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
+          atBat={stateAfterPitch(atBatState.data.atBat, currentSessionIdx)}
+          pitch={
+            stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[currentSessionIdx]
+          }
         />
       )}
-      {atBatState.data &&
-        isBigView &&
-        atBatState.data?.atBat.outcome === 0 &&
-        !showPitchOutcome && (
-          <ScoreForDesktop
-            atBat={atBatState.data.atBat}
-            pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
-          />
-        )}
+      {atBatState.data && isBigView && (
+        <ScoreForDesktop
+          openHistory={true}
+          atBat={stateAfterPitch(atBatState.data.atBat, currentSessionIdx - (isReplayOver ? 0 : 1))}
+          pitch={
+            stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[currentSessionIdx]
+          }
+        />
+      )}
       {atBatState.data?.atBat &&
-        showPitchOutcome &&
-        atBatState.data.atBat.pitches.length > 0 &&
-        selectedToken &&
-        atBatState.data.atBat.outcome === 0 && (
-          <div
-            className={
-              !outcomeType([selectedToken], atBatState.data.atBat)
-                ? styles.othersOutcome
-                : sessionOutcomeType(
-                    [selectedToken],
-                    atBatState.data.atBat,
-                    atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2],
-                  ) === "positive"
-                ? styles.positiveOutcome
-                : styles.negativeOutcome
-            }
-          >
-            {
-              sessionOutcomes[
-                atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2].outcome
-              ]
-            }
+        isPitchOutcomeVisible &&
+        !isReplayOver &&
+        stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches.length > 0 && (
+          <div className={styles.positiveOutcome} style={{ top: "18%" }}>
+            {atBatState.data.atBat.numberOfSessions > currentSessionIdx + 1
+              ? sessionOutcomes[
+                  stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[
+                    stateAfterPitch(atBatState.data.atBat, currentSessionIdx).numberOfSessions - 2
+                  ].outcome
+                ]
+              : sessionOutcomes[
+                  stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[
+                    stateAfterPitch(atBatState.data.atBat, currentSessionIdx).numberOfSessions - 1
+                  ].outcome
+                ]}
             !
           </div>
         )}
-      {atBatState.data && atBatState.data.atBat.outcome !== 0 && selectedToken && (
-        <div
-          className={
-            !outcomeType([selectedToken], atBatState.data.atBat)
-              ? styles.othersOutcome
-              : outcomeType([selectedToken], atBatState.data.atBat) === "positive"
-              ? styles.positiveOutcome2
-              : styles.negativeOutcome2
-          }
-        >
-          {outcomeType([selectedToken], atBatState.data.atBat) === "positive"
-            ? "you win!"
-            : "you lose!"}
-        </div>
-      )}
-      {atBatState.data?.atBat.outcome === 0 &&
-        !showPitchOutcome &&
-        atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
-        atBatState.data.atBat.pitches[currentSessionIdx].progress !== 6 && (
+      {atBatState.data?.atBat &&
+        stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[
+          stateAfterPitch(atBatState.data.atBat, currentSessionIdx).numberOfSessions - 1
+        ].progress !== 2 &&
+        stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[currentSessionIdx]
+          .progress !== 6 && (
           <div className={styles.playerView}>
             {isBigView && atBatState.data?.atBat.pitcher && (
               <TokenCard token={atBatState.data?.atBat.pitcher} isPitcher={true} />
             )}
-            {selectedToken &&
-              isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
-              atBatState.data && (
-                <PitcherViewMobile
-                  sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
-                  token={selectedToken as OwnedToken}
-                />
-              )}
-            {selectedToken &&
-              isSameToken(selectedToken, atBatState.data?.atBat.batter) &&
-              atBatState.data && (
-                <BatterViewMobile
-                  sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
-                  token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
-                />
+            {atBatState.data?.atBat &&
+              stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches.length > 0 && (
+                <>
+                  {atBatState.data?.atBat && (
+                    <OutcomeForReplay
+                      atBat={stateAfterPitch(atBatState.data?.atBat, currentSessionIdx)}
+                      forToken={undefined}
+                      sessionStatus={
+                        stateAfterPitch(atBatState.data.atBat, currentSessionIdx).outcome === 0
+                          ? stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[
+                              stateAfterPitch(atBatState.data.atBat, currentSessionIdx)
+                                .numberOfSessions - 2
+                            ]
+                          : stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[
+                              stateAfterPitch(atBatState.data.atBat, currentSessionIdx)
+                                .numberOfSessions - 1
+                            ]
+                      }
+                    />
+                  )}
+                </>
               )}
             {isBigView && atBatState.data?.atBat.batter && (
               <TokenCard token={atBatState.data?.atBat.batter} isPitcher={false} />
             )}
           </div>
         )}
-      {atBatState.data?.atBat && showPitchOutcome && atBatState.data.atBat.pitches.length > 0 && (
-        <>
-          {atBatState.data?.atBat && (
-            <Outcome2
-              atBat={atBatState.data?.atBat}
-              forToken={selectedToken}
-              sessionStatus={
-                atBatState.data.atBat.outcome === 0
-                  ? atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 2]
-                  : atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1]
-              }
-            />
-          )}
-        </>
-      )}
+
       {atBatState.data && !showPitchOutcome && !isBigView && (
-        <AtBatFooter atBat={atBatState.data.atBat} />
+        <AtBatFooter atBat={stateAfterPitch(atBatState.data.atBat, currentSessionIdx)} />
       )}
     </div>
   );
