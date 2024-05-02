@@ -2,6 +2,7 @@ import styles from "./AtBatsList.module.css";
 import { AtBat, OwnedToken, Token } from "../../types";
 import TokenToPlay from "./TokenToPlay";
 import DotsCounter from "../sessions/DotsCounter";
+import router from "next/router";
 
 export const outcomes = [
   "In Progress",
@@ -26,7 +27,7 @@ export const outcomeType = (tokens: Token[], atBat: AtBat): "positive" | "negati
 
 const AtBatItem = ({ atBat, tokens }: { atBat: AtBat; tokens: OwnedToken[] }) => {
   return (
-    <div className={styles.atBatContainer}>
+    <div className={styles.atBatContainer} onClick={() => router.push(`/replays?id=${atBat.id}`)}>
       <div className={styles.cards}>
         {atBat.pitcher ? (
           <TokenToPlay token={atBat.pitcher} isPitcher={true} />
