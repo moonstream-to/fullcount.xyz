@@ -1,4 +1,4 @@
-import { Image } from "@chakra-ui/react";
+import { Image, useMediaQuery } from "@chakra-ui/react";
 import styles from "./Outcome2.module.css";
 import { AtBatStatus, SessionStatus, Token } from "../../types";
 import OutcomeGrid from "./OutcomeGrid";
@@ -38,15 +38,19 @@ const OutcomeForReplay = ({
   sessionStatus,
   forToken,
   showTips = false,
+  currentSessionIdx,
+  isPitchVisible,
+  setIsPitchVisible,
 }: {
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
   forToken: Token | undefined;
   showTips?: boolean;
+  currentSessionIdx: number;
+  isPitchVisible: boolean;
+  setIsPitchVisible: (arg0: boolean) => void;
 }) => {
-  const { selectedToken } = useGameContext();
   const playSound = useSound();
-  const [isPitchVisible, setIsPitchVisible] = useState(false);
   const [isSwingVisible, setIsSwingVisible] = useState(false);
   const [isOutcomeVisible, setIsOutcomeVisible] = useState(false);
 
@@ -54,13 +58,12 @@ const OutcomeForReplay = ({
     if (atBat.outcome !== 0 && forToken) {
       playSound(outcomeType([forToken], atBat) === "positive" ? "win" : "loss");
     }
-    setIsPitchVisible(false);
     setIsOutcomeVisible(false);
     setIsSwingVisible(false);
     setTimeout(() => setIsPitchVisible(true), outcomeDelay);
     setTimeout(() => setIsSwingVisible(true), outcomeDelay * 2);
     setTimeout(() => setIsOutcomeVisible(true), outcomeDelay * 3);
-  }, [sessionStatus]);
+  }, [sessionStatus.batterReveal, sessionStatus.pitcherReveal]);
 
   if (!sessionStatus) {
     return <></>;
@@ -94,7 +97,7 @@ const OutcomeForReplay = ({
               )}
             </div>
           </div>
-          {sessionStatus.batterReveal.kind !== "2" && isSwingVisible && (
+          {sessionStatus.batterReveal.kind !== "2" && isSwingVisible && isPitchVisible && (
             <Image
               src={`${FULLCOUNT_ASSETS_PATH}/bat.png`}
               alt={"o"}

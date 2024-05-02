@@ -79,6 +79,7 @@ const AtBatReplay: React.FC = () => {
   const playSound = useSound();
   const [isPitchOutcomeVisible, setIsPitchOutcomeVisible] = useState(false);
   const [isReplayOver, setIsReplayOver] = useState(false);
+  const [isOutcomePitchVisible, setIsOutcomePitchVisible] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -142,9 +143,12 @@ const AtBatReplay: React.FC = () => {
       return;
     }
     const intervalId = setInterval(() => {
-      setCurrentSessionIdx(
-        (prev) => prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0),
-      );
+      setCurrentSessionIdx((prev) => {
+        if (prev + 1 < atBatState.data.atBat.pitches.length) {
+          setIsOutcomePitchVisible(false);
+        }
+        return prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0);
+      });
     }, 10000);
     return () => clearInterval(intervalId);
   }, [atBatState.data]);
@@ -152,6 +156,7 @@ const AtBatReplay: React.FC = () => {
   useEffect(() => {
     if (atBatState.data && atBatState.data.atBat.numberOfSessions > currentSessionIdx) {
       setIsPitchOutcomeVisible(false);
+      setIsOutcomePitchVisible(false);
     }
     if (atBatState.data && atBatState.data.atBat.numberOfSessions <= currentSessionIdx + 1) {
       setInterval(() => setIsReplayOver(true), outcomeDelay * 4);
@@ -253,6 +258,9 @@ const AtBatReplay: React.FC = () => {
                 <>
                   {atBatState.data?.atBat && (
                     <OutcomeForReplay
+                      isPitchVisible={isOutcomePitchVisible}
+                      setIsPitchVisible={setIsOutcomePitchVisible}
+                      currentSessionIdx={currentSessionIdx}
                       atBat={stateAfterPitch(atBatState.data?.atBat, currentSessionIdx)}
                       forToken={undefined}
                       sessionStatus={
