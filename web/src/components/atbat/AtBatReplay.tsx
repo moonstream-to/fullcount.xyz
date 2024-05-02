@@ -10,7 +10,7 @@ import { AtBatStatus, Token } from "../../types";
 import { getContracts } from "../../utils/getWeb3Contracts";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { Image, useMediaQuery } from "@chakra-ui/react";
-import { outcomeDelay } from "./Outcome2";
+import { outcomeDelay } from "./OutcomeForReplay";
 import ExitIcon from "../icons/ExitIcon";
 import TokenCard from "./TokenCard";
 import ScoreForDesktop from "./ScoreForDesktop";
@@ -198,7 +198,10 @@ const AtBatReplay: React.FC = () => {
 
       {atBatState.data && !isBigView && (
         <Score
-          atBat={stateAfterPitch(atBatState.data.atBat, currentSessionIdx)}
+          atBat={stateAfterPitch(
+            atBatState.data.atBat,
+            currentSessionIdx - (isReplayOver ? 0 : 1) + (isPitchOutcomeVisible ? 1 : 0),
+          )}
           pitch={
             stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[currentSessionIdx]
           }
@@ -207,7 +210,10 @@ const AtBatReplay: React.FC = () => {
       {atBatState.data && isBigView && (
         <ScoreForDesktop
           openHistory={true}
-          atBat={stateAfterPitch(atBatState.data.atBat, currentSessionIdx - (isReplayOver ? 0 : 1))}
+          atBat={stateAfterPitch(
+            atBatState.data.atBat,
+            currentSessionIdx - (isReplayOver ? 0 : 1) + (isPitchOutcomeVisible ? 1 : 0),
+          )}
           pitch={
             stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches[currentSessionIdx]
           }
