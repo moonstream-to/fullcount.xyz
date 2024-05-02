@@ -54,7 +54,7 @@ export const getAtBAtOutcome = (pitches: SessionStatus[]) => {
   return { balls, strikes, outcome };
 };
 
-const emptyPitch = {
+export const emptyPitch = {
   progress: 3,
   outcome: 0,
   sessionID: 0,
