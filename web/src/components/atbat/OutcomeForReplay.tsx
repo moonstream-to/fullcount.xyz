@@ -53,6 +53,7 @@ const OutcomeForReplay = ({
   const playSound = useSound();
   const [isSwingVisible, setIsSwingVisible] = useState(false);
   const [isOutcomeVisible, setIsOutcomeVisible] = useState(false);
+  const [isBigView] = useMediaQuery("(min-width: 1024px)");
 
   useEffect(() => {
     if (atBat.outcome !== 0 && forToken) {
@@ -79,22 +80,27 @@ const OutcomeForReplay = ({
           )}
           <div className={styles.pitcher}>
             <div className={styles.imageContainer}>
-              {atBat?.pitcher && (
-                <Image
-                  src={atBat.pitcher?.image}
-                  alt={atBat.pitcher?.name}
-                  className={
-                    sessionOutcomeType([atBat.pitcher], atBat, sessionStatus) === "positive"
-                      ? styles.winImage
-                      : styles.image
-                  }
-                />
+              {atBat?.pitcher && !isBigView && (
+                <>
+                  <Image
+                    src={atBat.pitcher?.image}
+                    alt={atBat.pitcher?.name}
+                    className={
+                      sessionOutcomeType([atBat.pitcher], atBat, sessionStatus) === "positive"
+                        ? styles.winImage
+                        : styles.image
+                    }
+                  />
+                  <div className={styles.name}>{atBat.pitcher.name}</div>
+                </>
               )}
-              {isPitchVisible && (
-                <div className={styles.actionType}>
-                  {speeds[Number(sessionStatus.pitcherReveal.speed)]}
-                </div>
-              )}
+              <div style={{ minHeight: "55px" }}>
+                {isPitchVisible && (
+                  <div className={styles.actionType}>
+                    {speeds[Number(sessionStatus.pitcherReveal.speed)]}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {sessionStatus.batterReveal.kind !== "2" && isSwingVisible && isPitchVisible && (
@@ -131,22 +137,27 @@ const OutcomeForReplay = ({
           />
           <div className={styles.batter}>
             <div className={styles.imageContainer}>
-              {atBat?.batter && (
-                <Image
-                  src={atBat.batter?.image}
-                  alt={atBat.batter?.name}
-                  className={
-                    sessionOutcomeType([atBat.batter], atBat, sessionStatus) === "positive"
-                      ? styles.winImage
-                      : styles.image
-                  }
-                />
+              {atBat?.batter && !isBigView && (
+                <>
+                  <Image
+                    src={atBat.batter?.image}
+                    alt={atBat.batter?.name}
+                    className={
+                      sessionOutcomeType([atBat.batter], atBat, sessionStatus) === "positive"
+                        ? styles.winImage
+                        : styles.image
+                    }
+                  />
+                  <div className={styles.name}>{atBat.batter.name}</div>
+                </>
               )}
-              {isSwingVisible && (
-                <div className={styles.actionType}>
-                  {kinds[Number(sessionStatus.batterReveal.kind)]}
-                </div>
-              )}
+              <div style={{ minHeight: "55px" }}>
+                {isPitchVisible && (
+                  <div className={styles.actionType}>
+                    {kinds[Number(sessionStatus.batterReveal.kind)]}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
