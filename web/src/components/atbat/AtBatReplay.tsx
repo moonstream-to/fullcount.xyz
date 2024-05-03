@@ -91,6 +91,7 @@ const AtBatReplay: React.FC = () => {
   const [isReplayOver, setIsReplayOver] = useState(false);
   const [isOutcomePitchVisible, setIsOutcomePitchVisible] = useState(false);
   const [intervalId, setIntervalId] = useState<any>(undefined);
+  const [replaysCount, setReplaysCount] = useState(0);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -146,7 +147,7 @@ const AtBatReplay: React.FC = () => {
       return;
     }
     setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
-  }, [currentSessionIdx, atBatState.data]);
+  }, [currentSessionIdx, atBatState.data, replaysCount]);
 
   useEffect(() => {
     if (currentSessionIdx === 0 && atBatState.data) {
@@ -165,7 +166,7 @@ const AtBatReplay: React.FC = () => {
         }, 10000),
       );
     }
-  }, [currentSessionIdx, atBatState.data]);
+  }, [currentSessionIdx, atBatState.data, replaysCount]);
 
   useEffect(() => {
     if (atBatState.data && currentSessionIdx > atBatState.data.atBat.pitches.length && intervalId) {
@@ -181,7 +182,7 @@ const AtBatReplay: React.FC = () => {
     if (atBatState.data && atBatState.data.atBat.numberOfSessions <= currentSessionIdx + 1) {
       setTimeout(() => setIsReplayOver(true), outcomeDelay * 4);
     }
-  }, [currentSessionIdx]);
+  }, [currentSessionIdx, replaysCount]);
 
   const handleExitClick = () => {
     playSound("homeButton");
@@ -202,6 +203,7 @@ const AtBatReplay: React.FC = () => {
         onClick={() => {
           setCurrentSessionIdx(0);
           setIsReplayOver(false);
+          setReplaysCount((prev) => prev + 1);
         }}
       >
         <ReplayIcon />
@@ -282,6 +284,7 @@ const AtBatReplay: React.FC = () => {
                 <>
                   {atBatState.data?.atBat && (
                     <OutcomeForReplay
+                      replaysCount={replaysCount}
                       isPitchVisible={isOutcomePitchVisible}
                       setIsPitchVisible={setIsOutcomePitchVisible}
                       currentSessionIdx={currentSessionIdx}

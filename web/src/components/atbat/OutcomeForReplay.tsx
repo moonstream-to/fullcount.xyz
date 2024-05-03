@@ -41,6 +41,7 @@ const OutcomeForReplay = ({
   currentSessionIdx,
   isPitchVisible,
   setIsPitchVisible,
+  replaysCount,
 }: {
   atBat: AtBatStatus;
   sessionStatus: SessionStatus;
@@ -49,6 +50,7 @@ const OutcomeForReplay = ({
   currentSessionIdx: number;
   isPitchVisible: boolean;
   setIsPitchVisible: (arg0: boolean) => void;
+  replaysCount: number;
 }) => {
   const playSound = useSound();
   const [isSwingVisible, setIsSwingVisible] = useState(false);
@@ -64,7 +66,7 @@ const OutcomeForReplay = ({
     setTimeout(() => setIsPitchVisible(true), outcomeDelay);
     setTimeout(() => setIsSwingVisible(true), outcomeDelay * 2);
     setTimeout(() => setIsOutcomeVisible(true), outcomeDelay * 3);
-  }, [sessionStatus.batterReveal, sessionStatus.pitcherReveal]);
+  }, [sessionStatus.batterReveal, sessionStatus.pitcherReveal, replaysCount]);
 
   if (!sessionStatus) {
     return <></>;
