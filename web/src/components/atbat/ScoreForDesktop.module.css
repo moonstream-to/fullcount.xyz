@@ -3,7 +3,7 @@
     flex-direction: column;
     gap: 22px;
     justify-content: center;
-    z-index: 5;
+    z-index: 25;
     flex-grow: 0;
     align-self: stretch;
     width: fit-content;

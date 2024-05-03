@@ -63,6 +63,9 @@ const PitchHistory = ({ atBat }: { atBat: AtBatStatus }) => {
                   {sessionOutcomes[p.outcome]}
                 </div>
               )}
+              {!selectedToken && (
+                <div className={styles.positiveOutcome}>{sessionOutcomes[p.outcome]}</div>
+              )}
             </div>
           ))}
       </div>

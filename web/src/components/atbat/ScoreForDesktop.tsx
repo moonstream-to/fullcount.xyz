@@ -41,9 +41,9 @@ const ScoreForDesktop = ({
           <DotsCounterLarge label={"Strike"} count={atBat.strikes} capacity={3} />
         </div>
         <Timer
-          start={pitch.phaseStartTimestamp ?? "0"}
+          start={pitch?.phaseStartTimestamp ?? "0"}
           delay={secondsPerPhase ?? 120}
-          isActive={pitch.progress === 3 || pitch.progress === 4}
+          isActive={pitch?.progress === 3 || pitch?.progress === 4}
         />
       </div>
     </div>

@@ -65,13 +65,37 @@
     font-style: normal;
     font-weight: 400;
     line-height: normal;
+    padding: 20px;
+}
+
+.name {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .ballImage {
     position: absolute;
     width: 4.5vh;
     height: 4.5vh;
+    transition: all 2s ;
     z-index: 1;
+    animation: scaleUp 0.5s ease-out forwards;
+}
+
+@keyframes scaleUp {
+    from {
+        transform: scale(0.2);
+        opacity: 1;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
 }
 
 .batImage {
@@ -107,5 +131,10 @@
 @media (min-width: 1024px) {
     .positiveOutcome, .negativeOutcome {
         font-size: 30px;
+    }
+
+    .actionType {
+        font-size: 24px;
+        padding: 20px;
     }
 }

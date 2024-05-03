@@ -7,7 +7,7 @@
     border: 1px solid #262019;
     background: #EBE4DC;
     min-height: 643px;
-    z-index: 2;
+    z-index: 20;
     position: absolute;
     max-width: 290px;
     left: calc((100vw - 66vh) / 4);
