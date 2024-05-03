@@ -1,6 +1,6 @@
 import type { AppProps } from "next/app";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { QueryClientProvider, QueryClient } from "react-query";
 import { ChakraProvider } from "@chakra-ui/react";
 
@@ -10,30 +10,10 @@ import "../src/styles/globals.css";
 import { GameContextProvider } from "../src/contexts/GameContext";
 import { UserProvider } from "../src/contexts/UserContext";
 import Script from "next/script";
-import { sendReport } from "../src/utils/humbug";
 import ErrorBoundary from "../src/components/layout/ErrorBoundary";
 
 export default function App({ Component, pageProps }: AppProps) {
   const [queryClient] = useState(new QueryClient());
-  useEffect(() => {
-    window.onerror = function (message, source, lineno, colno, error) {
-      const errorInfo = {
-        message: typeof message === "string" ? message : message.toString(),
-        source,
-        lineno,
-        colno,
-        error: error
-          ? {
-              message: error.message,
-              name: error.name,
-              stack: error.stack,
-            }
-          : "Error object not available",
-      };
-      sendReport("Unhandled Runtime Error", errorInfo, ["type:error", "error_domain:app"]);
-      return false;
-    };
-  }, []);
 
   return (
     <ErrorBoundary>
