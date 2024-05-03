@@ -152,7 +152,7 @@ const OutcomeForReplay = ({
                 </>
               )}
               <div style={{ minHeight: "55px" }}>
-                {isPitchVisible && (
+                {isPitchVisible && isSwingVisible && (
                   <div className={styles.actionType}>
                     {kinds[Number(sessionStatus.batterReveal.kind)]}
                   </div>
