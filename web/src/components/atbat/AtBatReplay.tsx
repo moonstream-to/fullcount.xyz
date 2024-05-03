@@ -18,6 +18,7 @@ import { useSound } from "../../hooks/useSound";
 import { InfoIcon } from "@chakra-ui/icons";
 import { emptyPitch } from "./OnboardingAPI";
 import OutcomeForReplay from "./OutcomeForReplay";
+import ReplayIcon from "../icons/ReplayIcon";
 
 export const outcomes = [
   "In Progress",
@@ -54,11 +55,14 @@ export const outcomeType = (
   }
 };
 
-const stateAfterPitch = (atBat: AtBatStatus, pitchIdx: number) => {
+const stateAfterPitch = (atBat: AtBatStatus, pitchIdx: number, log = false) => {
+  if (log) {
+    console.log(pitchIdx);
+  }
   if (!atBat) {
     return atBat;
   }
-  if (pitchIdx + 1 === atBat.pitches.length) {
+  if (pitchIdx + 1 >= atBat.pitches.length) {
     return atBat;
   }
   const pitches = atBat.pitches.slice(0, pitchIdx + 1);
@@ -80,6 +84,7 @@ const AtBatReplay: React.FC = () => {
   const [isPitchOutcomeVisible, setIsPitchOutcomeVisible] = useState(false);
   const [isReplayOver, setIsReplayOver] = useState(false);
   const [isOutcomePitchVisible, setIsOutcomePitchVisible] = useState(false);
+  const [intervalId, setIntervalId] = useState<any>(undefined);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -103,13 +108,6 @@ const AtBatReplay: React.FC = () => {
     }
   }, [router.query.id, router.query.session_id]);
 
-  useEffect(() => {
-    if (!atBatState.data?.atBat) {
-      return;
-    }
-    setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
-  }, [currentSessionIdx]);
-
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
     ["atBat", atBatId, sessionId],
     async () => {
@@ -132,26 +130,45 @@ const AtBatReplay: React.FC = () => {
           return;
         }
         setShowPitchOutcome(true);
-        setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
       },
       refetchInterval: false,
     },
   );
 
   useEffect(() => {
-    if (!atBatState.data) {
+    console.log(atBatState.data, currentSessionIdx);
+    if (!atBatState.data?.atBat) {
       return;
     }
-    const intervalId = setInterval(() => {
-      setCurrentSessionIdx((prev) => {
-        if (prev + 1 < atBatState.data.atBat.pitches.length) {
-          setIsOutcomePitchVisible(false);
-        }
-        return prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0);
-      });
-    }, 10000);
-    return () => clearInterval(intervalId);
-  }, [atBatState.data]);
+    setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
+  }, [currentSessionIdx, atBatState.data]);
+  // useEffect(() => {
+  //   console.log({ isPitchOutcomeVisible, isReplayOver });
+  // }, [isPitchOutcomeVisible, isReplayOver]);
+
+  useEffect(() => {
+    if (currentSessionIdx === 0 && atBatState.data) {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+      setIntervalId(
+        setInterval(() => {
+          setCurrentSessionIdx((prev) => {
+            if (prev + 1 < atBatState.data.atBat.pitches.length) {
+              setIsOutcomePitchVisible(false);
+            }
+            return prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0);
+          });
+        }, 10000),
+      );
+    }
+  }, [currentSessionIdx, atBatState.data]);
+
+  useEffect(() => {
+    if (atBatState.data && currentSessionIdx > atBatState.data.atBat.pitches.length && intervalId) {
+      clearInterval(intervalId);
+    }
+  }, [currentSessionIdx]);
 
   useEffect(() => {
     if (atBatState.data && atBatState.data.atBat.numberOfSessions > currentSessionIdx) {
@@ -159,7 +176,7 @@ const AtBatReplay: React.FC = () => {
       setIsOutcomePitchVisible(false);
     }
     if (atBatState.data && atBatState.data.atBat.numberOfSessions <= currentSessionIdx + 1) {
-      setInterval(() => setIsReplayOver(true), outcomeDelay * 4);
+      setTimeout(() => setIsReplayOver(true), outcomeDelay * 4);
     }
   }, [currentSessionIdx]);
 
@@ -178,10 +195,13 @@ const AtBatReplay: React.FC = () => {
       </div>
       <div
         className={styles.exitButton}
-        style={{ right: "50px" }}
-        onClick={() => setCurrentSessionIdx(0)}
+        style={{ top: "90px" }}
+        onClick={() => {
+          setCurrentSessionIdx(0);
+          setIsReplayOver(false);
+        }}
       >
-        <InfoIcon />
+        <ReplayIcon />
       </div>
       <Image
         minW={"441px"}
@@ -226,6 +246,7 @@ const AtBatReplay: React.FC = () => {
       )}
       {atBatState.data?.atBat &&
         isPitchOutcomeVisible &&
+        isOutcomePitchVisible &&
         !isReplayOver &&
         stateAfterPitch(atBatState.data.atBat, currentSessionIdx).pitches.length > 0 && (
           <div className={styles.positiveOutcome} style={{ top: "18%" }}>
