@@ -68,7 +68,13 @@ const stateAfterPitch = (atBat: AtBatStatus, pitchIdx: number, log = false) => {
   const pitches = atBat.pitches.slice(0, pitchIdx + 1);
   pitches.push({ ...emptyPitch, didPitcherCommit: false });
   const balls = pitches.filter((p) => p.outcome === 1).length;
-  const strikes = pitches.filter((p) => p.outcome === 0 && p.progress === 5).length;
+  let strikes = 0;
+  pitches.forEach((p) => {
+    if ((p.outcome === 0 && p.progress === 5) || (p.outcome === 2 && strikes < 2)) {
+      strikes += 1;
+    }
+  });
+
   return { ...atBat, outcome: 0, numberOfSessions: pitches.length, pitches, balls, strikes };
 };
 
@@ -136,15 +142,11 @@ const AtBatReplay: React.FC = () => {
   );
 
   useEffect(() => {
-    console.log(atBatState.data, currentSessionIdx);
     if (!atBatState.data?.atBat) {
       return;
     }
     setTimeout(() => setIsPitchOutcomeVisible(true), outcomeDelay * 4);
   }, [currentSessionIdx, atBatState.data]);
-  // useEffect(() => {
-  //   console.log({ isPitchOutcomeVisible, isReplayOver });
-  // }, [isPitchOutcomeVisible, isReplayOver]);
 
   useEffect(() => {
     if (currentSessionIdx === 0 && atBatState.data) {
@@ -156,6 +158,7 @@ const AtBatReplay: React.FC = () => {
           setCurrentSessionIdx((prev) => {
             if (prev + 1 < atBatState.data.atBat.pitches.length) {
               setIsOutcomePitchVisible(false);
+              setIsPitchOutcomeVisible(false);
             }
             return prev + (prev + 1 < atBatState.data.atBat.pitches.length ? 1 : 0);
           });
