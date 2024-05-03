@@ -27,7 +27,15 @@ export const outcomeType = (tokens: Token[], atBat: AtBat): "positive" | "negati
 
 const AtBatItem = ({ atBat, tokens }: { atBat: AtBat; tokens: OwnedToken[] }) => {
   return (
-    <div className={styles.atBatContainer} onClick={() => router.push(`/replays?id=${atBat.id}`)}>
+    <div
+      className={styles.atBatContainer}
+      style={{ cursor: atBat.outcome === 0 ? "default" : "pointer" }}
+      onClick={() => {
+        if (atBat.outcome !== 0) {
+          router.push(`/replays?id=${atBat.id}`);
+        }
+      }}
+    >
       <div className={styles.cards}>
         {atBat.pitcher ? (
           <TokenToPlay token={atBat.pitcher} isPitcher={true} />
