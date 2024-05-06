@@ -21,6 +21,7 @@ import ExitDialog from "./ExitDialog";
 import useUser from "../../contexts/UserContext";
 import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { useSound } from "../../hooks/useSound";
+import InviteLinkView from "./InviteLinkView";
 
 export const outcomes = [
   "In Progress",
@@ -296,11 +297,14 @@ const AtBatView: React.FC = () => {
         </div>
       )}
       {atBatState.data && atBatState.data.atBat.pitches[0].progress === 2 && (
-        <div className={styles.invitePrompt}>
-          Waiting for Opponent.
-          <br />
-          Invite Friend?
-        </div>
+        <>
+          <div className={styles.invitePrompt}>
+            Waiting for Opponent.
+            <br />
+            Invite Friend?
+          </div>
+          <InviteLinkView atBat={atBatState.data.atBat} />
+        </>
       )}
       {atBatState.data?.atBat.outcome === 0 &&
         !showPitchOutcome &&
