@@ -15,7 +15,7 @@ const NewCharacterButton = ({ small }: { small: boolean }) => {
         updateContext({ isCreateCharacter: true });
       }}
     >
-      {small ? <PlusIcon /> : "+ Mint new Beer League Baller"}
+      {small ? <PlusIcon /> : "+ Create new Beer League Baller"}
     </div>
   );
 };
