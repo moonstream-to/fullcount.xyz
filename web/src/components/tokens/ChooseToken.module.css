@@ -1,13 +1,19 @@
 .container {
+    position: absolute;
+    top: 50vh;
+    left: 50%;
+    border: 1px solid black;
+    transform: translateX(-50%) translateY(-50%);
     flex-direction: column;
     display: flex;
-    height: 100vh;
-    width: 100vw;
+    height: 75vh;
+    width: 320px;
     padding: 20px;
     justify-content: center;
     align-items: center;
     gap: 20px;
     background: #FCECD9;
+    z-index: 3;
 }
 
 .header {
