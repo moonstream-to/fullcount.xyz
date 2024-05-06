@@ -52,7 +52,7 @@
 
 .linkContainer {
     display: flex;
-    width: 270px;
+    max-width: 270px;
     align-items: center;
     gap: -1px;
 }
@@ -64,11 +64,20 @@
     gap: 10px;
     flex: 1 0 0;
     background: #262019;
+    white-space: nowrap;
+    overflow: clip;
+    color: #FFF;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+    letter-spacing: 0.7px;
 }
 
-.copyButton {
+.copyButton, .copyButtonSuccess {
     display: flex;
-    padding: 10px;
+    padding: 9px;
     align-items: center;
     gap: 10px;
     border: 1px solid #262019;
@@ -80,6 +89,11 @@
     font-weight: 400;
     line-height: 100%; /* 14px */
     letter-spacing: 0.7px;
+}
+
+.copyButtonSuccess {
+    background: #01641d;
+
 }
 
 .ball {

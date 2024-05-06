@@ -1,11 +1,19 @@
 import styles from "./InviteLinkView.module.css";
 import { AtBatStatus } from "../../types";
-import { Image } from "@chakra-ui/react";
+import { Image, useClipboard } from "@chakra-ui/react";
 import QuestionMarkIcon from "../icons/QuestionMarkIcon";
 import BallIconWhite from "../icons/BallIconWhite";
 import BatIconWhite from "../icons/BatIconWhite";
+import LinkIcon from "../icons/LinkIcon";
 
 const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
+  const link = `${window.location.protocol}//${
+    window.location.host
+  }/?invite_from=${encodeURIComponent(
+    atBat.pitcher ? atBat.pitcher.name : atBat.batter ? atBat.batter.name : "",
+  )}&id=${atBat.id}`;
+  const { onCopy, hasCopied } = useClipboard(link);
+
   return (
     <div className={styles.container}>
       <div className={styles.tokens}>
@@ -32,6 +40,19 @@ const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
             <BatIconWhite className={styles.bat} />
           </div>
         )}
+      </div>
+      <div className={styles.linkContainer}>
+        <div className={styles.link} title={link}>
+          {link}
+        </div>
+        <button
+          type={"button"}
+          className={hasCopied ? styles.copyButtonSuccess : styles.copyButton}
+          onClick={onCopy}
+        >
+          <div>Copy</div>
+          <LinkIcon />
+        </button>
       </div>
     </div>
   );
