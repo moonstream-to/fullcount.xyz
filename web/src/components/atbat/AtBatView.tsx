@@ -295,6 +295,13 @@ const AtBatView: React.FC = () => {
             : "you lose!"}
         </div>
       )}
+      {atBatState.data && atBatState.data.atBat.pitches[0].progress === 2 && (
+        <div className={styles.invitePrompt}>
+          Waiting for Opponent.
+          <br />
+          Invite Friend?
+        </div>
+      )}
       {atBatState.data?.atBat.outcome === 0 &&
         !showPitchOutcome &&
         atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&

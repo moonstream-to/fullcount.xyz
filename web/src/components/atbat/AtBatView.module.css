@@ -80,6 +80,22 @@
     height: 98px;
 }
 
+.invitePrompt {
+    color: #262019;
+    position: absolute;
+    right: 50%;
+    transform: translateX(50%);
+    z-index: 3;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    top: 88.5px;
+    font-size: 24px;
+    width: 320px;
+}
+
 .negativeOutcome2 {
     stroke: #CD7676;
     color: #CD7676;
