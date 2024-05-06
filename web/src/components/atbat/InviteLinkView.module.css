@@ -1,0 +1,97 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
+    width: 100vw;
+    justify-content: center;
+}
+.tokens {
+    display: flex;
+    width: 100%;
+    padding: 10px;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+
+    border-top: 1px solid #262019;
+    border-bottom: 1px solid #262019;
+    background: #FCECD9;
+}
+
+.player, .opponent {
+    width: 110px;
+    height: 110px;
+    position: relative;
+}
+
+.player {
+    border: 4px solid #328449;
+    position: relative;
+
+}
+
+.opponent {
+    display: flex;
+    border: 1px solid #262019;
+    background: linear-gradient(0deg, #EBE4DC 0%, #EBE4DC 100%), #F9F0E3;
+    align-items: center;
+    justify-content: center;
+}
+
+.vs {
+    color: #262019;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 120%; /* 28.8px */
+}
+
+.linkContainer {
+    display: flex;
+    width: 270px;
+    align-items: center;
+    gap: -1px;
+}
+
+.link {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    flex: 1 0 0;
+    background: #262019;
+}
+
+.copyButton {
+    display: flex;
+    padding: 10px;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #262019;
+    background: #328449;
+    color: #FFF;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 100%; /* 14px */
+    letter-spacing: 0.7px;
+}
+
+.ball {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(-50%);
+}
+
+.bat {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%) translateX(50%);
+}
