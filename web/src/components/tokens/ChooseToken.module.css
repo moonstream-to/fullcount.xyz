@@ -1,13 +1,25 @@
+.background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+
+
 .container {
     position: absolute;
     top: 50vh;
     left: 50%;
-    border: 1px solid black;
     transform: translateX(-50%) translateY(-50%);
     flex-direction: column;
     display: flex;
-    height: 75vh;
-    width: 320px;
+    height: 603px;
+    min-width: 322px;
     padding: 20px;
     justify-content: center;
     align-items: center;
@@ -16,15 +28,35 @@
     z-index: 3;
 }
 
+
+
+.headerContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
 .header {
-    color: #262019;
+    color: #328449;
     text-align: center;
     font-family: Bangers, cursive;
     font-size: 30px;
     font-style: normal;
     font-weight: 400;
-    line-height: 100%; /* 30px */
-    letter-spacing: 1.5px;
+    line-height: normal;
+}
+
+.prompt {
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
 }
 
 .content {
@@ -33,7 +65,7 @@
     align-items: center;
     gap: 15px;
     flex: 1 0 0;
-    width: 286px;
+    max-height: 310px;
 }
 
 .title {
@@ -57,11 +89,20 @@
 
 
 .cards {
-    width: 279px;
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 15px;
     flex-wrap: wrap;
     overflow-y: auto;
-    max-height: calc(100vh - 221px); /*console.log(20 + 30 + 20 + 25.5 + 15 + 17.5 + 15 + 20 + 37.5 + 20);*/
+    max-height: calc(100vh - 221px);
+    padding-bottom: 15px;
+}
+
+@media (min-width: 362px) and (min-height: 643px) {
+    .background {
+        background-image: url('https://static.fullcount.xyz/web/landing/Bl-banner-background-tinted.jpeg');
+    }
+    .container {
+        border: 1px solid black;
+    }
 }
