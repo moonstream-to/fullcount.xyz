@@ -120,3 +120,14 @@
 .button {
     cursor: pointer;
 }
+
+.legalText {
+    color: #262019;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    cursor: pointer;
+    margin-top: -5px;
+    margin-bottom: -5px;
+}

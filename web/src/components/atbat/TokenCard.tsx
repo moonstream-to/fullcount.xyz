@@ -11,7 +11,7 @@ import DetailedStat from "../playing/DetailedStat";
 
 const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) => {
   const pitcherStats = useQuery(
-    ["pitcher_stat", token],
+    ["pitcher_stat", token.id],
     async () => {
       if (!token) {
         return;
@@ -36,7 +36,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
   );
 
   const batterStats = useQuery(
-    ["batter_stat", token],
+    ["batter_stat", token.id],
     async () => {
       if (!token) {
         return;
@@ -61,7 +61,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
   );
 
   const pitchDistributions = useQuery(
-    ["pitch_distribution", token],
+    ["pitch_distribution", token.id],
     async () => {
       if (!token) {
         return;
@@ -98,7 +98,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
   );
 
   const swingDistributions = useQuery(
-    ["swing_distribution", token],
+    ["swing_distribution", token.id],
     async () => {
       if (!token) {
         return;

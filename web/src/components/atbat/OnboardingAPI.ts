@@ -2,7 +2,7 @@ import { AtBatStatus, BatterReveal, PitcherReveal, SessionStatus } from "../../t
 
 export const selectedToken = {
   address: "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0",
-  id: "2",
+  id: "155",
   image: "https://static.fullcount.xyz/Beer_League_Ballers/p2.png",
   isStaked: true,
   stakedSessionID: 0,

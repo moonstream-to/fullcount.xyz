@@ -77,6 +77,9 @@ const LaunchForm = ({ onClose }: { onClose: () => void }) => {
           />
         </div>
       </div>
+      <a>
+        <div className={styles.legalText}>Privacy Policy</div>
+      </a>
     </div>
   );
 };

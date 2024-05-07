@@ -92,4 +92,6 @@ export const LEADERBOARDS = [
 
 export const blbImage = (idx: number) =>
   `https://static.fullcount.xyz/Beer_League_Ballers/small/p${idx}.jpeg`;
+
+export const NUMBER_OF_BLB_IMAGES = 16;
 export const HUMBUG_REPORT_VERSION = "0.0.3";
