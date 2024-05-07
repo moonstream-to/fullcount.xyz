@@ -3,7 +3,7 @@ import Image from "next/image";
 import styles from "../tokens/CreateNewCharacter.module.css";
 import localStyles from "./OnboardingCharacter.module.css";
 import React, { useEffect, useState } from "react";
-import { blbImage, NUMBER_OF_BLB_IMAGES } from "../../constants";
+import { blbImage } from "../../constants";
 import { useSound } from "../../hooks/useSound";
 const names = [
   "Joe Expo",
@@ -15,11 +15,6 @@ const names = [
   "Trial Kyle",
   "Drew Preview",
 ];
-
-const images: number[] = [];
-for (let i = 0; i < NUMBER_OF_BLB_IMAGES; i += 1) {
-  images.push(i);
-}
 
 const OnboardingCharacter = ({
   onClose,
@@ -52,7 +47,7 @@ const OnboardingCharacter = ({
         <Image width={"161"} height={"161"} src={blbImage(imageIndex)} alt={""} />
         <div className={localStyles.name}>{names[imageIndex]}</div>
         <div className={styles.images}>
-          {images.map((_, idx: number) => (
+          {names.map((_, idx: number) => (
             <Image
               key={idx}
               width={"50"}
