@@ -2,7 +2,7 @@ import styles from "./ChooseToken.module.css";
 import parentStyles from "./CreateNewCharacter.module.css";
 import { AtBat, OwnedToken, Token } from "../../types";
 import TokenCard from "./TokenCard";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import NewCharacterButton from "./NewCharacterButton";
 import { useMutation, useQueryClient } from "react-query";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
@@ -12,6 +12,8 @@ import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
 import { useSound } from "../../hooks/useSound";
 import { Spinner } from "@chakra-ui/react";
+import PvPIcon from "../icons/PvPIcon";
+import { useGameContext } from "../../contexts/GameContext";
 
 const ChooseToken = ({
   tokens,
@@ -26,12 +28,14 @@ const ChooseToken = ({
   inviteCode: string;
   inviteFrom: string;
 }) => {
-  const [selectedTokenIdx, setSelectedTokenIdx] = useState(0);
+  const { updateContext, selectedTokenIdx } = useGameContext();
+
   const elementRef = useRef<HTMLDivElement>(null);
   const [drawBottomLine, setDrawBottomLine] = useState(false);
   const toast = useMoonToast();
   const { user } = useUser();
   const playSound = useSound();
+  const { isCreateCharacter } = useGameContext();
 
   useEffect(() => {
     const element = elementRef.current;
@@ -64,7 +68,6 @@ const ChooseToken = ({
         queryClient.setQueryData(
           ["atBats"],
           (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            console.log(oldData);
             if (!oldData) {
               return { atBats: [], tokens: [] };
             }
@@ -86,7 +89,6 @@ const ChooseToken = ({
           },
         );
         queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
-          console.log(oldData);
           if (!oldData) {
             return [];
           }
@@ -123,35 +125,49 @@ const ChooseToken = ({
   );
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>Choose character</div>
-      <div
-        className={styles.content}
-        style={{ borderBottom: drawBottomLine ? "1px solid #7e8e7f" : "none" }}
-      >
-        {/*<div className={styles.title}>Play</div>*/}
-        <div className={styles.prompt}>Choose a character to play with. </div>
-        <div className={styles.cards} ref={elementRef}>
-          {tokens.map((t, idx) => (
-            <TokenCard
-              key={idx}
-              token={t}
-              isSelected={idx === selectedTokenIdx}
-              onSelected={() => setSelectedTokenIdx(idx)}
-            />
-          ))}
-          <NewCharacterButton small={false} />
+    <>
+      {!isCreateCharacter && (
+        <div className={styles.background}>
+          <div className={styles.container}>
+            <div className={styles.headerContainer}>
+              <PvPIcon fill={"#262019"} />
+              <div className={styles.header}>BATTER UP</div>
+            </div>
+
+            <div className={styles.prompt}>
+              {`${inviteFrom} is inviting you to play Fullcount.xyz.`} <br />
+              {`Choose a character to play with.`}
+            </div>
+            <div
+              className={styles.content}
+              style={{ borderBottom: drawBottomLine ? "1px solid #7e8e7f" : "none" }}
+            >
+              <div className={styles.cards} ref={elementRef}>
+                {tokens.map((t, idx) => (
+                  <TokenCard
+                    key={idx}
+                    token={t}
+                    isSelected={idx === selectedTokenIdx}
+                    onSelected={() =>
+                      updateContext({ selectedToken: { ...tokens[idx] }, selectedTokenIdx: idx })
+                    }
+                  />
+                ))}
+                <NewCharacterButton small={false} />
+              </div>
+            </div>
+            <div className={parentStyles.buttonsContainer}>
+              <button type={"button"} className={parentStyles.cancelButton} onClick={onClose}>
+                Cancel
+              </button>
+              <button type={"button"} className={parentStyles.button} onClick={handleClick}>
+                {joinSession.isLoading ? <Spinner /> : "Play"}
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className={parentStyles.buttonsContainer}>
-        <div className={parentStyles.cancelButton} onClick={onClose}>
-          Cancel
-        </div>
-        <button type={"button"} className={parentStyles.button} onClick={handleClick}>
-          {joinSession.isLoading ? <Spinner /> : "Play"}
-        </button>
-      </div>
-    </div>
+      )}
+    </>
   );
 };
 
