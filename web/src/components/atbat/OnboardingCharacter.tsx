@@ -3,9 +3,8 @@ import Image from "next/image";
 import styles from "../tokens/CreateNewCharacter.module.css";
 import localStyles from "./OnboardingCharacter.module.css";
 import React, { useEffect, useState } from "react";
-import { blbImage } from "../../constants";
+import { blbImage, NUMBER_OF_BLB_IMAGES } from "../../constants";
 import { useSound } from "../../hooks/useSound";
-const NUMBER_OF_IMAGES = 8;
 const names = [
   "Joe Expo",
   "Playtest Celeste",
@@ -18,7 +17,7 @@ const names = [
 ];
 
 const images: number[] = [];
-for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
+for (let i = 0; i < NUMBER_OF_BLB_IMAGES; i += 1) {
   images.push(i);
 }
 
