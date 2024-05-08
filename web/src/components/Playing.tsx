@@ -22,6 +22,7 @@ import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import { useSound } from "../hooks/useSound";
+import { useRouter } from "next/router";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
@@ -38,6 +39,28 @@ const Playing = () => {
   } = useGameContext();
   const { user } = useUser();
   const playSound = useSound();
+  const [inviteFrom, setInviteFrom] = useState("");
+  const [inviteSession, setInviteSession] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.invite_from && typeof router.query.invite_from === "string") {
+      setInviteFrom(router.query.invite_from);
+    } else {
+      setInviteFrom("");
+    }
+    if (router.query.id && typeof router.query.id === "string") {
+      setInviteSession(router.query.id);
+    } else {
+      setInviteSession("");
+    }
+    if (router.query.invite_code && typeof router.query.invite_code === "string") {
+      setInviteCode(router.query.invite_code);
+    } else {
+      setInviteCode("");
+    }
+  }, [router.query.invite_from, router.query.id, router.query.invite_code]);
 
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
@@ -45,6 +68,15 @@ const Playing = () => {
       console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
+        updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
+      }
+      //first response  from the FCPLayer API after token creation has empty name and p0 image
+      if (
+        selectedToken &&
+        !selectedToken.name &&
+        ownedTokens[selectedTokenIdx] &&
+        selectedToken.id === ownedTokens[selectedTokenIdx].id
+      ) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
       }
       return ownedTokens;
@@ -192,25 +224,25 @@ const Playing = () => {
         ownedTokens.data &&
         ownedTokens.data.length >= 1 &&
         !invitedTo &&
+        !inviteFrom &&
         !isCreateCharacter && (
           <PlayingLayout>
             <HomePage tokens={ownedTokens.data} atBats={atBats.data?.atBats} />
           </PlayingLayout>
         )}
-
-      {invitedTo && ownedTokens.data && !isCreateCharacter && (
+      {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 0 && (
         <ChooseToken
-          tokens={ownedTokens.data}
-          onChoose={(token) => {
-            updateContext({ selectedToken: token, invitedTo: undefined });
+          tokens={ownedTokens.data.filter((t) => !t.isStaked)}
+          sessionID={Number(inviteSession)}
+          inviteCode={inviteCode}
+          inviteFrom={inviteFrom}
+          onClose={() => {
+            router.push("/");
+            setInviteCode("");
+            setInviteFrom("");
+            setInviteSession("");
           }}
-          onClose={() => updateContext({ invitedTo: undefined })}
         />
-      )}
-
-      {selectedSession && watchingToken && <PlayView selectedToken={watchingToken} />}
-      {selectedSession && !watchingToken && selectedToken && (
-        <PlayView selectedToken={selectedToken} />
       )}
     </>
   );

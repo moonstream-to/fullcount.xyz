@@ -21,6 +21,7 @@ import ExitDialog from "./ExitDialog";
 import useUser from "../../contexts/UserContext";
 import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { useSound } from "../../hooks/useSound";
+import InviteLinkView from "./InviteLinkView";
 
 export const outcomes = [
   "In Progress",
@@ -238,7 +239,7 @@ const AtBatView: React.FC = () => {
           </div>
         )}
 
-      {atBatState.data && !isBigView && (
+      {atBatState.data && !isBigView && atBatState.data.atBat.pitches[0].progress !== 2 && (
         <Score
           atBat={atBatState.data.atBat}
           pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
@@ -247,7 +248,8 @@ const AtBatView: React.FC = () => {
       {atBatState.data &&
         isBigView &&
         atBatState.data?.atBat.outcome === 0 &&
-        !showPitchOutcome && (
+        !showPitchOutcome &&
+        atBatState.data.atBat.pitches[0].progress !== 2 && (
           <ScoreForDesktop
             atBat={atBatState.data.atBat}
             pitch={atBatState.data.atBat.pitches[currentSessionIdx]}
@@ -294,6 +296,16 @@ const AtBatView: React.FC = () => {
             : "you lose!"}
         </div>
       )}
+      {atBatState.data && atBatState.data.atBat.pitches[0].progress === 2 && (
+        <>
+          <div className={styles.invitePrompt}>
+            Waiting for Opponent.
+            <br />
+            Invite Friend?
+          </div>
+          <InviteLinkView atBat={atBatState.data.atBat} />
+        </>
+      )}
       {atBatState.data?.atBat.outcome === 0 &&
         !showPitchOutcome &&
         atBatState.data.atBat.pitches[atBatState.data.atBat.numberOfSessions - 1].progress !== 2 &&
@@ -338,9 +350,12 @@ const AtBatView: React.FC = () => {
           )}
         </>
       )}
-      {atBatState.data && !showPitchOutcome && !isBigView && (
-        <AtBatFooter atBat={atBatState.data.atBat} />
-      )}
+      {atBatState.data &&
+        !showPitchOutcome &&
+        !isBigView &&
+        atBatState.data.atBat.pitches[0].progress !== 2 && (
+          <AtBatFooter atBat={atBatState.data.atBat} />
+        )}
     </div>
   );
 };
