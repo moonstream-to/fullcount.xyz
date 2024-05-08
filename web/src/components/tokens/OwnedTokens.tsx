@@ -76,7 +76,6 @@ const OwnedTokens = ({
 
   const mintToken = useMutation(
     async ({ name, imageIndex, source }: { name: string; imageIndex: number; source: string }) => {
-      console.log(imageIndex);
       switch (source) {
         case "BLBContract":
           return mintBLBToken({ web3ctx, name, imageIndex });

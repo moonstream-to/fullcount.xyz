@@ -27,7 +27,7 @@ const pitcherRecord = (stats: PlayerStats): string => {
 const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean }) => {
   return (
     <>
-      {isPitcher && stats && stats.points_data?.pitching_data && (
+      {isPitcher && !!stats && !!stats.points_data?.pitching_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>{pitcherRecord(stats)}</Text>
           <Text className={styles.label}>W-L</Text>
@@ -44,7 +44,7 @@ const MainStat = ({ stats, isPitcher }: { stats: PlayerStats; isPitcher: boolean
           <Text className={styles.label}>WHIP</Text>
         </Flex>
       )}
-      {!isPitcher && stats && stats.points_data?.batting_data && (
+      {!isPitcher && !!stats && !!stats.points_data?.batting_data && (
         <Flex className={styles.container}>
           <Text className={styles.data}>
             {formatDecimal(stats.points_data.batting_data.batting_average)}

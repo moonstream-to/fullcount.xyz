@@ -10,7 +10,6 @@ const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 const AT_BATS_OFFSET = 400;
 
 export const getAtBat = async ({ tokensCache, id }: { tokensCache: Token[]; id: number }) => {
-  console.log("FETCHING ATBAT", id);
   const { gameContract } = getContracts();
   const callData = [
     gameContract.methods.AtBatState(id).encodeABI(),
@@ -138,7 +137,6 @@ export const getAtBat = async ({ tokensCache, id }: { tokensCache: Token[]; id: 
 };
 
 export const getAtBats = async ({ tokensCache }: { tokensCache: Token[] }) => {
-  console.log("FETCHING ATBATS");
   const { gameContract } = getContracts();
   const numAtBats = Number(await gameContract.methods.NumAtBats().call());
   const oldestAtBatNumber = Math.max(numAtBats - AT_BATS_OFFSET, 1);

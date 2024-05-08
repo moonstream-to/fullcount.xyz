@@ -35,7 +35,6 @@ export const useSendReport = () => {
           `report_version:${HUMBUG_REPORT_VERSION}`,
         ],
       };
-      console.log("Sending data:", data);
 
       await axios.post("https://spire.bugout.dev/humbug/reports?sync=true", data, {
         headers: {

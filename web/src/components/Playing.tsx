@@ -65,7 +65,6 @@ const Playing = () => {
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
     async () => {
-      console.log("FETCHING TOKENS");
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
