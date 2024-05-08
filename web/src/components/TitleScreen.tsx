@@ -7,18 +7,33 @@ import Playing from "./Playing";
 import SignUpForm from "./account/SignUpForm";
 import LoginForm from "./account/LoginForm";
 
-import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../constants";
+import { FULLCOUNT_ASSETS } from "../constants";
 import LoadingView from "./HomePage/LoadingView";
 import LaunchForm from "./LaunchForm";
 import MoonstreamLogo2 from "./icons/MoonstreamLogo2";
 import { useGameContext } from "../contexts/GameContext";
+import { useRouter } from "next/router";
 
 const TitleScreen = () => {
   const { user, isLoading } = useUser();
+  const router = useRouter();
   const [isLogging, setIsLogging] = useState(false); // login or signUp
   const [isSuccess, setIsSuccess] = useState(false);
   const [isFirstSeconds, setIsFirstSeconds] = useState(true);
   const { isLaunching, updateContext } = useGameContext();
+
+  const [inviteFrom, setInviteFrom] = useState("");
+
+  useEffect(() => {
+    if (
+      router.isReady &&
+      router.query.invite_from &&
+      typeof router.query.invite_from === "string"
+    ) {
+      setInviteFrom(router.query.invite_from);
+      setIsLogging(true);
+    }
+  }, [router.isReady, router.query]);
 
   useEffect(() => {
     setTimeout(() => setIsFirstSeconds(false), 2000);
@@ -40,14 +55,20 @@ const TitleScreen = () => {
                   src={`${FULLCOUNT_ASSETS}/banners/Bl-banner-updated-logo.jpeg`}
                   alt={""}
                 />
-                {isLaunching ? (
+                {isLaunching && !inviteFrom ? (
                   <LaunchForm onClose={() => updateContext({ isLaunching: false })} />
                 ) : (
                   <>
                     {!isLogging ? (
-                      <SignUpForm setIsSuccess={(value) => setIsSuccess(value)} />
+                      <SignUpForm
+                        inviteFrom={inviteFrom}
+                        setIsSuccess={(value) => setIsSuccess(value)}
+                      />
                     ) : (
-                      <LoginForm setIsSuccess={(value) => setIsSuccess(value)} />
+                      <LoginForm
+                        inviteFrom={inviteFrom}
+                        setIsSuccess={(value) => setIsSuccess(value)}
+                      />
                     )}
                     {!isSuccess && (
                       <div className={styles.footer}>
