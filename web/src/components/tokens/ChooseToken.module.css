@@ -77,17 +77,6 @@
     line-height: normal;
 }
 
-.prompt {
-    color: #262019;
-    text-align: center;
-    font-family: Pangolin, cursive;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: normal;
-}
-
-
 .cards {
     display: flex;
     justify-content: center;
