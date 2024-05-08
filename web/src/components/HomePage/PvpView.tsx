@@ -42,7 +42,6 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
         queryClient.setQueryData(
           ["atBats"],
           (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            console.log(oldData);
             if (!oldData) {
               return { atBats: [], tokens: [] };
             }
@@ -64,7 +63,6 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           },
         );
         queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
-          console.log(oldData);
           if (!oldData) {
             return [];
           }

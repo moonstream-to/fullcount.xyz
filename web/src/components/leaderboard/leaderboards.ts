@@ -73,7 +73,6 @@ export const fetchWindowsForTokens = async (
     return res.data;
   });
   const response = await Promise.all(promises);
-  console.log(response);
   const windows = response.map((window: any) =>
     window.map((entry: { address: string }) => {
       const [address, id] = entry.address.split("_");

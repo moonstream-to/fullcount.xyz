@@ -127,7 +127,6 @@ const AtBatView: React.FC = () => {
     },
     {
       onSuccess: (data) => {
-        console.log(data);
         if (data && !selectedToken && ownedTokens.data) {
           const token = ownedTokens.data.find(
             (t) => isSameToken(t, data.atBat.batter) || isSameToken(t, data.atBat.pitcher),

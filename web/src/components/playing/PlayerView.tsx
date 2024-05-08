@@ -121,13 +121,6 @@ const PlayerView = ({
   }, [sessionStatus.sessionID]);
 
   useEffect(() => {
-    console.log(
-      isPitcher,
-      sessionStatus.progress,
-      sessionStatus.didBatterReveal,
-      sessionStatus.didPitcherReveal,
-      token.source,
-    );
     if (isPitcher && sessionStatus.progress === 4 && !sessionStatus.didPitcherReveal) {
       handleReveal();
     }

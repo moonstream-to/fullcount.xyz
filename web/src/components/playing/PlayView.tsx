@@ -96,15 +96,11 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   const atBat = useQuery(
     ["sessionAtBatID", selectedSession],
     () => {
-      console.log("sessionAtBatID");
       if (!selectedSession) return undefined;
       return gameContract.methods.SessionAtBat(selectedSession.sessionID).call();
     },
     {
       refetchInterval: 100000000,
-      onSuccess: (data) => {
-        console.log("sessionAtBatID success: ", data);
-      },
     },
   );
 
@@ -114,10 +110,8 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     ["atBatStatus", atBat.data?.progress],
     async () => {
       if (!atBat.data) {
-        console.log("!atBat.data");
         return;
       }
-      console.log("atBatStatus", atBat.data);
 
       const atBatID = atBat.data;
       const status = await gameContract.methods.getAtBat(atBatID).call();
@@ -127,13 +121,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
       const currentSessionID = await gameContract.methods
         .AtBatSessions(atBatID, numSessions - 1)
         .call();
-      console.log({
-        atBat: {
-          ...status,
-          currentSessionID,
-          numSessions,
-        },
-      });
       if (Number(status.outcome) !== 0) {
         queryClient.refetchQueries("owned_tokens");
       }
@@ -145,16 +132,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
     {
       enabled: false,
-      onSuccess: (data) => {
-        console.log("atBatStatus success: ", data);
-      },
     },
   );
 
   const sessionStatus = useQuery(
     ["session", selectedSession, atBatStatus.data, sessionID],
     async () => {
-      console.log("sessionStatus");
       if (!selectedSession) return undefined;
       const id = sessionID ?? selectedSession.sessionID;
       if (!secondsPerPhase) {
@@ -274,9 +257,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
     },
 
     {
-      onSuccess: (data) => {
-        console.log("sessionStatus success: ", data);
-      },
       refetchInterval: 3000,
       retry: false,
     },
@@ -288,20 +268,12 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
   }, [selectedToken, opponent]);
 
   useEffect(() => {
-    console.log("sessionStatus.data useEffect:", sessionStatus.data?.progress);
     if (sessionStatus.data) {
       atBatStatus.refetch();
     }
   }, [sessionStatus.data?.progress]);
 
   useEffect(() => {
-    console.log(
-      "atBatStatus.data, isShowOutcomeDone useEffect: ",
-      atBatStatus.data,
-      isShowOutcomeDone,
-      "sessionID: ",
-      sessionID,
-    );
     if (isShowOutcomeDone && atBatStatus.data?.currentSessionID) {
       if (Number(atBatStatus.data.currentSessionID) !== sessionStatus.data?.sessionID) {
         setSessionID(atBatStatus.data.currentSessionID);

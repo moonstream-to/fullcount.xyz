@@ -49,7 +49,6 @@ const PracticeSelect = () => {
         queryClient.setQueryData(
           ["atBats"],
           (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            console.log(oldData);
             if (!oldData) {
               return { atBats: [], tokens: [] };
             }
@@ -71,7 +70,6 @@ const PracticeSelect = () => {
           },
         );
         queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
-          console.log(oldData);
           if (!oldData) {
             return [];
           }

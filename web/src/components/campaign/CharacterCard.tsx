@@ -50,7 +50,6 @@ const CharacterCard = ({
         queryClient.setQueryData(
           ["atBats"],
           (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            console.log(oldData);
             if (!oldData) {
               return { atBats: [], tokens: [] };
             }
