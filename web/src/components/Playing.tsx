@@ -214,7 +214,7 @@ const Playing = () => {
             <HomePage tokens={ownedTokens.data} atBats={atBats.data?.atBats} />
           </PlayingLayout>
         )}
-      {inviteFrom && inviteSession && ownedTokens.data && (
+      {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 1 && (
         <ChooseToken
           tokens={ownedTokens.data.filter((t) => !t.isStaked)}
           sessionID={Number(inviteSession)}
