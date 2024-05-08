@@ -1,15 +1,16 @@
-import { Flex, Spinner } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 import Image from "next/image";
 
 import styles from "./CreateNewCharacter.module.css";
 import React, { useEffect, useState } from "react";
-import { TokenSource } from "../../types";
+import { OwnedToken, TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
 import { blbImage } from "../../constants";
 import { sendReport } from "../../utils/humbug";
 import { useSound } from "../../hooks/useSound";
+import useUser from "../../contexts/UserContext";
 const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
@@ -22,6 +23,7 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
   const [imageIndex, setImageIndex] = useState(0);
   const source: TokenSource = "FullcountPlayerAPI";
   const queryClient = useQueryClient();
+  const { user } = useUser();
   const toast = useMoonToast();
   const playSound = useSound();
 
@@ -35,11 +37,26 @@ const CreateCharacterForm = ({ onClose }: { onClose?: () => void }) => {
       }
     },
     {
-      onSuccess: () => {
+      onSuccess: (data, variables) => {
         if (onClose) {
           onClose();
         }
-        queryClient.invalidateQueries("owned_tokens"); //TODO data update
+        queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
+          if (!oldData) {
+            return [];
+          }
+          const newToken: OwnedToken = {
+            address: data.erc721_address,
+            id: data.token_id,
+            image: blbImage(variables.imageIndex),
+            isStaked: false,
+            name: variables.name,
+            source: "FullcountPlayerAPI",
+            stakedSessionID: 0,
+            tokenProgress: 0,
+          };
+          return [...oldData, newToken];
+        });
       },
       onError: (e: Error) => {
         console.log(e);
