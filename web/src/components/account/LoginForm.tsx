@@ -5,7 +5,13 @@ import { Spinner } from "@chakra-ui/react";
 import styles from "./Account.module.css";
 import useLogin from "../../hooks/useLogin";
 
-const LoginForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => void }) => {
+const LoginForm = ({
+  setIsSuccess,
+  inviteFrom,
+}: {
+  setIsSuccess: (isSuccess: boolean) => void;
+  inviteFrom?: string;
+}) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login, isLoading, isSuccess } = useLogin();
@@ -30,7 +36,13 @@ const LoginForm = ({ setIsSuccess }: { setIsSuccess: (isSuccess: boolean) => voi
   return (
     <form onSubmit={handleSubmit} className={styles.container}>
       {/*<div className={`${styles.container} ${isSuccess ? styles.fadeOut : ""}`}>*/}
-      <div className={`${styles.header} ${isSuccess ? styles.fadeOut : ""}`}>Welcome back!</div>
+      {inviteFrom ? (
+        <div className={styles.invitePrompt}>
+          {`${inviteFrom} is inviting you to play Fullcount.xyz.`}
+        </div>
+      ) : (
+        <div className={`${styles.header} ${isSuccess ? styles.fadeOut : ""}`}>Welcome back!</div>
+      )}
       <label className={styles.label}>Username</label>
       <input
         type="text"
