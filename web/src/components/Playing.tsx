@@ -22,7 +22,7 @@ import { getMulticallResults } from "../utils/multicall";
 import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import { useSound } from "../hooks/useSound";
-import router from "next/router";
+import { useRouter } from "next/router";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
@@ -42,16 +42,23 @@ const Playing = () => {
   const [inviteFrom, setInviteFrom] = useState("");
   const [inviteSession, setInviteSession] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     if (router.query.invite_from && typeof router.query.invite_from === "string") {
       setInviteFrom(router.query.invite_from);
+    } else {
+      setInviteFrom("");
     }
     if (router.query.id && typeof router.query.id === "string") {
       setInviteSession(router.query.id);
+    } else {
+      setInviteSession("");
     }
     if (router.query.invite_code && typeof router.query.invite_code === "string") {
       setInviteCode(router.query.invite_code);
+    } else {
+      setInviteCode("");
     }
   }, [router.query.invite_from, router.query.id, router.query.invite_code]);
 
@@ -223,7 +230,7 @@ const Playing = () => {
             <HomePage tokens={ownedTokens.data} atBats={atBats.data?.atBats} />
           </PlayingLayout>
         )}
-      {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 1 && (
+      {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 0 && (
         <ChooseToken
           tokens={ownedTokens.data.filter((t) => !t.isStaked)}
           sessionID={Number(inviteSession)}
