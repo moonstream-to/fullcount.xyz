@@ -31,7 +31,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       retry: (failureCount) => {
         return failureCount < 3;
       },
-      refetchInterval: 5000,
+      refetchInterval: 50000,
     },
   );
 
@@ -56,7 +56,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       retry: (failureCount) => {
         return failureCount < 3;
       },
-      refetchInterval: 5000,
+      refetchInterval: 50000,
     },
   );
 
@@ -93,7 +93,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       retry: (failureCount) => {
         return failureCount < 3;
       },
-      refetchInterval: 5000,
+      refetchInterval: 50000,
     },
   );
 
@@ -127,7 +127,7 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       retry: (failureCount) => {
         return failureCount < 3;
       },
-      refetchInterval: 5000,
+      refetchInterval: 50000,
     },
   );
   return (
