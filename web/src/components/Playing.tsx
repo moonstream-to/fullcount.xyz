@@ -63,6 +63,15 @@ const Playing = () => {
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
       }
+      //first response  from the FCPLayer API after token creation has empty name and p0 image
+      if (
+        selectedToken &&
+        !selectedToken.name &&
+        ownedTokens[selectedTokenIdx] &&
+        selectedToken.id === ownedTokens[selectedTokenIdx].id
+      ) {
+        updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
+      }
       return ownedTokens;
     },
     {
