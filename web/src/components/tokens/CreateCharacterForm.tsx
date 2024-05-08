@@ -7,14 +7,13 @@ import { OwnedToken, TokenSource } from "../../types";
 import { useMutation, useQueryClient } from "react-query";
 import { mintFullcountPlayerToken } from "../../tokenInterfaces/FullcountPlayerAPI";
 import useMoonToast from "../../hooks/useMoonToast";
-import { blbImage } from "../../constants";
+import { blbImage, NUMBER_OF_BLB_IMAGES } from "../../constants";
 import { sendReport } from "../../utils/humbug";
 import { useSound } from "../../hooks/useSound";
 import useUser from "../../contexts/UserContext";
-const NUMBER_OF_IMAGES = 8;
 
 const images: number[] = [];
-for (let i = 0; i < NUMBER_OF_IMAGES; i += 1) {
+for (let i = 0; i < NUMBER_OF_BLB_IMAGES; i += 1) {
   images.push(i);
 }
 

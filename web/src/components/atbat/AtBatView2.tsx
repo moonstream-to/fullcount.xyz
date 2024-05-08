@@ -83,7 +83,7 @@ const AtBatView2: React.FC = () => {
       className={styles.container}
       style={{ maxHeight: windowHeight ? `${windowHeight}px` : "100vh" }}
     >
-      {isCharacterSelectOpen && (
+      {isCharacterSelectOpen ? (
         <OnboardingCharacter
           onClose={() => setIsCharacterSelectOpen(false)}
           onChange={(name, image) => {
@@ -91,107 +91,110 @@ const AtBatView2: React.FC = () => {
             setImage(image);
           }}
         />
-      )}
-      <Image
-        minW={"441px"}
-        h={"calc(25vh - 27px)"}
-        position={"absolute"}
-        src={`${FULLCOUNT_ASSETS_PATH}/stadium.png`}
-        right={"50%"}
-        top={"35.5px"}
-        transform={"translateX(50%)"}
-        alt={""}
-      />
-      {atBat && showPitchOutcome && atBat.outcome !== 0 && atBat.pitches.length > 0 && (
-        <div
-          className={styles.homeButton}
-          onClick={() => {
-            playSound("homeButton");
-            updateContext({ isLaunching: false });
-            router.push("/");
-          }}
-        >
-          JOIN FULLCOUNT
-        </div>
-      )}
-
-      {!isBigView && <Score atBat={atBat} pitch={atBat.pitches[currentSessionIdx]} />}
-      {isBigView && atBat.outcome === 0 && !showPitchOutcome && (
-        <ScoreForDesktop atBat={atBat} pitch={atBat.pitches[currentSessionIdx]} openHistory />
-      )}
-      {atBat &&
-        showPitchOutcome &&
-        atBat.pitches.length > 0 &&
-        selectedToken &&
-        atBat.outcome === 0 && (
-          <div
-            className={
-              !outcomeType([selectedToken], atBat)
-                ? styles.othersOutcome
-                : sessionOutcomeType(
-                    [selectedToken],
-                    atBat,
-                    atBat.pitches[atBat.numberOfSessions - 2],
-                  ) === "positive"
-                ? styles.positiveOutcome
-                : styles.negativeOutcome
-            }
-          >
-            {sessionOutcomes[atBat.pitches[atBat.numberOfSessions - 2].outcome]}!
-          </div>
-        )}
-      {atBat.outcome !== 0 && selectedToken && (
-        <div
-          className={
-            !outcomeType([selectedToken], atBat)
-              ? styles.othersOutcome
-              : outcomeType([selectedToken], atBat) === "positive"
-              ? styles.positiveOutcome2
-              : styles.negativeOutcome2
-          }
-        >
-          {outcomeType([selectedToken], atBat) === "positive" ? "you win!" : "you lose!"}
-        </div>
-      )}
-      {atBat.outcome === 0 &&
-        !showPitchOutcome &&
-        atBat.pitches[atBat.numberOfSessions - 1].progress !== 2 &&
-        atBat.pitches[currentSessionIdx].progress !== 6 && (
-          <div className={styles.playerView}>
-            {isBigView && atBat.pitcher && <TokenCard token={atBat.pitcher} isPitcher={true} />}
-            {selectedToken && isSameToken(selectedToken, atBat.pitcher) && (
-              <PitcherViewMobile
-                sessionStatus={atBat.pitches.slice(-1)[0]}
-                token={selectedToken as OwnedToken}
-              />
-            )}
-            {selectedToken && isSameToken(selectedToken, atBat.batter) && (
-              <BatterViewMobile2
-                sessionStatus={atBat.pitches.slice(-1)[0]}
-                addSwing={handleSwing}
-                token={selectedToken as OwnedToken}
-              />
-            )}
-            {isBigView && atBat.batter && <TokenCard token={atBat.batter} isPitcher={false} />}
-          </div>
-        )}
-      {atBat && showPitchOutcome && atBat.pitches.length > 0 && (
+      ) : (
         <>
-          {atBat && (
-            <Outcome2
-              showTips={true}
-              atBat={atBat}
-              forToken={selectedToken}
-              sessionStatus={
-                atBat.outcome === 0
-                  ? atBat.pitches[atBat.numberOfSessions - 2]
-                  : atBat.pitches[atBat.numberOfSessions - 1]
-              }
-            />
+          <Image
+            minW={"441px"}
+            h={"calc(25vh - 27px)"}
+            position={"absolute"}
+            src={`${FULLCOUNT_ASSETS_PATH}/stadium.png`}
+            right={"50%"}
+            top={"35.5px"}
+            transform={"translateX(50%)"}
+            alt={""}
+          />
+          {atBat && showPitchOutcome && atBat.outcome !== 0 && atBat.pitches.length > 0 && (
+            <div
+              className={styles.homeButton}
+              onClick={() => {
+                playSound("homeButton");
+                updateContext({ isLaunching: false });
+                router.push("/");
+              }}
+            >
+              JOIN FULLCOUNT
+            </div>
           )}
+
+          {!isBigView && <Score atBat={atBat} pitch={atBat.pitches[currentSessionIdx]} />}
+          {isBigView && atBat.outcome === 0 && !showPitchOutcome && (
+            <ScoreForDesktop atBat={atBat} pitch={atBat.pitches[currentSessionIdx]} openHistory />
+          )}
+          {atBat &&
+            showPitchOutcome &&
+            atBat.pitches.length > 0 &&
+            selectedToken &&
+            atBat.outcome === 0 && (
+              <div
+                className={
+                  !outcomeType([selectedToken], atBat)
+                    ? styles.othersOutcome
+                    : sessionOutcomeType(
+                        [selectedToken],
+                        atBat,
+                        atBat.pitches[atBat.numberOfSessions - 2],
+                      ) === "positive"
+                    ? styles.positiveOutcome
+                    : styles.negativeOutcome
+                }
+              >
+                {sessionOutcomes[atBat.pitches[atBat.numberOfSessions - 2].outcome]}!
+              </div>
+            )}
+          {atBat.outcome !== 0 && selectedToken && (
+            <div
+              className={
+                !outcomeType([selectedToken], atBat)
+                  ? styles.othersOutcome
+                  : outcomeType([selectedToken], atBat) === "positive"
+                  ? styles.positiveOutcome2
+                  : styles.negativeOutcome2
+              }
+            >
+              {outcomeType([selectedToken], atBat) === "positive" ? "you win!" : "you lose!"}
+            </div>
+          )}
+          {atBat.outcome === 0 &&
+            !showPitchOutcome &&
+            atBat.pitches[atBat.numberOfSessions - 1].progress !== 2 &&
+            atBat.pitches[currentSessionIdx].progress !== 6 && (
+              <div className={styles.playerView}>
+                {isBigView && atBat.pitcher && <TokenCard token={atBat.pitcher} isPitcher={true} />}
+                {selectedToken && isSameToken(selectedToken, atBat.pitcher) && (
+                  <PitcherViewMobile
+                    sessionStatus={atBat.pitches.slice(-1)[0]}
+                    token={selectedToken as OwnedToken}
+                  />
+                )}
+                {selectedToken && isSameToken(selectedToken, atBat.batter) && (
+                  <BatterViewMobile2
+                    sessionStatus={atBat.pitches.slice(-1)[0]}
+                    addSwing={handleSwing}
+                    token={selectedToken as OwnedToken}
+                  />
+                )}
+                {isBigView && atBat.batter && <TokenCard token={atBat.batter} isPitcher={false} />}
+              </div>
+            )}
+          {atBat && showPitchOutcome && atBat.pitches.length > 0 && (
+            <>
+              {atBat && (
+                <Outcome2
+                  showTips={true}
+                  atBat={atBat}
+                  forToken={selectedToken}
+                  sessionStatus={
+                    atBat.outcome === 0
+                      ? atBat.pitches[atBat.numberOfSessions - 2]
+                      : atBat.pitches[atBat.numberOfSessions - 1]
+                  }
+                />
+              )}
+            </>
+          )}
+          {!showPitchOutcome && !isBigView && <AtBatFooter atBat={atBat} />}
         </>
       )}
-      {!showPitchOutcome && !isBigView && <AtBatFooter atBat={atBat} />}
     </div>
   );
 };
