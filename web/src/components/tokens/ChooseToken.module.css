@@ -59,6 +59,15 @@
     line-height: normal;
 }
 
+.error {
+    color: #CD7676;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
 .content {
     display: flex;
     flex-direction: column;

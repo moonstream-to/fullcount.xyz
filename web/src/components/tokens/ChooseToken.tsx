@@ -4,9 +4,9 @@ import { AtBat, OwnedToken, Token } from "../../types";
 import TokenCard from "./TokenCard";
 import React, { useEffect, useRef, useState } from "react";
 import NewCharacterButton from "./NewCharacterButton";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 import { joinSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
-import router from "next/router";
+import { useRouter } from "next/router";
 import { sendReport } from "../../utils/humbug";
 import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
@@ -14,6 +14,18 @@ import { useSound } from "../../hooks/useSound";
 import { Spinner } from "@chakra-ui/react";
 import PvPIcon from "../icons/PvPIcon";
 import { useGameContext } from "../../contexts/GameContext";
+import { getContracts } from "../../utils/getWeb3Contracts";
+
+const getErrorMessage = (sessionProgress: number) => {
+  switch (sessionProgress) {
+    case 0:
+      return "At-bat not found";
+    case 2:
+      return undefined;
+    default:
+      return "Invitation is no longer valid";
+  }
+};
 
 const ChooseToken = ({
   tokens,
@@ -36,6 +48,7 @@ const ChooseToken = ({
   const { user } = useUser();
   const playSound = useSound();
   const { isCreateCharacter } = useGameContext();
+  const router = useRouter();
 
   useEffect(() => {
     const element = elementRef.current;
@@ -48,6 +61,16 @@ const ChooseToken = ({
     playSound("batButton");
     joinSession.mutate({ sessionID, token: tokens[selectedTokenIdx], inviteCode });
   };
+
+  const handleExitClick = () => {
+    router.push("/");
+    sendReport("Invite is invalid", { sessionID }, ["type:click", "click:close_invite"]);
+  };
+
+  const sessionProgress = useQuery(["session_status", sessionID], () => {
+    const { gameContract } = getContracts();
+    return gameContract.methods.sessionProgress(sessionID).call();
+  });
 
   const queryClient = useQueryClient();
   const joinSession = useMutation(
@@ -133,37 +156,55 @@ const ChooseToken = ({
               <PvPIcon fill={"#262019"} />
               <div className={styles.header}>BATTER UP</div>
             </div>
-
-            <div className={styles.prompt}>
-              {`${inviteFrom} is inviting you to play Fullcount.xyz.`} <br />
-              {`Choose a character to play with.`}
-            </div>
-            <div
-              className={styles.content}
-              style={{ borderBottom: drawBottomLine ? "1px solid #7e8e7f" : "none" }}
-            >
-              <div className={styles.cards} ref={elementRef}>
-                {tokens.map((t, idx) => (
-                  <TokenCard
-                    key={idx}
-                    token={t}
-                    isSelected={idx === selectedTokenIdx}
-                    onSelected={() =>
-                      updateContext({ selectedToken: { ...tokens[idx] }, selectedTokenIdx: idx })
-                    }
-                  />
-                ))}
-                <NewCharacterButton small={false} />
-              </div>
-            </div>
-            <div className={parentStyles.buttonsContainer}>
-              <button type={"button"} className={parentStyles.cancelButton} onClick={onClose}>
-                Cancel
-              </button>
-              <button type={"button"} className={parentStyles.button} onClick={handleClick}>
-                {joinSession.isLoading ? <Spinner /> : "Play"}
-              </button>
-            </div>
+            {sessionProgress.data && getErrorMessage(Number(sessionProgress.data)) ? (
+              <>
+                <div className={styles.prompt}>
+                  {`${inviteFrom} is inviting you to play Fullcount.xyz.`} <br />
+                </div>
+                <div className={styles.error}>{getErrorMessage(Number(sessionProgress.data))}</div>
+                <div className={parentStyles.buttonsContainer}>
+                  <button type={"button"} className={parentStyles.button} onClick={handleExitClick}>
+                    Go to home page
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className={styles.prompt}>
+                  {`${inviteFrom} is inviting you to play Fullcount.xyz.`} <br />
+                  {`Choose a character to play with.`}
+                </div>
+                <div
+                  className={styles.content}
+                  style={{ borderBottom: drawBottomLine ? "1px solid #7e8e7f" : "none" }}
+                >
+                  <div className={styles.cards} ref={elementRef}>
+                    {tokens.map((t, idx) => (
+                      <TokenCard
+                        key={idx}
+                        token={t}
+                        isSelected={idx === selectedTokenIdx}
+                        onSelected={() =>
+                          updateContext({
+                            selectedToken: { ...tokens[idx] },
+                            selectedTokenIdx: idx,
+                          })
+                        }
+                      />
+                    ))}
+                    <NewCharacterButton small={false} />
+                  </div>
+                </div>
+                <div className={parentStyles.buttonsContainer}>
+                  <button type={"button"} className={parentStyles.cancelButton} onClick={onClose}>
+                    Cancel
+                  </button>
+                  <button type={"button"} className={parentStyles.button} onClick={handleClick}>
+                    {joinSession.isLoading ? <Spinner /> : "Play"}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
