@@ -171,6 +171,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
               .map((openAtBat, idx) => {
                 return openAtBat.pitcher ? (
                   <TokenToPlay
+                    requiresSignature={openAtBat.requiresSignature}
                     token={openAtBat.pitcher}
                     isPitcher={true}
                     onClick={() => {
@@ -202,6 +203,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
               .map((openAtBat, idx) => {
                 return openAtBat.batter ? (
                   <TokenToPlay
+                    requiresSignature={openAtBat.requiresSignature}
                     token={openAtBat.batter}
                     isPitcher={false}
                     onClick={() => {
