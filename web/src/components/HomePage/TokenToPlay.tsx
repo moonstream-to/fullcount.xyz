@@ -10,6 +10,7 @@ const TokenToPlay = ({
   isLoading,
   isForGame,
   showId = true,
+  requiresSignature = false,
 }: {
   token: Token | undefined;
   isPitcher: boolean;
@@ -17,6 +18,7 @@ const TokenToPlay = ({
   isLoading?: boolean;
   isForGame?: boolean;
   showId?: boolean;
+  requiresSignature?: boolean;
 }) => {
   if (!token) {
     return <></>;
@@ -45,10 +47,11 @@ const TokenToPlay = ({
           </div>
           {showId && <div className={styles.id}>{token.id}</div>}
         </div>
-        {onClick && (
-          <div className={styles.button} onClick={onClick}>
+        {onClick && requiresSignature && <div className={styles.private}>Private</div>}
+        {onClick && !requiresSignature && (
+          <button type="button" className={styles.button} onClick={onClick}>
             {isLoading ? <Spinner h={4} w={4} /> : isPitcher ? "Bat" : "Pitch"}
-          </div>
+          </button>
         )}
       </div>
     </div>
