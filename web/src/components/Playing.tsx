@@ -232,7 +232,7 @@ const Playing = () => {
         )}
       {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 0 && (
         <ChooseToken
-          tokens={ownedTokens.data.filter((t) => !t.isStaked)}
+          tokens={ownedTokens.data.filter((t) => !t.isStaked || t.tokenProgress === 6)}
           sessionID={Number(inviteSession)}
           inviteCode={inviteCode}
           inviteFrom={inviteFrom}
