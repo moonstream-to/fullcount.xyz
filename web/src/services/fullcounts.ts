@@ -185,11 +185,17 @@ export const getAtBats = async ({ tokensCache }: { tokensCache: Token[] }) => {
         .sessionProgress(lastSessions[i - oldestAtBatNumber])
         .encodeABI(),
     });
+    progressQueries.push({
+      target: GAME_CONTRACT,
+      callData: gameContract.methods
+        .SessionRequiresSignature(lastSessions[i - oldestAtBatNumber])
+        .encodeABI(),
+    });
   }
 
-  const [progresses] = await getMulticallResults(
+  const [progresses, signatures] = await getMulticallResults(
     FullcountABI,
-    ["sessionProgress"],
+    ["sessionProgress", "SessionRequiresSignature"],
     progressQueries,
   );
 
@@ -235,6 +241,7 @@ export const getAtBats = async ({ tokensCache }: { tokensCache: Token[] }) => {
         numberOfSessions: Number(numbersOfSessions[idx]),
         lastSessionId: Number(lastSessions[idx]),
         progress: Number(progresses[idx]),
+        requiresSignature: signatures[idx],
       }))
       .reverse(),
     tokens,
