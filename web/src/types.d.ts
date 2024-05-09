@@ -128,6 +128,7 @@ interface AtBat {
   numberOfSessions?: number;
   lastSession?: SessionState;
   progress: number;
+  requiresSignature: boolean;
 }
 
 interface AtBatStatus {
