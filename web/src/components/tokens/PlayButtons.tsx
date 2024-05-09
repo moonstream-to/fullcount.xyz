@@ -7,9 +7,12 @@ import { AtBat, OwnedToken, Token } from "../../types";
 import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
-import router, { useRouter } from "next/router";
+import { useRouter } from "next/router";
 import { sendReport } from "../../utils/humbug";
 import { useSound } from "../../hooks/useSound";
+import { useState } from "react";
+import StartAtBatDialog from "./StartAtBatDialog";
+import globalStyles from "../GlobalStyles.module.css";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
@@ -17,6 +20,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const router = useRouter();
   const { user } = useUser();
   const playSound = useSound();
+  const [role, setRole] = useState<0 | 1 | undefined>(undefined);
 
   const startSession = useMutation(
     async ({
@@ -40,6 +44,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
         pitcher: role === 0 ? token : undefined,
         outcome: 0,
         progress: 2,
+        requiresSignature: requireSignature,
       };
       return { sessionID, sign, atBat, token };
     },
@@ -99,67 +104,67 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
     },
   );
 
+  const handleClick = (role: 0 | 1) => {
+    playSound(role === 0 ? "pitchButton" : "batButton");
+    if (token.tokenProgress !== 6 && token.stakedSessionID) {
+      router.push(`atbats/?session_id=${token.stakedSessionID}`);
+      return;
+    }
+    setRole(role);
+  };
+
+  const handleChoice = (requireSignature: boolean) => {
+    if (role === undefined) {
+      return;
+    }
+    startSession.mutate({
+      role,
+      token,
+      requireSignature,
+    });
+    setRole(undefined);
+  };
+
   return (
     <div className={styles.buttonsContainer}>
+      {role !== undefined && (
+        <StartAtBatDialog onClick={handleChoice} onClose={() => setRole(undefined)} />
+      )}
+      {role !== undefined && <div className={globalStyles.overlay} />}
+
       {(!token.isStaked ||
         token.tokenProgress === 6 ||
         (token.activeSession?.batterNFT.nftAddress === token.address &&
           token.activeSession?.batterNFT.tokenID === token.id)) && (
-        <div
+        <button
           className={styles.button}
-          onClick={() => {
-            playSound("batButton");
-            if (
-              token.activeSession?.batterNFT.nftAddress === token.address &&
-              token.activeSession?.batterNFT.tokenID === token.id &&
-              token.tokenProgress !== 6
-            ) {
-              router.push(`atbats/?session_id=${token.stakedSessionID}`);
-              return;
-            }
-            startSession.mutate({
-              role: 1,
-              token,
-              requireSignature: false,
-            });
-          }}
+          disabled={startSession.isLoading}
+          style={{ zIndex: role === 0 ? 0 : 1, cursor: role === undefined ? "pointer" : "default" }}
+          onClick={() => handleClick(1)}
         >
           {startSession.isLoading && startSession.variables?.role === 1 ? (
             <Spinner h={4} w={4} />
           ) : (
             "Bat"
           )}
-        </div>
+        </button>
       )}
       {(!token.isStaked ||
         token.tokenProgress === 6 ||
         (token.activeSession?.pitcherNFT.nftAddress === token.address &&
           token.activeSession?.pitcherNFT.tokenID === token.id)) && (
-        <div
+        <button
+          disabled={startSession.isLoading}
           className={styles.button}
-          onClick={() => {
-            playSound("pitchButton");
-            if (
-              token.activeSession?.pitcherNFT.nftAddress === token.address &&
-              token.activeSession?.pitcherNFT.tokenID === token.id &&
-              token.tokenProgress !== 6
-            ) {
-              router.push(`atbats/?session_id=${token.stakedSessionID}`);
-              return;
-            }
-            startSession.mutate({
-              role: 0,
-              token,
-              requireSignature: false,
-            });
-          }}
+          style={{ zIndex: role === 1 ? 0 : 1, cursor: role === undefined ? "pointer" : "default" }}
+          onClick={() => handleClick(0)}
         >
           {startSession.isLoading && startSession.variables?.role === 0 ? (
             <Spinner h={4} w={4} />
           ) : (
             "Pitch"
           )}
-        </div>
+        </button>
       )}
     </div>
   );

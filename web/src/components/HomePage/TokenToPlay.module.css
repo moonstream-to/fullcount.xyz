@@ -78,6 +78,24 @@
     height: 31.5px;
 }
 
+.private {
+    display: flex;
+    padding: 5px 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: #8EAB8F;
+    color: #FFF;
+    text-align: center;
+    line-height: normal;
+    height: 31.5px;
+    font-family: Pangolin, cursive;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+}
+
 .heatMapContainer {
     position: absolute;
     top: -1px;

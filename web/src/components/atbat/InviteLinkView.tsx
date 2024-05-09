@@ -5,13 +5,22 @@ import QuestionMarkIcon from "../icons/QuestionMarkIcon";
 import BallIconWhite from "../icons/BallIconWhite";
 import BatIconWhite from "../icons/BatIconWhite";
 import LinkIcon from "../icons/LinkIcon";
+import { getLocalStorageInviteCodeKey, getLocalStorageItem } from "../../utils/localStorage";
+import { GAME_CONTRACT } from "../../constants";
 
 const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
+  const inviteCodeKey = getLocalStorageInviteCodeKey(
+    GAME_CONTRACT,
+    String(atBat.pitches[0].sessionID),
+  );
+  const inviteCode = getLocalStorageItem(inviteCodeKey);
   const link = `${window.location.protocol}//${
     window.location.host
   }/?invite_from=${encodeURIComponent(
     atBat.pitcher ? atBat.pitcher.name : atBat.batter ? atBat.batter.name : "",
-  )}&id=${atBat.pitches[0].sessionID}`;
+  )}&id=${atBat.pitches[0].sessionID}${inviteCode ? "&invite_code=" : ""}${
+    inviteCode ? inviteCode : ""
+  }`;
   const { onCopy, hasCopied } = useClipboard(link);
 
   return (

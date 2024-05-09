@@ -118,7 +118,7 @@ export async function startSessionFullcountPlayer({
     `token_address:${token.address}`,
     `token_id:${token.id}`,
   ]);
-  return { sessionID: data.session_id, sign: "0x" + data.signature };
+  return { sessionID: data.session_id, sign: data.signature };
 }
 
 export const delay = (delayInms: number) => {
