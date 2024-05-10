@@ -42,6 +42,7 @@ const Playing = () => {
   const [inviteFrom, setInviteFrom] = useState("");
   const [inviteSession, setInviteSession] = useState("");
   const [inviteCode, setInviteCode] = useState("");
+  const [inviteRole, setInviteRole] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -60,7 +61,12 @@ const Playing = () => {
     } else {
       setInviteCode("");
     }
-  }, [router.query.invite_from, router.query.id, router.query.invite_code]);
+    if (router.query.role && typeof router.query.role === "string") {
+      setInviteRole(router.query.role);
+    } else {
+      setInviteRole("");
+    }
+  }, [router.query.invite_from, router.query.id, router.query.invite_code, router.query.role]);
 
   const ownedTokens = useQuery<OwnedToken[]>(
     ["owned_tokens", user],
@@ -231,6 +237,7 @@ const Playing = () => {
         )}
       {inviteFrom && inviteSession && ownedTokens.data && ownedTokens.data.length > 0 && (
         <ChooseToken
+          inviteRole={inviteRole}
           tokens={ownedTokens.data.filter((t) => !t.isStaked || t.tokenProgress === 6)}
           sessionID={Number(inviteSession)}
           inviteCode={inviteCode}
