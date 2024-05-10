@@ -9,7 +9,13 @@ const AtBatFooter = ({ atBat }: { atBat: AtBatStatus }) => {
   const tokenCardRef = useRef<HTMLDivElement>(null);
   const handleClickOutside = (event: MouseEvent) => {
     if (tokenCardRef.current && !tokenCardRef.current.contains(event.target as Node)) {
-      setShowDetailsFor(undefined);
+      setShowDetailsFor((prev) => {
+        const opener = document.getElementById(`token-card-small-${prev?.address}-${prev?.id}`);
+        if (opener?.contains(event.target as Node)) {
+          event.stopPropagation(); //preventing handleClick that reopens details for same token
+        }
+        return undefined;
+      });
     }
   };
   useEffect(() => {
