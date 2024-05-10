@@ -1,6 +1,6 @@
 .container, .emptyStatContainer {
     display: flex;
-    padding: 10px 5px;
+    padding: 5px 10px;
     justify-content: center;
     gap: 10px;
     border: 0.5px solid #262019;
@@ -10,7 +10,7 @@
 
 .emptyStatContainer {
     justify-content: space-between;
-    padding: 10px 15px;
+    padding: 5px 15px;
 }
 
 .divider {
@@ -54,7 +54,6 @@
     }
     .label {
         font-size: 6px;
-        margin-left: 0px;
-
+        margin-left: 0;
     }
 }
