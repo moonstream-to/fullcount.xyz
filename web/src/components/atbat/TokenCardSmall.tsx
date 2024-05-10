@@ -28,9 +28,12 @@ const TokenCardSmall = ({
         return;
       }
       const API_URL = "https://api.fullcount.xyz/pitch_distribution";
+      const counts = new Array(25).fill(0);
       try {
         const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-        const counts = new Array(25).fill(0);
+        if (!res.data.pitch_distribution) {
+          return { counts, rates: counts };
+        }
         res.data.pitch_distribution.forEach(
           (l: PitchLocation) => (counts[l.pitch_vertical * 5 + l.pitch_horizontal] = l.count),
         );
@@ -39,7 +42,7 @@ const TokenCardSmall = ({
         return { rates, counts };
       } catch (e) {
         console.log({ token, e });
-        return;
+        return { counts, rates: counts };
       }
     },
     {
@@ -54,10 +57,13 @@ const TokenCardSmall = ({
         return;
       }
       const API_URL = "https://api.fullcount.xyz/swing_distribution";
+      const counts = new Array(25).fill(0);
       try {
         const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-        const counts = new Array(25).fill(0);
         let takes = 0;
+        if (!res.data.swing_distribution) {
+          return { counts, rates: counts, takes: 0 };
+        }
         res.data.swing_distribution.forEach((l: SwingLocation) =>
           l.swing_type === 2
             ? (takes += l.count)
@@ -68,7 +74,7 @@ const TokenCardSmall = ({
         return { rates, counts, takes };
       } catch (e) {
         console.log({ token, e });
-        return;
+        return { counts, rates: counts, takes: 0 };
       }
     },
     {
