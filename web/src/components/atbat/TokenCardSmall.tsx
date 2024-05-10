@@ -90,6 +90,7 @@ const TokenCardSmall = ({
       <div
         className={isPitcher ? styles.containerForPlayPitcher : styles.containerForPlayBatter}
         onClick={onClick}
+        id={`token-card-small-${token?.address}-${token?.id}`}
       >
         <Image src={token.image} alt={""} height={"50"} width={"50"} />
         {isPitcher && (
