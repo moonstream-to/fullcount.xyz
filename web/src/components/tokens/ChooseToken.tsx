@@ -33,12 +33,14 @@ const ChooseToken = ({
   sessionID,
   inviteCode,
   inviteFrom,
+  inviteRole,
 }: {
   tokens: OwnedToken[];
   onClose: () => void;
   sessionID: number;
   inviteCode: string;
   inviteFrom: string;
+  inviteRole: string;
 }) => {
   const { updateContext, selectedTokenIdx } = useGameContext();
 
@@ -200,7 +202,7 @@ const ChooseToken = ({
                     Cancel
                   </button>
                   <button type={"button"} className={parentStyles.button} onClick={handleClick}>
-                    {joinSession.isLoading ? <Spinner /> : "Play"}
+                    {joinSession.isLoading ? <Spinner /> : inviteRole === "0" ? "Pitch" : "Bat"}
                   </button>
                 </div>
               </>

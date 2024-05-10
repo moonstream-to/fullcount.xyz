@@ -14,13 +14,14 @@ const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
     String(atBat.pitches[0].sessionID),
   );
   const inviteCode = getLocalStorageItem(inviteCodeKey);
+  const inviteCodeParam = inviteCode ? `&invite_code=${inviteCode}` : "";
+  const role = atBat.pitcher ? 1 : atBat.batter ? 0 : undefined;
+  const roleParam = role !== undefined ? `&role=${role}` : "";
   const link = `${window.location.protocol}//${
     window.location.host
   }/?invite_from=${encodeURIComponent(
     atBat.pitcher ? atBat.pitcher.name : atBat.batter ? atBat.batter.name : "",
-  )}&id=${atBat.pitches[0].sessionID}${inviteCode ? "&invite_code=" : ""}${
-    inviteCode ? inviteCode : ""
-  }`;
+  )}&id=${atBat.pitches[0].sessionID}${roleParam}${inviteCodeParam}`;
   const { onCopy, hasCopied } = useClipboard(link);
 
   return (
