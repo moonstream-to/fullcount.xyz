@@ -81,7 +81,10 @@ const TokenCardSmall = ({
 
   if (isForGame) {
     return (
-      <div className={isPitcher ? styles.containerForPlayPitcher : styles.containerForPlayBatter}>
+      <div
+        className={isPitcher ? styles.containerForPlayPitcher : styles.containerForPlayBatter}
+        onClick={onClick}
+      >
         <Image src={token.image} alt={""} height={"50"} width={"50"} />
         {isPitcher && (
           <div>
