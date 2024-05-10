@@ -20,6 +20,12 @@
     transform: translateX(-65%);
 }
 
+.imageAndInfo {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
 .image {
     width: 260px;
     min-width: 260px;
@@ -59,4 +65,41 @@
     align-items: flex-start;
     gap: 10px;
     align-self: stretch;
+}
+
+@media (max-width: 1023px) {
+    .pitcherContainer, .batterContainer {
+        position: absolute;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 364px;
+        min-height: 342px;
+
+        padding: 10px;
+        width: 300px;
+        gap: 10px;
+    }
+
+    .imageAndInfo {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+
+    .image {
+        width: 80px;
+        min-width: 80px;
+        height: 80px;
+    }
+
+    .tokenName {
+        font-size: 18px;
+        line-height: 100%;
+    }
+
+    .icon {
+        display: none;
+    }
+
+
 }
