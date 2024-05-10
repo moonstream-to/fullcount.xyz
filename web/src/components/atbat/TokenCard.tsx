@@ -1,3 +1,4 @@
+import React from "react";
 import styles from "./TokenCard.module.css";
 import { Image } from "@chakra-ui/react";
 import { PitchLocation, SwingLocation, Token } from "../../types";
@@ -9,7 +10,12 @@ import MainStat from "../playing/MainStat";
 import HeatMap from "../playing/HeatMap";
 import DetailedStat from "../playing/DetailedStat";
 
-const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) => {
+interface TokenCardProps extends React.RefAttributes<HTMLDivElement> {
+  token: Token;
+  isPitcher: boolean;
+}
+
+const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher }, ref) => {
   const pitcherStats = useQuery(
     ["pitcher_stat", token.id],
     async () => {
@@ -131,16 +137,18 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
     },
   );
   return (
-    <div className={isPitcher ? styles.pitcherContainer : styles.batterContainer}>
-      <Image className={styles.image} alt={""} src={token.image} />
-      <div className={styles.tokenInfo}>
-        {!isPitcher ? (
-          <BatIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} />
-        ) : (
-          <BallIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} />
-        )}
-        <div className={styles.tokenName}>{token.name}</div>
-        <div className={styles.tokenId}>{token.id}</div>
+    <div className={isPitcher ? styles.pitcherContainer : styles.batterContainer} ref={ref}>
+      <div className={styles.imageAndInfo}>
+        <Image className={styles.image} alt={""} src={token.image} />
+        <div className={styles.tokenInfo}>
+          {!isPitcher ? (
+            <BatIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} className={styles.icon} />
+          ) : (
+            <BallIconBig width={"31"} height={"31"} viewBox={"0 0 31 30"} className={styles.icon} />
+          )}
+          <div className={styles.tokenName}>{token.name}</div>
+          <div className={styles.tokenId}>{token.id}</div>
+        </div>
       </div>
       <MainStat stats={isPitcher ? pitcherStats.data : batterStats.data} isPitcher={isPitcher} />
       <div className={styles.detailedStat}>
@@ -171,6 +179,8 @@ const TokenCard = ({ token, isPitcher }: { token: Token; isPitcher: boolean }) =
       </div>
     </div>
   );
-};
+});
+
+TokenCard.displayName = "TokenCard";
 
 export default TokenCard;
