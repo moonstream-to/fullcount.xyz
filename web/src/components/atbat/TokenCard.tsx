@@ -17,7 +17,7 @@ interface TokenCardProps extends React.RefAttributes<HTMLDivElement> {
 
 const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher }, ref) => {
   const pitcherStats = useQuery(
-    ["pitcher_stat", token.id],
+    ["pitcher_stat", token?.address, token?.id],
     async () => {
       if (!token) {
         return;
@@ -42,7 +42,7 @@ const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher
   );
 
   const batterStats = useQuery(
-    ["batter_stat", token.id],
+    ["batter_stat", token?.address, token?.id],
     async () => {
       if (!token) {
         return;
@@ -67,7 +67,7 @@ const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher
   );
 
   const pitchDistributions = useQuery(
-    ["pitch_distribution", token.id],
+    ["pitch_distribution", token?.address, token?.id],
     async () => {
       if (!token) {
         return;
@@ -104,7 +104,7 @@ const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher
   );
 
   const swingDistributions = useQuery(
-    ["swing_distribution", token.id],
+    ["swing_distribution", token?.address, token?.id],
     async () => {
       if (!token) {
         return;
