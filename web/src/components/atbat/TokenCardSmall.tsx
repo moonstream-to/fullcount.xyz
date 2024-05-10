@@ -83,14 +83,14 @@ const TokenCardSmall = ({
     return (
       <div className={isPitcher ? styles.containerForPlayPitcher : styles.containerForPlayBatter}>
         <Image src={token.image} alt={""} height={"50"} width={"50"} />
-        {isPitcher && pitchDistributions.data && (
+        {isPitcher && (
           <div>
-            <HeatMapSmall rates={pitchDistributions.data.rates} size={"10px"} />
+            <HeatMapSmall rates={pitchDistributions.data?.rates} size={"10px"} />
           </div>
         )}
-        {!isPitcher && swingDistributions.data && (
+        {!isPitcher && (
           <div>
-            <HeatMapSmall rates={swingDistributions.data.rates} size={"10px"} />
+            <HeatMapSmall rates={swingDistributions.data?.rates} size={"10px"} />
           </div>
         )}
       </div>
