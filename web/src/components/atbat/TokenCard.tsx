@@ -123,7 +123,8 @@ const TokenCard: React.FC<TokenCardProps> = React.forwardRef(({ token, isPitcher
         res.data.swing_distribution.forEach((l: SwingLocation) =>
           l.swing_type === 2
             ? (takes += l.count)
-            : (counts[l.swing_vertical * 5 + l.swing_horizontal] = l.count),
+            : (counts[l.swing_vertical * 5 + l.swing_horizontal] =
+                counts[l.swing_vertical * 5 + l.swing_horizontal] + l.count),
         );
         const total = counts.reduce((acc, value) => acc + value);
         const rates = counts.map((value) => value / total);
