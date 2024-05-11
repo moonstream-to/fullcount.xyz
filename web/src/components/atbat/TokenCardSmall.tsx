@@ -1,10 +1,10 @@
-import { PitchLocation, SwingLocation, Token } from "../../types";
+import { Token } from "../../types";
 import styles from "../HomePage/TokenToPlay.module.css";
 import Image from "next/image";
 import { useQuery } from "react-query";
-import axios from "axios";
 import HeatMapSmall from "../HomePage/HeatMapSmall";
 import { Spinner } from "@chakra-ui/react";
+import { fetchPitchDistribution, fetchSwingDistribution } from "../../utils/stats";
 
 const TokenCardSmall = ({
   token,
@@ -23,64 +23,27 @@ const TokenCardSmall = ({
 }) => {
   const pitchDistributions = useQuery(
     ["pitch_distribution", token?.address, token?.id],
-    async () => {
-      if (!token || !isPitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/pitch_distribution";
-      const counts = new Array(25).fill(0);
-      try {
-        const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-        if (!res.data.pitch_distribution) {
-          return { counts, rates: counts };
-        }
-        res.data.pitch_distribution.forEach((l: PitchLocation) => {
-          counts[l.pitch_vertical * 5 + l.pitch_horizontal] =
-            counts[l.pitch_vertical * 5 + l.pitch_horizontal] + l.count;
-        });
-        const total = counts.reduce((acc, value) => acc + value);
-        const rates = counts.map((value) => value / total);
-        return { rates, counts };
-      } catch (e) {
-        console.log({ token, e });
-        return { counts, rates: counts };
-      }
-    },
+    () => fetchPitchDistribution(token),
     {
       enabled: !!token && isPitcher,
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount) => {
+        return failureCount < 3;
+      },
+      refetchInterval: 50000,
     },
   );
 
   const swingDistributions = useQuery(
     ["swing_distribution", token?.address, token?.id],
-    async () => {
-      if (!token || isPitcher) {
-        return;
-      }
-      const API_URL = "https://api.fullcount.xyz/swing_distribution";
-      const counts = new Array(25).fill(0);
-      try {
-        const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
-        let takes = 0;
-        if (!res.data.swing_distribution) {
-          return { counts, rates: counts, takes: 0 };
-        }
-        res.data.swing_distribution.forEach((l: SwingLocation) =>
-          l.swing_type === 2
-            ? (takes += l.count)
-            : (counts[l.swing_vertical * 5 + l.swing_horizontal] =
-                counts[l.swing_vertical * 5 + l.swing_horizontal] + l.count),
-        );
-        const total = counts.reduce((acc, value) => acc + value);
-        const rates = counts.map((value) => value / total);
-        return { rates, counts, takes };
-      } catch (e) {
-        console.log({ token, e });
-        return { counts, rates: counts, takes: 0 };
-      }
-    },
+    () => fetchSwingDistribution(token),
     {
       enabled: !!token && !isPitcher,
+      retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
+      retry: (failureCount) => {
+        return failureCount < 3;
+      },
+      refetchInterval: 50000,
     },
   );
   if (!token) {
