@@ -5,7 +5,7 @@
     gap: 10px;
     border: 0.5px solid #262019;
     background: #FFF;
-    align-items: baseline;
+    align-items: flex-end;
 }
 
 .emptyStatContainer {
