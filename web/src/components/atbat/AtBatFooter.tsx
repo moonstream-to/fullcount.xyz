@@ -3,6 +3,7 @@ import { AtBatStatus, Token } from "../../types";
 import TokenCardSmall from "./TokenCardSmall";
 import { useEffect, useRef, useState } from "react";
 import TokenCard from "./TokenCard";
+import { sendReport } from "../../utils/humbug";
 
 const AtBatFooter = ({ atBat }: { atBat: AtBatStatus }) => {
   const [showDetailsFor, setShowDetailsFor] = useState<Token | undefined>(undefined);
@@ -23,6 +24,7 @@ const AtBatFooter = ({ atBat }: { atBat: AtBatStatus }) => {
     return () => document.removeEventListener("click", handleClickOutside, true);
   }, []);
   const handleClick = (token: Token | undefined) => {
+    sendReport("Details opened", {}, ["type:click", "click:open_details"]);
     setShowDetailsFor(token);
   };
 
