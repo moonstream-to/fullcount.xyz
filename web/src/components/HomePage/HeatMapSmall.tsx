@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Flex, Grid } from "@chakra-ui/react";
 import { valueToColor } from "../../utils/colors";
 
-const HeatMapSmall = ({ rates, size }: { rates: number[]; size?: string }) => {
+const HeatMapSmall = ({ rates, size }: { rates: number[] | undefined; size?: string }) => {
   const generateCell = (index: number) => (
     <Box key={index}>
       <Box
@@ -12,7 +12,7 @@ const HeatMapSmall = ({ rates, size }: { rates: number[]; size?: string }) => {
         alignItems="center"
         justifyContent="center"
         cursor={"pointer"}
-        bg={valueToColor(rates[index], rates)}
+        bg={rates ? valueToColor(rates[index], rates) : valueToColor(0, [0])}
       />
     </Box>
   );
