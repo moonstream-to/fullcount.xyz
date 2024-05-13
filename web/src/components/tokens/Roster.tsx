@@ -5,6 +5,7 @@ import NewCharacterButton from "./NewCharacterButton";
 import PlayButtons from "./PlayButtons";
 import { useGameContext } from "../../contexts/GameContext";
 import { useSound } from "../../hooks/useSound";
+import LeaderboardPositions from "./LeaderboardPositions";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const { updateContext, selectedMode, selectedTokenIdx } = useGameContext();
@@ -35,18 +36,21 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             )}
           </div>
         )}
-        <div className={styles.tokenCards}>
-          {tokens.map((t, idx) => (
-            <Image
-              key={idx}
-              src={t.image}
-              fallback={<div className={styles.tokenImageFallback} />}
-              alt={""}
-              className={selectedTokenIdx === idx ? styles.selectedTokenImage : styles.tokenImage}
-              onClick={() => handleClick(idx)}
-            />
-          ))}
-          <NewCharacterButton small={true} />
+        <div className={styles.tokensAndLeaderboard}>
+          <div className={styles.tokenCards}>
+            {tokens.map((t, idx) => (
+              <Image
+                key={idx}
+                src={t.image}
+                fallback={<div className={styles.tokenImageFallback} />}
+                alt={""}
+                className={selectedTokenIdx === idx ? styles.selectedTokenImage : styles.tokenImage}
+                onClick={() => handleClick(idx)}
+              />
+            ))}
+            <NewCharacterButton small={true} />
+          </div>
+          <LeaderboardPositions token={tokens[selectedTokenIdx]} />
         </div>
       </div>
     </div>
