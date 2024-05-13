@@ -65,7 +65,7 @@ export async function fetchFullcountPlayerTokens() {
       "error_domain:fcplayer",
       `error:fcplayer-tokens`,
     ]);
-    return [];
+    throw e;
   }
 }
 
