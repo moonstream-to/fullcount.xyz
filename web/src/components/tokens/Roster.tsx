@@ -6,6 +6,8 @@ import PlayButtons from "./PlayButtons";
 import { useGameContext } from "../../contexts/GameContext";
 import { useSound } from "../../hooks/useSound";
 import LeaderboardPositions from "./LeaderboardPositions";
+import { useQuery } from "react-query";
+import { fetchAllLeaderboardsPositions } from "../leaderboard/leaderboards";
 
 const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
   const { updateContext, selectedMode, selectedTokenIdx } = useGameContext();
@@ -15,6 +17,10 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
     playSound("characterSelector");
     updateContext({ selectedToken: { ...tokens[idx] }, selectedTokenIdx: idx });
   };
+
+  const leaderboards = useQuery(["allLeaderboardsPositions, tokens"], () =>
+    fetchAllLeaderboardsPositions(tokens),
+  );
 
   return (
     <div className={styles.container}>
@@ -50,7 +56,18 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
             ))}
             <NewCharacterButton small={true} />
           </div>
-          <LeaderboardPositions token={tokens[selectedTokenIdx]} />
+          {leaderboards.data && (
+            <LeaderboardPositions
+              positions={leaderboards.data
+                .flat(1)
+                .filter(
+                  (p) =>
+                    p &&
+                    p.token.id === tokens[selectedTokenIdx].id &&
+                    p.token.id === tokens[selectedTokenIdx].id,
+                )}
+            />
+          )}
         </div>
       </div>
     </div>

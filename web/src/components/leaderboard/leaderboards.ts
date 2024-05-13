@@ -95,7 +95,7 @@ export const fetchWindowsForTokens = async (
 };
 
 export const fetchLeaderboardsPositions = async (token: Token) => {
-  const promises = LEADERBOARDS.map(async (lb, idx) => {
+  const promises = LEADERBOARDS.map(async (lb) => {
     const res = await axios.get(
       `https://engineapi.moonstream.to/leaderboard/position/?leaderboard_id=${lb.id}&address=${token.address}_${token.id}&normalize_addresses=false&window_size=0`,
     );
@@ -114,4 +114,40 @@ export const fetchLeaderboardsPositions = async (token: Token) => {
     )
     .filter(Boolean)
     .sort((a, b) => a?.rank - b?.rank);
+};
+
+export interface LeaderboardPosition {
+  token: Token;
+  title: string;
+  rank: number;
+  score: number;
+}
+
+export const fetchAllLeaderboardsPositions = async (
+  tokens: Token[],
+): Promise<LeaderboardPosition[][]> => {
+  const tokenPromises = tokens.map(async (token) => {
+    const promises = LEADERBOARDS.map(async (lb) => {
+      const res = await axios.get(
+        `https://engineapi.moonstream.to/leaderboard/position/?leaderboard_id=${lb.id}&address=${token.address}_${token.id}&normalize_addresses=false&window_size=0`,
+      );
+      return res.data;
+    });
+
+    return (await Promise.allSettled(promises))
+      .map((entry, idx) =>
+        entry.status === "fulfilled" && entry.value[0]
+          ? {
+              title: LEADERBOARDS[idx]?.title,
+              rank: entry.value[0].rank,
+              score: entry.value[0].score,
+              token,
+            }
+          : { title: LEADERBOARDS[idx]?.title, rank: Infinity, score: 0, token },
+      )
+      .filter(Boolean)
+      .sort((a, b) => a.rank - b.rank);
+  });
+
+  return await Promise.all(tokenPromises);
 };
