@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Token, TokenId } from "../../types";
 import { getTokensMetadata } from "../../tokenInterfaces/BLBTokenAPI";
+import { LEADERBOARDS } from "../../constants";
 
 export interface LeaderboardEntry {
   address: string;
@@ -91,4 +92,26 @@ export const fetchWindowsForTokens = async (
       return { ...entry, image: metadata?.image ?? "", name: metadata?.name ?? "" };
     }),
   );
+};
+
+export const fetchLeaderboardsPositions = async (token: Token) => {
+  const promises = LEADERBOARDS.map(async (lb, idx) => {
+    const res = await axios.get(
+      `https://engineapi.moonstream.to/leaderboard/position/?leaderboard_id=${lb.id}&address=${token.address}_${token.id}&normalize_addresses=false&window_size=0`,
+    );
+    return res.data;
+  });
+  const datas = await Promise.allSettled(promises);
+  return datas
+    .map((entry, idx) =>
+      entry.status === "fulfilled" && entry.value[0]
+        ? {
+            title: LEADERBOARDS[idx]?.title,
+            rank: entry.value[0].rank,
+            score: entry.value[0].score,
+          }
+        : undefined,
+    )
+    .filter(Boolean)
+    .sort((a, b) => a?.rank - b?.rank);
 };
