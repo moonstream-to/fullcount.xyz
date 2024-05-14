@@ -119,6 +119,35 @@
 .banner {
   border-bottom: 1px solid #262019;
   min-height: 160px;
+  position: relative;
+}
+
+.loginButton {
+  display: flex;
+  padding: 5px 10px;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+
+  position: absolute;
+  right: 10px;
+  top: 10px;
+
+  border: 1px solid #7E8E7F;
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(3px);
+  color: #000;
+  font-family: Pangolin, cursive;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+}
+
+.closeButton {
+  position: absolute;
+  right: 24px;
+  top: 24px;
 }
 
 
