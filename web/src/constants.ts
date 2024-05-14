@@ -95,3 +95,6 @@ export const blbImage = (idx: number) =>
 
 export const NUMBER_OF_BLB_IMAGES = 16;
 export const HUMBUG_REPORT_VERSION = "0.0.3";
+
+export const GA_MEASUREMENT_ID = "G-7GHX3XTZT3";
+export const GTM_ID = "GTM-KSQM8K8K";

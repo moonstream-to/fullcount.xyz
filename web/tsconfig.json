@@ -21,7 +21,8 @@
     "**/*.tsx",
     "src/theme/components/button",
     "types/**/*.d.ts",
-    "node_modules/eslint-plugin-react/lib/types.d.ts"
+    "node_modules/eslint-plugin-react/lib/types.d.ts",
+    "global.d.ts"
   ],
   "exclude": ["node_modules", "metadata"]
 }

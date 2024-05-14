@@ -1,5 +1,5 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import { FULLCOUNT_ASSETS_PATH } from "../src/constants";
+import { FULLCOUNT_ASSETS_PATH, GTM_ID } from "../src/constants";
 
 export default function Document() {
   return (
@@ -36,7 +36,7 @@ export default function Document() {
         {/*<!-- Google Tag Manager (noscript) -->*/}
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-KSQM8K8K"
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
             height="0"
             width="0"
             style={{ display: "none", visibility: "hidden" }}

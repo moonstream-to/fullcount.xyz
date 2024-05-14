@@ -21,6 +21,13 @@ const useSignUp = () => {
       sendReport("signed up", { username: variables.username, email: variables.email }, [
         `user_token: ${response.data.id}`,
       ]);
+      if (typeof gtag === "function") {
+        gtag("set", "user_properties", {
+          user_status: "signed_up",
+        });
+      } else {
+        console.warn("gtag function is not defined");
+      }
 
       getUser();
     },
