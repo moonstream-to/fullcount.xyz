@@ -13,6 +13,7 @@ import LaunchForm from "./LaunchForm";
 import MoonstreamLogo2 from "./icons/MoonstreamLogo2";
 import { useGameContext } from "../contexts/GameContext";
 import { useRouter } from "next/router";
+import CloseIconBig from "./icons/CloseIconBig";
 
 const TitleScreen = () => {
   const { user, isLoading } = useUser();
@@ -50,11 +51,32 @@ const TitleScreen = () => {
           ) : (
             <div className={styles.loginContainer}>
               <div className={styles.content} style={{ maxWidth: isLaunching ? "320px" : "400px" }}>
-                <img
-                  className={styles.banner}
-                  src={`${FULLCOUNT_ASSETS}/banners/Bl-banner-updated-logo.jpeg`}
-                  alt={""}
-                />
+                <div className={styles.banner}>
+                  <img
+                    className={styles.banner}
+                    src={`${FULLCOUNT_ASSETS}/banners/Bl-banner-updated-logo.jpeg`}
+                    alt={""}
+                  />
+                  {isLaunching ? (
+                    <button
+                      className={styles.loginButton}
+                      onClick={() => {
+                        setIsLogging(true);
+                        updateContext({ isLaunching: false });
+                      }}
+                    >
+                      Log in
+                    </button>
+                  ) : (
+                    <button
+                      className={styles.closeButton}
+                      onClick={() => updateContext({ isLaunching: true })}
+                    >
+                      <CloseIconBig stroke={"white"} />
+                    </button>
+                  )}
+                </div>
+
                 {isLaunching && !inviteFrom ? (
                   <LaunchForm onClose={() => updateContext({ isLaunching: false })} />
                 ) : (
