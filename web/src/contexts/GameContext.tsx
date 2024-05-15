@@ -37,6 +37,7 @@ interface GameContextProps {
   isLaunching: boolean;
   userSessionId: string;
   selectedPVPView: number;
+  isPitchingInCampaign: boolean;
 }
 
 interface GameContextType extends GameContextProps {
@@ -85,6 +86,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     isLaunching: true,
     userSessionId: uuidv4(),
     selectedPVPView: 0,
+    isPitchingInCampaign: true,
   });
 
   useEffect(() => {
