@@ -1,5 +1,4 @@
 import router from "next/router";
-import { useState } from "react";
 import { useMutation, useQueryClient } from "react-query";
 
 import styles from "./PvpView.module.css";

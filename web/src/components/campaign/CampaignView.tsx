@@ -2,7 +2,6 @@ import styles from "./CampaignView.module.css";
 import PlayerStat from "./PlayerStat";
 import { AtBat } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import { useState } from "react";
 import TeamsView from "./TeamsView";
 import { useQuery } from "react-query";
 import { GAME_CONTRACT } from "../../constants";
