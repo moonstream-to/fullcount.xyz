@@ -107,16 +107,16 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
     }
   };
 
-  const [selectedView, setSelectedView] = useState(0);
+  const { selectedPVPView, updateContext } = useGameContext();
   return (
     <div className={styles.container}>
       <div className={styles.viewSelector}>
         {views.map((v, idx) => (
           <div
-            className={selectedView === idx ? styles.buttonSelected : styles.button}
+            className={selectedPVPView === idx ? styles.buttonSelected : styles.button}
             onClick={() => {
               playSound("viewSelector");
-              setSelectedView(idx);
+              updateContext({ selectedPVPView: idx });
             }}
             key={idx}
           >
@@ -124,7 +124,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           </div>
         ))}
       </div>
-      {selectedView === 2 && atBats && (
+      {selectedPVPView === 2 && atBats && (
         <AtBatsList
           tokens={tokens}
           atBats={atBats.filter(
@@ -139,7 +139,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           )}
         />
       )}
-      {selectedView === 1 && atBats && (
+      {selectedPVPView === 1 && atBats && (
         <AtBatsList
           tokens={tokens}
           atBats={atBats.filter(
@@ -153,7 +153,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           )}
         />
       )}
-      {atBats && selectedView === 0 && (
+      {atBats && selectedPVPView === 0 && (
         <div className={styles.listsContainer}>
           <div className={styles.list}>
             <div className={styles.listHeader}>PITCHERS</div>
