@@ -2,7 +2,6 @@ import { Box, Flex, Image, Text } from "@chakra-ui/react";
 import styles from "./CharacterCard.module.css";
 import { useGameContext } from "../../contexts/GameContext";
 import { OwnedToken, Session, Token } from "../../types";
-import OwnedTokens from "./OwnedTokens";
 
 const CharacterCard = ({
   token,
