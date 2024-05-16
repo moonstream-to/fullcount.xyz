@@ -6,7 +6,7 @@ import useMoonToast from "./useMoonToast";
 import { sendReport } from "../utils/humbug";
 import useUser from "../contexts/UserContext";
 
-type JoinSessionParams = {
+export type JoinSessionParams = {
   sessionID: number;
   token: OwnedToken;
   inviteCode: string;
