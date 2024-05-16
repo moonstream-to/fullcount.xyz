@@ -1,12 +1,10 @@
-interface Token {
-  address: string;
-  id: string;
-}
+import { TokenId } from "../../types";
+import { getTokensStatus } from "../../tokenInterfaces/BLBTokenAPI";
 
 export interface Character {
   name: string;
   quote: string;
-  tokens: Token[];
+  tokens: TokenId[];
   isPitcher: boolean;
   wins?: number;
 }
@@ -148,6 +146,30 @@ export const isCampaignToken = (address: string, id: string): boolean => {
     }
   }
   return false;
+};
+
+export const getAllTokensOfCharacter = ({ id, address }: TokenId): TokenId[] | undefined => {
+  const teams = getTeams();
+  for (const team of teams) {
+    for (const character of team.roster) {
+      for (const token of character.tokens) {
+        if (token.address === address && token.id === id) {
+          return character.tokens;
+        }
+      }
+    }
+  }
+};
+
+export const getCharacterSessions = async (tokenId: TokenId): Promise<number[] | undefined> => {
+  const tokens = getAllTokensOfCharacter(tokenId);
+  if (!tokens) {
+    return undefined;
+  }
+  return (await getTokensStatus(tokens))
+    .filter((s) => s.tokenProgress === 2)
+    .map((s) => s.stakedSessionID)
+    .sort((a, b) => a - b);
 };
 
 export const getPitchersOfTeam = (teamTitle: string) => {
