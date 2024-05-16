@@ -1,5 +1,4 @@
 import Layout from "../../src/components/layout/layout";
-import PracticeSelect from "../../src/components/practice/PracticeSelect";
 import AtBatView from "../../src/components/atbat/AtBatView";
 
 const Home = () => {

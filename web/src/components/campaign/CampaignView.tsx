@@ -2,7 +2,6 @@ import styles from "./CampaignView.module.css";
 import PlayerStat from "./PlayerStat";
 import { AtBat } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
-import { useState } from "react";
 import TeamsView from "./TeamsView";
 import { useQuery } from "react-query";
 import { GAME_CONTRACT } from "../../constants";
@@ -18,8 +17,7 @@ import axios from "axios";
 import { useSound } from "../../hooks/useSound";
 
 const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
-  const { selectedToken } = useGameContext();
-  const [isPitching, setIsPitching] = useState(true);
+  const { selectedToken, isPitchingInCampaign, updateContext } = useGameContext();
   const playSound = useSound();
 
   const stats = useQuery(
@@ -99,26 +97,26 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
       )}
       <div className={styles.roleSelector}>
         <div
-          className={isPitching ? styles.selectedRole : styles.role}
+          className={isPitchingInCampaign ? styles.selectedRole : styles.role}
           onClick={() => {
             playSound("modeSelector");
-            setIsPitching(true);
+            updateContext({ isPitchingInCampaign: true });
           }}
         >
           pitchers
         </div>
         <div
-          className={!isPitching ? styles.selectedRole : styles.role}
+          className={!isPitchingInCampaign ? styles.selectedRole : styles.role}
           onClick={() => {
             playSound("modeSelector");
-            setIsPitching(false);
+            updateContext({ isPitchingInCampaign: false });
           }}
         >
           batters
         </div>
       </div>
       <div className={styles.hint}>
-        {isPitching
+        {isPitchingInCampaign
           ? "To defeat a pitcher, you must hit three home runs against them. Defeat them all to finish the campaign!"
           : "To defeat a batter, you must strike them out in only three pitches three times. Defeat them all to finish the campaign!"}
       </div>
@@ -126,7 +124,7 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
         isStatsLoading={stats.isLoading}
         stats={stats.data?.stats}
         atBats={atBats}
-        isPitching={isPitching}
+        isPitching={isPitchingInCampaign}
       />
     </div>
   );

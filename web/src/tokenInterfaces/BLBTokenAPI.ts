@@ -99,6 +99,43 @@ export const getTokensData = async ({
   return await Promise.all(promises);
 };
 
+export const getTokensStatus = async (tokens: TokenId[]) => {
+  if (tokens.length < 1) {
+    return [];
+  }
+
+  const { gameContract } = getContracts();
+
+  const stakedQueries = tokens.map((t) => ({
+    target: gameContract.options.address,
+    callData: gameContract.methods.StakedSession(t.address, t.id).encodeABI(),
+  }));
+
+  const [stakedSessions] = await getMulticallResults(
+    FullcountABI,
+    ["StakedSession"],
+    stakedQueries,
+  );
+
+  const progressQueries = stakedSessions.map((s) => ({
+    target: gameContract.options.address,
+    callData: gameContract.methods.sessionProgress(s).encodeABI(),
+  }));
+
+  const [progresses] = await getMulticallResults(
+    FullcountABI,
+    ["sessionProgress"],
+    progressQueries,
+  );
+
+  return tokens.map((t, idx) => ({
+    id: t.id,
+    address: t.address,
+    stakedSessionID: Number(stakedSessions[idx]),
+    tokenProgress: Number(progresses[idx]),
+  }));
+};
+
 export const getTokensMetadata = async (
   tokens: TokenId[],
   tokensCache: Token[],

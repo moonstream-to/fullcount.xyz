@@ -22,6 +22,7 @@ import useUser from "../../contexts/UserContext";
 import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { useSound } from "../../hooks/useSound";
 import InviteLinkView from "./InviteLinkView";
+import RematchButton from "./RematchButton";
 
 export const outcomes = [
   "In Progress",
@@ -90,7 +91,7 @@ const AtBatView: React.FC = () => {
     if (router.query.id && typeof router.query.id === "string") {
       setAtBatId(router.query.id);
     }
-    if (router.query.session_id && typeof router.query.session_id === "string") {
+    if (router.query.session_id && typeof router.query.session_id === "string" && !sessionId) {
       setSessionId(router.query.session_id);
     }
   }, [router.query.id, router.query.session_id]);
@@ -127,6 +128,9 @@ const AtBatView: React.FC = () => {
     },
     {
       onSuccess: (data) => {
+        if (!data) {
+          return;
+        }
         if (data && !selectedToken && ownedTokens.data) {
           const token = ownedTokens.data.find(
             (t) => isSameToken(t, data.atBat.batter) || isSameToken(t, data.atBat.pitcher),
@@ -209,6 +213,19 @@ const AtBatView: React.FC = () => {
     },
   );
 
+  const handleRematch = (sessionID: number) => {
+    setAtBatId(null);
+    setSessionId(String(sessionID)); //sorry
+    setCurrentSessionIdx(0);
+    setShowPitchOutcome(false);
+    setCurrentSessionId(0);
+    queryClient.removeQueries("atBat");
+    router.push({
+      pathname: router.pathname,
+      query: { session_id: sessionID },
+    });
+  };
+
   return (
     <div
       className={styles.container}
@@ -232,9 +249,31 @@ const AtBatView: React.FC = () => {
       {atBatState.data?.atBat &&
         showPitchOutcome &&
         atBatState.data.atBat.outcome !== 0 &&
-        atBatState.data.atBat.pitches.length > 0 && (
-          <div className={styles.homeButton} onClick={handleExitClick}>
-            Go to home page
+        atBatState.data.atBat.pitches.length > 0 &&
+        selectedToken && (
+          <div className={styles.outcomeButtons}>
+            <RematchButton
+              atBat={atBatState.data.atBat}
+              selectedToken={selectedToken}
+              onSuccess={handleRematch}
+            />
+            <button className={styles.homeButton} onClick={handleExitClick}>
+              Go to home page
+            </button>
+          </div>
+        )}
+      {atBatState.data?.atBat &&
+        atBatState.data.atBat.pitches[currentSessionIdx].progress === 6 &&
+        selectedToken && (
+          <div className={styles.outcomeButtons}>
+            <RematchButton
+              atBat={atBatState.data.atBat}
+              selectedToken={selectedToken}
+              onSuccess={handleRematch}
+            />
+            <button className={styles.homeButton} onClick={handleExitClick}>
+              Go to home page
+            </button>
           </div>
         )}
 

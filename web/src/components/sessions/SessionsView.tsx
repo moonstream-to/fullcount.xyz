@@ -9,15 +9,12 @@ import Web3Context from "../../contexts/Web3Context/context";
 
 import SessionView3 from "./SessionView3";
 import FiltersView2 from "./FiltersView2";
-import InviteView from "./InviteView";
-import OwnedTokens from "../tokens/OwnedTokens";
 
 import styles from "./SessionsView.module.css";
 import { FullcountContractSession, OwnedToken, Session, Token } from "../../types";
 
 import { getAtBatOutputs, outputs } from "../../web3/abi/ABIITems";
 import { getContracts } from "../../utils/getWeb3Contracts";
-import useUser from "../../contexts/UserContext";
 import Roster from "../tokens/Roster";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";

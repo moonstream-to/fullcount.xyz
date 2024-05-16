@@ -124,33 +124,30 @@
     }
 }
 
-
-.homeButton {
+.outcomeButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     position: absolute;
     bottom: 0;
     left: 50%;
     transform: translateY(-92px) translateX(-50%);
+    z-index: 4;
+}
 
-    color: #FFF;
-    text-align: center;
-    font-family: Bangers, cursive;
-    font-size: 18px;
+.homeButton {
+    color: #262019;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
     font-style: normal;
     font-weight: 400;
-    line-height: 100%; /* 18px */
-    letter-spacing: 0.9px;
-
-    cursor: pointer;
-    z-index: 4;
+    line-height: normal;
     display: flex;
-    width: 26.96vh;
-    padding: 10px 20px;
+    width: 141px;
+    padding: 5px 15px;
     justify-content: center;
     align-items: center;
     gap: 10px;
-
-    border: 1px solid #262019;
-    background: #328449;
 }
 
 .playerView {

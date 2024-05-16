@@ -1,7 +1,6 @@
 import { Modal, ModalContent, Text } from "@chakra-ui/react";
 import styles from "./InviteView.module.css";
 import globalStyles from "../GlobalStyles.module.css";
-import OwnedTokens from "../tokens/OwnedTokens";
 import { useGameContext } from "../../contexts/GameContext";
 
 const InviteView = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
