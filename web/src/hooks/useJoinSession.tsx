@@ -8,7 +8,7 @@ import useUser from "../contexts/UserContext";
 
 export type JoinSessionParams = {
   sessionID: number;
-  token: OwnedToken;
+  token: Token;
   inviteCode: string;
 };
 
