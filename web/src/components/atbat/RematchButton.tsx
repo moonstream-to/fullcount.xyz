@@ -69,7 +69,7 @@ const RematchButton = ({
     <>
       {availableBots.data && availableBots.data.length > 0 && (
         <button className={styles.container} onClick={handleClick} disabled={joinSession.isLoading}>
-          {joinSession.isLoading ? <Spinner /> : "REMATCH"}
+          {joinSession.isLoading ? <Spinner h={4} w={4} /> : "REMATCH"}
         </button>
       )}
     </>
