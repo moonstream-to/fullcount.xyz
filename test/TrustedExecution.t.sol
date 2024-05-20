@@ -11,6 +11,7 @@ import {
     Outcome,
     Pitch,
     PitchSpeed,
+    PlayerType,
     Session,
     Swing,
     SwingType,
@@ -43,7 +44,96 @@ contract TrustedExecutionTest_executors is TrustedExecutionTest {
     }
 }
 
-contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
+contract TrustedExecutionTest_signature is TrustedExecutionTest {
+    uint256 PitcherTokenID;
+    uint256 BatterTokenID;
+    uint256 MaliciousPlayerTokenID;
+
+    function setUp() public virtual override {
+        super.setUp();
+
+        charactersMinted++;
+        uint256 tokenID = charactersMinted;
+
+        otherCharactersMinted++;
+        uint256 otherTokenID = otherCharactersMinted;
+
+        characterNFTs.mint(player1, tokenID);
+        otherCharacterNFTs.mint(player2, otherTokenID);
+
+        PitcherTokenID = tokenID;
+        BatterTokenID = otherTokenID;
+
+        charactersMinted++;
+        MaliciousPlayerTokenID = charactersMinted;
+        characterNFTs.mint(randomPerson, MaliciousPlayerTokenID);
+    }
+
+    function test_nft_owner_is_verified() public {
+        string memory atBatID = "d5bb2e54-9a17-4d22-8813-04bbfe738d61";
+
+        bytes32 pitcherTrustedMessageHash =
+            game.trustedAtBatHash(atBatID, address(characterNFTs), PitcherTokenID, PlayerType.Pitcher);
+        bytes memory pitcherSignature = signMessageHash(player1PrivateKey, pitcherTrustedMessageHash);
+
+        assertTrue(
+            game.verifyTrustedAtBatSignature(
+                atBatID, address(characterNFTs), PitcherTokenID, PlayerType.Pitcher, pitcherSignature
+            )
+        );
+
+        bytes32 batterTrustedMessageHash =
+            game.trustedAtBatHash(atBatID, address(otherCharacterNFTs), BatterTokenID, PlayerType.Batter);
+        bytes memory batterSignature = signMessageHash(player2PrivateKey, batterTrustedMessageHash);
+
+        assertTrue(
+            game.verifyTrustedAtBatSignature(
+                atBatID, address(otherCharacterNFTs), BatterTokenID, PlayerType.Batter, batterSignature
+            )
+        );
+    }
+
+    function test_non_owner_is_not_verified() public {
+        string memory atBatID = "d5bb2e54-9a17-4d22-8813-04bbfe738d61";
+        string memory anotherAtBatID = "f4249298-335b-4976-a6f1-6226eb4382ac";
+
+        bytes32 firstAtBatMessageHash =
+            game.trustedAtBatHash(atBatID, address(characterNFTs), PitcherTokenID, PlayerType.Pitcher);
+        // Malicious player signs message for token he does not own.
+        bytes memory wrongTokenSignature = signMessageHash(randomPersonPrivateKey, firstAtBatMessageHash);
+
+        assertFalse(
+            game.verifyTrustedAtBatSignature(
+                atBatID, address(characterNFTs), PitcherTokenID, PlayerType.Pitcher, wrongTokenSignature
+            )
+        );
+
+        bytes32 secondAtBatMessageHash =
+            game.trustedAtBatHash(anotherAtBatID, address(characterNFTs), MaliciousPlayerTokenID, PlayerType.Pitcher);
+        // Malicious player signs a message for another at-bat.
+        bytes memory anotherAtBatSignature = signMessageHash(randomPersonPrivateKey, secondAtBatMessageHash);
+
+        // Malicous player's signature is valid for second at-bat.
+        assertTrue(
+            game.verifyTrustedAtBatSignature(
+                anotherAtBatID,
+                address(characterNFTs),
+                MaliciousPlayerTokenID,
+                PlayerType.Pitcher,
+                anotherAtBatSignature
+            )
+        );
+
+        // But he cannot sign use that signature for another at-bat
+        assertFalse(
+            game.verifyTrustedAtBatSignature(
+                atBatID, address(characterNFTs), MaliciousPlayerTokenID, PlayerType.Pitcher, anotherAtBatSignature
+            )
+        );
+    }
+}
+
+contract TrustedExecutionTest_submitTrustedAtBat is TrustedExecutionTest {
     uint256 PitcherTokenID;
     uint256 BatterTokenID;
 
@@ -85,21 +175,21 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         });
 
         vm.prank(executor1);
-        vm.expectRevert("Fullcount.submitAtBat: sender is not an executor for pitcher.");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
+        vm.expectRevert("Fullcount.submitTrustedAtBat: sender is not an executor for pitcher.");
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
 
         vm.prank(player1);
         game.setTrustedExecutor(executor1, true);
 
         vm.prank(executor1);
-        vm.expectRevert("Fullcount.submitAtBat: sender is not an executor for batter.");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
+        vm.expectRevert("Fullcount.submitTrustedAtBat: sender is not an executor for batter.");
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
 
         vm.prank(player2);
         game.setTrustedExecutor(executor1, true);
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
     }
 
     function test_submit_at_bat_populates_at_bat_and_sessions() public {
@@ -120,7 +210,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[0], swings[0]) = _generateHomeRun();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -164,7 +254,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[2], swings[2]) = _generateStrike();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -206,7 +296,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[3], swings[3]) = _generateBall();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Walk);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Walk);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -248,7 +338,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[3], swings[3]) = _generateDouble();
 
         vm.prank(executor1);
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -350,7 +440,7 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
             address(otherCharacterNFTs),
             BatterTokenID
         );
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.HomeRun);
 
         uint256 atBatID = game.NumAtBats();
 
@@ -398,8 +488,8 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[5], swings[5]) = _generateBall();
 
         vm.prank(executor1);
-        vm.expectRevert("Fullcount.submitAtBat: invalid at-bat - inconclusive");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.InProgress);
+        vm.expectRevert("Fullcount.submitTrustedAtBat: invalid at-bat - inconclusive");
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.InProgress);
 
         assertEq(game.NumAtBats(), initialNumAtBats);
         assertEq(game.NumSessions(), initialNumSessions);
@@ -428,8 +518,8 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[3], swings[3]) = _generateDouble();
 
         vm.prank(executor1);
-        vm.expectRevert("Fullcount.submitAtBat: invalid at-bat - invalid at-bat");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
+        vm.expectRevert("Fullcount.submitTrustedAtBat: invalid at-bat - invalid at-bat");
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Double);
 
         assertEq(game.NumAtBats(), initialNumAtBats);
         assertEq(game.NumSessions(), initialNumSessions);
@@ -461,10 +551,18 @@ contract TrustedExecutionTest_submitAtBat is TrustedExecutionTest {
         (pitches[6], swings[6]) = _generateBall();
 
         vm.prank(executor1);
-        vm.expectRevert("Fullcount.submitAtBat: at-bat outcome does not match executor proposed outcome");
-        game.submitAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
+        vm.expectRevert("Fullcount.submitTrustedAtBat: at-bat outcome does not match executor proposed outcome");
+        game.submitTrustedAtBat(pitcher, batter, pitches, swings, AtBatOutcome.Strikeout);
 
         assertEq(game.NumAtBats(), initialNumAtBats);
         assertEq(game.NumSessions(), initialNumSessions);
+    }
+
+    function test_xor_swap() public {
+        uint256 x = 5;
+        uint256 y = 17;
+        x = x ^ (y = y ^ (x = x ^ y));
+        assertEq(x, 17);
+        assertEq(y, 5);
     }
 }

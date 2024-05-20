@@ -57,7 +57,7 @@ Functionality:
       second commit, then the session is cancelled and both players may unstake their NFTs.
  */
 contract Fullcount is EIP712 {
-    string public constant FullcountVersion = "0.1.1";
+    string public constant FullcountVersion = "0.2.0";
 
     uint256 public SecondsPerPhase;
 
@@ -908,7 +908,46 @@ contract Fullcount is EIP712 {
         }
     }
 
-    function submitAtBat(
+    // *** Trusted Execution ***
+    function trustedAtBatHash(
+        string memory atBatID,
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role
+    )
+        public
+        view
+        returns (bytes32)
+    {
+        bytes32 structHash = keccak256(
+            abi.encode(
+                keccak256("TrustedAtBatMessage(string atBatID,address nftAddress,uint256 tokenID,uint256 role)"),
+                atBatID,
+                nftAddress,
+                tokenID,
+                uint256(role)
+            )
+        );
+        return _hashTypedDataV4(structHash);
+    }
+
+    function verifyTrustedAtBatSignature(
+        string memory atBatID,
+        address nftAddress,
+        uint256 tokenID,
+        PlayerType role,
+        bytes memory signature
+    )
+        external
+        view
+        returns (bool)
+    {
+        address owner = IERC721(nftAddress).ownerOf(tokenID);
+        bytes32 messageHash = trustedAtBatHash(atBatID, nftAddress, tokenID, role);
+        return SignatureChecker.isValidSignatureNow(owner, messageHash, signature);
+    }
+
+    function submitTrustedAtBat(
         NFT memory pitcherNFT,
         NFT memory batterNFT,
         Pitch[] memory pitches,
@@ -918,19 +957,20 @@ contract Fullcount is EIP712 {
         external
     {
         require(
-            pitches.length == swings.length, "Fullcount.submitAtBat: number of pitches does not match number of swings."
+            pitches.length == swings.length,
+            "Fullcount.submitTrustedAtBat: number of pitches does not match number of swings."
         );
 
         address pitcherOwner = IERC721(pitcherNFT.nftAddress).ownerOf(pitcherNFT.tokenID);
         require(
             _isExecutorForPlayer(msg.sender, pitcherOwner),
-            "Fullcount.submitAtBat: sender is not an executor for pitcher."
+            "Fullcount.submitTrustedAtBat: sender is not an executor for pitcher."
         );
 
         address batterOwner = IERC721(batterNFT.nftAddress).ownerOf(batterNFT.tokenID);
         require(
             _isExecutorForPlayer(msg.sender, batterOwner),
-            "Fullcount.submitAtBat: sender is not an executor for batter."
+            "Fullcount.submitTrustedAtBat: sender is not an executor for batter."
         );
 
         // Create at-bat
@@ -943,7 +983,7 @@ contract Fullcount is EIP712 {
 
         for (uint256 i = 0; i < pitches.length; i++) {
             if (AtBatState[NumAtBats].outcome != AtBatOutcome.InProgress) {
-                revert("Fullcount.submitAtBat: invalid at-bat - invalid at-bat");
+                revert("Fullcount.submitTrustedAtBat: invalid at-bat - invalid at-bat");
             }
 
             Outcome sessionOutcome = resolve(pitches[i], swings[i]);
@@ -975,11 +1015,11 @@ contract Fullcount is EIP712 {
         }
 
         if (AtBatState[NumAtBats].outcome == AtBatOutcome.InProgress) {
-            revert("Fullcount.submitAtBat: invalid at-bat - inconclusive");
+            revert("Fullcount.submitTrustedAtBat: invalid at-bat - inconclusive");
         }
 
         if (AtBatState[NumAtBats].outcome != proposedOutcome) {
-            revert("Fullcount.submitAtBat: at-bat outcome does not match executor proposed outcome");
+            revert("Fullcount.submitTrustedAtBat: at-bat outcome does not match executor proposed outcome");
         }
     }
 }
