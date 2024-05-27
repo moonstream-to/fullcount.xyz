@@ -23,6 +23,7 @@ import { fetchFullcountPlayerTokens } from "../../tokenInterfaces/FullcountPlaye
 import { useSound } from "../../hooks/useSound";
 import InviteLinkView from "./InviteLinkView";
 import RematchButton from "./RematchButton";
+import { getAtBatTrustedExecutor } from "../../tokenInterfaces/TrustedExecutorAPI";
 
 export const outcomes = [
   "In Progress",
@@ -100,31 +101,27 @@ const AtBatView: React.FC = () => {
   const atBatState: UseQueryResult<{ atBat: AtBatStatus; tokens: Token[] }> = useQuery(
     ["atBat", atBatId, sessionId],
     async () => {
-      let id = atBatId;
-      if (!atBatId && sessionId) {
-        const { gameContract } = getContracts();
-        id = await gameContract.methods.SessionAtBat(sessionId).call();
-        if (id) {
-          setAtBatId(id);
-        }
-      }
+      const id = atBatId;
+      console.log(id);
       if (!id) {
         return;
       }
-      const atBat = await getAtBat({ tokensCache, id: Number(id) });
-      if (
-        atBatState.data &&
-        atBatState.data.atBat.outcome === 0 &&
-        atBat &&
-        atBat.atBat.outcome !== 0 &&
-        selectedToken
-      ) {
-        sendReport("At-bat outcome", {}, [
-          "type:outcome",
-          `outcome:${outcomeType([selectedToken], atBat.atBat)}`,
-        ]);
-      }
-      return atBat;
+      // const atBat = await getAtBat({ tokensCache, id: Number(id) });
+      const atBatTE = await getAtBatTrustedExecutor(id, tokensCache);
+      console.log(atBatTE);
+      // if (
+      //   atBatState.data &&
+      //   atBatState.data.atBat.outcome === 0 &&
+      //   atBat &&
+      //   atBat.atBat.outcome !== 0 &&
+      //   selectedToken
+      // ) {
+      //   sendReport("At-bat outcome", {}, [
+      //     "type:outcome",
+      //     `outcome:${outcomeType([selectedToken], atBat.atBat)}`,
+      //   ]);
+      // }
+      return atBatTE;
     },
     {
       onSuccess: (data) => {
