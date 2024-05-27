@@ -70,11 +70,17 @@ export const getChainImage = (identifier: string | number): string | undefined =
 };
 
 export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
-export const FULLCOUNT_PLAYER_API = "https://player.fullcount.xyz"; //TODO env
-export const GAME_CONTRACT = "0xDfE251B4F12547867ff839bcacec4d159DD68E47"; //TODO env
-export const TOKEN_CONTRACT = "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0"; //TODO env
-export const CHAIN_ID = 42170;
-export const RPC = "https://nova.arbitrum.io/rpc";
+export const FULLCOUNT_PLAYER_API =
+  process.env.NEXT_PUBLIC_FULLCOUNT_PLAYER_API_URL || "https://player.alpha.fullcount.xyz";
+export const FULLCOUNT_API =
+  process.env.NEXT_PUBLIC_FULLCOUNT_API_URL || "https://api.fullcount.xyz";
+
+export const GAME_CONTRACT =
+  process.env.NEXT_PUBLIC_FULLCOUNT_GAME_CONTRACT || "0xDfE251B4F12547867ff839bcacec4d159DD68E47";
+export const TOKEN_CONTRACT =
+  process.env.NEXT_PUBLIC_FULLCOUNT_BLB_CONTRACT || "0xf40c0961A9CC5c037B92D2cb48167F7f62Dd7cD0";
+export const CHAIN_ID = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || "42170");
+export const RPC = process.env.NEXT_PUBLIC_RPC || "https://nova.arbitrum.io/rpc";
 
 export const LEADERBOARD_HOME_RUNS = "0f061af5-22a7-4449-a4e3-b0efe3a5a3d8";
 export const LEADERBOARD_ON_BASE_PERCENTAGE = "941f5bfb-b6c9-4ff5-8442-8beae42009ee";
