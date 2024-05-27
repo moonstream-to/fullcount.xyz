@@ -137,7 +137,7 @@ interface AtBatStatus {
   balls: number;
   strikes: number;
   outcome: number;
-  id: number;
+  id: number | string;
   pitches: SessionStatus[];
   numberOfSessions: number;
 }
