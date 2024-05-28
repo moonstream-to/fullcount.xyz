@@ -1,4 +1,11 @@
-import { AtBatStatus, Token, TokenId, TrustedExecutionAtBatState } from "../types";
+import {
+  AtBat,
+  AtBatStatus,
+  OpenAtBat,
+  Token,
+  TokenId,
+  TrustedExecutionAtBatState,
+} from "../types";
 import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, ZERO_ADDRESS } from "../constants";
 import axios from "axios";
 import { getContracts } from "../utils/getWeb3Contracts";
@@ -44,6 +51,7 @@ export const getAtBatTrustedExecutor = async (id: string, tokensCache: Token[]) 
     .get(`${FULLCOUNT_PLAYER_API}/trusted/state?at_bat_id=${id}`)
     .then((res) => res.data.state);
   const newTokens: TokenId[] = [];
+  console.log(state);
 
   if (
     !tokensCache.some(
@@ -160,5 +168,52 @@ export const fetchAllCurrentAtBats = async (
 ): Promise<(TrustedExecutionAtBatState | undefined)[]> => {
   const promises = tokens.map((token) => fetchCurrentAtBat(token));
   const results = await Promise.allSettled(promises);
+  console.log(results);
   return results.map((result) => (result.status === "fulfilled" ? result.value : undefined));
+};
+
+export const fetchOpenTrustedExecutorAtBats = async (
+  tokensCache: Token[],
+): Promise<{ atBats: AtBat[]; tokens: Token[] }> => {
+  const atBats = await axios
+    .get(`${FULLCOUNT_PLAYER_API}/trusted/open`)
+    .then((res) => res.data.open_at_bats ?? []);
+  console.log(atBats);
+  const newTokens: TokenId[] = [];
+  atBats.forEach((a: OpenAtBat) => {
+    if (
+      !tokensCache.some((t) => t.address === a.nft.erc721_address && t.id === a.nft.token_id) &&
+      a.nft.erc721_address !== ZERO_ADDRESS &&
+      !newTokens.some((t) => t.address === a.nft.erc721_address && t.id === a.nft.token_id)
+    ) {
+      newTokens.push({ address: a.nft.erc721_address, id: a.nft.token_id });
+    }
+  });
+  console.log(tokensCache, newTokens);
+  const newTokensData = await getTokensData({ tokens: newTokens, tokensSource: "BLBContract" });
+  const tokens = [...tokensCache, ...newTokensData];
+  return {
+    atBats: atBats
+      .map((a: OpenAtBat, idx: number) => ({
+        ...a,
+        balls: 0,
+        outcome: 0,
+        strikes: 0,
+        pitcher:
+          a.Role === 0
+            ? tokens.find((t) => t.address === a.nft.erc721_address && t.id === a.nft.token_id)
+            : undefined,
+        batter:
+          a.Role === 1
+            ? tokens.find((t) => t.address === a.nft.erc721_address && t.id === a.nft.token_id)
+            : undefined,
+        id: a.at_bat_id,
+        numberOfSessions: 1,
+        lastSessionId: 0,
+        progress: 2,
+        requiresSignature: !!a.invite_code,
+      }))
+      .reverse(),
+    tokens,
+  };
 };
