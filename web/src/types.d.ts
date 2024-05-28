@@ -83,6 +83,14 @@ interface TrustedExecutionAtBatState {
   strikes: number;
 }
 
+interface OpenAtBat {
+  Role: 0 | 1;
+  at_bat_id: string;
+  invite_code: string;
+  nft: { erc721_address: string; token_id: string };
+  timestamp: number;
+}
+
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
