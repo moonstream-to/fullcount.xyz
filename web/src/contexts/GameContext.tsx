@@ -78,7 +78,7 @@ export const GameContextProvider: FC<ProviderProps> = ({ children }) => {
     secondsPerPhase: undefined,
     isCreateCharacter: false,
     atBatsForPractice: undefined,
-    selectedMode: 1,
+    selectedMode: 0,
     selectedTokenIdx: 0,
     joinedNotification: false,
     onboardingName: "",
