@@ -9,15 +9,19 @@ import useMoonToast from "../../hooks/useMoonToast";
 import { useEffect, useRef } from "react";
 import useUser from "../../contexts/UserContext";
 import { useSound } from "../../hooks/useSound";
+import { PLAYER_INTERFACE } from "../../constants";
+import { abortAtBatTrustedExecutor } from "../../tokenInterfaces/TrustedExecutorAPI";
 
 const ExitDialog = ({
   token,
   sessionId,
   onClose,
+  atBatID,
 }: {
   token: Token;
   sessionId: number;
   onClose: () => void;
+  atBatID: string | null;
 }) => {
   const toast = useMoonToast();
   const queryClient = useQueryClient();
@@ -60,8 +64,22 @@ const ExitDialog = ({
   };
 
   const closeAtBat = useMutation(
-    ({ token, sessionId }: { token: Token; sessionId: number }) => {
-      return abortFullcountPlayerSession({ token, sessionId });
+    ({
+      token,
+      sessionId,
+      atBatID,
+    }: {
+      token: Token;
+      sessionId?: number;
+      atBatID?: string | null;
+    }) => {
+      if (PLAYER_INTERFACE === "TRUSTED_EXECUTOR" && atBatID) {
+        return abortAtBatTrustedExecutor({ token, atBatID });
+      }
+      if (PLAYER_INTERFACE === "FULLCOUNT_PLAYER" && sessionId) {
+        return abortFullcountPlayerSession({ token, sessionId });
+      }
+      throw new Error("Unexpected error");
     },
     {
       retry: (failureCount, error) => {
@@ -76,7 +94,7 @@ const ExitDialog = ({
         toast(`Can't close At-Bat - ${error.message}`, "error");
       },
       onSuccess: (_, variables) => {
-        updateTokenInCache(variables.token, variables.sessionId);
+        // updateTokenInCache(variables.token, variables.sessionId); //TODO update
         router.push("/");
       },
     },
@@ -99,7 +117,7 @@ const ExitDialog = ({
 
   const handleCloseClick = () => {
     playSound("homeButton");
-    closeAtBat.mutate({ token, sessionId });
+    closeAtBat.mutate({ token, sessionId, atBatID });
   };
   const handleKeepClick = () => {
     playSound("homeButton");
