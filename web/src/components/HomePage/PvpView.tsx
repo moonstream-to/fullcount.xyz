@@ -1,8 +1,8 @@
 import router from "next/router";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, useQuery, useQueryClient } from "react-query";
 
 import styles from "./PvpView.module.css";
-import { AtBat, OwnedToken, Token } from "../../types";
+import { AtBat, OpenAtBat, OwnedToken, Token } from "../../types";
 import { ZERO_ADDRESS } from "../../constants";
 import TokenToPlay from "./TokenToPlay";
 import AtBatsList from "./AtBatsList";
@@ -14,13 +14,30 @@ import { isCampaignToken } from "../campaign/teams";
 import { isCoach } from "./PracticeView";
 import { sendReport } from "../../utils/humbug";
 import { useSound } from "../../hooks/useSound";
+import { fetchOpenTrustedExecutorAtBats } from "../../tokenInterfaces/TrustedExecutorAPI";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
-  const { selectedToken } = useGameContext();
+  const { selectedToken, tokensCache, updateContext, selectedPVPView } = useGameContext();
   const toast = useMoonToast();
   const { user } = useUser();
   const playSound = useSound();
+
+  const openAtBats = useQuery(
+    ["openAtBats"],
+    () => {
+      return fetchOpenTrustedExecutorAtBats(tokensCache);
+    },
+    {
+      onSuccess: (data) => {
+        console.log(data);
+        if (data.tokens) {
+          updateContext({ tokensCache: tokens });
+        }
+      },
+      refetchInterval: 5000,
+    },
+  );
 
   const queryClient = useQueryClient();
   const joinSession = useMutation(
@@ -28,39 +45,41 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
       sessionID,
       token,
       inviteCode,
+      atBatID,
     }: {
       sessionID: number;
       token: OwnedToken;
       inviteCode: string;
+      atBatID?: string;
     }): Promise<unknown> => {
       return joinSessionFullcountPlayer({ token, sessionID, inviteCode });
     },
     {
       onSuccess: async (data, variables) => {
-        let atBatId: number | undefined = undefined;
-        queryClient.setQueryData(
-          ["atBats"],
-          (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            if (!oldData) {
-              return { atBats: [], tokens: [] };
-            }
-            const newAtBats = oldData.atBats.map((atBat) => {
-              if (atBat.lastSessionId !== variables.sessionID) {
-                return atBat;
-              }
-              atBatId = atBat.id;
-              if (!atBat.pitcher) {
-                return { ...atBat, progress: 3, pitcher: { ...variables.token } };
-              }
-              if (!atBat.batter) {
-                return { ...atBat, progress: 3, batter: { ...variables.token } };
-              }
-              return atBat;
-            });
-
-            return { atBats: newAtBats, tokens: oldData.tokens };
-          },
-        );
+        const atBatID: string | undefined = variables.atBatID;
+        // queryClient.setQueryData(
+        //   ["atBats"],
+        //   (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
+        //     if (!oldData) {
+        //       return { atBats: [], tokens: [] };
+        //     }
+        //     const newAtBats = oldData.atBats.map((atBat) => {
+        //       if (atBat.lastSessionId !== variables.sessionID) {
+        //         return atBat;
+        //       }
+        //       atBatId = atBat.id;
+        //       if (!atBat.pitcher) {
+        //         return { ...atBat, progress: 3, pitcher: { ...variables.token } };
+        //       }
+        //       if (!atBat.batter) {
+        //         return { ...atBat, progress: 3, batter: { ...variables.token } };
+        //       }
+        //       return atBat;
+        //     });
+        //
+        //     return { atBats: newAtBats, tokens: oldData.tokens };
+        //   },
+        // );
         queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
           if (!oldData) {
             return [];
@@ -78,8 +97,8 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
           });
         });
         queryClient.invalidateQueries("owned_tokens");
-        if (atBatId) {
-          router.push(`atbats/?id=${atBatId}`);
+        if (atBatID) {
+          router.push(`atbats/?id=${atBatID}`);
         }
       },
       retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
@@ -106,7 +125,6 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
     }
   };
 
-  const { selectedPVPView, updateContext } = useGameContext();
   return (
     <div className={styles.container}>
       <div className={styles.viewSelector}>
@@ -156,16 +174,9 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
         <div className={styles.listsContainer}>
           <div className={styles.list}>
             <div className={styles.listHeader}>PITCHERS</div>
-            {atBats
-              .filter(
-                (a) =>
-                  a.progress === 2 &&
-                  a.pitcher &&
-                  a.pitcher?.address !== ZERO_ADDRESS &&
-                  !isCampaignToken(a.pitcher.address, a.pitcher.id) &&
-                  !isCoach(a.pitcher.address, a.pitcher.id),
-              )
-              .map((openAtBat, idx) => {
+            {openAtBats.data &&
+              openAtBats.data.atBats &&
+              openAtBats.data.atBats.map((openAtBat, idx) => {
                 return openAtBat.pitcher ? (
                   <TokenToPlay
                     requiresSignature={openAtBat.requiresSignature}
@@ -182,22 +193,15 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                     key={idx}
                   />
                 ) : (
-                  <div style={{ width: "130px", height: "225.5px" }} />
+                  <div key={idx} style={{ width: "130px", height: "225.5px" }} />
                 );
               })}
           </div>
           <div className={styles.list}>
             <div className={styles.listHeader}>batters</div>
-            {atBats
-              .filter(
-                (a) =>
-                  a.progress === 2 &&
-                  a.batter &&
-                  a.batter?.address !== ZERO_ADDRESS &&
-                  !isCampaignToken(a.batter.address, a.batter.id) &&
-                  !isCoach(a.batter.address, a.batter.id),
-              )
-              .map((openAtBat, idx) => {
+            {openAtBats.data &&
+              openAtBats.data.atBats &&
+              openAtBats.data.atBats.map((openAtBat, idx) => {
                 return openAtBat.batter ? (
                   <TokenToPlay
                     requiresSignature={openAtBat.requiresSignature}
