@@ -70,9 +70,23 @@ interface NFT {
   tokenID: string;
 }
 
+interface TrustedExecutionAtBatState {
+  aborted: boolean;
+  at_bat_id: string;
+  balls: number;
+  batter_can_act: boolean;
+  batter_nft: NFT;
+  current_session_index: number;
+  outcome: number;
+  pitcher_can_act: boolean;
+  pitcher_nft: NFT;
+  strikes: number;
+}
+
 interface OwnedToken extends Token {
   isStaked: boolean;
   stakedSessionID: number;
+  stakedAtBatID?: string | undefined;
   tokenProgress: number;
   activeSession?: { batterNFT: NFT; pitcherNFT: NFT };
 }
@@ -124,7 +138,7 @@ interface AtBat {
   strikes: number;
   outcome: number;
   lastSessionId?: number;
-  id?: number;
+  id?: number | string;
   numberOfSessions?: number;
   lastSession?: SessionState;
   progress: number;
