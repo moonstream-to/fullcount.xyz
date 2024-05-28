@@ -21,7 +21,7 @@ const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
     window.location.host
   }/?invite_from=${encodeURIComponent(
     atBat.pitcher ? atBat.pitcher.name : atBat.batter ? atBat.batter.name : "",
-  )}&id=${atBat.pitches[0].sessionID}${roleParam}${inviteCodeParam}`;
+  )}&id=${atBat.id}${roleParam}${inviteCodeParam}`;
   const { onCopy, hasCopied } = useClipboard(link);
 
   return (
