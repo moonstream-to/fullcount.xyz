@@ -15,6 +15,7 @@ import { Spinner } from "@chakra-ui/react";
 import PvPIcon from "../icons/PvPIcon";
 import { useGameContext } from "../../contexts/GameContext";
 import { getContracts } from "../../utils/getWeb3Contracts";
+import { joinAtBatTrustedExecutor } from "../../tokenInterfaces/TrustedExecutorAPI";
 
 const getErrorMessage = (sessionProgress: number) => {
   switch (sessionProgress) {
@@ -34,10 +35,12 @@ const ChooseToken = ({
   inviteCode,
   inviteFrom,
   inviteRole,
+  atBatID,
 }: {
   tokens: OwnedToken[];
   onClose: () => void;
-  sessionID: number;
+  sessionID?: number;
+  atBatID: string;
   inviteCode: string;
   inviteFrom: string;
   inviteRole: string;
@@ -61,7 +64,7 @@ const ChooseToken = ({
 
   const handleClick = () => {
     playSound("batButton");
-    joinSession.mutate({ sessionID, token: tokens[selectedTokenIdx], inviteCode });
+    joinSession.mutate({ atBatID, token: tokens[selectedTokenIdx], inviteCode });
   };
 
   const handleExitClick = () => {
@@ -70,69 +73,28 @@ const ChooseToken = ({
   };
 
   const sessionProgress = useQuery(["session_status", sessionID], () => {
-    const { gameContract } = getContracts();
-    return gameContract.methods.sessionProgress(sessionID).call();
+    // const { gameContract } = getContracts();
+    return 2;
+    // return gameContract.methods.sessionProgress(sessionID).call();
   });
 
   const queryClient = useQueryClient();
   const joinSession = useMutation(
     async ({
-      sessionID,
+      atBatID,
       token,
       inviteCode,
     }: {
-      sessionID: number;
+      atBatID: string;
       token: OwnedToken;
       inviteCode: string;
     }): Promise<unknown> => {
-      return joinSessionFullcountPlayer({ token, sessionID, inviteCode });
+      return joinAtBatTrustedExecutor({ token, atBatID });
     },
     {
       onSuccess: async (data, variables) => {
-        let atBatId: number | undefined = undefined;
-        queryClient.setQueryData(
-          ["atBats"],
-          (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
-            if (!oldData) {
-              return { atBats: [], tokens: [] };
-            }
-            const newAtBats = oldData.atBats.map((atBat) => {
-              if (atBat.lastSessionId !== variables.sessionID) {
-                return atBat;
-              }
-              atBatId = atBat.id;
-              if (!atBat.pitcher) {
-                return { ...atBat, progress: 3, pitcher: { ...variables.token } };
-              }
-              if (!atBat.batter) {
-                return { ...atBat, progress: 3, batter: { ...variables.token } };
-              }
-              return atBat;
-            });
-
-            return { atBats: newAtBats, tokens: oldData.tokens };
-          },
-        );
-        queryClient.setQueryData(["owned_tokens", user], (oldData: OwnedToken[] | undefined) => {
-          if (!oldData) {
-            return [];
-          }
-          return oldData.map((t) => {
-            if (t.address === variables.token.address && t.id === variables.token.id) {
-              return {
-                ...t,
-                isStaked: true,
-                stakedSessionID: variables.sessionID,
-                tokenProgress: 3,
-              };
-            }
-            return t;
-          });
-        });
         queryClient.invalidateQueries("owned_tokens");
-        if (atBatId) {
-          router.push(`atbats/?id=${atBatId}`);
-        }
+        router.push(`atbats/?id=${variables.atBatID}`);
       },
       retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
       retry: (failureCount, error) => {
