@@ -6,13 +6,14 @@ import useUser from "../../contexts/UserContext";
 import { AtBat, OwnedToken, Token } from "../../types";
 import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
-import { GAME_CONTRACT, ZERO_ADDRESS } from "../../constants";
+import { GAME_CONTRACT, PLAYER_INTERFACE, ZERO_ADDRESS } from "../../constants";
 import { useRouter } from "next/router";
 import { sendReport } from "../../utils/humbug";
 import { useSound } from "../../hooks/useSound";
 import { useState } from "react";
 import StartAtBatDialog from "./StartAtBatDialog";
 import globalStyles from "../GlobalStyles.module.css";
+import { startSessionTrustedExecutor } from "../../tokenInterfaces/TrustedExecutorAPI";
 
 const PlayButtons = ({ token }: { token: OwnedToken }) => {
   const queryClient = useQueryClient();
@@ -28,15 +29,28 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
       token,
       requireSignature,
     }: {
-      role: number;
+      role: 0 | 1;
       token: OwnedToken;
       requireSignature: boolean;
-    }): Promise<{ sessionID: string; sign: string | undefined; atBat: AtBat; token: Token }> => {
-      const { sessionID, sign } = await startSessionFullcountPlayer({
-        token,
-        roleNumber: role,
-        requireSignature,
-      });
+    }): Promise<{
+      sessionID: string | undefined;
+      atBatID: string | undefined;
+      inviteCode: string | undefined;
+      atBat: AtBat;
+      token: Token;
+    }> => {
+      const { sessionID, atBatID, inviteCode } =
+        PLAYER_INTERFACE === "FULLCOUNT_PLAYER"
+          ? await startSessionFullcountPlayer({
+              token,
+              role,
+              requireSignature,
+            })
+          : await startSessionTrustedExecutor({
+              token,
+              role,
+              requireSignature,
+            });
       const atBat: AtBat = {
         balls: 0,
         strikes: 0,
@@ -45,17 +59,27 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
         outcome: 0,
         progress: 2,
         requiresSignature: requireSignature,
+        id: atBatID,
       };
-      return { sessionID, sign, atBat, token };
+      return { sessionID, atBatID, inviteCode, atBat, token };
     },
     {
       onSuccess: async (
-        data: { sessionID: string; sign: string | undefined; atBat: AtBat; token: Token },
+        data: {
+          sessionID: string | undefined;
+          atBatID: string | undefined;
+          inviteCode: string | undefined;
+          atBat: AtBat;
+          token: Token;
+        },
         variables,
       ) => {
-        if (data.sign) {
-          const inviteCodeKey = getLocalStorageInviteCodeKey(GAME_CONTRACT, data.sessionID);
-          setLocalStorageItem(inviteCodeKey, data.sign);
+        if (data.inviteCode && (data.sessionID || data.atBatID)) {
+          const id = data.atBatID ?? data.sessionID;
+          if (data.inviteCode && id) {
+            const inviteCodeKey = getLocalStorageInviteCodeKey(GAME_CONTRACT, id);
+            setLocalStorageItem(inviteCodeKey, data.inviteCode);
+          }
         }
         queryClient.setQueryData(
           ["atBats"],
@@ -76,7 +100,8 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
               return {
                 ...t,
                 isStaked: true,
-                stakedSessionID: Number(data.sessionID),
+                stakedSessionID: Number(data.sessionID ?? 0),
+                stakedAtBatID: data.atBatID,
                 tokenProgress: 2,
                 activeSession:
                   variables.role === 0
@@ -87,7 +112,11 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
             return t;
           });
         });
-        router.push(`atbats/?session_id=${data.sessionID}`);
+        if (data.atBatID) {
+          router.push(`atbats/?id=${data.atBatID}`);
+        } else if (data.sessionID) {
+          router.push(`atbats/?session_id=${data.sessionID}`);
+        }
       },
       retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),
       retry: (failureCount, error) => {
@@ -110,7 +139,15 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
       router.push(`atbats/?session_id=${token.stakedSessionID}`);
       return;
     }
-    setRole(role);
+    if (token.tokenProgress !== 6 && token.stakedAtBatID) {
+      router.push(`atbats/?id=${token.stakedAtBatID}`);
+      return;
+    }
+    if (PLAYER_INTERFACE === "FULLCOUNT_PLAYER") {
+      setRole(role);
+    } else {
+      startSession.mutate({ role, token, requireSignature: false });
+    }
   };
 
   const handleChoice = (requireSignature: boolean) => {
