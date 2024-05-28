@@ -18,7 +18,7 @@ const parseActiveSession = (s: any) => {
   };
 };
 
-export async function fetchFullcountPlayerTokens() {
+export async function fetchFullcountPlayerTokens(): Promise<OwnedToken[]> {
   try {
     const headers = getHeaders();
     const res = await axios.get(`${FULLCOUNT_PLAYER_API}/nfts`, {
@@ -71,18 +71,18 @@ export async function fetchFullcountPlayerTokens() {
 
 export async function startSessionFullcountPlayer({
   token,
-  roleNumber,
+  role,
   requireSignature,
 }: {
   token: Token;
-  roleNumber: number;
+  role: 0 | 1;
   requireSignature: boolean;
-}): Promise<{ sessionID: string; sign: string | undefined }> {
+}): Promise<{ sessionID: string; inviteCode: string | undefined; atBatID: undefined }> {
   const postData = {
     fullcount_address: GAME_CONTRACT,
     erc721_address: token.address,
     token_id: token.id,
-    role: roleNumber === 0 ? "pitcher" : "batter",
+    role: role === 0 ? "pitcher" : "batter",
     require_signature: requireSignature,
   };
   const headers = getHeaders();
@@ -118,7 +118,7 @@ export async function startSessionFullcountPlayer({
     `token_address:${token.address}`,
     `token_id:${token.id}`,
   ]);
-  return { sessionID: data.session_id, sign: data.signature };
+  return { sessionID: data.session_id, inviteCode: data.signature, atBatID: undefined };
 }
 
 export const delay = (delayInms: number) => {
