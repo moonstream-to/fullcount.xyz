@@ -13,7 +13,7 @@ import ChooseToken from "./tokens/ChooseToken";
 import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
 import React, { useEffect, useState } from "react";
-import { FULLCOUNT_ASSETS_PATH } from "../constants";
+import { FULLCOUNT_ASSETS_PATH, PLAYER_INTERFACE } from "../constants";
 import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 
@@ -21,6 +21,7 @@ import { AbiItem } from "web3-utils";
 import FullcountABIImported from "../web3/abi/FullcountABI.json";
 import { useSound } from "../hooks/useSound";
 import { useRouter } from "next/router";
+import { fetchAllCurrentAtBats } from "../tokenInterfaces/TrustedExecutorAPI";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const Playing = () => {
@@ -70,6 +71,17 @@ const Playing = () => {
     ["owned_tokens", user],
     async () => {
       const ownedTokens = user ? await fetchFullcountPlayerTokens() : [];
+      if (PLAYER_INTERFACE === "TRUSTED_EXECUTOR") {
+        const states = await fetchAllCurrentAtBats(ownedTokens);
+        console.log(states);
+        ownedTokens.forEach((t, index) => {
+          if (states[index]) {
+            t.stakedAtBatID = states[index]?.at_bat_id;
+            t.isStaked = !!states[index]?.at_bat_id;
+          }
+        });
+      }
+      console.log(ownedTokens);
       if (ownedTokens.length > 0 && !selectedToken && ownedTokens[selectedTokenIdx]) {
         updateContext({ selectedToken: { ...ownedTokens[selectedTokenIdx] } });
       }
@@ -238,6 +250,7 @@ const Playing = () => {
           inviteRole={inviteRole}
           tokens={ownedTokens.data.filter((t) => !t.isStaked || t.tokenProgress === 6)}
           sessionID={Number(inviteSession)}
+          atBatID={inviteSession}
           inviteCode={inviteCode}
           inviteFrom={inviteFrom}
           onClose={() => {
