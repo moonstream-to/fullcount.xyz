@@ -136,9 +136,6 @@ const AtBatView: React.FC = () => {
             updateContext({ selectedToken: { ...token } });
           }
         }
-        if (data && currentSessionId === 0) {
-          setCurrentSessionId(data.atBat.pitches[data.atBat.numberOfSessions - 1].sessionID);
-        }
         if (data && data.atBat.numberOfSessions - 1 !== currentSessionIdx) {
           setCurrentSessionIdx(data.atBat.numberOfSessions - 1);
           setShowPitchOutcome(true);
@@ -153,7 +150,7 @@ const AtBatView: React.FC = () => {
         }
       },
       // enabled: atBatId !== null,
-      refetchInterval: 3000,
+      refetchInterval: 10000,
     },
   );
 
@@ -231,10 +228,16 @@ const AtBatView: React.FC = () => {
       <div className={styles.exitButton} onClick={handleExitClick}>
         <ExitIcon />
         {isOpen && selectedToken && (
-          <ExitDialog token={selectedToken} sessionId={currentSessionId} onClose={onClose} />
+          <ExitDialog
+            token={selectedToken}
+            sessionId={currentSessionId}
+            onClose={onClose}
+            atBatID={atBatId}
+          />
         )}
       </div>
       <Image
+        alt={""}
         minW={"441px"}
         h={"calc(25vh - 27px)"}
         position={"absolute"}
