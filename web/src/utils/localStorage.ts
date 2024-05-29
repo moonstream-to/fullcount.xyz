@@ -10,10 +10,14 @@ export const getLocalStorageKey = (
 export const getLocalStorageInviteCodeKey = (contractAddress: string, sessionID: string) =>
   `${LOCAL_STORAGE_NAMESPACE}-invites-${contractAddress}-${sessionID}`;
 
-export const getLocalStorageItem = (key: string) => {
-  const item = localStorage.getItem(key) ?? "";
+export const getAppStorageItem = (key: string, isSessionStorage = false) => {
+  const item = isSessionStorage
+    ? sessionStorage.getItem(key) ?? ""
+    : localStorage.getItem(key) ?? "";
   return item ? JSON.parse(item) : null;
 };
 
-export const setLocalStorageItem = (key: string, value: any) =>
-  localStorage.setItem(key, JSON.stringify(value));
+export const setAppStorageItem = (key: string, value: any, isSessionStorage = false) =>
+  isSessionStorage
+    ? sessionStorage.setItem(key, JSON.stringify(value))
+    : localStorage.setItem(key, JSON.stringify(value));
