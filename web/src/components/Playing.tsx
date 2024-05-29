@@ -13,7 +13,7 @@ import ChooseToken from "./tokens/ChooseToken";
 import HomePage from "./HomePage/HomePage";
 import { getAtBats } from "../services/fullcounts";
 import React, { useEffect, useState } from "react";
-import { FULLCOUNT_ASSETS_PATH, PLAYER_INTERFACE } from "../constants";
+import { FULLCOUNT_ASSETS_PATH, PLAYER_INTERFACE, ZERO_ADDRESS } from "../constants";
 import { getContracts } from "../utils/getWeb3Contracts";
 import { getMulticallResults } from "../utils/multicall";
 
@@ -76,8 +76,20 @@ const Playing = () => {
         console.log(states);
         ownedTokens.forEach((t, index) => {
           if (states[index]) {
-            t.stakedAtBatID = states[index]?.at_bat_id;
-            t.isStaked = !!states[index]?.at_bat_id;
+            const state = states[index];
+            t.stakedAtBatID = state?.at_bat_id;
+            t.isStaked = !!state?.at_bat_id;
+            t.tokenProgress = !t.isStaked ? 0 : state?.join_timestamp !== 0 ? 3 : 2;
+            t.activeSession = {
+              pitcherNFT: {
+                nftAddress: state?.pitcher_nft.erc721_address ?? ZERO_ADDRESS,
+                tokenID: state?.pitcher_nft.token_id ?? "",
+              },
+              batterNFT: {
+                nftAddress: state?.batter_nft.erc721_address ?? ZERO_ADDRESS,
+                tokenID: state?.batter_nft.token_id ?? "",
+              },
+            };
           }
         });
       }
@@ -99,6 +111,12 @@ const Playing = () => {
     {
       ...queryCacheProps,
       refetchInterval: 5000,
+      onSuccess: (data) => {
+        const activeSession = data.find((t) => t.isStaked && t.tokenProgress !== 2);
+        // if (activeSession) {
+        //   router.push(`atbats/?id=${activeSession.stakedAtBatID}`);
+        // }
+      },
     },
   );
 
