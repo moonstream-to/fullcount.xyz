@@ -7,7 +7,7 @@ import { getPitchDescription, getSwingDescription } from "../../utils/messages";
 import { getRowCol, SessionStatus } from "./PlayView";
 import React, { useContext, useEffect, useState } from "react";
 import { signPitch, signSwing } from "../../utils/signing";
-import { getLocalStorageItem, setLocalStorageItem } from "../../utils/localStorage";
+import { getAppStorageItem, setAppStorageItem } from "../../utils/localStorage";
 import Web3Context from "../../contexts/Web3Context/context";
 import { useGameContext } from "../../contexts/GameContext";
 import AnimatedMessage from "../AnimatedMessage";
@@ -67,7 +67,7 @@ const PlayerView = ({
 
   const handleReveal = async () => {
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    const reveal = getLocalStorageItem(localStorageKey);
+    const reveal = getAppStorageItem(localStorageKey, true);
     if (!revealMutation.isLoading) {
       revealMutation.mutate(reveal);
     }
@@ -94,7 +94,7 @@ const PlayerView = ({
       horizontal,
     };
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    setLocalStorageItem(localStorageKey, commit);
+    setAppStorageItem(localStorageKey, commit, true);
     if (selectedToken?.source === "FullcountPlayerAPI") {
       commitMutation.mutate({ sign: undefined, commit });
     } else {
@@ -113,7 +113,7 @@ const PlayerView = ({
 
   useEffect(() => {
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    const reveal = getLocalStorageItem(localStorageKey);
+    const reveal = getAppStorageItem(localStorageKey, true);
     if (reveal) {
       setActionChoice(reveal.actionChoice);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);

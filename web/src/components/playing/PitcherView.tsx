@@ -17,11 +17,7 @@ import styles from "./PlayView.module.css";
 import { sendTransactionWithEstimate } from "../../utils/sendTransactions";
 import RandomGenerator from "./RandomGenerator";
 import ActionTypeSelector from "./ActionTypeSelector";
-import {
-  getLocalStorageItem,
-  getLocalStorageKey,
-  setLocalStorageItem,
-} from "../../utils/localStorage";
+import { getAppStorageItem, getLocalStorageKey, setAppStorageItem } from "../../utils/localStorage";
 import { getPitchDescription } from "../../utils/messages";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
@@ -56,18 +52,23 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
     );
 
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    setLocalStorageItem(localStorageKey, {
-      nonce,
-      speed,
-      vertical: getRowCol(gridIndex)[0],
-      horizontal: getRowCol(gridIndex)[1],
-    });
+    setAppStorageItem(
+      localStorageKey,
+      {
+        nonce,
+        speed,
+        vertical: getRowCol(gridIndex)[0],
+        horizontal: getRowCol(gridIndex)[1],
+      },
+      true,
+    );
     commitPitch.mutate({ sign });
   };
 
   const handleReveal = async () => {
-    const reveal = getLocalStorageItem(
+    const reveal = getAppStorageItem(
       `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`,
+      true,
     );
     console.log(reveal);
     revealPitch.mutate(reveal);
@@ -75,7 +76,7 @@ const PitcherView = ({ sessionStatus }: { sessionStatus: SessionStatus }) => {
 
   useEffect(() => {
     const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
-    const reveal = getLocalStorageItem(localStorageKey);
+    const reveal = getAppStorageItem(localStorageKey, true);
     if (reveal) {
       setSpeed(reveal.speed);
       setGridIndex(reveal.vertical * 5 + reveal.horizontal);
