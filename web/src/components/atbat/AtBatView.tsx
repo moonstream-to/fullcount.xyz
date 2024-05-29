@@ -174,7 +174,7 @@ const AtBatView: React.FC = () => {
     },
     {
       refetchIntervalInBackground: true,
-      refetchInterval: 10000,
+      refetchInterval: 3000,
       enabled: !!currentSessionId && joinedNotification,
     },
   );
