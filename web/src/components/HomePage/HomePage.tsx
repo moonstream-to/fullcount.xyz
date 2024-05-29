@@ -12,7 +12,6 @@ const HomePage = ({ tokens, atBats }: { tokens: OwnedToken[]; atBats: AtBat[] })
   return (
     <div className={styles.container}>
       <Roster tokens={tokens} />
-      <ModeSelector />
       {selectedMode === 0 && atBats && <PvpView atBats={atBats} tokens={tokens} />}
       {selectedMode === 1 && atBats && <CampaignView atBats={atBats} />}
 
