@@ -219,13 +219,6 @@ const PlayerView = ({
               {revealMutation.isLoading ? <Spinner h={"14px"} w={"14px"} /> : <Text>Reveal</Text>}
             </button>
           )}
-        {isCommitted &&
-          ((!isPitcher && !sessionStatus.didPitcherCommit) ||
-            (isPitcher && !sessionStatus.didBatterCommit)) && (
-            <div className={globalStyles.waitingMessage}>
-              <AnimatedMessage message={"Waiting for opponent"} />
-            </div>
-          )}
         {isRevealed &&
           ((!isPitcher && !sessionStatus.didPitcherReveal) ||
             (isPitcher && !sessionStatus.didBatterReveal)) && (
