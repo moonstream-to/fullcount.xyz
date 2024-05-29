@@ -5,6 +5,11 @@ import {
   Token,
   TokenId,
   TrustedExecutionAtBatState,
+  Swing,
+  Pitch,
+  SessionStatus,
+  PitcherReveal,
+  BatterReveal,
 } from "../types";
 import { FULLCOUNT_PLAYER_API, GAME_CONTRACT, ZERO_ADDRESS } from "../constants";
 import axios from "axios";
@@ -78,6 +83,13 @@ export const getAtBatTrustedExecutor = async (id: string, tokensCache: Token[]) 
 
   const newTokensData = await getTokensData({ tokens: newTokens, tokensSource: "BLBContract" });
   const tokens = [...tokensCache, ...newTokensData];
+  const pitches: SessionStatus[] = [];
+  if (state.sessions) {
+    state.sessions.forEach((_: any, idx: number) => pitches.push(getPitch(state, idx + 1)));
+  }
+  if (state.outcome === 0) {
+    pitches.push(getPitch(state, state.current_session_index));
+  }
   const atBat: AtBatStatus = {
     pitcher: tokens.find(
       (t) => t.address === state.pitcher_nft.erc721_address && t.id === state.pitcher_nft.token_id,
@@ -88,11 +100,68 @@ export const getAtBatTrustedExecutor = async (id: string, tokensCache: Token[]) 
     balls: state.balls,
     strikes: state.strikes,
     outcome: state.outcome,
-    pitches: state.current_session_index === 1 ? [{ ...emptyPitch, progress: 2 }] : [],
+    pitches,
     numberOfSessions: state.current_session_index,
     id,
   };
   return { atBat, tokens };
+};
+
+const getPitch = (state: TrustedExecutionAtBatState, idx: number): SessionStatus => {
+  if (state.current_session_index === idx && state.outcome === 0) {
+    return {
+      progress: state.join_timestamp ? 3 : 2, //TODO session.timestamp
+      outcome: 0,
+      sessionID: idx,
+      didPitcherCommit: !state.pitcher_can_act,
+      didBatterCommit: !state.batter_can_act,
+      didPitcherReveal: !state.pitcher_can_act,
+      didBatterReveal: !state.batter_can_act,
+      pitcherReveal: { nonce: "0", speed: "0", vertical: "0", horizontal: "0" },
+      batterReveal: {
+        nonce: "0",
+        kind: "0",
+        vertical: "0",
+        horizontal: "0",
+      },
+      phaseStartTimestamp: String(state.join_timestamp),
+    };
+  }
+  if (!state.sessions) {
+    throw new Error("unexpected error parsing at-bat state");
+  }
+  return {
+    progress: 5,
+    outcome: state.sessions[idx - 1].outcome,
+    sessionID: idx,
+    didPitcherCommit: true,
+    didBatterCommit: true,
+    didPitcherReveal: true,
+    didBatterReveal: true,
+    pitcherReveal: pitchToPitchReveal(state.sessions[idx - 1].pitch),
+    batterReveal: swingToBatterReveal(state.sessions[idx - 1].swing),
+    phaseStartTimestamp: String(state.sessions[idx - 1].timestamp),
+  };
+};
+
+const pitchToPitchReveal = (pitch: Pitch): PitcherReveal => {
+  const { nonce, speed, vertical, horizontal } = pitch;
+  return {
+    nonce,
+    speed: String(speed),
+    horizontal: String(horizontal),
+    vertical: String(horizontal),
+  };
+};
+
+const swingToBatterReveal = (swing: Swing): BatterReveal => {
+  const { nonce, kind, vertical, horizontal } = swing;
+  return {
+    nonce,
+    kind: String(kind),
+    horizontal: String(horizontal),
+    vertical: String(horizontal),
+  };
 };
 
 export const joinAtBatTrustedExecutor = async ({
