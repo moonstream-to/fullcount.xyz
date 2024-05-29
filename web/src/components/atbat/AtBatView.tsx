@@ -356,14 +356,19 @@ const AtBatView: React.FC = () => {
               isSameToken(selectedToken, atBatState.data?.atBat.pitcher) &&
               atBatState.data && (
                 <PitcherViewMobile
+                  atBatID={String(atBatState.data.atBat.id)}
+                  index={atBatState.data.atBat.numberOfSessions}
                   sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
                   token={selectedToken as OwnedToken}
                 />
               )}
             {selectedToken &&
+              atBatId &&
               isSameToken(selectedToken, atBatState.data?.atBat.batter) &&
               atBatState.data && (
                 <BatterViewMobile
+                  atBatID={String(atBatState.data.atBat.id)}
+                  index={atBatState.data.atBat.numberOfSessions}
                   sessionStatus={atBatState.data.atBat.pitches.slice(-1)[0]}
                   token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
                 />

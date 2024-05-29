@@ -12,14 +12,19 @@ import PlayerView from "./PlayerView";
 import { commitPitchBLBToken, revealPitchBLBToken } from "../../tokenInterfaces/BLBTokenAPI";
 import { commitOrRevealPitchFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
 import { OwnedToken } from "../../types";
+import { pitchTrustedExecutor } from "../../tokenInterfaces/TrustedExecutorAPI";
 const FullcountABI = FullcountABIImported as unknown as AbiItem[];
 
 const PitcherViewMobile = ({
   sessionStatus,
   token,
+  atBatID,
+  index,
 }: {
   sessionStatus: SessionStatus;
   token: OwnedToken;
+  atBatID: string;
+  index: number;
 }) => {
   const [isCommitted, setIsCommitted] = useState(false);
   const [isRevealed, setIsRevealed] = useState(sessionStatus.didPitcherReveal);
@@ -31,6 +36,29 @@ const PitcherViewMobile = ({
 
   const toast = useMoonToast();
   const queryClient = useQueryClient();
+
+  const pitch = useMutation(
+    async ({
+      commit,
+    }: {
+      commit: { nonce: string; vertical: number; horizontal: number; actionChoice: number };
+    }) =>
+      pitchTrustedExecutor({
+        atBatID,
+        token,
+        pitch: { ...commit, speed: commit.actionChoice },
+        index,
+      }),
+    {
+      onSuccess: (data) => {
+        setIsCommitted(true);
+        setIsRevealed(true);
+        queryClient.invalidateQueries("atBat");
+        console.log(data);
+      },
+      onError: (error) => console.log(error),
+    },
+  );
 
   const commitPitch = useMutation(
     async ({
@@ -143,7 +171,7 @@ const PitcherViewMobile = ({
       token={token}
       sessionStatus={sessionStatus}
       isPitcher={true}
-      commitMutation={commitPitch}
+      commitMutation={pitch}
       revealMutation={revealPitch}
       isCommitted={isCommitted}
       isRevealed={isRevealed}
