@@ -150,7 +150,7 @@ const pitchToPitchReveal = (pitch: Pitch): PitcherReveal => {
     nonce,
     speed: String(speed),
     horizontal: String(horizontal),
-    vertical: String(horizontal),
+    vertical: String(vertical),
   };
 };
 
@@ -160,7 +160,7 @@ const swingToBatterReveal = (swing: Swing): BatterReveal => {
     nonce,
     kind: String(kind),
     horizontal: String(horizontal),
-    vertical: String(horizontal),
+    vertical: String(vertical),
   };
 };
 
