@@ -70,16 +70,21 @@ interface NFT {
   tokenID: string;
 }
 
+interface responseNFT {
+  erc721_address: string;
+  token_id: string;
+}
+
 interface TrustedExecutionAtBatState {
   aborted: boolean;
   at_bat_id: string;
   balls: number;
   batter_can_act: boolean;
-  batter_nft: NFT;
+  batter_nft: responseNFT;
   current_session_index: number;
   outcome: number;
   pitcher_can_act: boolean;
-  pitcher_nft: NFT;
+  pitcher_nft: responseNFT;
   strikes: number;
   start_timestamp: number;
   join_timestamp: number;
