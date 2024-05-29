@@ -105,7 +105,7 @@ const AtBatView2: React.FC = () => {
           />
           {atBat && showPitchOutcome && atBat.outcome !== 0 && atBat.pitches.length > 0 && (
             <div
-              className={styles.homeButton}
+              className={styles.joinButton}
               onClick={() => {
                 playSound("homeButton");
                 updateContext({ isLaunching: false });
