@@ -25,7 +25,7 @@ import FullcountABIImported from "../../web3/abi/FullcountABI.json";
 import { AbiItem } from "web3-utils";
 import { FULLCOUNT_ASSETS_PATH } from "../../constants";
 import TokenABIImported from "../../web3/abi/BLBABI.json";
-import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
+import { getLocalStorageInviteCodeKey, setAppStorageItem } from "../../utils/localStorage";
 import {
   fetchOwnedBLBTokens,
   joinSessionBLB,
@@ -119,7 +119,7 @@ const OwnedTokens = ({
       onSuccess: async (data: { sessionID: string; sign: string | undefined }, variables) => {
         if (data.sign) {
           const inviteCodeKey = getLocalStorageInviteCodeKey(contractAddress, data.sessionID);
-          setLocalStorageItem(inviteCodeKey, data.sign);
+          setAppStorageItem(inviteCodeKey, data.sign);
         }
         queryClient.setQueryData(["sessions"], (oldData: Session[] | undefined) => {
           const newSession: Session = {

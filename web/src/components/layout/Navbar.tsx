@@ -6,7 +6,7 @@ import AccountMobile from "../icons/AccountMobile";
 import MoreHorizontal from "../icons/MoreHorizontal";
 import useLogout from "../../hooks/useLogout";
 import { FEEDBACK_FORM_URL, FULLCOUNT_ASSETS_PATH } from "../../constants";
-import { setLocalStorageItem } from "../../utils/localStorage";
+import { setAppStorageItem } from "../../utils/localStorage";
 import { useGameContext } from "../../contexts/GameContext";
 import router from "next/router";
 import VolumeOn from "../icons/VolumeOn";
@@ -41,7 +41,7 @@ const Navbar = () => {
   const { joinedNotification, updateContext } = useGameContext();
   const handleNotificationClick = () => {
     playSound("menuItem");
-    setLocalStorageItem("joinedNotification", !joinedNotification);
+    setAppStorageItem("joinedNotification", !joinedNotification);
     updateContext({ joinedNotification: !joinedNotification });
   };
 

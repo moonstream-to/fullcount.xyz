@@ -5,7 +5,7 @@ import QuestionMarkIcon from "../icons/QuestionMarkIcon";
 import BallIconWhite from "../icons/BallIconWhite";
 import BatIconWhite from "../icons/BatIconWhite";
 import LinkIcon from "../icons/LinkIcon";
-import { getLocalStorageInviteCodeKey, getLocalStorageItem } from "../../utils/localStorage";
+import { getLocalStorageInviteCodeKey, getAppStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT } from "../../constants";
 
 const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
@@ -13,7 +13,7 @@ const InviteLinkView = ({ atBat }: { atBat: AtBatStatus }) => {
     GAME_CONTRACT,
     String(atBat.pitches[0].sessionID),
   );
-  const inviteCode = getLocalStorageItem(inviteCodeKey);
+  const inviteCode = getAppStorageItem(inviteCodeKey);
   const inviteCodeParam = inviteCode ? `&invite_code=${inviteCode}` : "";
   const role = atBat.pitcher ? 1 : atBat.batter ? 0 : undefined;
   const roleParam = role !== undefined ? `&role=${role}` : "";

@@ -5,7 +5,7 @@ import useMoonToast from "../../hooks/useMoonToast";
 import useUser from "../../contexts/UserContext";
 import { AtBat, OwnedToken, Token } from "../../types";
 import { startSessionFullcountPlayer } from "../../tokenInterfaces/FullcountPlayerAPI";
-import { getLocalStorageInviteCodeKey, setLocalStorageItem } from "../../utils/localStorage";
+import { getLocalStorageInviteCodeKey, setAppStorageItem } from "../../utils/localStorage";
 import { GAME_CONTRACT, PLAYER_INTERFACE, ZERO_ADDRESS } from "../../constants";
 import { useRouter } from "next/router";
 import { sendReport } from "../../utils/humbug";
@@ -78,7 +78,7 @@ const PlayButtons = ({ token }: { token: OwnedToken }) => {
           const id = data.atBatID ?? data.sessionID;
           if (data.inviteCode && id) {
             const inviteCodeKey = getLocalStorageInviteCodeKey(GAME_CONTRACT, id);
-            setLocalStorageItem(inviteCodeKey, data.inviteCode);
+            setAppStorageItem(inviteCodeKey, data.inviteCode);
           }
         }
         queryClient.setQueryData(

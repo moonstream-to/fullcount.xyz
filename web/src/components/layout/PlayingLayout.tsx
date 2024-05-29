@@ -4,7 +4,7 @@ import { Flex } from "@chakra-ui/react";
 import Navbar from "./Navbar";
 import { FULLCOUNT_ASSETS, FULLCOUNT_ASSETS_PATH } from "../../constants";
 import { useGameContext } from "../../contexts/GameContext";
-import { getLocalStorageItem } from "../../utils/localStorage";
+import { getAppStorageItem } from "../../utils/localStorage";
 
 const sounds = {
   // whoosh: `${FULLCOUNT_ASSETS_PATH}/sounds/whoosh.wav`,
@@ -21,7 +21,7 @@ const sounds = {
 const PlayingLayout = ({ children }: { children: ReactNode }) => {
   const { updateContext } = useGameContext();
   useEffect(() => {
-    const joinedNotification = getLocalStorageItem("joinedNotification");
+    const joinedNotification = getAppStorageItem("joinedNotification");
     updateContext({ joinedNotification: !!joinedNotification });
   }, []);
 
