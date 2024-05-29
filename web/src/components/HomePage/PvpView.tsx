@@ -171,8 +171,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                       handlePlay(openAtBat);
                     }}
                     isLoading={
-                      joinSession.variables?.atBatID === openAtBat.lastSessionId &&
-                      joinSession.isLoading
+                      joinSession.variables?.atBatID === openAtBat.id && joinSession.isLoading
                     }
                     key={idx}
                   />
