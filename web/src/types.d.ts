@@ -81,6 +81,17 @@ interface TrustedExecutionAtBatState {
   pitcher_can_act: boolean;
   pitcher_nft: NFT;
   strikes: number;
+  start_timestamp: number;
+  join_timestamp: number;
+  sessions: null | TrustedExecuionSessionState[];
+}
+
+interface TrustedExecuionSessionState {
+  index: number;
+  outcome: number;
+  timestamp: number;
+  pitch: Pitch;
+  swing: Swing;
 }
 
 interface OpenAtBat {
@@ -112,18 +123,32 @@ interface SessionState {
   phaseStartTimestamp: string;
 }
 
-interface PitcherReveal {
+export interface PitcherReveal {
   nonce: string;
   speed: string;
   vertical: string;
   horizontal: string;
 }
 
-interface BatterReveal {
+export interface BatterReveal {
   nonce: string;
   kind: string;
   vertical: string;
   horizontal: string;
+}
+
+export interface Pitch {
+  nonce: string;
+  speed: number;
+  vertical: number;
+  horizontal: number;
+}
+
+export interface Swing {
+  nonce: string;
+  kind: number;
+  vertical: number;
+  horizontal: number;
 }
 
 export interface SessionStatus {
