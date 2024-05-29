@@ -168,6 +168,7 @@ const BatterViewMobile = ({
 
   return (
     <PlayerView
+      atBatID={atBatID}
       token={token}
       sessionStatus={sessionStatus}
       isPitcher={false}

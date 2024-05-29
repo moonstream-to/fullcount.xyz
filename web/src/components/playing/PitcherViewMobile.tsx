@@ -168,6 +168,7 @@ const PitcherViewMobile = ({
 
   return (
     <PlayerView
+      atBatID={atBatID}
       token={token}
       sessionStatus={sessionStatus}
       isPitcher={true}

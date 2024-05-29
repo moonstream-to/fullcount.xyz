@@ -27,6 +27,7 @@ const PlayerView = ({
   isRevealed,
   token,
   isRevealFailed,
+  atBatID,
 }: {
   sessionStatus: SessionStatus;
   isPitcher: boolean;
@@ -36,6 +37,7 @@ const PlayerView = ({
   isRevealed: boolean;
   token: OwnedToken;
   isRevealFailed: boolean;
+  atBatID: string;
 }) => {
   const [actionChoice, setActionChoice] = useState(0);
   const [gridIndex, setGridIndex] = useState(-1);
@@ -66,7 +68,7 @@ const PlayerView = ({
   };
 
   const handleReveal = async () => {
-    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${atBatID}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getAppStorageItem(localStorageKey, true);
     if (!revealMutation.isLoading) {
       revealMutation.mutate(reveal);
@@ -93,7 +95,7 @@ const PlayerView = ({
       vertical,
       horizontal,
     };
-    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${atBatID}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     setAppStorageItem(localStorageKey, commit, true);
     if (selectedToken?.source === "FullcountPlayerAPI") {
       commitMutation.mutate({ sign: undefined, commit });
@@ -112,7 +114,7 @@ const PlayerView = ({
   };
 
   useEffect(() => {
-    const localStorageKey = `fullcount.xyz-${contractAddress}-${sessionStatus.sessionID}-${selectedToken?.id}`;
+    const localStorageKey = `fullcount.xyz-${contractAddress}-${atBatID}-${sessionStatus.sessionID}-${selectedToken?.id}`;
     const reveal = getAppStorageItem(localStorageKey, true);
     if (reveal) {
       setActionChoice(reveal.actionChoice);
