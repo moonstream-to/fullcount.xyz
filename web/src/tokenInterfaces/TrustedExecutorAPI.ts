@@ -286,3 +286,97 @@ export const fetchOpenTrustedExecutorAtBats = async (
     tokens,
   };
 };
+
+export const swingTrustedExecutor = async ({
+  atBatID,
+  token,
+  swing,
+  index,
+  signature,
+}: {
+  atBatID: string;
+  token: Token;
+  swing: Swing;
+  index: number;
+  signature?: string;
+}) => {
+  const headers = getHeaders();
+
+  let _signature = signature;
+
+  if (!signature) {
+    const postDataSignature = {
+      at_bat_id: atBatID,
+      fullcount_address: GAME_CONTRACT,
+      erc721_address: token.address,
+      token_id: token.id,
+      role: 1,
+    };
+    _signature = await axios
+      .post(`${FULLCOUNT_PLAYER_API}/trusted/signature`, postDataSignature, { headers })
+      .then((res) => res.data.signature);
+    console.log(_signature);
+  }
+  if (!_signature) {
+    throw new Error("Can't retrieve signature");
+  }
+
+  const postData = {
+    at_bat_id: atBatID,
+    fullcount_address: GAME_CONTRACT,
+    nft: { erc721_address: token.address, token_id: token.id },
+    swing,
+    index,
+    signature: _signature,
+  };
+  return await axios
+    .post(`${FULLCOUNT_PLAYER_API}/trusted/swing`, postData, { headers })
+    .then((res) => res.data);
+};
+
+export const pitchTrustedExecutor = async ({
+  atBatID,
+  token,
+  pitch,
+  index,
+  signature,
+}: {
+  atBatID: string;
+  token: Token;
+  pitch: Pitch;
+  index: number;
+  signature?: string;
+}) => {
+  const headers = getHeaders();
+
+  let _signature = signature;
+
+  if (!signature) {
+    const postDataSignature = {
+      at_bat_id: atBatID,
+      fullcount_address: GAME_CONTRACT,
+      erc721_address: token.address,
+      token_id: token.id,
+      role: 0,
+    };
+    _signature = await axios
+      .post(`${FULLCOUNT_PLAYER_API}/trusted/signature`, postDataSignature, { headers })
+      .then((res) => res.data.signature);
+    console.log(_signature);
+  }
+  if (!_signature) {
+    throw new Error("Can't retrieve signature");
+  }
+
+  const postData = {
+    at_bat_id: atBatID,
+    fullcount_address: GAME_CONTRACT,
+    nft: { erc721_address: token.address, token_id: token.id },
+    pitch,
+    index,
+    signature: _signature,
+  };
+  return await axios
+    .post(`${FULLCOUNT_PLAYER_API}/trusted/pitch`, postData, { headers })
+    .then((res) => res.data);
+};
