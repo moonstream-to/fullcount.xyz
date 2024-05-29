@@ -58,7 +58,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
     },
     {
       onSuccess: async (data, variables) => {
-        queryClient.invalidateQueries("owned_tokens");
+        queryClient.refetchQueries("owned_tokens");
         router.push(`atbats/?id=${variables.atBatID}`);
       },
       retryDelay: (attemptIndex) => (attemptIndex < 1 ? 5000 : 10000),

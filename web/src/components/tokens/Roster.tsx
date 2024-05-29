@@ -27,7 +27,7 @@ const Roster = ({ tokens }: { tokens: OwnedToken[] }) => {
               <div className={styles.tokenId}>{tokens[selectedTokenIdx].id}</div>
             </div>
             {selectedMode === 0 ||
-            (!!tokens[selectedTokenIdx].stakedSessionID &&
+            (!!tokens[selectedTokenIdx].stakedAtBatID &&
               tokens[selectedTokenIdx].tokenProgress !== 6) ? (
               <PlayButtons token={tokens[selectedTokenIdx]} />
             ) : (
