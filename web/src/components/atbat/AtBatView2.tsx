@@ -160,12 +160,6 @@ const AtBatView2: React.FC = () => {
             atBat.pitches[currentSessionIdx].progress !== 6 && (
               <div className={styles.playerView}>
                 {isBigView && atBat.pitcher && <TokenCard token={atBat.pitcher} isPitcher={true} />}
-                {selectedToken && isSameToken(selectedToken, atBat.pitcher) && (
-                  <PitcherViewMobile
-                    sessionStatus={atBat.pitches.slice(-1)[0]}
-                    token={selectedToken as OwnedToken}
-                  />
-                )}
                 {selectedToken && isSameToken(selectedToken, atBat.batter) && (
                   <BatterViewMobile2
                     sessionStatus={atBat.pitches.slice(-1)[0]}
