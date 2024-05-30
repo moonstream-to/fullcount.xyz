@@ -71,7 +71,7 @@ export const getChainImage = (identifier: string | number): string | undefined =
 
 export const APPLICATION_ID = "6a97c2fa-e485-4073-9b5f-a533f4718837"; //TODO env
 export const FULLCOUNT_PLAYER_API =
-  process.env.NEXT_PUBLIC_FULLCOUNT_PLAYER_API_URL || "https://player.alpha.fullcount.xyz";
+  process.env.NEXT_PUBLIC_FULLCOUNT_PLAYER_API_URL || "https://player.fullcount.xyz";
 export const FULLCOUNT_API =
   process.env.NEXT_PUBLIC_FULLCOUNT_API_URL || "https://api.fullcount.xyz";
 

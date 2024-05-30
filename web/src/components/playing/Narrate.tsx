@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useQuery } from "react-query";
 import axios from "axios";
 import { Text } from "@chakra-ui/react";
+import { FULLCOUNT_API } from "../../constants";
 
 const Narrate = ({
   sessionID,
@@ -32,7 +33,7 @@ const Narrate = ({
   const narrate = useQuery(
     ["narrate", sessionID],
     () => {
-      const API_URL = "https://api.fullcount.xyz/throws";
+      const API_URL = `${FULLCOUNT_API}/throws`;
       return axios.get(`${API_URL}/${sessionID}/narrate`).then((res) => res.data.narration);
     },
     {

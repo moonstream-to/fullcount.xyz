@@ -4,7 +4,7 @@ import { AtBat } from "../../types";
 import { useGameContext } from "../../contexts/GameContext";
 import TeamsView from "./TeamsView";
 import { useQuery } from "react-query";
-import { GAME_CONTRACT } from "../../constants";
+import { FULLCOUNT_API, GAME_CONTRACT } from "../../constants";
 import {
   CAMPAIGN_BOTS_ADDRESS,
   getAllBatters,
@@ -31,12 +31,12 @@ const CampaignView = ({ atBats }: { atBats: AtBat[] }) => {
       const playerTokenId = selectedToken.id;
       const playerAddress = selectedToken.address;
 
-      let batterUrl = `https://api.fullcount.xyz/batter_campaign_results?fullcount_address=${fullcountAddress}&bots_address=${botsAddress}&batter_address=${playerAddress}&batter_token_id=${playerTokenId}`;
+      let batterUrl = `${FULLCOUNT_API}/batter_campaign_results?fullcount_address=${fullcountAddress}&bots_address=${botsAddress}&batter_address=${playerAddress}&batter_token_id=${playerTokenId}`;
       const pitcherTokenIds = getAllPitchersIds();
       pitcherTokenIds.forEach((id) => {
         batterUrl += `&pitcher_token_ids=${id}`;
       });
-      let pitcherUrl = `https://api.fullcount.xyz/pitcher_campaign_results?fullcount_address=${fullcountAddress}&bots_address=${botsAddress}&pitcher_address=${playerAddress}&pitcher_token_id=${playerTokenId}`;
+      let pitcherUrl = `${FULLCOUNT_API}/pitcher_campaign_results?fullcount_address=${fullcountAddress}&bots_address=${botsAddress}&pitcher_address=${playerAddress}&pitcher_token_id=${playerTokenId}`;
       const batterTokenIds = getAllBattersIds();
       batterTokenIds.forEach((id) => {
         pitcherUrl += `&batter_token_ids=${id}`;

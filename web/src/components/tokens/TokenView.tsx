@@ -6,6 +6,7 @@ import MainStat from "../playing/MainStat";
 import MainStatMobile from "../playing/MainStatMobile";
 import HeatMap from "../playing/HeatMap";
 import { PitchLocation, SwingLocation, Token } from "../../types";
+import { FULLCOUNT_API } from "../../constants";
 
 const TokenView = ({
   token,
@@ -22,7 +23,7 @@ const TokenView = ({
       if (!token) {
         return;
       }
-      const API_URL = "https://api.fullcount.xyz/stats";
+      const API_URL = `${FULLCOUNT_API}/stats`;
       const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
       return stat.data;
     },
@@ -37,7 +38,7 @@ const TokenView = ({
       if (!token) {
         return;
       }
-      const API_URL = "https://api.fullcount.xyz/stats";
+      const API_URL = `${FULLCOUNT_API}/stats`;
       const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
       return stat.data;
     },
@@ -52,7 +53,7 @@ const TokenView = ({
       if (!token) {
         return;
       }
-      const API_URL = "https://api.fullcount.xyz/pitch_distribution";
+      const API_URL = `${FULLCOUNT_API}/pitch_distribution`;
       const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
       const counts = new Array(25).fill(0);
       res.data.pitch_distribution.forEach(
@@ -73,7 +74,7 @@ const TokenView = ({
       if (!token) {
         return;
       }
-      const API_URL = "https://api.fullcount.xyz/swing_distribution";
+      const API_URL = `${FULLCOUNT_API}/swing_distribution`;
       const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
       const counts = new Array(25).fill(0);
       let takes = 0;

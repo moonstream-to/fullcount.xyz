@@ -1,12 +1,13 @@
 import { PitchLocation, SwingLocation, Token } from "../types";
 import axios from "axios";
+import { FULLCOUNT_API } from "../constants";
 
 export const fetchSwingDistribution = async (token: Token | undefined) => {
   if (!token) {
     return;
   }
 
-  const API_URL = "https://api.fullcount.xyz/swing_distribution";
+  const API_URL = `${FULLCOUNT_API}/swing_distribution`;
   const counts = new Array(25).fill(0);
   try {
     const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
@@ -34,7 +35,7 @@ export const fetchPitchDistribution = async (token: Token | undefined) => {
   if (!token) {
     return;
   }
-  const API_URL = "https://api.fullcount.xyz/pitch_distribution";
+  const API_URL = `${FULLCOUNT_API}/pitch_distribution`;
   const counts = new Array(25).fill(0);
   try {
     const res = await axios.get(`${API_URL}/${token.address}/${token.id}`);
@@ -63,7 +64,7 @@ export const fetchBatterStats = async (token: Token) => {
   if (!token) {
     return;
   }
-  const API_URL = "https://api.fullcount.xyz/stats";
+  const API_URL = `${FULLCOUNT_API}/stats`;
   try {
     const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
     return stat.data;
@@ -76,7 +77,7 @@ export const fetchPitcherStats = async (token: Token) => {
   if (!token) {
     return;
   }
-  const API_URL = "https://api.fullcount.xyz/stats";
+  const API_URL = `${FULLCOUNT_API}/stats`;
   try {
     const stat = await axios.get(`${API_URL}/${token.address}/${token.id}`);
     return stat.data;
