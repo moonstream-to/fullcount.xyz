@@ -381,20 +381,6 @@ const PlayView = ({ selectedToken }: { selectedToken: Token }) => {
                   sessionStatus.data?.progress === 5
                 }
               />
-              {isPitcher(selectedToken) && sessionStatus.data && (
-                <>
-                  <PitcherViewMobile
-                    sessionStatus={sessionStatus.data}
-                    token={selectedToken as OwnedToken}
-                  />
-                </>
-              )}
-              {!isPitcher(selectedToken) && sessionStatus.data && (
-                <BatterViewMobile
-                  sessionStatus={sessionStatus.data}
-                  token={selectedToken as OwnedToken} //TODO something. selectedToken can be Token (when view), but for actions OwnedToken needed
-                />
-              )}
             </Flex>
           )}
         {sessionStatus.data &&

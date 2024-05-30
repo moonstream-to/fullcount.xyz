@@ -24,7 +24,7 @@ export const useJoinSession = () => {
     },
     {
       onSuccess: async (data, variables) => {
-        let atBatId: number | undefined = undefined;
+        let atBatId: string | number | undefined = undefined;
         queryClient.setQueryData(
           ["atBats"],
           (oldData: { atBats: AtBat[]; tokens: Token[] } | undefined) => {
