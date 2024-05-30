@@ -10,16 +10,15 @@ import { useGameContext } from "../contexts/GameContext";
 import router from "next/router";
 import { sendReport } from "../utils/humbug";
 import { useSound } from "../hooks/useSound";
-const buttons = ["PVP", "CAMPAIGN", "PRACTICE"];
+// const buttons = ["PVP", "CAMPAIGN", "PRACTICE"];
+const buttons = ["LOG IN", "SIGN UP"];
 
-const LaunchForm = ({ onClose }: { onClose: () => void }) => {
-  const { updateContext } = useGameContext();
+const LaunchForm = ({ onClose }: { onClose: (isLogging: boolean) => void }) => {
   const playSound = useSound();
 
-  const handleClick = (selectedMode: number) => {
+  const handleClick = (buttonIdx: number) => {
     playSound("launchButton");
-    updateContext({ selectedMode });
-    onClose();
+    onClose(buttonIdx === 0);
   };
   const handleDemoClick = () => {
     playSound("launchButton");

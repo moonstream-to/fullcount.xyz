@@ -78,7 +78,12 @@ const TitleScreen = () => {
                 </div>
 
                 {isLaunching && !inviteFrom ? (
-                  <LaunchForm onClose={() => updateContext({ isLaunching: false })} />
+                  <LaunchForm
+                    onClose={(_isLogging) => {
+                      updateContext({ isLaunching: false });
+                      setIsLogging(_isLogging);
+                    }}
+                  />
                 ) : (
                   <>
                     {!isLogging ? (
