@@ -28,12 +28,10 @@ const ExitDialog = ({
   const { user } = useUser();
   const playSound = useSound();
 
-  const updateTokenInCache = (token: Token, sessionId: number) => {
+  const updateTokenInCache = (token: Token, atBatID: string | undefined | null) => {
     const currentTokens = queryClient.getQueryData<OwnedToken[]>(["owned_tokens", user]);
-    const currentAtBats = queryClient.getQueryData<{ tokens: Token[]; atBats: AtBat[] }>([
-      "atBats",
-    ]);
     if (currentTokens) {
+      const emptyToken = { nftAddress: "", tokenID: "" };
       const updatedTokens = currentTokens.map((t) => {
         if (t.id === token.id) {
           return {
@@ -41,25 +39,20 @@ const ExitDialog = ({
             isStaked: false,
             tokenProgress: 0,
             stakedSession: 0,
+            stakedAtBatID: "",
+            activeSession: { batterNFT: emptyToken, pitcherNFT: emptyToken },
           };
         }
         return t;
       });
       queryClient.setQueryData(["owned_tokens", user], updatedTokens);
     }
-    if (currentAtBats) {
-      const updatedAtBats = currentAtBats.atBats.map((a) => {
-        if (a.lastSessionId === sessionId) {
-          return {
-            ...a,
-            progress: 1,
-            tokenProgress: 0,
-            stakedSession: 0,
-          };
-        }
-        return a;
-      });
-      queryClient.setQueryData(["atBats"], updatedAtBats);
+    const openAtBats = queryClient.getQueryData<{ tokens: Token[]; atBats: AtBat[] }>([
+      "openAtBats",
+    ]);
+    if (openAtBats && atBatID) {
+      const updatedAtBats = openAtBats.atBats.filter((atBat) => atBat.id !== atBatID);
+      queryClient.setQueryData(["openAtBats"], updatedAtBats);
     }
   };
 
@@ -94,7 +87,7 @@ const ExitDialog = ({
         toast(`Can't close At-Bat - ${error.message}`, "error");
       },
       onSuccess: (_, variables) => {
-        // updateTokenInCache(variables.token, variables.sessionId); //TODO update
+        updateTokenInCache(variables.token, variables.atBatID);
         router.push("/");
       },
     },
