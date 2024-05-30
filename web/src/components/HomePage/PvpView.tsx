@@ -18,10 +18,14 @@ import {
   fetchOpenTrustedExecutorAtBats,
   joinAtBatTrustedExecutor,
 } from "../../tokenInterfaces/TrustedExecutorAPI";
+import React, { useState } from "react";
+import SelectTokenView from "../tokens/SelectTokenView";
 const views = ["Open", "My games", "Other"];
 
 const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) => {
-  const { selectedToken, tokensCache, updateContext, selectedPVPView } = useGameContext();
+  const { selectedToken, tokensCache, updateContext, selectedPVPView, atBatToPlay } =
+    useGameContext();
+  const [playRole, setPlayRole] = useState(0);
   const toast = useMoonToast();
   const { user } = useUser();
   const playSound = useSound();
@@ -77,16 +81,33 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
   );
   const handlePlay = (atBat: AtBat) => {
     if (selectedToken && atBat.id) {
-      joinSession.mutate({
-        atBatID: String(atBat.id),
-        token: selectedToken,
-        inviteCode: "",
-      });
+      if (!selectedToken.isStaked) {
+        joinSession.mutate({
+          atBatID: String(atBat.id),
+          token: selectedToken,
+          inviteCode: "",
+        });
+      } else {
+        setPlayRole(atBat.pitcher ? 1 : 0);
+        updateContext({ atBatToPlay: { ...atBat } });
+      }
     }
   };
 
   return (
     <div className={styles.container}>
+      {atBatToPlay && (
+        <SelectTokenView
+          playRole={playRole}
+          tokens={tokens}
+          onClose={(isSuccess: boolean) => {
+            if (isSuccess && atBatToPlay) {
+              handlePlay({ ...atBatToPlay });
+            }
+            updateContext({ atBatToPlay: undefined });
+          }}
+        />
+      )}
       <div className={styles.viewSelector}>
         {views.map((v, idx) => (
           <div
@@ -176,7 +197,7 @@ const PvpView = ({ atBats, tokens }: { atBats: AtBat[]; tokens: OwnedToken[] }) 
                     key={idx}
                   />
                 ) : (
-                  <div style={{ width: "130px", height: "225.5px" }} />
+                  <div key={idx} style={{ width: "130px", height: "225.5px" }} />
                 );
               })}
           </div>
