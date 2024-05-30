@@ -124,7 +124,11 @@ const getPitch = (state: TrustedExecutionAtBatState, idx: number): SessionStatus
         vertical: "0",
         horizontal: "0",
       },
-      phaseStartTimestamp: String(state.join_timestamp),
+      phaseStartTimestamp: String(
+        state.sessions && state.sessions[idx - 2]
+          ? state.sessions[idx - 2].timestamp
+          : state.join_timestamp,
+      ),
     };
   }
   if (!state.sessions) {
@@ -140,7 +144,11 @@ const getPitch = (state: TrustedExecutionAtBatState, idx: number): SessionStatus
     didBatterReveal: true,
     pitcherReveal: pitchToPitchReveal(state.sessions[idx - 1].pitch),
     batterReveal: swingToBatterReveal(state.sessions[idx - 1].swing),
-    phaseStartTimestamp: String(state.sessions[idx - 1].timestamp),
+    phaseStartTimestamp: String(
+      state.sessions && state.sessions[idx - 2]
+        ? state.sessions[idx - 2].timestamp
+        : state.join_timestamp,
+    ),
   };
 };
 
@@ -304,7 +312,7 @@ export const swingTrustedExecutor = async ({
 
   let _signature = signature;
 
-  if (!signature) {
+  if (!_signature) {
     const postDataSignature = {
       at_bat_id: atBatID,
       fullcount_address: GAME_CONTRACT,
@@ -315,7 +323,6 @@ export const swingTrustedExecutor = async ({
     _signature = await axios
       .post(`${FULLCOUNT_PLAYER_API}/trusted/signature`, postDataSignature, { headers })
       .then((res) => res.data.signature);
-    console.log(_signature);
   }
   if (!_signature) {
     throw new Error("Can't retrieve signature");
