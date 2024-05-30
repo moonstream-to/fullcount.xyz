@@ -1,0 +1,106 @@
+.background {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+
+
+.container {
+    position: absolute;
+    top: 50vh;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    flex-direction: column;
+    display: flex;
+    height: 603px;
+    min-width: 322px;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    background: #FCECD9;
+    z-index: 3;
+}
+
+
+
+.headerContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+}
+
+.header {
+    color: #328449;
+    text-align: center;
+    font-family: Bangers, cursive;
+    font-size: 30px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.prompt {
+    color: #262019;
+    text-align: center;
+    font-family: Pangolin, cursive;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.error {
+    color: #CD7676;
+    text-align: center;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    flex: 1 0 0;
+    max-height: 310px;
+}
+
+.title {
+    color: #262019;
+    font-family: Bangers, cursive;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}
+
+.cards {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    overflow-y: auto;
+    max-height: calc(100vh - 221px);
+    padding-bottom: 15px;
+}
+
+@media (min-width: 362px) and (min-height: 643px) {
+    .background {
+        background-image: url('https://static.fullcount.xyz/web/landing/Bl-banner-background-tinted.jpeg');
+    }
+    .container {
+        border: 1px solid black;
+    }
+}
