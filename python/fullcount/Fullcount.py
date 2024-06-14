@@ -225,15 +225,20 @@ class Fullcount:
             arg1, arg2, block_identifier=block_number
         )
 
+    def trusted_executors(
+        self,
+        arg1: ChecksumAddress,
+        arg2: ChecksumAddress,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.TrustedExecutors.call(
+            arg1, arg2, block_identifier=block_number
+        )
+
     def abort_session(self, session_id: int, transaction_config) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.abortSession(session_id, transaction_config)
-
-    def at_bat_hash(
-        self, at_bat_id: int, block_number: Optional[Union[str, int]] = "latest"
-    ) -> Any:
-        self.assert_contract_is_instantiated()
-        return self.contract.atBatHash.call(at_bat_id, block_identifier=block_number)
 
     def commit_pitch(
         self, session_id: int, signature: bytes, transaction_config
@@ -270,6 +275,17 @@ class Fullcount:
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.getSession.call(session_id, block_identifier=block_number)
+
+    def is_executor_for_player(
+        self,
+        executor: ChecksumAddress,
+        player: ChecksumAddress,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.isExecutorForPlayer.call(
+            executor, player, block_identifier=block_number
+        )
 
     def join_session(
         self,
@@ -372,6 +388,12 @@ class Fullcount:
             session_id, block_identifier=block_number
         )
 
+    def set_trusted_executor(
+        self, executor: ChecksumAddress, approved: bool, transaction_config
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.setTrustedExecutor(executor, approved, transaction_config)
+
     def start_at_bat(
         self,
         nft_address: ChecksumAddress,
@@ -398,6 +420,25 @@ class Fullcount:
             nft_address, token_id, role, require_signature, transaction_config
         )
 
+    def submit_trusted_at_bat(
+        self,
+        pitcher_nft: tuple,
+        batter_nft: tuple,
+        pitches: List,
+        swings: List,
+        proposed_outcome: int,
+        transaction_config,
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.submitTrustedAtBat(
+            pitcher_nft,
+            batter_nft,
+            pitches,
+            swings,
+            proposed_outcome,
+            transaction_config,
+        )
+
     def swing_hash(
         self,
         nonce: int,
@@ -411,11 +452,43 @@ class Fullcount:
             nonce, kind, vertical, horizontal, block_identifier=block_number
         )
 
+    def trusted_at_bat_hash(
+        self,
+        at_bat_id: str,
+        nft_address: ChecksumAddress,
+        token_id: int,
+        role: int,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.trustedAtBatHash.call(
+            at_bat_id, nft_address, token_id, role, block_identifier=block_number
+        )
+
     def unstake_nft(
         self, nft_address: ChecksumAddress, token_id: int, transaction_config
     ) -> Any:
         self.assert_contract_is_instantiated()
         return self.contract.unstakeNFT(nft_address, token_id, transaction_config)
+
+    def verify_trusted_at_bat_signature(
+        self,
+        at_bat_id: str,
+        nft_address: ChecksumAddress,
+        token_id: int,
+        role: int,
+        signature: bytes,
+        block_number: Optional[Union[str, int]] = "latest",
+    ) -> Any:
+        self.assert_contract_is_instantiated()
+        return self.contract.verifyTrustedAtBatSignature.call(
+            at_bat_id,
+            nft_address,
+            token_id,
+            role,
+            signature,
+            block_identifier=block_number,
+        )
 
 
 def get_transaction_config(args: argparse.Namespace) -> Dict[str, Any]:
@@ -634,6 +707,15 @@ def handle_staked_session(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_trusted_executors(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.trusted_executors(
+        arg1=args.arg1, arg2=args.arg2, block_number=args.block_number
+    )
+    print(result)
+
+
 def handle_abort_session(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -644,15 +726,6 @@ def handle_abort_session(args: argparse.Namespace) -> None:
     print(result)
     if args.verbose:
         print(result.info())
-
-
-def handle_at_bat_hash(args: argparse.Namespace) -> None:
-    network.connect(args.network)
-    contract = Fullcount(args.address)
-    result = contract.at_bat_hash(
-        at_bat_id=args.at_bat_id, block_number=args.block_number
-    )
-    print(result)
 
 
 def handle_commit_pitch(args: argparse.Namespace) -> None:
@@ -713,6 +786,15 @@ def handle_get_session(args: argparse.Namespace) -> None:
     contract = Fullcount(args.address)
     result = contract.get_session(
         session_id=args.session_id, block_number=args.block_number
+    )
+    print(result)
+
+
+def handle_is_executor_for_player(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.is_executor_for_player(
+        executor=args.executor, player=args.player, block_number=args.block_number
     )
     print(result)
 
@@ -831,6 +913,20 @@ def handle_session_progress(args: argparse.Namespace) -> None:
     print(result)
 
 
+def handle_set_trusted_executor(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.set_trusted_executor(
+        executor=args.executor,
+        approved=args.approved,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def handle_start_at_bat(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -863,6 +959,23 @@ def handle_start_session(args: argparse.Namespace) -> None:
         print(result.info())
 
 
+def handle_submit_trusted_at_bat(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    transaction_config = get_transaction_config(args)
+    result = contract.submit_trusted_at_bat(
+        pitcher_nft=args.pitcher_nft,
+        batter_nft=args.batter_nft,
+        pitches=args.pitches,
+        swings=args.swings,
+        proposed_outcome=args.proposed_outcome,
+        transaction_config=transaction_config,
+    )
+    print(result)
+    if args.verbose:
+        print(result.info())
+
+
 def handle_swing_hash(args: argparse.Namespace) -> None:
     network.connect(args.network)
     contract = Fullcount(args.address)
@@ -871,6 +984,19 @@ def handle_swing_hash(args: argparse.Namespace) -> None:
         kind=args.kind,
         vertical=args.vertical,
         horizontal=args.horizontal,
+        block_number=args.block_number,
+    )
+    print(result)
+
+
+def handle_trusted_at_bat_hash(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.trusted_at_bat_hash(
+        at_bat_id=args.at_bat_id,
+        nft_address=args.nft_address,
+        token_id=args.token_id,
+        role=args.role,
         block_number=args.block_number,
     )
     print(result)
@@ -888,6 +1014,20 @@ def handle_unstake_nft(args: argparse.Namespace) -> None:
     print(result)
     if args.verbose:
         print(result.info())
+
+
+def handle_verify_trusted_at_bat_signature(args: argparse.Namespace) -> None:
+    network.connect(args.network)
+    contract = Fullcount(args.address)
+    result = contract.verify_trusted_at_bat_signature(
+        at_bat_id=args.at_bat_id,
+        nft_address=args.nft_address,
+        token_id=args.token_id,
+        role=args.role,
+        signature=args.signature,
+        block_number=args.block_number,
+    )
+    print(result)
 
 
 def generate_cli() -> argparse.ArgumentParser:
@@ -1016,19 +1156,18 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     staked_session_parser.set_defaults(func=handle_staked_session)
 
+    trusted_executors_parser = subcommands.add_parser("trusted-executors")
+    add_default_arguments(trusted_executors_parser, False)
+    trusted_executors_parser.add_argument("--arg1", required=True, help="Type: address")
+    trusted_executors_parser.add_argument("--arg2", required=True, help="Type: address")
+    trusted_executors_parser.set_defaults(func=handle_trusted_executors)
+
     abort_session_parser = subcommands.add_parser("abort-session")
     add_default_arguments(abort_session_parser, True)
     abort_session_parser.add_argument(
         "--session-id", required=True, help="Type: uint256", type=int
     )
     abort_session_parser.set_defaults(func=handle_abort_session)
-
-    at_bat_hash_parser = subcommands.add_parser("at-bat-hash")
-    add_default_arguments(at_bat_hash_parser, False)
-    at_bat_hash_parser.add_argument(
-        "--at-bat-id", required=True, help="Type: uint256", type=int
-    )
-    at_bat_hash_parser.set_defaults(func=handle_at_bat_hash)
 
     commit_pitch_parser = subcommands.add_parser("commit-pitch")
     add_default_arguments(commit_pitch_parser, True)
@@ -1078,6 +1217,16 @@ def generate_cli() -> argparse.ArgumentParser:
         "--session-id", required=True, help="Type: uint256", type=int
     )
     get_session_parser.set_defaults(func=handle_get_session)
+
+    is_executor_for_player_parser = subcommands.add_parser("is-executor-for-player")
+    add_default_arguments(is_executor_for_player_parser, False)
+    is_executor_for_player_parser.add_argument(
+        "--executor", required=True, help="Type: address"
+    )
+    is_executor_for_player_parser.add_argument(
+        "--player", required=True, help="Type: address"
+    )
+    is_executor_for_player_parser.set_defaults(func=handle_is_executor_for_player)
 
     join_session_parser = subcommands.add_parser("join-session")
     add_default_arguments(join_session_parser, True)
@@ -1199,6 +1348,16 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     session_progress_parser.set_defaults(func=handle_session_progress)
 
+    set_trusted_executor_parser = subcommands.add_parser("set-trusted-executor")
+    add_default_arguments(set_trusted_executor_parser, True)
+    set_trusted_executor_parser.add_argument(
+        "--executor", required=True, help="Type: address"
+    )
+    set_trusted_executor_parser.add_argument(
+        "--approved", required=True, help="Type: bool", type=boolean_argument_type
+    )
+    set_trusted_executor_parser.set_defaults(func=handle_set_trusted_executor)
+
     start_at_bat_parser = subcommands.add_parser("start-at-bat")
     add_default_arguments(start_at_bat_parser, True)
     start_at_bat_parser.add_argument(
@@ -1237,6 +1396,25 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     start_session_parser.set_defaults(func=handle_start_session)
 
+    submit_trusted_at_bat_parser = subcommands.add_parser("submit-trusted-at-bat")
+    add_default_arguments(submit_trusted_at_bat_parser, True)
+    submit_trusted_at_bat_parser.add_argument(
+        "--pitcher-nft", required=True, help="Type: tuple", type=eval
+    )
+    submit_trusted_at_bat_parser.add_argument(
+        "--batter-nft", required=True, help="Type: tuple", type=eval
+    )
+    submit_trusted_at_bat_parser.add_argument(
+        "--pitches", required=True, help="Type: tuple[]", nargs="+"
+    )
+    submit_trusted_at_bat_parser.add_argument(
+        "--swings", required=True, help="Type: tuple[]", nargs="+"
+    )
+    submit_trusted_at_bat_parser.add_argument(
+        "--proposed-outcome", required=True, help="Type: uint8", type=int
+    )
+    submit_trusted_at_bat_parser.set_defaults(func=handle_submit_trusted_at_bat)
+
     swing_hash_parser = subcommands.add_parser("swing-hash")
     add_default_arguments(swing_hash_parser, False)
     swing_hash_parser.add_argument(
@@ -1253,6 +1431,22 @@ def generate_cli() -> argparse.ArgumentParser:
     )
     swing_hash_parser.set_defaults(func=handle_swing_hash)
 
+    trusted_at_bat_hash_parser = subcommands.add_parser("trusted-at-bat-hash")
+    add_default_arguments(trusted_at_bat_hash_parser, False)
+    trusted_at_bat_hash_parser.add_argument(
+        "--at-bat-id", required=True, help="Type: string", type=str
+    )
+    trusted_at_bat_hash_parser.add_argument(
+        "--nft-address", required=True, help="Type: address"
+    )
+    trusted_at_bat_hash_parser.add_argument(
+        "--token-id", required=True, help="Type: uint256", type=int
+    )
+    trusted_at_bat_hash_parser.add_argument(
+        "--role", required=True, help="Type: uint8", type=int
+    )
+    trusted_at_bat_hash_parser.set_defaults(func=handle_trusted_at_bat_hash)
+
     unstake_nft_parser = subcommands.add_parser("unstake-nft")
     add_default_arguments(unstake_nft_parser, True)
     unstake_nft_parser.add_argument(
@@ -1262,6 +1456,29 @@ def generate_cli() -> argparse.ArgumentParser:
         "--token-id", required=True, help="Type: uint256", type=int
     )
     unstake_nft_parser.set_defaults(func=handle_unstake_nft)
+
+    verify_trusted_at_bat_signature_parser = subcommands.add_parser(
+        "verify-trusted-at-bat-signature"
+    )
+    add_default_arguments(verify_trusted_at_bat_signature_parser, False)
+    verify_trusted_at_bat_signature_parser.add_argument(
+        "--at-bat-id", required=True, help="Type: string", type=str
+    )
+    verify_trusted_at_bat_signature_parser.add_argument(
+        "--nft-address", required=True, help="Type: address"
+    )
+    verify_trusted_at_bat_signature_parser.add_argument(
+        "--token-id", required=True, help="Type: uint256", type=int
+    )
+    verify_trusted_at_bat_signature_parser.add_argument(
+        "--role", required=True, help="Type: uint8", type=int
+    )
+    verify_trusted_at_bat_signature_parser.add_argument(
+        "--signature", required=True, help="Type: bytes", type=bytes_argument_type
+    )
+    verify_trusted_at_bat_signature_parser.set_defaults(
+        func=handle_verify_trusted_at_bat_signature
+    )
 
     return parser
 

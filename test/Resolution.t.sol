@@ -1280,4 +1280,46 @@ contract ResolutionTest is FullcountTestBase {
 
         assertEq(game.sessionProgress(SessionID), 5);
     }
+
+    function test_trusted_exec_example() public {
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Pitch memory pitch = Pitch(125, PitchSpeed.Slow, VerticalLocation.Middle, HorizontalLocation.OutsideStrike);
+
+        _commitPitch(SessionID, player1, player1PrivateKey, pitch);
+
+        assertEq(game.sessionProgress(SessionID), 3);
+
+        Swing memory swing = Swing(126, SwingType.Power, VerticalLocation.Middle, HorizontalLocation.OutsideStrike);
+
+        _commitSwing(SessionID, player2, player2PrivateKey, swing);
+
+        assertEq(game.sessionProgress(SessionID), 4);
+
+        // Pitcher reveals first.
+        _revealPitch(SessionID, player1, pitch);
+
+        vm.startPrank(player2);
+
+        vm.expectEmit(address(game));
+        emit SessionResolved(
+            SessionID, Outcome.Triple, PitcherNFTAddress, PitcherTokenID, BatterNFTAddress, BatterTokenID
+        );
+
+        game.revealSwing(SessionID, swing.nonce, swing.kind, swing.vertical, swing.horizontal);
+
+        vm.stopPrank();
+
+        Session memory session = game.getSession(SessionID);
+        assertTrue(session.didBatterReveal);
+        assertEq(uint256(session.outcome), uint256(Outcome.Triple));
+
+        Swing memory sessionSwing = session.batterReveal;
+        assertEq(sessionSwing.nonce, swing.nonce);
+        assertEq(uint256(sessionSwing.kind), uint256(swing.kind));
+        assertEq(uint256(sessionSwing.vertical), uint256(swing.vertical));
+        assertEq(uint256(sessionSwing.horizontal), uint256(swing.horizontal));
+
+        assertEq(game.sessionProgress(SessionID), 5);
+    }
 }
